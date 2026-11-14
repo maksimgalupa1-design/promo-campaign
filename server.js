@@ -20,11 +20,11 @@ const MAX_PAGES = 15;               // 20 videos per page
 
 if (!KEY || !SECRET || !ADMIN_TOKEN) { console.error("Set TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET and ADMIN_TOKEN"); process.exit(1); }
 
-/* tiny JSON file store: { users: { open_id: {...} }, sessions: { sid: open_id } } */
-let db = { users: {}, sessions: {} };
-try { db = JSON.parse(fs.readFileSync(DB_FILE, "utf8")); } catch (e) {}
+/* tiny JSON file store: { users: { uid: { id, accounts: [ {open_id, tokens, profile, videos, price, ...} ] } }, sessions: { sid: uid }, byOpen: { open_id: uid } } */
+let db = { users: {}, sessions: {}, byOpen: {} };
+try { db = Object.assign(db, JSON.parse(fs.readFileSync(DB_FILE, "utf8"))); } catch (e) {}
 function saveDb() { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), { mode: 0o600 }); }
-const pending = new Map();          // oauth state -> expiry
+const pending = new Map();          // oauth state -> {exp, handle, uid}
 
 function send(res, code, body, headers) {
   res.writeHead(code, Object.assign({ "Content-Type": "application/json; charset=utf-8" }, headers || {}));
@@ -40,7 +40,8 @@ function cookie(req, name) {
   const m = (req.headers.cookie || "").match(new RegExp("(?:^|; )" + name + "=([^;]+)"));
   return m ? m[1] : null;
 }
-function sessionUser(req) { const sid = cookie(req, "sid"); return sid && db.sessions[sid] ? db.users[db.sessions[sid]] : null; }
+function sessionUser(req) { const sid = cookie(req, "sid"); return sid && db.sessions[sid] ? db.users[db.sessions[sid]] || null : null; }
+function findAcc(user, id) { return (user.accounts || []).find(a => a.open_id === id) || null; }
 
 /* ---- TikTok API ---- */
 async function tokenRequest(params) {
@@ -90,12 +91,13 @@ async function refreshAnalysis(user) {
   user.analysisAt = Date.now();
   saveDb();
 }
-function view(user) {
-  const A = PC.analyze(user.videos || [], Date.now());
-  return { handle: "@" + (user.profile && user.profile.username || ""), name: user.profile && user.profile.display_name,
-    analysis: A, price: user.price || null, evaluation: PC.evaluate(A, user.price), adminStatus: user.adminStatus || "new", recommended: PC.recommend(A), analysisAt: user.analysisAt,
-    videos: (user.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, url: v.url })) };
+function accView(acc) {
+  const A = PC.analyze(acc.videos || [], Date.now());
+  return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
+    analysis: A, price: acc.price || null, evaluation: PC.evaluate(A, acc.price), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
+    videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, url: v.url })) };
 }
+function view(user) { return { accounts: (user.accounts || []).map(accView) }; }
 
 /* ---- routes ---- */
 const server = http.createServer(async (req, res) => {
@@ -103,7 +105,8 @@ const server = http.createServer(async (req, res) => {
   try {
     if (url.pathname === "/auth/tiktok") {                       // "Open in TikTok" button points here
       const state = crypto.randomBytes(16).toString("hex");
-      pending.set(state, { exp: Date.now() + 10 * 60000, handle: (url.searchParams.get("u") || "").toLowerCase() });
+      const cu = sessionUser(req);
+      pending.set(state, { exp: Date.now() + 10 * 60000, handle: (url.searchParams.get("u") || "").toLowerCase().replace(/^@/, ""), uid: cu ? cu.id : null });
       const q = new URLSearchParams({ client_key: KEY, scope: SCOPES, response_type: "code", redirect_uri: REDIRECT, state });
       res.writeHead(302, { Location: "https://www.tiktok.com/v2/auth/authorize/?" + q }); return res.end();
     }
@@ -112,16 +115,26 @@ const server = http.createServer(async (req, res) => {
       if (url.searchParams.get("error")) { res.writeHead(302, { Location: "/#signup?denied=1" }); return res.end(); }   // user pressed Cancel in TikTok
       if (!code || !pending.has(state) || pending.get(state).exp < Date.now()) return send(res, 400, { error: "bad state" });
       const want = pending.get(state).handle;     // account link the creator pasted
+      const uid0 = pending.get(state).uid;        // signed-in profile that is adding an account (if any)
       pending.delete(state);
       const tok = await tokenRequest({ code, grant_type: "authorization_code", redirect_uri: REDIRECT });
-      const user = db.users[tok.open_id] || (db.users[tok.open_id] = { open_id: tok.open_id, createdAt: Date.now() });
-      Object.assign(user, { access_token: tok.access_token, refresh_token: tok.refresh_token, expires_at: Date.now() + tok.expires_in * 1000, consent: true });
-      await refreshAnalysis(user);
-      if (want && (user.profile.username || "").toLowerCase() !== want) {   // confirmed a different account than the pasted link
-        user.consent = false; saveDb(); res.writeHead(302, { Location: "/#signup?mismatch=1" }); return res.end();
+      const owner = db.byOpen[tok.open_id];
+      if (owner && uid0 && owner !== uid0) { res.writeHead(302, { Location: "/#signup?taken=1" }); return res.end(); }   // already linked to another profile
+      const uid = uid0 || owner || crypto.randomBytes(12).toString("hex");
+      const user = db.users[uid] || (db.users[uid] = { id: uid, createdAt: Date.now(), accounts: [] });
+      let acc = findAcc(user, tok.open_id);
+      if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now() }; user.accounts.push(acc); }
+      Object.assign(acc, { access_token: tok.access_token, refresh_token: tok.refresh_token, expires_at: Date.now() + tok.expires_in * 1000 });
+      await refreshAnalysis(acc);
+      if (want && (acc.profile.username || "").toLowerCase() !== want) {   // confirmed a different account than the pasted link
+        user.accounts = user.accounts.filter(x => x !== acc); saveDb();
+        res.writeHead(302, { Location: "/#signup?mismatch=1" }); return res.end();
       }
-      const sid = crypto.randomBytes(24).toString("hex"); db.sessions[sid] = tok.open_id; saveDb();
-      res.writeHead(302, { Location: "/#analysis", "Set-Cookie": "sid=" + sid + "; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000" });
+      db.byOpen[tok.open_id] = uid;
+      const headers = { Location: "/#analysis" };
+      if (!uid0) { const sid = crypto.randomBytes(24).toString("hex"); db.sessions[sid] = uid; headers["Set-Cookie"] = "sid=" + sid + "; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000"; }
+      saveDb();
+      res.writeHead(302, headers);
       return res.end();
     }
     if (url.pathname === "/api/me" && req.method === "GET") {
@@ -130,26 +143,30 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === "/api/reanalyze" && req.method === "POST") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
-      await refreshAnalysis(u); return send(res, 200, view(u));
+      const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
+      await refreshAnalysis(acc); return send(res, 200, view(u));
     }
-    if (url.pathname === "/api/price" && req.method === "POST") {  // creator sets own price, we answer with chance + good/bad list
+    if (url.pathname === "/api/price" && req.method === "POST") {  // creator confirms/edits price, we answer with chance + good/bad list
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
-      const b = await readBody(req), price = Number(b.price);
+      const b = await readBody(req), price = Number(b.price), acc = findAcc(u, b.id);
+      if (!acc) return send(res, 404, { error: "no such account" });
       if (!(price >= 1 && price <= 200)) return send(res, 400, { error: "price 1..200" });
-      u.price = Math.round(price * 100) / 100; saveDb(); return send(res, 200, view(u));
+      acc.price = Math.round(price * 100) / 100; saveDb(); return send(res, 200, view(u));
     }
-    if (url.pathname === "/api/revoke" && req.method === "POST") {
+    if (url.pathname === "/api/account/delete" && req.method === "POST") {   // remove one TikTok account and its stored data
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
-      u.consent = false; delete u.access_token; delete u.refresh_token; saveDb(); return send(res, 200, { ok: true });
+      const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
+      u.accounts = u.accounts.filter(x => x !== acc); delete db.byOpen[acc.open_id]; saveDb();
+      return send(res, 200, view(u));
     }
     if (url.pathname === "/api/admin/applicants" && req.method === "GET") {   // owner screen: take or don't take
       if (req.headers.authorization !== "Bearer " + ADMIN_TOKEN) return send(res, 401, { error: "unauthorized" });
-      return send(res, 200, Object.values(db.users).filter(u => u.consent).map(view));
+      return send(res, 200, Object.values(db.users).flatMap(u => u.accounts || []).map(accView));
     }
     /* static site */
     const file = path.join(__dirname, "public", url.pathname === "/" ? "index.html" : url.pathname);
     if (file.startsWith(path.join(__dirname, "public")) && fs.existsSync(file) && fs.statSync(file).isFile()) {
-      const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css" };
+      const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".txt": "text/plain; charset=utf-8" };
       res.writeHead(200, { "Content-Type": types[path.extname(file)] || "application/octet-stream" });
       return fs.createReadStream(file).pipe(res);
     }
