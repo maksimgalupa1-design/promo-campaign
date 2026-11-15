@@ -900,6 +900,18 @@ button.wgt::after{opacity:.2;transition:opacity .2s}button.wgt:hover::after{opac
 .chnick{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chdel{margin-left:auto;opacity:.7}
 .chcard .btn+.btn{margin-top:8px}
+/* v40 compact request cards */
+details.rqd{border:1px solid var(--line);border-radius:18px;background:var(--surface);overflow:hidden;animation:chgIn .3s ease both}
+details.rqd[open]{box-shadow:var(--sh)}
+.rqs{list-style:none;display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer}
+.rqs::-webkit-details-marker{display:none}
+.rqs .rsav{width:44px;height:44px}
+.rqm{flex:1;min-width:0;display:flex;flex-direction:column}.rqm small{color:var(--muted);overflow-wrap:anywhere}
+.rqm a{color:inherit;text-decoration:underline dotted}
+.rqp{flex:none;transform:scale(.9);transform-origin:right}
+.rqc{font-style:normal;transition:transform .2s;color:var(--muted)}details.rqd[open] .rqc{transform:rotate(180deg)}
+details.rqd>.card{border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;margin:0;animation:none}
+.vdchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1078,7 +1090,7 @@ button.wgt::after{opacity:.2;transition:opacity .2s}button.wgt:hover::after{opac
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v39 · 16.11 00:30</span>
+  <span>© Promo Campaign · v40 · 16.11 01:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4454,6 +4466,38 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
     LV.pyEdit=(a==="pyEdit");LV._pyKey=c.label+"|"+(c.value||"");if(a==="pyEdit"&&c.method)LV.pyM=c.method==="crypto"?"crypto":c.method;
     renderDashLive();if(a==="pyEdit")setTimeout(function(){var i=$("pyValue");if(i){if(c.method==="paypal"&&c.value)i.value=c.value;i.focus()}},50);return}
 },true);
+
+/* ===== v40: owner request cards: compact, video count ===== */
+Object.assign(LT.en,{rq_pick_h:"Usually up to 7 videos per order, up to 10 for a really strong account.",rq_open_tt:"Open TikTok",rq_vid_saved:"Saved",rq_avg:"avg views"});
+Object.assign(LT.ru,{rq_pick_h:"Обычно до 7 видео за заказ, до 10 для очень сильного аккаунта.",rq_open_tt:"Открыть TikTok",rq_vid_saved:"Сохранено",rq_avg:"средний просмотр"});
+LV.vdDraft=LV.vdDraft||{};
+(function(){var o=vidRow;vidRow=function(q){
+  var h=o(q);if(!h)return h;
+  var dv=LV.vdDraft[q.id];if(dv)h=h.replace('id="vd_'+esc(q.id)+'" type="number" min="1" max="500" value="'+q.videos+'"','id="vd_'+esc(q.id)+'" type="number" min="1" max="10" value="'+esc(dv)+'"');else h=h.replace('min="1" max="500"','min="1" max="10"');
+  var cur=Number(dv||q.videos),chips='<div class="vdchips">'+[1,2,3,4,5,6,7,10].map(function(n){return '<button type="button" class="chip" data-l="vdPick" data-id="'+esc(q.id)+'" data-n="'+n+'" aria-pressed="'+(cur===n)+'">'+n+'</button>'}).join("")+'</div><p class="hint">'+esc(L("rq_pick_h"))+'</p>';
+  return h.replace('<div class="row vidrow">',chips+'<div class="row vidrow">')}})();
+document.addEventListener("input",function(e){var t=e.target;if(t&&t.id&&t.id.indexOf("vd_")===0){var n=Math.round(Number(t.value));if(n>10){t.value=10;n=10}if(n>=1)LV.vdDraft[t.id.slice(3)]=n}},true);
+window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="vdPick"){e.stopImmediatePropagation();var i=$("vd_"+id);if(i){i.value=el.getAttribute("data-n");LV.vdDraft[id]=Number(i.value);i.dispatchEvent(new Event("input",{bubbles:true}));
+    el.parentNode.querySelectorAll(".chip").forEach(function(c){c.setAttribute("aria-pressed",String(c===el))})}return}
+  if(a==="vdSave"){e.stopImmediatePropagation();var v=Number(val("vd_"+id));api("/api/admin/request-videos",{id:id,videos:v}).then(function(r){if(!r.ok){toast((r.j&&r.j.error)||"error");return}delete LV.vdDraft[id];toast("✓ "+L("rq_vid_saved"));ownerReload()});return}
+  if(a==="rAct"&&el.getAttribute("data-s")==="approved"){e.stopImmediatePropagation();var bd={id:id,status:"approved"};if($("dy_"+id))bd.days=Number(val("dy_"+id));if($("vd_"+id))bd.videos=Number(val("vd_"+id));
+    api("/api/admin/request",bd).then(function(r){if(!r.ok){toast((r.j&&r.j.error)||"error");return}delete LV.vdDraft[id];ownerReload()});return}
+},true);
+/* compact request cards */
+LV.rqOpen=LV.rqOpen||{};
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{
+  if(LV.adTab==="requests"||LV.adTab==="waiting"){document.querySelectorAll("#adApp .list > .card.ord[class*=rq-]").forEach(function(c){
+    if(c.parentNode.classList.contains("rqd"))return;
+    var idEl=c.querySelector("[data-id]"),id=idEl?idEl.getAttribute("data-id"):"";
+    var av=c.querySelector(".rsav"),h=c.querySelector(".rshandle"),handle=h?h.textContent.replace(/\s*🔎\s*$/,"").trim():"",avg=c.querySelector(".rsp span:last-child"),tt=c.querySelector(".t b"),pill=c.querySelector(".t .row > *");
+    var d=document.createElement("details");d.className="rqd";if(id&&LV.rqOpen[id])d.open=true;if(id)d.setAttribute("data-rid",id);
+    var s=document.createElement("summary");s.className="rqs";
+    s.innerHTML=(av?av.outerHTML:'<span class="rsav ph">?</span>')+'<span class="rqm"><b><a class="rqtt" href="https://www.tiktok.com/'+esc(handle.charAt(0)==="@"?handle:"@"+handle)+'" target="_blank" rel="noopener noreferrer" title="'+esc(L("rq_open_tt"))+'">'+esc(handle)+' ↗</a></b><small>'+esc(avg?avg.textContent:"")+(tt?' · '+esc(tt.textContent):'')+'</small></span>'+(pill?'<span class="rqp">'+pill.outerHTML+'</span>':'')+'<i class="rqc">▾</i>';
+    c.parentNode.insertBefore(d,c);d.appendChild(s);d.appendChild(c)})}
+  }catch(e){}return r}})();
+document.addEventListener("toggle",function(e){var d=e.target;if(d&&d.classList&&d.classList.contains("rqd")){var id=d.getAttribute("data-rid");if(id)LV.rqOpen[id]=d.open}},true);
+document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a.rqtt");if(a){e.preventDefault();e.stopPropagation();window.open(a.href,"_blank","noopener")}},true);
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);

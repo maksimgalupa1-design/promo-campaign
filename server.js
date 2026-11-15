@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 31;
+const SERVER_VER = 32;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -1067,6 +1067,7 @@ const server = http.createServer(async (req, res) => {
         const allowed = { pending: ["approved", "rejected"], submitted: ["completed", "returned", "cancelled"], approved: ["cancelled"], returned: ["cancelled"] };
         if (!need(res, (allowed[from] || []).includes(st), 409, "cannot change " + from + " to " + st)) return;
         if (st === "approved") {
+          const nv = Math.round(Number(b.videos)); if (nv >= 1 && nv <= 500 && nv !== r.videos) { const ac0 = findAccAny(r.openId); r.videos = nv; r.discount = ac0 ? discountFor(ac0, nv) : 0; }
           const t = db.tracks[r.trackId], cost = reqCost(r);
           if (!need(res, t && t.status === "active" && trackLeft(t) >= cost, 409, "not enough budget on the track")) return;
           t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100; r.approvedAt = Date.now();
