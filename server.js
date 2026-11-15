@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 37;
+const SERVER_VER = 38;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -817,6 +817,17 @@ const server = http.createServer(async (req, res) => {
       const c = cookie(req, "psid"); if (c) { delete db.psessions[c]; saveDb(); }
       return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("psid", "", 0) });
     }
+    if (P === "/api/maker" && M === "POST") {      // Market Maker (test): a public request from a producer who wants big accounts
+      const b = await readBody(req, 2e4), ip = clientIp(req), now = Date.now();
+      global.__mk = global.__mk || {}; global.__mk[ip] = (global.__mk[ip] || []).filter(t => now - t < 3600000);
+      if (!need(res, global.__mk[ip].length < 5, 429, "Too many requests, try again later")) return;
+      const name = String(b.name || "").trim().slice(0, 60), contact = String(b.contact || "").trim().slice(0, 120), track = String(b.track || "").trim().slice(0, 300), msg = String(b.message || "").trim().slice(0, 800), budget = Math.max(0, Math.min(1e7, Number(b.budget) || 0));
+      if (!need(res, name && contact, 400, "write your name and a way to contact you")) return;
+      if (!need(res, /^https?:\/\/\S+\.\S+/i.test(track), 400, "add a link to your track (https://…)")) return;
+      const D = db.settings.makers = db.settings.makers || [];
+      D.push({ id: uid8(), at: now, name, contact, track, budget, message: msg, status: "new" }); db.settings.makers = D.slice(-500); global.__mk[ip].push(now);
+      saveDb(); notify("Market Maker request from " + name + ": " + track); return send(res, 200, { ok: true });
+    }
     if (P.startsWith("/api/dm")) {     // private messages between a user (editor or producer) and the manager
       const asR = url.searchParams.get("as") || "", pr1 = producerOf(req), eu1 = sessionUser(req);
       const pr0 = asR === "editor" && eu1 ? null : (asR === "producer" && !pr1 ? null : pr1), eu0 = pr0 ? null : eu1;   // the page says which role it is acting as
@@ -1089,6 +1100,12 @@ const server = http.createServer(async (req, res) => {
         const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;
         const text = String(b.text || "").trim().slice(0, 1000); if (!need(res, text, 400, "write a message")) return;
         t.msgs.push({ id: uid8(), at: Date.now(), mgr: true, text }); t.updated = Date.now(); t.adminSeen = Date.now(); saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/makers" && M === "GET") return send(res, 200, { list: (db.settings.makers || []).slice().sort((a, c) => c.at - a.at) });
+      if (P === "/api/admin/maker" && M === "POST") {
+        const D = db.settings.makers = db.settings.makers || [], i = D.findIndex(x => x.id === b.id); if (!need(res, i >= 0, 404, "no such request")) return;
+        if (b.del) D.splice(i, 1); else if (["new", "talking", "done"].includes(b.status)) D[i].status = b.status;
+        saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/dm/flag" && M === "POST") {
         const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;

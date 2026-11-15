@@ -1050,6 +1050,14 @@ body.tab-promos .ownmain .f{margin-right:8px}
 .chk:has(#nDesc:checked){border-color:#8B6CFF;background:rgba(139,108,255,.16);box-shadow:0 0 14px -4px #8B6CFF}
 .camp.flash{animation:campFlash 2.4s ease}
 @keyframes campFlash{0%,100%{box-shadow:none}20%,60%{box-shadow:0 0 0 3px #8B6CFF,0 0 30px rgba(139,108,255,.6)}}
+/* v50: Market Maker */
+.roles{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))!important}
+.role:nth-child(3) b,.role:nth-child(3) .pill{color:#2DD4BF}
+.role:nth-child(3) .pill{border-color:#2DD4BF;background:rgba(45,212,191,.12)}
+.role:nth-child(3):hover{border-color:#2DD4BF}
+.mkbox{max-width:620px;margin:0 auto}.mkt{background:rgba(45,212,191,.15);color:#2DD4BF}
+.mkrow{display:flex;flex-direction:column;gap:6px}.mkh{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.mkh small{margin-left:auto;color:var(--muted)}
+.mk-new{background:rgba(229,51,74,.18);color:#FF7A88}.mk-talking{background:rgba(224,168,0,.18);color:#E0A800}.mk-done{background:rgba(31,168,90,.18);color:#4CD08F}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1221,6 +1229,7 @@ body.tab-promos .ownmain .f{margin-right:8px}
   <div class="grid" id="lgrid"></div>
 </section>
 <section class="view" id="v-pay"><div id="payPageBody"></div></section>
+<section class="view" id="v-maker"><div id="makerBody"></div></section>
 <section class="view" id="v-orders"><div id="ordersBody"></div></section>
 <section class="view" id="v-lprod"><div id="lprodBody"></div></section>
 <div id="modalRoot"></div>
@@ -1228,7 +1237,7 @@ body.tab-promos .ownmain .f{margin-right:8px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v49 · 15.11 22:40</span>
+  <span>© Promo Campaign · v50 · 15.11 23:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -1526,7 +1535,7 @@ function genVideos(key,now){
   return out;
 }
 var COINS={USDT:["TRC20","TON","ERC20","BEP20"],TON:["TON"],BTC:["Bitcoin"],ETH:["ERC20"],LTC:["Litecoin"],BNB:["BEP20"],TRX:["TRON"],USDC:["ERC20","BEP20"]};
-var VIEWS=["home","signup","tiktok","analysis","report","campaigns","dashboard","orders","pay","admin","privacy","terms","producer"];
+var VIEWS=["home","signup","tiktok","analysis","report","campaigns","dashboard","orders","pay","maker","admin","privacy","terms","producer"];
 var lang="en",filter="all",runId=0,scn="active",payCoin="USDT",LIVE=false,pendingHandle="",delAsk=false,delMsg="";
 var S={accounts:[],active:0,prof:{},orders:[],history:[],user:null};
 try{var raw=localStorage.getItem("pc_state4");if(raw){var p=JSON.parse(raw);if(p&&typeof p==="object")S=p}}catch(e){}
@@ -2037,7 +2046,8 @@ function renderLHome(){
   $("lhomeBody").innerHTML='<div class="hero1"><p class="eyebrow">'+esc(L("h_eyebrow"))+'</p><h1 style="margin-top:12px">'+esc(L("h_title"))+'</h1><p class="lead">'+esc(L("h_lead"))+'</p></div>'+
    '<h2 class="sub">'+esc(L("h_who"))+'</h2><div class="roles">'+
    '<button type="button" class="card role" data-go="'+(signed?"dashboard":"signup")+'"><span class="pill">'+esc(L("r_ed_tag"))+'</span><b>'+esc(L("r_ed"))+'</b><span>'+esc(L("r_ed_d"))+'</span></button>'+
-   '<button type="button" class="card role" data-go="producer"><span class="pill">'+esc(L("r_pr_tag"))+'</span><b>'+esc(L("r_pr"))+'</b><span>'+esc(L("r_pr_d"))+'</span></button></div>';
+   '<button type="button" class="card role" data-go="producer"><span class="pill">'+esc(L("r_pr_tag"))+'</span><b>'+esc(L("r_pr"))+'</b><span>'+esc(L("r_pr_d"))+'</span></button>'+
+   '<button type="button" class="card role" data-go="maker"><span class="pill">'+esc(L("r_mk_tag"))+'</span><b>'+esc(L("r_mk"))+'</b><span>'+esc(L("r_mk_d"))+'</span></button></div>';
 }
 
 /* ---- tracks catalog for editors ---- */
@@ -2202,7 +2212,7 @@ function renderOwner(){
   if(!ADM.ok||!D)return false;checkNew(D);
   var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks","maker"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -4084,7 +4094,7 @@ Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Ос
   var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
 
 /* ===== v29: phone owner cabinet with bottom menu ===== */
-var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["pr","🎵","g_pr",["producers","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
+var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["pr","🎵","g_pr",["producers","payments","tracks","maker"]],["st","⚙️","g_st",["pay","contacts"]]];
 function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
 function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
   if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
@@ -5044,6 +5054,44 @@ window.addEventListener("click",function(e){var el=e.target.closest&&e.target.cl
   var f=$("nProof");if(!(f&&f.files&&f.files[0]))return stop("nProof",L("p_attach_need"));
   var ne=$("nErr");if(ne)ne.hidden=true;document.querySelectorAll(".badf").forEach(function(x){x.classList.remove("badf")})},true);
 document.addEventListener("input",function(e){var l=e.target&&e.target.closest&&e.target.closest(".badf");if(l)l.classList.remove("badf")});
+})();
+
+/* ===== v50: Market Maker (test) ===== */
+(function(){
+var N={
+en:{r_mk_tag:"Market Maker",r_mk:"I need top accounts",r_mk_d:"I want big, strong accounts to push my track. The manager will contact me.",a_maker:"Market Maker",mk_title:"Market Maker",mk_h:"Leave a request and the manager will contact you about big accounts for your track.",mk_test:"Test version",mk_name:"Your name or nickname",mk_contact:"How to reach you (Telegram, Instagram or email)",mk_track:"Link to your track",mk_budget:"Budget in USD (optional)",mk_msg:"What do you need? (optional)",mk_send:"Send request",mk_ok:"Thank you! The manager will contact you soon.",mk_need:"Fill in your name, contact and the track link.",mk_back:"Back",mk_none:"No requests yet.",mk_st_new:"New",mk_st_talking:"In talk",mk_st_done:"Done",mk_del:"Delete",ow_i_mk:"Market Maker: {h}"},
+ru:{r_mk_tag:"Market Maker",r_mk:"Мне нужны сильные аккаунты",r_mk_d:"Хочу продвинуть трек через крупные аккаунты. Менеджер свяжется со мной.",a_maker:"Market Maker",mk_title:"Market Maker",mk_h:"Оставьте заявку, и менеджер свяжется с вами по поводу крупных аккаунтов для вашего трека.",mk_test:"Тестовая версия",mk_name:"Ваше имя или ник",mk_contact:"Как с вами связаться (Telegram, Instagram или email)",mk_track:"Ссылка на ваш трек",mk_budget:"Бюджет в USD (по желанию)",mk_msg:"Что вам нужно? (по желанию)",mk_send:"Отправить заявку",mk_ok:"Спасибо! Менеджер скоро свяжется с вами.",mk_need:"Заполните имя, контакт и ссылку на трек.",mk_back:"Назад",mk_none:"Заявок пока нет.",mk_st_new:"Новая",mk_st_talking:"В переписке",mk_st_done:"Готово",mk_del:"Удалить",ow_i_mk:"Market Maker: {h}"}};
+Object.assign(LT.en,N.en);Object.assign(LT.ru,N.ru);
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in N.en)if(!XLL[k][x])XLL[k][x]=N.en[x]});
+function renderMaker(){var b=$("makerBody");if(!b)return;
+  b.innerHTML='<div class="mkbox"><span class="pill mkt">'+esc(L("mk_test"))+'</span><h2>'+esc(L("mk_title"))+'</h2><p class="lead">'+esc(L("mk_h"))+'</p><div class="card form">'+
+   '<label class="f" for="mkName"><span>'+esc(L("mk_name"))+'</span><input id="mkName" type="text" maxlength="60"></label>'+
+   '<label class="f" for="mkContact"><span>'+esc(L("mk_contact"))+'</span><input id="mkContact" type="text" maxlength="120"></label>'+
+   '<label class="f" for="mkTrack"><span>'+esc(L("mk_track"))+'</span><input id="mkTrack" type="text" inputmode="url" placeholder="https://"></label>'+
+   '<label class="f" for="mkBudget"><span>'+esc(L("mk_budget"))+'</span><input id="mkBudget" type="number" min="0" inputmode="decimal"></label>'+
+   '<label class="f" for="mkMsg"><span>'+esc(L("mk_msg"))+'</span><textarea id="mkMsg" rows="3" maxlength="800"></textarea></label>'+
+   '<div class="note err" id="mkErr" hidden></div><div class="note payok" id="mkOk" hidden></div>'+
+   '<div class="row"><button type="button" class="btn primary" data-l="mkSend">'+esc(L("mk_send"))+'</button><button type="button" class="btn" data-go="home">'+esc(L("mk_back"))+'</button></div></div></div>'}
+(function(){var o=route;route=function(){o.apply(this,arguments);if(LIVE&&(location.hash||"").replace(/\?.*/,"")==="#maker")renderMaker()}})();
+(function(){var o=dockItems;dockItems=function(){if((location.hash||"").replace(/\?.*/,"")==="#maker")return null;return o.apply(this,arguments)}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="mkSend"]');if(!el)return;e.stopImmediatePropagation();
+  var er=$("mkErr"),ok=$("mkOk");er.hidden=true;ok.hidden=true;
+  var b={name:val("mkName"),contact:val("mkContact"),track:val("mkTrack"),budget:Number(val("mkBudget"))||0,message:val("mkMsg")};
+  if(!b.name||!b.contact||!/^https?:\/\/\S+\.\S+/i.test(b.track)){er.textContent=L("mk_need");er.hidden=false;return}
+  el.disabled=true;api("/api/maker",b).then(function(r){el.disabled=false;if(r.ok){ok.textContent=L("mk_ok");ok.hidden=false;["mkName","mkContact","mkTrack","mkBudget","mkMsg"].forEach(function(i){$(i).value=""})}else{er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false}})},true);
+/* owner: Market Maker tab */
+var MK={list:null,sig:""};
+function mkLoad(){api("/api/admin/makers").then(function(r){if(!r.ok)return;var sg=JSON.stringify(r.j.list.map(function(x){return [x.id,x.status]}));if(sg===MK.sig&&MK.list)return;MK.sig=sg;MK.list=r.j.list;if(LV.adTab==="maker")renderOwner()})}
+function mkHtml(){if(!MK.list){mkLoad();return '<div class="empty">…</div>'}
+  return '<h3 style="margin:0 0 12px">💼 '+esc(L("a_maker"))+' <span class="pill">'+esc(L("mk_test"))+'</span></h3><div class="tklist">'+(MK.list.length?MK.list.map(function(x){return '<div class="card mkrow"><div class="mkh"><b>'+esc(x.name)+'</b><span class="pill mk-'+x.status+'">'+esc(L("mk_st_"+x.status))+'</span><small>'+dmTime(x.at)+'</small></div><div>'+esc(x.contact)+'</div><div><a href="'+esc(x.track)+'" target="_blank" rel="noopener noreferrer">'+esc(x.track)+'</a>'+(x.budget?' · '+money(x.budget):'')+'</div>'+(x.message?'<div class="hint">'+esc(x.message)+'</div>':'')+'<div class="row">'+["new","talking","done"].map(function(s){return '<button type="button" class="chip" data-l="mkSt" data-id="'+esc(x.id)+'" data-s="'+s+'" aria-pressed="'+(x.status===s)+'">'+esc(L("mk_st_"+s))+'</button>'}).join("")+'<button type="button" class="btn sm danger" data-l="mkDel" data-id="'+esc(x.id)+'">'+esc(L("mk_del"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("mk_none"))+'</div>')+'</div>'}
+function dmTime(t){var d=new Date(t);return p2(d.getDate())+"."+p2(d.getMonth()+1)+" "+chHm(t)}
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="maker"){var mn=document.querySelector(".ownmain")||$("adApp");if(mn){var nav=mn.querySelector(".adnav");mn.innerHTML=mkHtml()}}}catch(e){}return r}})();
+(function(){var o=ownerReload;ownerReload=function(){if(LV.adTab==="maker"){MK.sig="";mkLoad();return Promise.resolve()}return o.apply(this,arguments)}})();
+(function(){var o=ownItems;ownItems=function(){var it=o();if(ownOn("tracks"))(MK.list||[]).filter(function(x){return x.status==="new"}).forEach(function(x){it.push({id:"mk"+x.id,t:"tracks",tab:"maker",txt:L("ow_i_mk").replace("{h}",x.name)})});return it}})();
+setInterval(function(){if(ownerMode()&&!document.hidden)mkLoad()},20000);
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="mkSt"],[data-l="mkDel"]');if(!el)return;e.stopImmediatePropagation();
+  var b=el.getAttribute("data-l")==="mkDel"?{id:el.getAttribute("data-id"),del:true}:{id:el.getAttribute("data-id"),status:el.getAttribute("data-s")};
+  api("/api/admin/maker",b).then(function(){MK.sig="";mkLoad()})},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
