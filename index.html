@@ -202,6 +202,7 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
 .tl li.cur{color:var(--fg);font-weight:600}.tl li.cur::before{background:#E8A91E;border-color:#E8A91E;animation:pulseDot 1.6s ease-in-out infinite}
 .tl small{display:block;font-weight:400;color:var(--muted);margin-top:2px}
 @keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(232,169,30,.5)}50%{box-shadow:0 0 0 7px rgba(232,169,30,0)}}
+.lang{display:flex;align-items:center;gap:8px}.langL{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}@media (max-width:560px){.langL{display:none}}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -234,7 +235,7 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
     <button class="btn primary sm" data-go="signup" id="navSignup"></button>
   </nav>
   <div class="lang" role="group" aria-label="Language">
-    <select id="langSel" aria-label="Language"></select>
+    <span class="langL">Language</span><select id="langSel" aria-label="Language"></select>
   </div>
 </div></header>
 
@@ -674,7 +675,7 @@ var VIEWS=["home","signup","tiktok","analysis","report","campaigns","dashboard",
 var lang="en",filter="all",runId=0,scn="active",payCoin="USDT",LIVE=false,pendingHandle="",delAsk=false,delMsg="";
 var S={accounts:[],active:0,prof:{},orders:[],history:[],user:null};
 try{var raw=localStorage.getItem("pc_state4");if(raw){var p=JSON.parse(raw);if(p&&typeof p==="object")S=p}}catch(e){}
-try{var lg=localStorage.getItem("pc_lang");if(/^(en|ru|uk|es|pt|de|fr|tr)$/.test(lg))lang=lg}catch(e){}
+/* the site always starts in English; the visitor switches the language himself */
 if(!S.orders)S.orders=[];if(!S.history)S.history=[];if(!S.accounts)S.accounts=[];if(!S.prof)S.prof={};if(!(S.active>=0))S.active=0;
 function sync(){S.user=S.accounts[S.active]||null}
 sync();
@@ -1326,7 +1327,7 @@ function renderOwner(){
   }else if(LV.adTab==="payments"){
     body='<div class="list">'+(D.topups.length?D.topups.map(function(p){
       return '<div class="card ord"><div class="t"><div><span>'+esc(p.producer||"")+'</span><b>'+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' 20%: '+money(Math.round(p.amount*20)/100)+'</span><span>'+esc(p.track||"")+'</span></div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
-        (p.status==="pending"?'<div class="row"><button class="btn sm primary" data-l="tAct" data-id="'+esc(p.id)+'" data-s="confirmed">'+esc(L("a_confirm"))+'</button><button class="btn sm danger" data-l="tAct" data-id="'+esc(p.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>':'')+'</div>';
+        (p.hasProof?'<div class="row"><button class="btn sm" data-l="admProofT" data-id="'+esc(p.id)+'">'+esc(L("a_view_proof"))+'</button></div>':'')+(p.status==="pending"?'<div class="row"><button class="btn sm primary" data-l="tAct" data-id="'+esc(p.id)+'" data-s="confirmed">'+esc(L("a_confirm"))+'</button><button class="btn sm danger" data-l="tAct" data-id="'+esc(p.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>':'')+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="producers"){
     body='<div class="list">'+((D.producers||[]).length?D.producers.map(function(p){return '<div class="card ord"><div class="t"><div><b>'+esc(p.name||"—")+'</b><span>'+esc(p.email)+'</span><span>'+esc(L("a_pr_joined"))+' '+fmtDate(p.created)+'</span></div><div class="kv" style="grid-template-columns:1fr 1fr"><div><b>'+p.tracks.length+'</b><span>'+esc(L("a_pr_tracks"))+'</span></div><div><b>'+money(p.paid)+'</b><span>'+esc(L("a_pr_paid"))+'</span></div></div></div>'+p.tracks.map(function(t){return '<div class="hint">'+esc(t.title)+' · '+esc(t.status)+' · '+money(t.left)+' '+esc(L("a_left"))+'</div>'}).join("")+'</div>'}).join(""):'<div class="empty">'+esc(L("a_pr_none"))+'</div>')+'</div>';
@@ -1483,7 +1484,7 @@ function drawProd(){
   $("lprodBody").innerHTML='<div class="row" style="justify-content:space-between"><h2>'+esc(L("p_tracks"))+'</h2><div class="row"><span class="hint">'+esc(P.name?P.name+" · ":"")+esc(P.email)+'</span><button class="btn sm" data-l="pOut">'+esc(L("p_logout"))+'</button></div></div>'+
     '<div class="list" style="margin-top:14px">'+(P.tracks.length?P.tracks.map(function(t){
       var stc={review:"warn",active:"ok",rejected:"bad"}[t.status]||"";
-      var pays=(t.status==="active"&&t.topups&&t.topups.length)?t.topups.map(function(tp){return '<div><b>'+esc(L("p_pay_now"))+': '+money(tp.amount)+'</b>'+payBoxHtml(tp.method,tp.amount,tp.coin)+'</div>'}).join(""):'';
+      var pays=(t.status==="active"&&t.topups&&t.topups.length)?t.topups.map(function(tp){return '<div><b>'+esc(L("p_pay_now"))+': '+money(tp.amount)+'</b>'+payBoxHtml(tp.method,tp.amount,tp.coin)+(tp.proof?'<div class="note">'+esc(L("p_proof_sent"))+'</div>':'')+'<label class="f" for="ps_'+esc(tp.id)+'"><span>'+esc(L("p_proof_pick"))+'</span><input id="ps_'+esc(tp.id)+'" type="file" accept="image/*"></label><div class="note err" id="pe_'+esc(tp.id)+'" hidden></div><button class="btn sm primary" data-l="proofSend" data-id="'+esc(tp.id)+'">'+esc(L("p_proof_send"))+'</button></div>'}).join(""):'';
       return '<div class="card ord"><div class="t"><div><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span><span class="pill '+stc+'">'+esc(L("p_st_"+t.status))+'</span></div><div class="row">'+(t.status==="active"?'<button class="btn sm" data-l="pTop" data-id="'+esc(t.id)+'">'+esc(L("p_addb"))+'</button>':'')+'<button class="btn sm danger" data-l="pDel" data-id="'+esc(t.id)+'">'+esc(L("p_del"))+'</button></div></div>'+
         '<div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div>'+
         '<div>'+catPills(t.categories,t.otherCategory)+'</div>'+pays+'</div>';
@@ -1548,8 +1549,8 @@ document.addEventListener("change",function(e){if(e.target&&e.target.id==="pyMet
 
 function refreshMe(){return api("/api/me").then(function(r){if(r.ok)applyLive(r.j)})}
 /* ===== round 3: payment timeline, screenshots, eta, ban ===== */
-Object.assign(LT.en,{tl_sent:"Request sent",tl_ok:"Account checked, request approved",tl_link:"Video link sent",tl_acc:"Video accepted",tl_way:"Payment on the way",tl_paid:"Paid",tl_eta:"Expected",tl_proof:"View payment screenshot",tl_overdue:"The deadline has passed. Send the video link or the account will be banned.",tl_rej:"Request rejected",tl_ret:"Returned: fix the video and send the link again",d_banned:"Your account is banned for breaking the terms. Contact the manager.",a_ban:"Ban",a_eta:"Payment expected (date or note)",a_eta_save:"Save",a_overdue:"Overdue",a_proof_pick:"Payment screenshot (optional)",a_view_proof:"View screenshot",a_banned:"banned",a_close:"Close"});
-Object.assign(LT.ru,{tl_sent:"Заявка отправлена",tl_ok:"Аккаунт проверен, заявка одобрена",tl_link:"Ссылка на видео отправлена",tl_acc:"Видео принято",tl_way:"Оплата в пути",tl_paid:"Оплачено",tl_eta:"Ожидается",tl_proof:"Посмотреть скриншот оплаты",tl_overdue:"Срок прошёл. Отправьте ссылку на видео, иначе аккаунт будет заблокирован.",tl_rej:"Заявка отклонена",tl_ret:"Возвращено: исправьте видео и отправьте ссылку снова",d_banned:"Ваш аккаунт заблокирован за нарушение условий. Свяжитесь с менеджером.",a_ban:"Заблокировать",a_eta:"Когда ожидается оплата (дата или заметка)",a_eta_save:"Сохранить",a_overdue:"Просрочено",a_proof_pick:"Скриншот оплаты (по желанию)",a_view_proof:"Показать скриншот",a_banned:"заблокирован",a_close:"Закрыть"});
+Object.assign(LT.en,{p_proof_pick:"Screenshot or photo of your payment",p_proof_send:"I paid, send screenshot",p_proof_sent:"Screenshot sent. The manager will check your payment.",p_proof_bad:"Choose an image file first.",tl_sent:"Request sent",tl_ok:"Account checked, request approved",tl_link:"Video link sent",tl_acc:"Video accepted",tl_way:"Payment on the way",tl_paid:"Paid",tl_eta:"Expected",tl_proof:"View payment screenshot",tl_overdue:"The deadline has passed. Send the video link or the account will be banned.",tl_rej:"Request rejected",tl_ret:"Returned: fix the video and send the link again",d_banned:"Your account is banned for breaking the terms. Contact the manager.",a_ban:"Ban",a_eta:"Payment expected (date or note)",a_eta_save:"Save",a_overdue:"Overdue",a_proof_pick:"Payment screenshot (optional)",a_view_proof:"View screenshot",a_banned:"banned",a_close:"Close"});
+Object.assign(LT.ru,{p_proof_pick:"Скриншот или фото вашей оплаты",p_proof_send:"Я оплатил, отправить скриншот",p_proof_sent:"Скриншот отправлен. Менеджер проверит вашу оплату.",p_proof_bad:"Сначала выберите файл-картинку.",tl_sent:"Заявка отправлена",tl_ok:"Аккаунт проверен, заявка одобрена",tl_link:"Ссылка на видео отправлена",tl_acc:"Видео принято",tl_way:"Оплата в пути",tl_paid:"Оплачено",tl_eta:"Ожидается",tl_proof:"Посмотреть скриншот оплаты",tl_overdue:"Срок прошёл. Отправьте ссылку на видео, иначе аккаунт будет заблокирован.",tl_rej:"Заявка отклонена",tl_ret:"Возвращено: исправьте видео и отправьте ссылку снова",d_banned:"Ваш аккаунт заблокирован за нарушение условий. Свяжитесь с менеджером.",a_ban:"Заблокировать",a_eta:"Когда ожидается оплата (дата или заметка)",a_eta_save:"Сохранить",a_overdue:"Просрочено",a_proof_pick:"Скриншот оплаты (по желанию)",a_view_proof:"Показать скриншот",a_banned:"заблокирован",a_close:"Закрыть"});
 function tlHtml(q){
   if(q.status==="rejected"||q.status==="cancelled")return '<div class="note err">'+esc(L("tl_rej"))+'</div>';
   var cur=0;
@@ -1595,6 +1596,21 @@ function navRole(){
 }
 Object.assign(LT.en,{a_producers:"Producers",a_pr_none:"No producers yet.",a_pr_tracks:"tracks",a_pr_paid:"paid in total",a_pr_joined:"joined",a_f_all_rated:"All accounts (including below 2 stars and unrated)",a_open_acc:"Open accounts"});
 Object.assign(LT.ru,{a_producers:"Продюсеры",a_pr_none:"Продюсеров пока нет.",a_pr_tracks:"треков",a_pr_paid:"оплачено всего",a_pr_joined:"зарегистрирован",a_f_all_rated:"Все аккаунты (в том числе ниже 2 звёзд и без оценки)",a_open_acc:"Открыть аккаунты"});
+
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="proofSend"){
+    var inp=$("ps_"+id),f=inp&&inp.files&&inp.files[0],er=$("pe_"+id);
+    if(!f){er.textContent=L("p_proof_bad");er.hidden=false;return}
+    shrinkImage(f,function(img){if(!img){er.textContent=L("p_proof_bad");er.hidden=false;return}
+      api("/api/producer/proof",{id:id,image:img}).then(function(r){if(!r.ok){er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false;return}LV.prod=r.j;drawProd()})});return}
+  if(a==="admProofT"){api("/api/admin/proof?id="+encodeURIComponent("t"+id)).then(function(r){if(r.ok&&r.j.image)showImage(r.j.image)});return}
+});
+function navRole(){
+  if(!LIVE)return;var adm=/^#admin/.test(location.hash),r=roleGet(),show={campaigns:r==="editor",dashboard:r==="editor",producer:r==="producer",admin:false};
+  document.querySelectorAll("nav .lnk").forEach(function(b){b.hidden=adm||!show[b.getAttribute("data-go")]});
+  var nb=$("navSignup");if(nb)nb.hidden=adm||r!=="editor";
+}
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);

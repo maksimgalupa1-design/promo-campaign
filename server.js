@@ -251,7 +251,7 @@ function overview() {
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
     tracks: Object.values(db.tracks).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
-    topups: Object.values(db.topups).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
+    topups: Object.values(db.topups).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
         paid: Math.round(Object.values(db.topups).filter(x => x.producerId === p.id && x.status === "confirmed").reduce((q, x) => q + x.amount, 0) * 100) / 100 }; }),
@@ -301,6 +301,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     /* ----- editor (creator) ----- */
+    if (P === "/health" && M === "GET") return send(res, 200, { ok: true, storage: SB_URL && SB_KEY ? "supabase" : "local file (data is lost on restart)", tiktokKey: KEY ? "set" : "missing", adminPassword: ADMIN_TOKEN ? "set" : "missing", time: new Date().toISOString() });
     if (P === "/api/me" && M === "GET") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       return send(res, 200, view(u));
@@ -430,9 +431,15 @@ const server = http.createServer(async (req, res) => {
       const p = producerOf(req); if (!p) return send(res, 401, { error: "not signed in" });
       const mine = () => Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       const pview = () => ({ email: p.email, name: p.name || "", fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule,
-        topups: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").map(x => ({ id: x.id, amount: x.amount, method: x.method, coin: x.coin || "" })),
+        topups: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").map(x => ({ id: x.id, amount: x.amount, method: x.method, coin: x.coin || "", proof: !!x.proof })),
         pendingTopup: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").reduce((s, x) => s + x.amount, 0) })) });
       if (P === "/api/producer/me" && M === "GET") return send(res, 200, pview());
+      if (P === "/api/producer/proof" && M === "POST") {      // producer attaches a screenshot of the payment he sent
+        const b = await readBody(req, 8e5), tp = db.topups[b.id];
+        if (!need(res, tp && tp.producerId === p.id && tp.status === "pending", 404, "no pending payment")) return;
+        if (!need(res, /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.image || "") && b.image.length < 700000, 400, "bad image")) return;
+        await putProof("t" + tp.id, b.image); tp.proof = true; saveDb(); return send(res, 200, pview());
+      }
       if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
         const b = await readBody(req), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
         if (!need(res, title && budget >= 1 && budget <= 1000000, 400, "title and budget (1..1000000) required")) return;
