@@ -192,6 +192,16 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
 @media (max-width:640px){.roles{grid-template-columns:1fr}.cats{grid-template-columns:1fr 1fr}}
 .role .pill{align-self:flex-start}
 .tile.hot{background:rgba(232,193,90,.18);border-color:rgba(201,150,26,.65)}.tile.hot b{color:#B07F0A}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tile.hot b{color:#F1C75B}}:root[data-theme="dark"] .tile.hot b{color:#F1C75B}.tile select{margin-top:8px;max-width:100%;font:inherit;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.tl{list-style:none;margin:14px 0 4px;padding:0}
+.tl li{position:relative;padding:0 0 14px 28px;font-size:14px;color:var(--muted)}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:5px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--line);border:2px solid var(--line);box-sizing:border-box}
+.tl li::after{content:"";position:absolute;left:10px;top:19px;bottom:-3px;width:2px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl li.done{color:var(--fg)}.tl li.done::before{background:#1FA85A;border-color:#1FA85A}.tl li.done::after{background:#1FA85A}
+.tl li.cur{color:var(--fg);font-weight:600}.tl li.cur::before{background:#E8A91E;border-color:#E8A91E;animation:pulseDot 1.6s ease-in-out infinite}
+.tl small{display:block;font-weight:400;color:var(--muted);margin-top:2px}
+@keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(232,169,30,.5)}50%{box-shadow:0 0 0 7px rgba(232,169,30,0)}}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -335,9 +345,9 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
   <div class="card" id="profCard"></div>
   <h3 class="sub" data-i18n="d_orders"></h3>
   <div class="list" id="orders"></div>
-  <h3 class="sub" data-i18n="pay_title"></h3>
+  <h3 class="sub" id="payH1" data-i18n="pay_title"></h3>
   <div class="card pay" id="payBox"></div>
-  <h3 class="sub" data-i18n="pay_hist"></h3>
+  <h3 class="sub" id="payH2" data-i18n="pay_hist"></h3>
   <div class="list" id="hist"></div>
   <div id="consentRow" style="margin-top:24px"></div>
 </section>
@@ -613,10 +623,10 @@ privacy:'<p class="eyebrow">Черновик</p><h2>Политика конфи�
 '<h3>6. Контакты</h3><p>[адрес поддержки будет указан здесь]</p>',
 terms:'<p class="eyebrow">Черновик</p><h2>Условия использования</h2><p>Проект текста для прототипа. Перед запуском его должен проверить юрист.</p>'+
 '<h3>1. Кто может участвовать</h3><p>Совершеннолетние авторы с собственным аккаунтом, который регулярно публикует видео. Пустые и давно неактивные аккаунты мы не принимаем.</p>'+
-'<h3>2. Как устроены кампании</h3><p>Автор отправляет заявку на трек, менеджер её одобряет, затем автор получает оплату и публикует ролик со звуком кампании. На отправку ссылки отводится 16 дней. После проверки ссылки менеджером кампания считается завершённой.</p>'+
+'<h3>2. Как устроены кампании</h3><p>Автор отправляет заявку на трек, менеджер проверяет аккаунт и одобряет заявку, затем автор публикует ролик со звуком кампании. На отправку ссылки отводится 16 дней. После проверки ссылки менеджером кампания считается завершённой, и выплата отправляется автору: в кабинете виден статус «оплата в пути», а после оплаты автор получает скриншот перевода.</p>'+
 '<h3>3. Цена и оплата</h3><p>Автор сам выбирает цену за видео. Выплата идёт на реквизиты, сохранённые в кабинете.</p>'+
 '<h3>4. Что запрещено</h3><ul><li>Накрутка просмотров и чужие аккаунты.</li><li>Контент, нарушающий правила площадки или права третьих лиц.</li></ul>'+
-'<h3>5. Последствия нарушений</h3><p>Мы можем отклонить ролик, приостановить аккаунт и потребовать возврата выплаты за нарушенные условия.</p>'+
+'<h3>5. Последствия нарушений</h3><p>Мы можем отклонить ролик, приостановить аккаунт и потребовать возврата выплаты за нарушенные условия. Если автор не соблюдает сроки и не отправляет ссылку на видео в течение 16 дней после одобрения заявки, его аккаунт блокируется. Менеджер также может заблокировать аккаунт за нарушение условий.</p>'+
 '<h3>6. Изменения</h3><p>Мы можем обновлять условия и сообщим об этом в кабинете.</p>'
 },
 en:{
@@ -629,10 +639,10 @@ privacy:'<p class="eyebrow">Draft</p><h2>Privacy policy</h2><p>Sample text for t
 '<h3>6. Contact</h3><p>[support address goes here]</p>',
 terms:'<p class="eyebrow">Draft</p><h2>Terms of use</h2><p>Sample text for the prototype. A lawyer must review it before launch.</p>'+
 '<h3>1. Who can take part</h3><p>Adult creators with their own account that posts regularly. Empty and long-inactive accounts are not accepted.</p>'+
-'<h3>2. How campaigns work</h3><p>The creator requests a track, a manager approves it, then the creator is paid and posts a video with the campaign sound. The link is due within 16 days. After a manager checks the link, the campaign is complete.</p>'+
+'<h3>2. How campaigns work</h3><p>The creator requests a track, a manager checks the account and approves the request, then the creator posts a video with the campaign sound. The link is due within 16 days. After a manager checks the link, the campaign is complete and the payout is sent: the dashboard shows “payment on the way”, and once it is paid the creator receives a screenshot of the transfer.</p>'+
 '<h3>3. Price and payment</h3><p>The creator sets their own price per video. Payouts go to the details saved in the dashboard.</p>'+
 '<h3>4. Not allowed</h3><ul><li>Fake views and accounts that are not yours.</li><li>Content that breaks platform rules or third-party rights.</li></ul>'+
-'<h3>5. Consequences</h3><p>We may reject a video, suspend an account and ask for a refund of payments made for breached terms.</p>'+
+'<h3>5. Consequences</h3><p>We may reject a video, suspend an account and ask for a refund of payments made for breached terms. If a creator misses deadlines and does not send the video link within 16 days after the request is approved, the account is banned. The manager may also ban an account for breaking these terms.</p>'+
 '<h3>6. Changes</h3><p>We may update these terms and will announce it in your dashboard.</p>'
 }};
 
@@ -1213,10 +1223,11 @@ function renderDashLive(){
     if(q.status==="approved"||q.status==="returned")extra='<label class="f" for="lk_'+esc(q.id)+'"><span>'+esc(L("dl_links"))+' ('+q.videos+')</span><textarea id="lk_'+esc(q.id)+'" rows="'+Math.min(4,q.videos)+'" placeholder="https://www.tiktok.com/'+esc(u.handle)+'/video/..."></textarea></label><div class="note err" id="lkErr_'+esc(q.id)+'" hidden></div><div><button class="btn sm primary" data-l="sendLinks" data-id="'+esc(q.id)+'" data-n="'+q.videos+'">'+esc(L("dl_send"))+'</button></div>';
     if(q.links&&q.links.length&&q.status!=="approved")extra+='<div class="hint" style="overflow-wrap:anywhere">'+q.links.map(function(l){return esc(l.url)+(l.views!=null?' · '+n(l.views):'')}).join("<br>")+'</div>';
     return '<div class="card ord"><div class="t"><div><span>'+esc(q.handle)+'</span><b>'+esc(q.track)+'</b><span>'+esc(q.artist)+'</span></div>'+stL(q.status)+'</div>'+
-      '<div class="kv"><div><b>'+money(q.cost)+'</b><span>'+esc(t("o_price"))+'</span></div><div><b>'+q.videos+'</b><span>'+esc(L("rq_videos"))+'</span></div><div><b>'+fmtDate(q.created)+'</b><span>'+esc(t("o_req"))+'</span></div></div>'+(q.discount?'<div>'+discBadge(q.discount)+'</div>':'')+extra+'</div>';
+      '<div class="kv"><div><b>'+money(q.cost)+'</b><span>'+esc(t("o_price"))+'</span></div><div><b>'+q.videos+'</b><span>'+esc(L("rq_videos"))+'</span></div><div><b>'+fmtDate(q.created)+'</b><span>'+esc(t("o_req"))+'</span></div></div>'+(q.discount?'<div>'+discBadge(q.discount)+'</div>':'')+tlHtml(q)+extra+'</div>';
   }).join(""):'<div class="empty">'+esc(L("dl_req_none"))+'</div>';
-  $("payBox").innerHTML=(u.adminStatus!=="approved"?'<div class="note">'+esc(L("d_wait"))+'</div>':"")+payoutBlock();refreshPayBox();
+  $("payBox").innerHTML=(u.adminStatus==="banned"?'<div class="note err">'+esc(L("d_banned"))+'</div>':(u.adminStatus!=="approved"?'<div class="note">'+esc(L("d_wait"))+'</div>':""))+payoutBlock();refreshPayBox();
   $("hist").innerHTML="";
+  $("payH1").hidden=true;$("payH2").hidden=true;
   $("consentRow").innerHTML=delBox(u);
 }
 function saveAcc(){
@@ -1304,10 +1315,11 @@ function renderOwner(){
       var act="";
       if(q.status==="pending")act='<div class="row"><button class="btn sm primary" data-l="rAct" data-id="'+esc(q.id)+'" data-s="approved">'+esc(L("a_approve"))+'</button><button class="btn sm danger" data-l="rAct" data-id="'+esc(q.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>';
       if(q.status==="submitted")act='<div class="row"><button class="btn sm primary" data-l="rAct" data-id="'+esc(q.id)+'" data-s="completed">'+esc(L("a_complete"))+'</button><button class="btn sm danger" data-l="rAct" data-id="'+esc(q.id)+'" data-s="returned">'+esc(L("a_return"))+'</button></div>';
+      var eta=(q.status==="approved"||q.status==="submitted"||q.status==="completed")&&!q.paid?'<div class="row"><label class="f" for="eta_'+esc(q.id)+'" style="flex:1 1 220px"><span>'+esc(L("a_eta"))+'</span><input id="eta_'+esc(q.id)+'" type="text" maxlength="80" value="'+esc(q.eta||"")+'"></label><button class="btn sm" data-l="etaSave" data-id="'+esc(q.id)+'">'+esc(L("a_eta_save"))+'</button></div>':'';
       var po=q.payout?'<div class="note"><b>'+esc(L("a_pay_payout"))+':</b> '+esc((q.payout.method==="crypto"?coinL(q.payout.coin)+" ":q.payout.method+" ")+q.payout.value+(q.payout.holder?" · "+q.payout.holder:""))+'</div>':'';
       var links=(q.links||[]).map(function(l){return '<div class="hint" style="overflow-wrap:anywhere"><a href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.url)+'</a> · '+(l.views!=null?n(l.views):"—")+'</div>'}).join("");
       return '<div class="card ord"><div class="t"><div><span>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+' · '+esc(starsTxt(q.stars))+'</span><b>'+esc(q.track)+'</b><span>'+esc(q.artist)+'</span></div><div class="row">'+discBadge(q.discount)+stL(q.status)+'</div></div>'+
-        '<div class="kv"><div><b>'+money(q.price)+'</b><span>'+esc(L("a_price"))+'</span></div><div><b>'+q.videos+'</b><span>'+esc(L("rq_videos"))+'</span></div><div><b>'+money(q.cost)+'</b><span>'+esc(t("o_price"))+'</span></div></div>'+po+links+act+'</div>';
+        '<div class="kv"><div><b>'+money(q.price)+'</b><span>'+esc(L("a_price"))+'</span></div><div><b>'+q.videos+'</b><span>'+esc(L("rq_videos"))+'</span></div><div><b>'+money(q.cost)+'</b><span>'+esc(t("o_price"))+'</span></div></div>'+(q.overdue?'<div class="note err">'+esc(L("a_overdue"))+'</div>':'')+po+eta+links+act+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_req"))+'</div>')+'</div>';
   }else if(LV.adTab==="payments"){
     body='<div class="list">'+(D.topups.length?D.topups.map(function(p){
@@ -1319,12 +1331,12 @@ function renderOwner(){
     body='<div class="list">'+(dl.length?dl.map(function(q){
       var po=q.payout?'<div class="note"><b>'+esc(L("a_pay_payout"))+':</b> '+esc((q.payout.method==="crypto"?coinL(q.payout.coin)+" ":q.payout.method+" ")+q.payout.value+(q.payout.holder?" · "+q.payout.holder:""))+'</div>':'<div class="note err">'+esc(L("a_no_payout"))+'</div>';
       return '<div class="card ord"><div class="t"><div><span>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+'</span><b>'+money(q.cost)+'</b><span>'+esc(q.track)+' · '+esc(q.artist)+'</span></div><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></div>'+po+
-        '<div class="row"><button class="btn sm '+(q.paid?'':'primary')+'" data-l="poAct" data-id="'+esc(q.id)+'" data-p="'+(q.paid?0:1)+'">'+esc(L(q.paid?"a_unpaid":"a_mark_paid"))+'</button></div></div>';
+        (q.paid?'':'<label class="f" for="sc_'+esc(q.id)+'"><span>'+esc(L("a_proof_pick"))+'</span><input id="sc_'+esc(q.id)+'" type="file" accept="image/*"></label>')+'<div class="row"><button class="btn sm '+(q.paid?'':'primary')+'" data-l="poAct2" data-id="'+esc(q.id)+'" data-p="'+(q.paid?0:1)+'">'+esc(L(q.paid?"a_unpaid":"a_mark_paid"))+'</button>'+(q.hasProof?'<button class="btn sm" data-l="admProof" data-id="'+esc(q.id)+'">'+esc(L("a_view_proof"))+'</button>':'')+'</div></div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="accounts"){
     var fs=LV.fStars;
     var list=D.accounts.filter(function(a){var s=a.stars.final;if(s==null||s<2)return false;var okS=fs==="2+"?true:(fs==="5"?s>=5:(s>=Number(fs)&&s<Number(fs)+1));return okS&&(LV.fDisc!=="yes"||(a.discount||0)>0)&&(LV.fCat==="all"||(a.categories||[]).indexOf(LV.fCat)>=0)}).sort(function(x,y){return y.stars.final-x.stars.final||(y.discount||0)-(x.discount||0)||(x.cpm||9)-(y.cpm||9)});
-    var wait=D.accounts.filter(function(a){return a.adminStatus==='new'||!a.adminStatus}).map(function(a){return '<div class="card arow"><div class="row" style="justify-content:space-between"><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'<br><span class="hint">'+(a.price?money(a.price):'—')+' · '+n(a.analysis.refAvg||0)+'</span></span><span class="row"><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button></span></div></div>'}).join('');
+    var wait=D.accounts.filter(function(a){return a.adminStatus==='new'||!a.adminStatus}).map(function(a){return '<div class="card arow"><div class="row" style="justify-content:space-between"><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'<br><span class="hint">'+(a.price?money(a.price):'—')+' · '+n(a.analysis.refAvg||0)+'</span></span><span class="row"><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button></span></div></div>'}).join('');
     body=(wait?'<h3 class="sub">'+esc(L("a_wait_acc"))+'</h3><div class="list" style="margin-bottom:18px">'+wait+'</div>':'')+'<div class="row" style="margin-bottom:12px"><label class="f" for="fCat" style="flex:1 1 200px"><span>'+esc(L("a_f_cat"))+'</span><select id="fCat" data-l="fCat"><option value="all">'+esc(L("a_f_all"))+'</option>'+CATS.map(function(c){return '<option value="'+c+'"'+(LV.fCat===c?' selected':'')+'>'+esc(L("c_"+c))+'</option>'}).join("")+'</select></label>'+
       '<label class="f" for="fStars" style="flex:1 1 160px"><span>'+esc(L("a_f_stars"))+'</span><select id="fStars" data-l="fStars">'+[["2+","a_min2"],["2","a_r2"],["3","a_r3"],["4","a_r4"],["5","a_r5"]].map(function(o){return '<option value="'+o[0]+'"'+(LV.fStars===o[0]?' selected':'')+'>'+esc(L(o[1]))+'</option>'}).join("")+'</select></label><label class="f" for="fDisc" style="flex:1 1 160px"><span>'+esc(L("a_bulk"))+'</span><select id="fDisc" data-l="fDisc"><option value="all">'+esc(L("a_disc_all"))+'</option><option value="yes"'+(LV.fDisc==="yes"?' selected':'')+'>'+esc(L("a_disc_yes"))+'</option></select></label></div><p class="hint" style="margin-bottom:10px">'+esc(L("a_acc_note"))+'</p>'+
       '<div class="list">'+(list.length?list.map(function(a){
@@ -1332,7 +1344,7 @@ function renderOwner(){
         return '<details class="card arow"><summary><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'</span><span class="hint">'+(a.price?money(a.price):"—")+(a.cpm?' · '+money(a.cpm)+' '+esc(L("a_per1k")):'')+' · '+n(a.analysis.refAvg||0)+'</span></summary>'+
           '<div style="margin-top:10px">'+catPills(a.categories,a.otherCategory)+'</div>'+
           '<div class="row" style="margin:12px 0"><label class="f" for="rt_'+esc(a.id)+'" style="flex:0 1 180px"><span>'+esc(L("a_manual"))+'</span><select id="rt_'+esc(a.id)+'" data-l="rate" data-id="'+esc(a.id)+'">'+sel+'</select></label>'+
-          '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
+          '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
           winTable(a.analysis)+videoTable({videos:a.videos})+'</details>';
       }).join(""):'<div class="empty">'+esc(L("a_no_acc"))+'</div>')+'</div>';
   }else if(LV.adTab==="pay"){
@@ -1531,6 +1543,44 @@ document.addEventListener("click",function(e){
 document.addEventListener("change",function(e){if(e.target&&e.target.id==="pyMethod")LV.pyM=e.target.value});
 
 function refreshMe(){return api("/api/me").then(function(r){if(r.ok)applyLive(r.j)})}
+/* ===== round 3: payment timeline, screenshots, eta, ban ===== */
+Object.assign(LT.en,{tl_sent:"Request sent",tl_ok:"Account checked, request approved",tl_link:"Video link sent",tl_acc:"Video accepted",tl_way:"Payment on the way",tl_paid:"Paid",tl_eta:"Expected",tl_proof:"View payment screenshot",tl_overdue:"The deadline has passed. Send the video link or the account will be banned.",tl_rej:"Request rejected",tl_ret:"Returned: fix the video and send the link again",d_banned:"Your account is banned for breaking the terms. Contact the manager.",a_ban:"Ban",a_eta:"Payment expected (date or note)",a_eta_save:"Save",a_overdue:"Overdue",a_proof_pick:"Payment screenshot (optional)",a_view_proof:"View screenshot",a_banned:"banned",a_close:"Close"});
+Object.assign(LT.ru,{tl_sent:"Заявка отправлена",tl_ok:"Аккаунт проверен, заявка одобрена",tl_link:"Ссылка на видео отправлена",tl_acc:"Видео принято",tl_way:"Оплата в пути",tl_paid:"Оплачено",tl_eta:"Ожидается",tl_proof:"Посмотреть скриншот оплаты",tl_overdue:"Срок прошёл. Отправьте ссылку на видео, иначе аккаунт будет заблокирован.",tl_rej:"Заявка отклонена",tl_ret:"Возвращено: исправьте видео и отправьте ссылку снова",d_banned:"Ваш аккаунт заблокирован за нарушение условий. Свяжитесь с менеджером.",a_ban:"Заблокировать",a_eta:"Когда ожидается оплата (дата или заметка)",a_eta_save:"Сохранить",a_overdue:"Просрочено",a_proof_pick:"Скриншот оплаты (по желанию)",a_view_proof:"Показать скриншот",a_banned:"заблокирован",a_close:"Закрыть"});
+function tlHtml(q){
+  if(q.status==="rejected"||q.status==="cancelled")return '<div class="note err">'+esc(L("tl_rej"))+'</div>';
+  var cur=0;
+  if(q.status==="approved"||q.status==="returned")cur=1;
+  else if(q.status==="submitted")cur=2;
+  else if(q.status==="completed")cur=q.paid?5:4;
+  var steps=["tl_sent","tl_ok","tl_link","tl_acc","tl_way","tl_paid"];
+  var html='<ol class="tl">'+steps.map(function(k,i){
+    var st=i<cur||(q.paid&&i===5)?"done":(i===cur?"cur":"todo");
+    var extra="";
+    if(i===4&&st==="cur"&&q.eta)extra='<small>'+esc(L("tl_eta"))+': '+esc(q.eta)+'</small>';
+    if(i===5&&q.paid&&q.hasProof)extra='<small><a href="#" data-l="showProof" data-id="'+esc(q.id)+'">'+esc(L("tl_proof"))+'</a></small>';
+    if(i===1&&st==="cur"&&q.eta)extra='<small>'+esc(L("tl_eta"))+': '+esc(q.eta)+'</small>';
+    return '<li class="'+st+'"><span>'+esc(L(k))+'</span>'+extra+'</li>';
+  }).join("")+'</ol>';
+  if(q.status==="returned")html+='<div class="note err">'+esc(L("tl_ret"))+'</div>';
+  if(q.overdue)html+='<div class="note err">'+esc(L("tl_overdue"))+'</div>';
+  return html;
+}
+function shrinkImage(file,cb){
+  var fr=new FileReader();
+  fr.onload=function(){var im=new Image();im.onload=function(){var m=900,w=im.width,h=im.height,k=Math.min(1,m/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",0.6))};im.onerror=function(){cb(null)};im.src=fr.result};
+  fr.onerror=function(){cb(null)};fr.readAsDataURL(file);
+}
+function showImage(src){openModal('<img src="'+esc(src)+'" alt="" style="max-width:100%;border-radius:12px"><div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("a_close"))+'</button></div>')}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="showProof"){e.preventDefault();api("/api/request/proof?id="+encodeURIComponent(id)).then(function(r){if(r.ok&&r.j.image)showImage(r.j.image)});return}
+  if(a==="admProof"){api("/api/admin/proof?id="+encodeURIComponent(id)).then(function(r){if(r.ok&&r.j.image)showImage(r.j.image)});return}
+  if(a==="etaSave"){api("/api/admin/eta",{id:id,eta:val("eta_"+id)}).then(function(){ownerReload()});return}
+  if(a==="poAct2"){
+    var paid=el.getAttribute("data-p")==="1",inp=$("sc_"+id),f=inp&&inp.files&&inp.files[0];
+    function go(img){var body={id:id,paid:paid};if(img)body.image=img;api("/api/admin/payout",body).then(function(){ownerReload()})}
+    if(paid&&f){shrinkImage(f,function(img){go(img)})}else go(null);return}
+});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);

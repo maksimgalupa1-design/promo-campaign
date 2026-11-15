@@ -48,6 +48,15 @@ async function loadDb() {
   }
   normDb();
 }
+/* payment screenshots live in their own rows so the main database stays small */
+async function putProof(id, img) {
+  if (SB_URL && SB_KEY) { const r = await fetch(SB_URL + "/rest/v1/kv?on_conflict=key", { method: "POST", headers: sbHeaders({ Prefer: "resolution=merge-duplicates,return=minimal" }), body: JSON.stringify({ key: "proof:" + id, value: { img }, updated_at: new Date().toISOString() }) }); if (!r.ok) throw new Error("proof save " + r.status); }
+  else { fs.mkdirSync(path.join(__dirname, "proofs"), { recursive: true }); fs.writeFileSync(path.join(__dirname, "proofs", id + ".json"), JSON.stringify({ img }), { mode: 0o600 }); }
+}
+async function getProof(id) {
+  if (SB_URL && SB_KEY) { const r = await fetch(SB_URL + "/rest/v1/kv?key=eq.proof:" + encodeURIComponent(id) + "&select=value", { headers: sbHeaders() }); if (!r.ok) return null; const rows = await r.json(); return rows.length ? rows[0].value.img : null; }
+  try { return JSON.parse(fs.readFileSync(path.join(__dirname, "proofs", id + ".json"), "utf8")).img; } catch (e) { return null; }
+}
 let saveTimer = null, saving = false, dirty = false;
 function saveDb() { dirty = true; if (!saveTimer) saveTimer = setTimeout(flushDb, 400); }
 async function flushDb() {
@@ -93,9 +102,9 @@ function send(res, code, body, headers) {
   res.writeHead(code, Object.assign({ "Content-Type": "application/json; charset=utf-8" }, headers || {}));
   res.end(typeof body === "string" ? body : JSON.stringify(body));
 }
-function readBody(req) {
+function readBody(req, max) {
   return new Promise((ok, fail) => {
-    let s = ""; req.on("data", c => { s += c; if (s.length > 1e5) req.destroy(); });
+    let s = ""; req.on("data", c => { s += c; if (s.length > (max || 1e5)) req.destroy(); });
     req.on("end", () => { try { ok(s ? JSON.parse(s) : {}); } catch (e) { fail(e); } });
   });
 }
@@ -207,7 +216,8 @@ function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
-    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidAt: r.paidAt || 0 };
+    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidAt: r.paidAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
+    overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)); if (ou && ou.payout) o.payout = decObj(ou.payout.enc); }
   if (withAdmin && acc) { const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
   return o;
@@ -371,6 +381,12 @@ const server = http.createServer(async (req, res) => {
       }
       saveDb(); return send(res, 200, { requests: out });
     }
+    if (P === "/api/request/proof" && M === "GET") {      // the editor sees the screenshot of the payment sent to them
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const r = db.requests[url.searchParams.get("id") || ""];
+      if (!need(res, r && r.proof && (u.accounts || []).some(a => a.open_id === r.openId), 404, "no screenshot")) return;
+      return send(res, 200, { image: await getProof(r.id) });
+    }
     if (P === "/api/request/links" && M === "POST") {    // editor sends the video link(s); we check they belong to the connected account
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), r = db.requests[b.id];
@@ -461,7 +477,7 @@ const server = http.createServer(async (req, res) => {
       if (!adminOk(req)) return send(res, 401, { error: "unauthorized" });
       if (P === "/api/admin/overview" && M === "GET") { refreshStale(20).catch(() => {}); return send(res, 200, overview()); }
       if (P === "/api/admin/applicants" && M === "GET") return send(res, 200, allAccounts().map(accAdminView));
-      const b = M === "POST" ? await readBody(req) : {};
+      const b = M === "POST" ? await readBody(req, P === "/api/admin/payout" ? 8e5 : 1e5) : {};
       if (P === "/api/admin/pay" && M === "GET") return send(res, 200, payInfo());
       if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) cr[k] = c(b.crypto, k); db.settings.pay = { paypal: c(b, "paypal"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), crypto: cr }; saveDb(); return send(res, 200, payInfo()); }
       if (P === "/api/admin/track" && M === "POST") {   // owner approves a track before the producer pays
@@ -470,7 +486,7 @@ const server = http.createServer(async (req, res) => {
         saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/decision" && M === "POST") {
-        if (!need(res, ["approved", "rejected", "new"].includes(b.status), 400, "bad status")) return;
+        if (!need(res, ["approved", "rejected", "new", "banned"].includes(b.status), 400, "bad status")) return;
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
         a.adminStatus = b.status; saveDb(); return send(res, 200, { ok: true });
       }
@@ -488,13 +504,19 @@ const server = http.createServer(async (req, res) => {
         if (st === "approved") {
           const t = db.tracks[r.trackId], cost = reqCost(r);
           if (!need(res, t && t.status === "active" && trackLeft(t) >= cost, 409, "not enough budget on the track")) return;
-          t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100;
+          t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100; r.approvedAt = Date.now();
         }
         r.status = st; r.updated = Date.now(); if (st === "completed") r.completedAt = Date.now(); saveDb(); return send(res, 200, { ok: true });
       }
+      if (P === "/api/admin/eta" && M === "POST") {
+        const r = db.requests[b.id]; if (!need(res, r, 404, "no such request")) return;
+        r.eta = String(b.eta || "").trim().slice(0, 80); saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/proof" && M === "GET") { const img = await getProof(url.searchParams.get("id") || ""); return send(res, 200, { image: img }); }
       if (P === "/api/admin/payout" && M === "POST") {     // mark that the editor has been paid for a completed request
         const r = db.requests[b.id]; if (!need(res, r && r.status === "completed", 404, "no completed request")) return;
-        r.paid = !!b.paid; r.paidAt = r.paid ? Date.now() : 0; saveDb(); return send(res, 200, { ok: true });
+        r.paid = !!b.paid; r.paidAt = r.paid ? Date.now() : 0;
+        if (b.image) { if (!need(res, /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.image) && b.image.length < 700000, 400, "bad image")) return; await putProof(r.id, b.image); r.proof = true; } saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
         const tp = db.topups[b.id]; if (!need(res, tp && tp.status === "pending", 404, "no pending payment")) return;
