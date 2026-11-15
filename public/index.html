@@ -12,7 +12,7 @@
 <meta property="og:description" content="Earn from TikTok videos with artists' tracks, or promote your music with real creators.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/icon.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Cpath%20d=%22M32%200A32%2032%200%200%201%2064%2032A32%2032%200%200%201%2032%2064H20A20%2020%200%200%201%200%2044V32A32%2032%200%200%201%2032%200Z%22%20fill=%22%23FF5C80%22/%3E%3Ccircle%20cx=%2232%22%20cy=%2232%22%20r=%2212.5%22%20fill=%22%230E1020%22/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/icon.png"><meta name="theme-color" content="#0E1020">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%236D5CFF%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23A56BFF%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20d=%22M32%200A32%2032%200%200%201%2064%2032A32%2032%200%200%201%2032%2064H20A20%2020%200%200%201%200%2044V32A32%2032%200%200%201%2032%200Z%22%20fill=%22url(%23g)%22/%3E%3Ccircle%20cx=%2232%22%20cy=%2232%22%20r=%2212.5%22%20fill=%22%2314121F%22/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/icon.png"><meta name="theme-color" content="#0E1020">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap">
 <style>
@@ -589,7 +589,7 @@ h2{font-size:clamp(24px,3vw,30px)}
 header.bar{background:color-mix(in srgb,var(--bg) 72%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding-block:10px}
 .bar .wrap{flex-wrap:nowrap;gap:10px}
 .logo{font-size:18px;white-space:nowrap}
-.mark{background:linear-gradient(135deg,var(--accent),#8B6CFF);box-shadow:var(--glow)}
+.mark{background:linear-gradient(135deg,#6D5CFF,#A56BFF);box-shadow:var(--glow)}
 .mark::after{background:var(--bg)}
 .lang{border:0;background:none;gap:6px;align-items:center;flex-wrap:nowrap;overflow:visible}
 .lang .langL{display:none}
@@ -690,6 +690,37 @@ body.hasdock #navSignup{display:none!important}
 
 body.isadmin #navSignup{display:none!important}
 @media (max-width:899px){.lang select{max-width:92px!important}.lang .themesel{max-width:70px!important}}
+
+@media (max-width:899px){#dock .dkd{display:none}}
+.supl{display:grid;gap:10px}.supb{justify-content:flex-start!important;font-size:16px;padding:14px 16px;text-decoration:none}.supb i{font-style:normal;font-size:22px}
+/* owner: left menu + right content */
+body.isadmin .wrap{max-width:1320px}
+.ownlay{display:block}
+@media (min-width:900px){
+ .ownlay{display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;align-items:start}
+ .ownside{position:sticky;top:78px;max-height:calc(100vh - 96px);overflow:auto;padding-right:2px}
+ .ownside>.row{display:block!important}
+ .ownside>.row>div{margin:0}
+ .ownside label{display:none!important}
+ .ownside .agroups{display:grid;grid-template-columns:1fr!important;grid-template-areas:none!important;gap:10px;margin:0 0 12px}
+ .ownside .agrp{grid-area:auto!important;padding:10px 10px 8px;border-radius:20px}
+ .ownside .agh{padding:2px 8px 6px;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+ .ownside .agb{flex-direction:column;flex-wrap:nowrap;gap:2px}
+ .ownside .atb{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0!important;background:transparent!important;border-radius:13px!important;padding:10px 12px;font-size:14.5px}
+ .ownside .atb:hover{background:rgba(255,255,255,.07)!important}
+ .ownside .agrp .atb[aria-pressed="true"]{background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important;color:#fff;box-shadow:0 6px 18px rgba(109,92,255,.35)}
+ .ownside .atb .cnt{margin-left:auto}
+ .ownside .atb::before{font-size:16px;width:22px;text-align:center}
+ .ownside .atb[data-k=overview]::before{content:"📊"}.ownside .atb[data-k=promos]::before{content:"🔥"}.ownside .atb[data-k=waiting]::before{content:"⏳"}.ownside .atb[data-k=requests]::before{content:"📥"}.ownside .atb[data-k=accounts]::before{content:"👥"}.ownside .atb[data-k=editorpay]::before{content:"💸"}.ownside .atb[data-k=prices]::before{content:"🏷️"}.ownside .atb[data-k=producers]::before{content:"🎤"}.ownside .atb[data-k=payments]::before{content:"💳"}.ownside .atb[data-k=tracks]::before{content:"🎵"}.ownside .atb[data-k=pay]::before{content:"🏦"}.ownside .atb[data-k=contacts]::before{content:"📞"}
+ .ownside #admLogout{width:100%;margin-top:4px}
+ .ownmain{min-width:0}
+}
+#v-admin>h2{margin-bottom:16px}
+
+.cvt .cvr.pick{cursor:pointer;transition:background .15s,border-color .15s}
+.cvt .cvr.pick:hover{border-color:var(--ok)}
+.cvt .cvr.sel{background:color-mix(in srgb,var(--ok) 18%,var(--surface));border-color:var(--ok);box-shadow:0 0 0 1px var(--ok) inset}
+.cvt .cvr.sel b{color:var(--ok)}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -867,7 +898,7 @@ body.isadmin #navSignup{display:none!important}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v21 · 15.11 19:00</span>
+  <span>© Promo Campaign · v24 · 15.11 18:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -902,7 +933,7 @@ function analyze(videos,now){
 /* Chance of approval for a given price (USD per video). cpm = price per 1000 average views. */
 function evaluate(A,price){
   var r={good:[],bad:[],chance:0,decision:"no",cpm:null};
-  if(!A.accepted){r.bad.push(A.reject);return r}
+  if(!A.accepted){r.bad.push(A.reject);r.chance=A.status==="abandoned"?3:2;return r}
   var hasPrice=price>0&&A.refAvg>0;
   var cpm=hasPrice?price/A.refAvg*1000:null;r.cpm=cpm;
   if(A.status==="dormant"){
@@ -1186,7 +1217,7 @@ function gate(){
   var u=S.user;
   if(!u||!u.consent)return "signup";
   var A=getA();
-  if(!A.accepted||!u.reviewed)return "analysis";
+  if(!u.reviewed)return "analysis";
   return null;
 }
 
@@ -1283,16 +1314,15 @@ function renderAnalysis(){loadRanges();
     var h=winTable(A)+videoTable(u);
     if(!A.accepted){
       h+='<div class="blk"><h3>'+esc(t("rp_bad"))+'</h3>'+reasonList([A.reject],"b")+'<p class="hint" style="margin-top:8px">'+esc(t("rej_hint"))+'</p></div>'+
-        '<button class="btn primary" id="otherAcc">'+esc(t("rej_other"))+'</button>';
-    }else{
+        '<div class="note" style="margin-top:12px"><b>'+esc(L("rj_chance"))+'</b> '+esc(L("rj_note"))+'</div>';
+    }
       h+='<div class="card" style="margin-top:18px"><h3>'+esc(L("tp_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(L("tp_h"))+'</p>'+catChecks("anCats",u.categories||[])+(LIVE?'<label class="f" for="anAbout" style="margin-top:14px"><span>'+esc(L("an_about"))+'</span><textarea id="anAbout" rows="3" maxlength="600" placeholder="'+esc(L("dl_about_ph"))+'">'+esc(u.about||"")+'</textarea><span class="hint">'+esc(L("an_about_h"))+'</span></label><div class="note err" id="aboutErr" hidden>'+esc(L("an_about_err"))+'</div>':'')+'<div class="note err" id="topicErr" hidden style="margin-top:12px">'+esc(L("tp_err"))+'</div></div>'+
         '<div class="card" style="margin-top:18px"><h3>'+esc(t("price_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(t("price_hint"))+'</p><div class="note" id="rangeHint" hidden style="margin-bottom:12px"></div>'+
-        '<div class="pricebox"><span style="font-family:var(--display);font-size:24px;font-weight:700">$</span><input type="number" id="priceIn" min="1" max="200" step="0.5" inputmode="decimal" aria-label="'+esc(t("price_title"))+'" value="'+(u.price||PC.recommend(A))+'"></div>'+
+        '<div class="pricebox"><span style="font-family:var(--display);font-size:24px;font-weight:700">$</span><input type="number" id="priceIn" min="1" max="200" step="0.5" inputmode="decimal" aria-label="'+esc(t("price_title"))+'" value="'+(u.price||PC.recommend(A)||5)+'"></div>'+
         '<div class="note err" id="priceErr" hidden style="margin-top:12px">'+esc(t("price_err"))+'</div></div>'+
         '<button class="btn primary wide" id="sendReview" style="margin-top:16px">'+esc(t("an_send"))+'</button>';
-    }
     res.innerHTML=h;res.hidden=false;
-    if(A.accepted){RA=A;updRange()}
+    if(A.accepted){RA=A;updRange()}else{var rh=$("rangeHint");if(rh)rh.hidden=true}
   }
   if(u.analyzed){show();return}
   res.hidden=true;$("anTitle").textContent=t("an_title");paint(0,0);
@@ -1873,7 +1903,7 @@ function renderOwner(){
   }else if(LV.adTab==="promos"){
     body=moneySum(D)+promosHtml(D);
   }else if(LV.adTab==="waiting"){
-    var wl=D.accounts.filter(function(a){return isWait(a)}).map(function(a){return accCardHtml(a)}).join("");
+    var wl=D.accounts.filter(function(a){return isWait(a)}).sort(function(x,y){return ((y.stars&&y.stars.final)||0)-((x.stars&&x.stars.final)||0)}).map(function(a){return accCardHtml(a)}).join("");
     var wn=D.accounts.filter(function(a){return isWait(a)}).length;
     var wr=waitReqHtml(D);
     body=(wl?'<div class="waitbig">'+esc(L("a_wait_cnt").replace("{n}",wn))+'</div><div class="list">'+wl+'</div>':'')+(wr?'<h3 class="wrh">'+esc(L("wr_title"))+'</h3>'+wr:'')+((wl||wr)?'':'<div class="empty">'+esc(L("a_wait_none"))+'</div>');
@@ -3395,22 +3425,22 @@ function trackModalHtml(q){
 }
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="trOpen"]');if(!el)return;var q=(LV.reqs||[]).filter(function(x){return x.id===el.getAttribute("data-q")})[0];if(q)openModal(trackModalHtml(q))});
 /* ===== v21: dock navigation, stat widgets, budget converter ===== */
-Object.assign(LT.en,{dk_orders:"Orders",dk_pay:"Payments",dk_acc:"Accounts",dk_tracks:"My tracks",dk_add:"Add track",dk_role:"Change role",
+Object.assign(LT.en,{p_attach_req:"Attach proof of payment (required)",p_attach_need:"Attach the payment screenshot first. It is required.",rj_chance:"Approval chance: 2–3%.",rj_note:"You can still send the account for review. The manager looks at it by hand, but the chance is very low.",dk_sup:"Support",sup_t:"Support",sup_h:"Write to the manager if something is wrong.",sup_none:"Contacts are not added yet.",dk_orders:"Orders",dk_pay:"Payments",dk_acc:"Accounts",dk_tracks:"My tracks",dk_add:"Add track",dk_role:"Change role",
  w_active:"In progress",w_wait:"Waiting",w_earned:"Earned",w_prog:"Money in progress",w_orders:"orders",
- cv_UAH:"Budget, UAH (₴)",cv_USDT:"Budget, USDT",cv_USD:"Budget, USD",cv_card_h:"You pay in hryvnia. We convert it to dollars for the budget.",cv_crypto_h:"Type the amount in USDT. Below is the same amount in other coins. Tap Copy to copy a number.",
+ cv_UAH:"Budget, UAH (₴)",cv_USDT:"Budget, USDT",cv_USD:"Budget, USD",cv_card_h:"Type the budget in dollars. Below is how much to pay in hryvnia.",cv_crypto_h:"Type the amount in USDT. Below is the same amount in other coins. Tap Copy to copy a number.",
  cv_usd:"Budget in dollars",cv_pay:"To pay",cv_rate:"Rate",cv_min:"Minimum",cv_copy:"Copy",cv_copied:"Copied",cv_approx:"Approximate rate (live rate is not available now)",cv_conv:"Same amount in other coins",cv_sel:"selected"});
-Object.assign(LT.ru,{dk_orders:"Заказы",dk_pay:"Платежи",dk_acc:"Аккаунты",dk_tracks:"Мои треки",dk_add:"Добавить",dk_role:"Сменить роль",
+Object.assign(LT.ru,{p_attach_req:"Прикрепите подтверждение оплаты (обязательно)",p_attach_need:"Сначала прикрепите скриншот оплаты. Это обязательно.",rj_chance:"Шанс одобрения: 2–3%.",rj_note:"Вы всё равно можете отправить аккаунт на проверку. Менеджер посмотрит его вручную, но шанс очень низкий.",dk_sup:"Поддержка",sup_t:"Поддержка",sup_h:"Напишите менеджеру, если что-то не так.",sup_none:"Контакты пока не добавлены.",dk_orders:"Заказы",dk_pay:"Платежи",dk_acc:"Аккаунты",dk_tracks:"Мои треки",dk_add:"Добавить",dk_role:"Сменить роль",
  w_active:"В работе",w_wait:"Ждут",w_earned:"Заработано",w_prog:"Деньги в работе",w_orders:"заказов",
- cv_UAH:"Бюджет, грн (₴)",cv_USDT:"Бюджет, USDT",cv_USD:"Бюджет, USD",cv_card_h:"Вы платите в гривнах. Мы пересчитаем в доллары для бюджета.",cv_crypto_h:"Впишите сумму в USDT. Ниже та же сумма в других монетах. Нажмите «Копировать», чтобы скопировать число.",
+ cv_UAH:"Бюджет, грн (₴)",cv_USDT:"Бюджет, USDT",cv_USD:"Бюджет, USD",cv_card_h:"Впишите бюджет в долларах. Ниже сумма к оплате в гривнах.",cv_crypto_h:"Впишите сумму в USDT. Ниже та же сумма в других монетах. Нажмите «Копировать», чтобы скопировать число.",
  cv_usd:"Бюджет в долларах",cv_pay:"К оплате",cv_rate:"Курс",cv_min:"Минимум",cv_copy:"Копировать",cv_copied:"Скопировано",cv_approx:"Примерный курс (живой сейчас недоступен)",cv_conv:"Эта же сумма в других монетах",cv_sel:"выбрано"});
 
 /* ---------- dock ---------- */
 function dockItems(){
   var h=(location.hash||"#home").replace(/\?.*/,""),r=roleGet();
   if(!LIVE||h==="#admin"||h==="#home"||h===""||!r)return null;
-  if(r==="producer")return [["producer","🎵",L("dk_tracks"),""],["producer","➕",L("dk_add"),"add"],["home","⇄",L("dk_role"),"sw"]];
+  if(r==="producer")return [["producer","🎵",L("dk_tracks"),""],["producer","➕",L("dk_add"),"add"],["sup","🛟",L("dk_sup"),"sup"],["home","⇄",L("dk_role"),"sw"]];
   var pg=LV.dockPay;
-  return [["orders","🛒",L("dk_orders"),""],["dashboard","💳",L("dk_pay"),"pay"],["dashboard","👤",L("dk_acc"),""],["home","⇄",L("dk_role"),"sw"]];
+  return [["orders","🛒",L("dk_orders"),""],["dashboard","💳",L("dk_pay"),"pay"],["dashboard","👤",L("dk_acc"),""],["sup","🛟",L("dk_sup"),"sup"],["home","⇄",L("dk_role"),"sw"]];
 }
 function dockRender(){
   var h=(location.hash||"#home").replace(/\?.*/,""),items=dockItems(),d=$("dock");
@@ -3420,14 +3450,15 @@ function dockRender(){
   d.hidden=false;document.body.classList.add("hasdock");
   var cur=h.slice(1);
   d.innerHTML=items.map(function(it){
-    var on=it[0]===cur&&((it[3]==="pay")===!!LV.dockPay)&&it[3]!=="sw"&&it[3]!=="add";
-    return '<button type="button" data-dk="'+it[0]+'" data-x="'+it[3]+'"'+(on?' aria-current="page"':'')+(it[3]==="sw"?' class="dksw"':'')+'><i>'+it[1]+'</i><span>'+esc(it[2])+'</span></button>'}).join("");
+    var on=it[0]===cur&&((it[3]==="pay")===!!LV.dockPay)&&it[3]!=="sw"&&it[3]!=="add"&&it[3]!=="sup";
+    return '<button type="button" data-dk="'+it[0]+'" data-x="'+it[3]+'"'+(on?' aria-current="page"':'')+(it[3]==="sw"?' class="dksw"':(it[3]==="sup"?' class="dkd"':''))+'><i>'+it[1]+'</i><span>'+esc(it[2])+'</span></button>'}).join("");
   var sw=d.querySelector(".dksw");if(sw){var sp=document.createElement("span");sp.className="dkx";d.insertBefore(sp,sw)}
 }
 document.addEventListener("click",function(e){
   var b=e.target.closest("#dock [data-dk]");if(!b)return;
   var g=b.getAttribute("data-dk"),x=b.getAttribute("data-x");LV.dockPay=(x==="pay");
   if(x==="sw"){go("home");return}
+  if(x==="sup"){supOpen();return}
   var after=function(){
     var t=x==="pay"?$("payH1"):(x==="add"?document.querySelector("#v-lprod h3, #v-lprod .form, #nTitle"):null);
     if(x==="add"&&$("nTitle")){$("nTitle").closest("label").scrollIntoView({behavior:"smooth",block:"center"});return}
@@ -3477,31 +3508,29 @@ function cvCtx(){
   return null;
 }
 function cvMode(c){var m=c.sel?c.sel.value:"paypal";return m==="card"?"UAH":(m==="crypto"||m==="usdt")?"USDT":"USD"}
-function cvToUsd(amount,mode){var R=CV.rates||CV.fall;return mode==="UAH"?amount/R.UAH:amount}
 function cvUpdate(force){
   var c=cvCtx();if(!c)return;if(!CV.rates){cvLoad();}
   var R=CV.rates||CV.fall,mode=cvMode(c),lab=c.inp.closest("label"),sp=lab&&lab.querySelector("span");
-  if(sp)sp.textContent=L("cv_"+mode);
-  c.inp.min=mode==="UAH"?String(Math.ceil(100*R.UAH)):"100";c.inp.placeholder=mode==="UAH"?String(Math.ceil(100*R.UAH)):"100";
+  if(sp)sp.textContent=L(mode==="USDT"?"cv_USDT":"cv_USD");
+  c.inp.min="100";c.inp.placeholder="100";
+  var pl=document.querySelector('label[for=nProof] span');if(pl)pl.textContent=L("p_attach_req");
   var box=$("cvBox");
   if(!box){box=document.createElement("div");box.id="cvBox";box.className="cvt";
     var anchor=$("nBudgetInfo")||lab;if(anchor&&anchor.insertAdjacentElement)anchor.insertAdjacentElement("afterend",box)}
-  var a=Number(c.inp.value)||0,usd=cvToUsd(a,mode),html="";
-  var rate=mode==="UAH"?'1 $ = '+cvFmt("UAH",R.UAH)+' ₴':'';
+  var usd=Number(c.inp.value)||0,html="";
   var approx=(!CV.live&&CV.rates)?'<div class="cvb">⚠ '+esc(L("cv_approx"))+'</div>':'';
-  var q=$("nBudgetInfo");if(q&&mode!=="USD"&&a>0){if(usd<100){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=L("p_you_get")+": "+money(usd*0.8)+" ("+money(usd)+" − 20%). "+L("p_fee_short");q.className="hotnote"}}
   if(mode==="USD"){box.hidden=true;return}
   box.hidden=false;
   if(mode==="UAH"){
+    var uah=usd*R.UAH;
     html='<h4>₴ '+esc(L("cv_card_h"))+'</h4>'+
-     '<div class="cvr"><b>₴</b><span>'+(a>0?cvFmt("UAH",a)+' ₴':'—')+'</span>'+(a>0?'<button type="button" data-cv="'+(Math.round(a*100)/100)+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'+
-     '<div class="cvmain"><span>'+esc(L("cv_usd"))+'</span><b>'+(a>0?'$'+cvFmt("USD",usd):'—')+'</b></div>'+
-     '<div class="cvb">'+esc(L("cv_rate"))+': '+rate+' · '+esc(L("cv_min"))+': '+cvFmt("UAH",100*R.UAH)+' ₴ ($100)</div>'+approx;
+     '<div class="cvr sel"><b>₴ UAH</b><span>'+(usd>0?cvFmt("UAH",uah)+' ₴':'—')+'</span>'+(usd>0?'<button type="button" data-cv="'+(Math.round(uah*100)/100)+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'+
+     '<div class="cvb">'+esc(L("cv_rate"))+': 1 $ = '+cvFmt("UAH",R.UAH)+' ₴ · '+esc(L("cv_min"))+': $100</div>'+approx;
   }else{
-    var sel=c.coin?(CV.coinMap[c.coin.value]||"USDT"):"USDT",order=["USDT","SOL","TRX","ETH","LTC","TON","BTC"];
+    var sel=c.coin?(CV.coinMap[c.coin.value]||""):"",order=["USDT","SOL","TRX","ETH","LTC","TON"];
     html='<h4>◎ '+esc(L("cv_crypto_h"))+'</h4>'+
-     order.map(function(k){var v=k==="USDT"?a:a*(R[k]||0),show=a>0?cvFmt(k,v):"—";
-       return '<div class="cvr"><b>'+k+(k===sel?' ✓':'')+'</b><span>'+show+'</span>'+(a>0?'<button type="button" data-cv="'+show+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'}).join("")+
+     order.map(function(k){var v=k==="USDT"?usd:usd*(R[k]||0),show=usd>0?cvFmt(k,v):"—",pick=k!=="USDT";
+       return '<div class="cvr'+(k===sel?' sel':'')+(pick?' pick':'')+'"'+(pick?' data-net="'+k+'"':'')+'><b>'+k+'</b><span>'+show+'</span>'+(usd>0?'<button type="button" data-cv="'+show+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'}).join("")+
      '<div class="cvb">'+esc(L("cv_min"))+': 100 USDT</div>'+approx;
   }
   if(box.getAttribute("data-k")!==html){box.setAttribute("data-k",html);box.innerHTML=html}
@@ -3509,20 +3538,23 @@ function cvUpdate(force){
 document.addEventListener("input",function(e){if(e.target&&(e.target.id==="nBudget"||e.target.id==="tAmt"))cvUpdate()});
 document.addEventListener("change",function(e){if(e.target&&/^(nMethod|tMeth|nCoin|tCoin)$/.test(e.target.id)){var b=$("cvBox");if(b)b.removeAttribute("data-k");setTimeout(cvUpdate,0)}});
 document.addEventListener("click",function(e){
-  var b=e.target.closest("[data-cv]");if(!b)return;var v=b.getAttribute("data-cv");
-  var ok=function(){var o=b.textContent;b.textContent=L("cv_copied");b.classList.add("done");setTimeout(function(){b.textContent=L("cv_copy");b.classList.remove("done")},1400)};
+  var b=e.target.closest("[data-cv]");
+  if(!b){var row=e.target.closest(".cvr[data-net]");if(row){var c=cvCtx(),k=row.getAttribute("data-net"),name=Object.keys(CV.coinMap).filter(function(x){return CV.coinMap[x]===k})[0];
+    if(c&&c.coin&&name){c.coin.value=name;c.coin.dispatchEvent(new Event("change",{bubbles:true}))}}return}
+  var v=b.getAttribute("data-cv");
+  var ok=function(){b.textContent=L("cv_copied");b.classList.add("done");setTimeout(function(){b.textContent=L("cv_copy");b.classList.remove("done")},1400)};
   try{navigator.clipboard.writeText(v).then(ok,function(){fallback()})}catch(er){fallback()}
   function fallback(){var t=document.createElement("textarea");t.value=v;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(x){}t.remove();ok()}
 });
-/* before the old handlers read the amount: turn hryvnia into dollars and remember the original */
+/* payment screenshot is required for a new track; remember what was paid for the owner */
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
   if(a!=="pAdd"&&a!=="pTopGo")return;
-  var c=cvCtx();if(!c)return;var mode=cvMode(c),v=Number(c.inp.value)||0;window.__cv=null;
-  if(mode==="USD"||!(v>0))return;
-  window.__cv={cur:mode,orig:Math.round(v*100)/100};
-  var usd=Math.round(cvToUsd(v,mode)*100)/100,old=c.inp.value;c.inp.value=String(usd);
-  setTimeout(function(){var i=$(c.id);if(i)i.value=old},0);
+  var c=cvCtx();window.__cv=null;if(!c)return;
+  if(a==="pAdd"){var f=$("nProof"),ne=$("nErr");if(!(f&&f.files&&f.files[0])){e.stopImmediatePropagation();e.preventDefault();if(ne){ne.textContent=L("p_attach_need");ne.hidden=false;ne.scrollIntoView({behavior:"smooth",block:"center"})}return}}
+  var mode=cvMode(c),usd=Number(c.inp.value)||0,R=CV.rates||CV.fall;
+  if(mode==="USD"||!(usd>0))return;
+  window.__cv={cur:mode,orig:Math.round((mode==="UAH"?usd*R.UAH:usd)*100)/100};
 },true);
 (function(){var o=prodCall;prodCall=function(p,b){
   if(window.__cv&&b&&(b.budget!=null||b.amount!=null)){b.cur=window.__cv.cur;b.orig=window.__cv.orig}window.__cv=null;return o.apply(this,arguments)}})();
@@ -3534,6 +3566,29 @@ document.addEventListener("click",function(e){
       if($("nBudget")||$("tAmt")){var c=cvCtx();if(c&&!$("cvBox"))cvUpdate()}
       wgtInject()})}).observe(document.body,{childList:true,subtree:true});
 })();
+
+/* ---------- support window: the owner's contacts ---------- */
+function supOpen(){
+  var c=CONTACTS||{},ln=function(u,l,i){return '<a class="btn supb" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer"><i>'+i+'</i>'+esc(l)+'</a>'},rows=[];
+  var url=function(v,base){return /^https?:\/\//i.test(v)?v:base+String(v).replace(/^@/,"")};
+  if(c.telegram)rows.push(ln(url(c.telegram,"https://t.me/"),"Telegram","✈️"));
+  if(c.instagram)rows.push(ln(url(c.instagram,"https://instagram.com/"),"Instagram","📸"));
+  if(c.tiktok)rows.push(ln(url(c.tiktok,"https://tiktok.com/@"),"TikTok","🎵"));
+  if(c.discord)rows.push(/^https?:\/\//i.test(c.discord)?ln(c.discord,"Discord","🎮"):'<div class="btn supb"><i>🎮</i>Discord: '+esc(c.discord)+'</div>');
+  openModal('<h3>🛟 '+esc(L("sup_t"))+'</h3><p class="hint">'+esc(L("sup_h"))+'</p>'+(rows.length?'<div class="supl">'+rows.join("")+'</div>':'<div class="note">'+esc(L("sup_none"))+'</div>')+'<div class="row"><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');
+}
+
+/* ---------- owner cabinet: menu on the left, the opened section on the right ---------- */
+function ownLayout(){
+  var app=$("adApp");if(!app||!app.firstElementChild||app.querySelector(".ownlay"))return;
+  var kids=Array.prototype.slice.call(app.children),head=kids[0];
+  var lay=document.createElement("div");lay.className="ownlay";
+  var side=document.createElement("aside");side.className="ownside";side.appendChild(head);
+  var main=document.createElement("section");main.className="ownmain";kids.slice(1).forEach(function(k){main.appendChild(k)});
+  lay.appendChild(side);lay.appendChild(main);app.appendChild(lay);
+}
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{ownLayout()}catch(e){}return r}})();
+(function(){var o=autoScOn;autoScOn=function(){return window.innerWidth>=900?false:o()}})();
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
