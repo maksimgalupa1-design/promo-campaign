@@ -541,6 +541,31 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/overview" && M === "GET") { refreshStale(20).catch(() => {}); return send(res, 200, overview()); }
       if (P === "/api/admin/applicants" && M === "GET") return send(res, 200, allAccounts().map(accAdminView));
       const b = M === "POST" ? await readBody(req, P === "/api/admin/payout" ? 8e5 : 1e5) : {};
+      if (P === "/api/admin/plan" && M === "POST") {   // suggests how many videos to buy from which accounts for one track
+        const t = db.tracks[b.trackId]; if (!need(res, t && t.status === "active", 404, "track not active")) return;
+        let rem = Math.round((Number(b.budget) > 0 ? Number(b.budget) : trackLeft(t)) * 100) / 100; const budget = rem;
+        if (!need(res, rem > 0, 400, "no budget left on this track")) return;
+        const busy = new Set(Object.values(db.requests).filter(r => r.trackId === t.id && ["pending", "approved", "submitted"].includes(r.status)).map(r => r.openId));
+        const cands = [];
+        for (const acc of allAccounts()) {
+          if (acc.adminStatus !== "approved" || !(acc.price > 0) || busy.has(acc.open_id)) continue;
+          const v = accAdminView(acc), A = v.analysis;
+          if (!A.accepted || !A.month || A.month.views < 1000 || !A.refAvg) continue;
+          if (v.evaluation && v.evaluation.decision === "risky") continue;
+          if ((t.categories || []).length && !(t.categories || []).some(c => (acc.categories || []).includes(c))) continue;
+          const unit = Math.round(acc.price * (1 - (acc.discount || 0) / 100) * 100) / 100; if (!(unit > 0)) continue;
+          const stars = v.stars.final == null ? 3 : v.stars.final;
+          cands.push({ id: v.id, handle: v.handle, unit, exp: A.refAvg, stars, discount: acc.discount || 0, price: acc.price, score: (A.refAvg / unit) * (0.6 + 0.4 * stars / 5) * ((acc.discount || 0) > 0 ? 1.05 : 1), n: 0 });
+        }
+        for (;;) {
+          let best = null, bv = -1;
+          for (const c of cands) { if (c.n >= 10 || c.unit > rem + 1e-9) continue; const val = c.score / (1 + c.n * 0.35); if (val > bv) { bv = val; best = c; } }
+          if (!best) break; best.n++; rem = Math.round((rem - best.unit) * 100) / 100;
+        }
+        const plan = cands.filter(c => c.n > 0).sort((x, y) => y.n - x.n || y.score - x.score).map(c => ({ id: c.id, handle: c.handle, videos: c.n, price: c.price, discount: c.discount, unit: c.unit, cost: Math.round(c.n * c.unit * 100) / 100, expViews: Math.round(c.n * c.exp), stars: c.stars }));
+        const spent = Math.round((budget - rem) * 100) / 100;
+        return send(res, 200, { track: t.title, budget, spent, left: rem, videos: plan.reduce((x, p) => x + p.videos, 0), expViews: plan.reduce((x, p) => x + p.expViews, 0), plan, candidates: cands.length });
+      }
       if (P === "/api/admin/contacts" && M === "POST") { const tg = String(b.telegram || "").trim().replace(/^https?:\/\/t\.me\//i, "").replace(/^@/, "").slice(0, 60), dc = String(b.discord || "").trim().slice(0, 200); db.settings.contacts = { telegram: tg, discord: dc }; saveDb(); return send(res, 200, db.settings.contacts); }
       if (P === "/api/admin/demo" && M === "POST") {    // test producer with a ready track, only for the owner's own checks
         const email = "demo-producer@promo.test", pw = crypto.randomBytes(5).toString("hex") + "Aa1";
