@@ -441,6 +441,9 @@ const server = http.createServer(async (req, res) => {
       Object.values(db.requests).forEach(r => { if (r.openId === acc.open_id && r.status === "pending") r.status = "cancelled"; });
       saveDb(); return send(res, 200, view(u));
     }
+    if (P === "/google418570ab9aa36d84.html" && M === "GET") { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); return res.end("google-site-verification: google418570ab9aa36d84.html"); }
+    if (P === "/robots.txt" && M === "GET") { res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: " + (PUBLIC_URL || "") + "/sitemap.xml\n"); }
+    if (P === "/sitemap.xml" && M === "GET") { res.writeHead(200, { "Content-Type": "application/xml; charset=utf-8" }); return res.end('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>' + (PUBLIC_URL || "") + '/</loc></url></urlset>\n'); }
     if ((P === "/icon.png" || P === "/favicon.ico") && M === "GET") { res.writeHead(200, { "Content-Type": "image/png", "Cache-Control": "public, max-age=86400" }); return res.end(ICON_PNG); }
     if (P === "/sw.js" && M === "GET") { res.writeHead(200, { "Content-Type": "text/javascript", "Cache-Control": "no-cache" }); return res.end(SW_JS); }
     if (P === "/api/push/key" && M === "GET") return send(res, 200, { key: vapid().pub });
@@ -455,7 +458,7 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, { now: Date.now(), items: (db.settings.inbox || []).filter(x => x.at > since).slice(-5).map(x => ({ id: x.id, at: x.at, audience: x.audience, title: x.title, text: x.text, url: x.url })) });
     }
     if (P === "/api/price-ranges" && M === "GET") return send(res, 200, { ranges: db.settings.ranges || { visual: { min: 3, max: 5 } } });
-    if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "" }); }
+    if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "", instagram: c.instagram || "", tiktok: c.tiktok || "" }); }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
       const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
@@ -555,7 +558,7 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
         const b = await readBody(req), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
-        if (!need(res, title && budget >= 1 && budget <= 1000000, 400, "title and budget (1..1000000) required")) return;
+        if (!need(res, title && budget >= 100 && budget <= 1000000, 400, "minimum budget is $100")) return;
         const L = {}, src = b.links && typeof b.links === "object" ? b.links : {};
         for (const k of ["spotify", "soundcloud", "tiktok", "mp3"]) { const v = String(src[k] || "").trim().slice(0, 400); if (v) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(v), 400, "link must start with https://")) return; const kk = classifyLink(v); if (!L[kk]) L[kk] = v; } }
         if (!need(res, Object.keys(L).length > 0 || b.willUpload, 400, "add at least one link or an mp3 file")) return;
@@ -576,7 +579,7 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/producer/topup" && M === "POST") {     // "Add budget": owner confirms the payment by hand
         const b = await readBody(req), t = db.tracks[b.trackId], amount = Number(b.amount);
-        if (!need(res, t && t.producerId === p.id && t.status !== "deleted" && amount >= 1 && amount <= 1000000, 400, "track and amount (1..1000000) required")) return;
+        if (!need(res, t && t.producerId === p.id && t.status !== "deleted" && amount >= 100 && amount <= 1000000, 400, "minimum budget is $100")) return;
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(amount * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", coin: COINS.includes(b.coin) ? b.coin : "", status: "pending", created: Date.now() };
         db.topups[tp.id] = tp; saveDb(); notify("budget top-up "+tp.amount+" USD for track \""+t.title+"\" waits for confirmation"); return send(res, 200, pview());
       }
@@ -631,7 +634,9 @@ const server = http.createServer(async (req, res) => {
         for (const c of CATEGORIES) { const x = src[c] || {}, mn = Number(x.min), mx = Number(x.max); if (mn > 0 && mx >= mn && mx <= 200) out[c] = { min: Math.round(mn * 100) / 100, max: Math.round(mx * 100) / 100 }; }
         db.settings.ranges = out; saveDb(); return send(res, 200, { ranges: out });
       }
-      if (P === "/api/admin/contacts" && M === "POST") { const tg = String(b.telegram || "").trim().replace(/^https?:\/\/t\.me\//i, "").replace(/^@/, "").slice(0, 60), dc = String(b.discord || "").trim().slice(0, 200); db.settings.contacts = { telegram: tg, discord: dc }; saveDb(); return send(res, 200, db.settings.contacts); }
+      if (P === "/api/admin/contacts" && M === "POST") { let tg = String(b.telegram || "").trim().slice(0, 200); if (tg && !/^https?:\/\//i.test(tg)) tg = "https://t.me/" + tg.replace(/^@/, "").replace(/^t\.me\//i, ""); if (tg && !/^https:\/\/(t|telegram)\.me\/\S+$/i.test(tg)) tg = ""; const dc = String(b.discord || "").trim().slice(0, 200); const link = (v, base, re) => { v = String(v || "").trim().slice(0, 200); if (!v) return ""; if (!/^https?:\/\//i.test(v)) v = base + v.replace(/^@/, ""); return re.test(v) ? v : ""; };
+        const ig = link(b.instagram, "https://instagram.com/", /^https:\/\/(www\.)?instagram\.com\/\S+$/i), tk = link(b.tiktok, "https://www.tiktok.com/@", /^https:\/\/(www\.)?tiktok\.com\/\S+$/i);
+        db.settings.contacts = { telegram: tg, discord: dc, instagram: ig, tiktok: tk }; saveDb(); return send(res, 200, db.settings.contacts); }
       if (P === "/api/admin/broadcast" && M === "POST") {
         const text = String(b.text || "").trim().slice(0, 300), title = String(b.title || "Promo Campaign").trim().slice(0, 80), aud = ["editors", "producers", "all"].includes(b.audience) ? b.audience : "editors";
         if (!need(res, text, 400, "write a message")) return;
