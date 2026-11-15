@@ -886,6 +886,13 @@ button.wgt::after{opacity:.2;transition:opacity .2s}button.wgt:hover::after{opac
 @keyframes hgFlip{0%{transform:rotate(0)}60%,100%{transform:rotate(180deg)}}
 .wgt .wgh{margin:8px 0 0;font-size:12px;line-height:1.35;color:rgba(255,255,255,.78)}
 .wgt.big{min-height:0}.wgt.big em{display:block;margin-top:6px;font-weight:600}
+/* v38 owner chat */
+.cmhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.cmhead h3{margin:0}
+.cmwho{border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:10px;margin-bottom:12px;animation:chcPop .35s cubic-bezier(.2,.9,.3,1.25) both;max-height:50vh;overflow:auto}
+.cmwt{padding:4px 6px 8px}.cmmem{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:12px;animation:chgIn .35s ease both}.cmmem:hover{background:var(--soft)}
+.cmmi{flex:1;min-width:0;display:flex;flex-direction:column}.cmmi small{color:var(--muted);overflow-wrap:anywhere}.cmm{color:#E8445A!important}
+.cmlog{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;padding:10px;border:1px solid var(--line);border-radius:18px;background:var(--bg);margin-bottom:12px}
+.cmlog .chm{max-width:min(520px,86%)}.cmact{margin-top:6px}.cmsel{font-size:12px;padding:3px 6px;border-radius:8px;max-width:150px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1064,7 +1071,7 @@ button.wgt::after{opacity:.2;transition:opacity .2s}button.wgt:hover::after{opac
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v37 · 15.11 23:10</span>
+  <span>© Promo Campaign · v38 · 15.11 23:55</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4266,6 +4273,108 @@ wgtHtml=function(){
     '<button type="button" class="wgt w" data-l="wgtGo" data-m="pending" data-i="⏳"><small>'+esc(L("w_wait"))+'</small><b>'+wait+'</b><em>'+esc(L("w_orders"))+'</em></button></div>'};
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="wgtGo"]');if(!el)return;e.stopImmediatePropagation();
   LV.mk=el.getAttribute("data-m");LV.oq="";renderOrders();var t=$("ordList");if(t)t.scrollIntoView({behavior:"smooth",block:"start"})},true);
+
+/* ===== v38: owner screens ===== */
+(function(){
+var N={
+en:{chn_12h:"Mute for 12 hours",chn_1d:"Mute for 1 day",chn_1w:"Mute for 1 week"},
+ru:{chn_12h:"Выключить на 12 часов",chn_1d:"Выключить на 1 день",chn_1w:"Выключить на неделю"},
+uk:{chn_12h:"Вимкнути на 12 годин",chn_1d:"Вимкнути на 1 день",chn_1w:"Вимкнути на тиждень"},
+de:{chn_12h:"12 Stunden stumm",chn_1d:"1 Tag stumm",chn_1w:"1 Woche stumm"},
+es:{chn_12h:"Silenciar 12 horas",chn_1d:"Silenciar 1 día",chn_1w:"Silenciar 1 semana"},
+pt:{chn_12h:"Silenciar por 12 horas",chn_1d:"Silenciar por 1 dia",chn_1w:"Silenciar por 1 semana"},
+fr:{chn_12h:"Couper 12 heures",chn_1d:"Couper 1 jour",chn_1w:"Couper 1 semaine"},
+tr:{chn_12h:"12 saat sustur",chn_1d:"1 gün sustur",chn_1w:"1 hafta sustur"}};
+Object.assign(LT.en,N.en,{ow_t:"Notifications",ow_in:"New",ow_set:"Settings",ow_none:"Nothing new. All done.",ow_readall:"Mark all as read",ow_what:"What to notify about",
+ ow_accounts:"New accounts waiting for your decision",ow_orders:"Track requests from editors",ow_payments:"Payments from producers",ow_payouts:"Payouts to editors",ow_tracks:"Tracks to review",
+ ow_i_acc:"Account {h} is waiting for your decision",ow_i_price:"Account {h} suggests a new price",ow_i_req:"Track request: {h} wants “{t}”",ow_i_sub:"Videos from {h} for “{t}” are waiting for your check",ow_i_top:"Payment from a producer: {a} for “{t}”",ow_i_pay:"Pay {h}: {a} for “{t}”",ow_i_trk:"Track “{t}” is waiting for review",
+ ow_acc_sum:"Total accounts: {n} · approved: {a} · waiting: {w} · rejected: {r} · archive: {b}",
+ cw_who:"Who is in the chat",cw_members:"Members",cw_msgs:"messages",cw_mute:"Mute…",cw_unmute:"Unmute",cw_muted:"Muted",cw_until:"until {t}",cw_forever:"forever",cw_1h:"1 hour",cw_12h:"12 hours",cw_1d:"1 day",cw_1w:"1 week",cw_inf:"Forever",cw_nomem:"Nobody has joined the chat yet.",cw_title:"Editors chat"});
+Object.assign(LT.ru,N.ru,{ow_t:"Уведомления",ow_in:"Новое",ow_set:"Настройки",ow_none:"Ничего нового. Всё сделано.",ow_readall:"Прочитать всё",ow_what:"О чём уведомлять",
+ ow_accounts:"Новые аккаунты ждут вашего решения",ow_orders:"Заявки на трек от эдиторов",ow_payments:"Платежи от продюсеров",ow_payouts:"Выплаты эдиторам",ow_tracks:"Треки на проверку",
+ ow_i_acc:"Аккаунт {h} ждёт вашего решения",ow_i_price:"Аккаунт {h} предлагает новую цену",ow_i_req:"Заявка на трек: {h} хочет «{t}»",ow_i_sub:"Видео от {h} по «{t}» ждут вашей проверки",ow_i_top:"Платёж от продюсера: {a} за «{t}»",ow_i_pay:"Выплатить {h}: {a} за «{t}»",ow_i_trk:"Трек «{t}» ждёт проверки",
+ ow_acc_sum:"Всего аккаунтов: {n} · одобрено: {a} · ждут: {w} · отклонено: {r} · архив: {b}",
+ cw_who:"Кто в чате",cw_members:"Участники",cw_msgs:"сообщ.",cw_mute:"Заглушить…",cw_unmute:"Включить",cw_muted:"Заглушён",cw_until:"до {t}",cw_forever:"навсегда",cw_1h:"1 час",cw_12h:"12 часов",cw_1d:"1 день",cw_1w:"1 неделя",cw_inf:"Навсегда",cw_nomem:"В чат ещё никто не заходил.",cw_title:"Чат эдиторов"});
+for(var k in N){if(k==="en"||k==="ru")continue;Object.assign(XLL[k],N[k])}
+})();
+/* editor chat mute: more durations */
+chMuteSet=function(m){try{var H={"1h":1,"8h":8,"12h":12,"1d":24,"1w":168};localStorage.setItem("pc_chmute",m==="on"?"":m==="off"?"forever":String(Date.now()+(H[m]||1)*3600e3))}catch(e){}};
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="chBell"]');if(!el)return;
+  setTimeout(function(){var m=$("chMenu");if(!m||m.getAttribute("data-x"))return;m.setAttribute("data-x","1");
+    var a=m.querySelector('[data-m="8h"]');if(a){a.insertAdjacentHTML("afterend",'<button type="button" data-l="chMuteSet" data-m="12h">'+esc(L("chn_12h"))+'</button><button type="button" data-l="chMuteSet" data-m="1d">'+esc(L("chn_1d"))+'</button><button type="button" data-l="chMuteSet" data-m="1w">'+esc(L("chn_1w"))+'</button>');a.remove()}},0)});
+
+/* requests tab: show requests that wait for a decision */
+(function(){var o=reqTabHtml;reqTabHtml=function(D){
+  var act=(D.requests||[]).filter(function(q){return rGroup(q)==="act"}).length;
+  if(!LV._rUser&&act&&LV.rFilter==="work")LV.rFilter="act";
+  var h=o(D);if(LV._onlyAct)return h;
+  return h.replace('<div class="chips" role="group">','<div class="chips" role="group"><button type="button" class="chip" data-l="rFil" data-f="act" aria-pressed="'+(LV.rFilter==="act")+'">'+esc(L("rf_act"))+' ('+act+')</button>')}})();
+document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest('[data-l="rFil"]'))LV._rUser=true},true);
+/* accounts tab: summary line so nothing is "lost" */
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{
+  if(LV.adTab==="accounts"&&ADM.data){var A=ADM.data.accounts,c=function(f){return A.filter(f).length};
+    var s=L("ow_acc_sum").replace("{n}",A.length).replace("{a}",c(function(a){return a.adminStatus==="approved"})).replace("{w}",c(function(a){return isWait(a)})).replace("{r}",c(function(a){return a.adminStatus==="rejected"})).replace("{b}",c(function(a){return a.adminStatus==="banned"}));
+    var l=document.querySelector("#adApp .list");if(l&&!$("accSum"))l.insertAdjacentHTML("beforebegin",'<p class="hint" id="accSum"><b>'+esc(s)+'</b></p>')}
+  nBadge()}catch(e){}return r}})();
+
+/* owner notifications */
+function ownerMode(){return (location.hash||"").replace(/\?.*/,"")==="#admin"&&typeof ADM!=="undefined"&&ADM.ok&&ADM.data}
+function ownTypes(){try{return JSON.parse(localStorage.getItem("pc_ont")||"{}")}catch(e){return {}}}
+function ownOn(t){return ownTypes()[t]!==false}
+function ownRead(){try{return JSON.parse(localStorage.getItem("pc_oread")||"[]")}catch(e){return []}}
+function ownItems(){
+  var D=ADM.data,it=[],R=function(s,o){return s.replace(/\{(\w)\}/g,function(a,k){return o[k]!==undefined?o[k]:""})};
+  (D.accounts||[]).filter(isWait).forEach(function(a){it.push({id:"a"+a.id+(a.priceReq?"p":""),t:"accounts",tab:"waiting",txt:R(L(a.priceReq?"ow_i_price":"ow_i_acc"),{h:a.handle})})});
+  (D.requests||[]).forEach(function(q){
+    if(q.status==="pending")it.push({id:"r"+q.id,t:"orders",tab:"requests",txt:R(L("ow_i_req"),{h:q.handle,t:q.track})});
+    else if(q.status==="submitted")it.push({id:"s"+q.id,t:"orders",tab:"requests",txt:R(L("ow_i_sub"),{h:q.handle,t:q.track})});
+    else if(q.status==="completed"&&!q.paid)it.push({id:"p"+q.id,t:"payouts",tab:"editorpay",txt:R(L("ow_i_pay"),{h:q.handle,a:money(q.cost),t:q.track})})});
+  (D.topups||[]).filter(function(p){return p.status==="pending"}).forEach(function(p){it.push({id:"t"+p.id,t:"payments",tab:"payments",txt:R(L("ow_i_top"),{a:money(p.amount),t:p.track||""})})});
+  (D.tracks||[]).filter(function(t){return t.status==="review"}).forEach(function(t){it.push({id:"k"+t.id,t:"tracks",tab:"tracks",txt:R(L("ow_i_trk"),{t:t.title})})});
+  return it.filter(function(x){return ownOn(x.t)})}
+var nBadge0=nBadge;
+nBadge=function(){if(!ownerMode())return nBadge0();var b=$("navBell");if(!b)return;var rd=ownRead(),n=ownItems().filter(function(x){return rd.indexOf(x.id)<0}).length;b.innerHTML='🔔'+(n?'<span class="bdg">'+(n>9?"9+":n)+'</span>':'')};
+var OWN={tab:"in"};
+function ownModal(){
+  LV.modal={type:"own"};var rd=ownRead(),it=ownItems(),body;
+  if(OWN.tab==="in"){
+    body=(it.some(function(x){return rd.indexOf(x.id)<0})?'<div class="row" style="margin:8px 0"><button class="btn sm" data-l="ownReadAll">'+esc(L("ow_readall"))+'</button></div>':'')+'<div class="nlist">'+(it.length?it.map(function(x){var u=rd.indexOf(x.id)<0;return '<div class="nitem'+(u?' unr':'')+'" data-l="ownGo" data-id="'+esc(x.id)+'" data-tab="'+x.tab+'"><span class="ndot"></span><div class="nb"><div class="nt">'+esc(x.txt)+'</div><small>'+esc(L("ow_"+x.t))+'</small></div></div>'}).join(""):'<div class="empty">'+esc(L("ow_none"))+'</div>')+'</div>'}
+  else{
+    var cur=sndGet();
+    body='<h4>'+esc(L("ow_what"))+'</h4>'+["accounts","orders","payouts","payments","tracks"].map(function(k){return '<label class="chk" for="ot_'+k+'"><input type="checkbox" id="ot_'+k+'" data-ot="'+k+'"'+(ownOn(k)?' checked':'')+'><span><b>'+esc(L("ow_"+k))+'</b></span></label>'}).join("")+
+      '<h4>'+esc(L("nt_snd"))+'</h4><div class="sndl">'+Object.keys(SNDS).map(function(k){return '<label class="sndo"><input type="radio" name="snd" value="'+k+'"'+(k===cur?' checked':'')+' data-l="sndPick"><span>'+esc(L("snd_"+k))+'</span><button type="button" class="btn sm" data-l="sndTry" data-k="'+k+'">▶</button></label>'}).join("")+'</div>'}
+  openModal('<div class="ntm"><h3>🔔 '+esc(L("ow_t"))+'</h3><div class="ntabs"><button type="button" class="chip" data-l="ownTab" data-t="in" aria-pressed="'+(OWN.tab==="in")+'">'+esc(L("ow_in"))+' ('+it.filter(function(x){return rd.indexOf(x.id)<0}).length+')</button><button type="button" class="chip" data-l="ownTab" data-t="set" aria-pressed="'+(OWN.tab==="set")+'">'+esc(L("ow_set"))+'</button></div>'+body+'<div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("rc_close"))+'</button></div></div>')}
+window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="sndOpen"&&ownerMode()){e.stopImmediatePropagation();e.preventDefault();OWN.tab="in";ownModal();return}
+  if(a==="ownTab"){OWN.tab=el.getAttribute("data-t");ownModal();return}
+  if(a==="ownReadAll"){try{localStorage.setItem("pc_oread",JSON.stringify(ownItems().map(function(x){return x.id})))}catch(er){}ownModal();nBadge();return}
+  if(a==="ownGo"){var id=el.getAttribute("data-id"),rd=ownRead();if(rd.indexOf(id)<0){rd.push(id);try{localStorage.setItem("pc_oread",JSON.stringify(rd.slice(-400)))}catch(er){}}
+    closeModal();LV.adTab=el.getAttribute("data-tab");if(LV.adTab==="requests"){LV.rFilter="act";LV._rUser=true}renderOwner();nBadge();window.scrollTo(0,0);return}
+},true);
+document.addEventListener("change",function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute("data-ot")){var o=ownTypes();o[t.getAttribute("data-ot")]=t.checked;try{localStorage.setItem("pc_ont",JSON.stringify(o))}catch(er){}nBadge()}});
+
+/* owner: chat as a real chat + who is in it + timed mute */
+CM.who=false;
+cmLoad=function(){api("/api/admin/chat").then(function(r){if(r.ok){CM.msgs=r.j.msgs;CM.members=r.j.members||[];if(LV.adTab==="chatmod")renderOwner()}})};
+function cmUntil(ms){return ms===0?L("cw_forever"):L("cw_until").replace("{t}",new Date(ms).toLocaleString(lang,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}
+function cmSel(uid){return '<select class="cmsel" data-l="cmMuteSel" data-uid="'+esc(uid)+'"><option value="">'+esc(L("cw_mute"))+'</option><option value="1">'+esc(L("cw_1h"))+'</option><option value="12">'+esc(L("cw_12h"))+'</option><option value="24">'+esc(L("cw_1d"))+'</option><option value="168">'+esc(L("cw_1w"))+'</option><option value="0">'+esc(L("cw_inf"))+'</option></select>'}
+cmHtml=function(){
+  if(!CM.msgs){cmLoad();return '<div class="empty">…</div>'}
+  var mem=CM.members||[];
+  var who='<div class="cmwho" id="cmWho"><div class="cmwt"><b>👥 '+esc(L("cw_members"))+' · '+mem.length+'</b></div>'+(mem.length?mem.map(function(m,i){return '<div class="cmmem" style="animation-delay:'+Math.min(i,10)*0.04+'s"><span class="rsav ph">'+esc((m.nick||"?").charAt(0).toUpperCase())+'</span><div class="cmmi"><b>'+esc(m.nick)+'</b><small>'+esc((m.handles||[]).join(", ")||"—")+' · '+m.msgs+' '+esc(L("cw_msgs"))+'</small>'+(m.muted>=0?'<small class="cmm">🔇 '+esc(L("cw_muted"))+' '+esc(cmUntil(m.muted))+'</small>':'')+'</div>'+(m.muted>=0?'<button type="button" class="btn sm" data-l="cmUnmute" data-uid="'+esc(m.uid)+'">'+esc(L("cw_unmute"))+'</button>':cmSel(m.uid))+'</div>'}).join(""):'<div class="empty">'+esc(L("cw_nomem"))+'</div>')+'</div>';
+  var msgs=(CM.msgs||[]).map(function(m){
+    var f=m.file?(m.file.gone?'<div class="chgone">'+esc(L("ch_gone"))+'</div>':(/^image\//.test(m.file.type)?'<a href="/api/admin/chat/file?id='+encodeURIComponent(m.file.id)+'" target="_blank" rel="noopener"><img class="chimg" loading="lazy" src="/api/admin/chat/file?id='+encodeURIComponent(m.file.id)+'" alt=""></a>':'<a class="chfile" href="/api/admin/chat/file?id='+encodeURIComponent(m.file.id)+'" target="_blank" rel="noopener">📎 <span>'+esc(m.file.name)+'</span></a>')):'';
+    return '<div class="chm'+(m.mgr?' mine mgr':'')+'"><div class="chn"><b>'+esc(m.name)+'</b><span>'+chHm(m.at)+(m.reps?' · ⚑ '+m.reps:'')+'</span><button type="button" class="chr" data-l="cmDel" data-id="'+esc(m.id)+'" title="'+esc(L("cm_del"))+'">🗑</button></div>'+f+(m.text?'<div class="cht">'+chLinkify(m.text)+'</div>':'')+(m.mgr?'':'<div class="cmact">'+(m.banned?'<span class="cmm">🔇 '+esc(L("cw_muted"))+'</span>':cmSel(m.uid))+'</div>')+'</div>'}).join("");
+  return '<div class="cmhead"><h3>💬 '+esc(L("cw_title"))+'</h3><button type="button" class="btn sm cmwb" data-l="cmWhoBtn" aria-expanded="'+CM.who+'">👥 '+esc(L("cw_who"))+' ('+mem.length+')</button></div>'+(CM.who?who:'')+
+    '<div class="cmlog" id="cmLog">'+(msgs||'<div class="empty">'+esc(L("cm_none"))+'</div>')+'</div><div class="card form"><div class="row"><input id="cmIn" type="text" maxlength="300" placeholder="'+esc(L("cm_say"))+'" style="flex:1;min-width:0"><button class="btn primary" data-l="cmSay">'+esc(L("ch_send"))+'</button></div></div>'};
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="cmWhoBtn"){e.stopImmediatePropagation();CM.who=!CM.who;renderOwner();return}
+  if(a==="cmUnmute"){e.stopImmediatePropagation();api("/api/admin/chat/ban",{uid:el.getAttribute("data-uid"),on:0}).then(cmLoad);return}
+},true);
+document.addEventListener("change",function(e){var t=e.target;if(t&&t.getAttribute&&t.getAttribute("data-l")==="cmMuteSel"&&t.value!==""){
+  api("/api/admin/chat/ban",{uid:t.getAttribute("data-uid"),on:1,hours:Number(t.value)}).then(function(r){if(r.ok){toast(L("cw_muted"));cmLoad()}})}});
+setInterval(function(){if(ownerMode()&&LV.adTab==="chatmod"&&!document.hidden){var a=document.activeElement;if(a&&(a.id==="cmIn"||a.classList.contains("cmsel")))return;cmLoad()}},7000);
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="chatmod"){var l=$("cmLog");if(l&&!CM._sc){l.scrollTop=l.scrollHeight;CM._sc=true}}else CM._sc=false}catch(e){}return r}})();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);

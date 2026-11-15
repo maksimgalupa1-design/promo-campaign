@@ -153,7 +153,8 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 29;
+const SERVER_VER = 30;
+function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
@@ -478,7 +479,7 @@ function overview() {
     stats: { accounts: accs.length, boughtVideos, purchasedViews, purchasedLinksCounted: matched, views30, byTrack,
       editorsPaidTotal: paidSum(paidReqs), editorsPaid30: paidSum(paidReqs.filter(r => now - (r.paidAt || 0) <= D30)), producersPaidTotal: topSum(okTopups), producersPaid30: topSum(okTopups.filter(t => now - (t.confirmedAt || t.created) <= D30)),
       pendingPayouts: reqs.filter(r => r.status === "completed" && !r.paid).length,
-      pendingRequests: reqs.filter(r => r.status === "pending").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
+      pendingRequests: reqs.filter(r => r.status === "pending" || r.status === "submitted").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
     tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
@@ -658,12 +659,12 @@ const server = http.createServer(async (req, res) => {
     if (P.startsWith("/api/chat") ) {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} };
-      const canWrite = (u.accounts || []).some(x => x.adminStatus === "approved") && !C.bans[u.id];
+      const canWrite = (u.accounts || []).some(x => x.adminStatus === "approved") && !chBanned(C, u.id);
 
       const linkRe = /(https?:\/\/|www\.|t\.me|@[a-z0-9_]{3,}|\b[a-z0-9-]+\.(com|ru|ua|net|org|io|me|gg|ly|cc|info)\b)/i;
       if (P === "/api/chat" && M === "GET") {
         if (u.chatNick && badNick(u.chatNick)) { u.chatNick = ""; saveDb(); }
-        return send(res, 200, { me: { nick: u.chatNick || "", canWrite, banned: !!C.bans[u.id] }, msgs: C.msgs.slice(-100).map(m => ({ id: m.id, at: m.at, name: m.name, text: m.text, mine: m.uid === u.id, mgr: !!m.mgr, file: m.file ? { id: m.file.id, name: m.file.name, type: m.file.type, size: m.file.size, gone: !(C.files && C.files[m.file.id]) } : null })) });
+        return send(res, 200, { me: { nick: u.chatNick || "", canWrite, banned: chBanned(C, u.id) }, msgs: C.msgs.slice(-100).map(m => ({ id: m.id, at: m.at, name: m.name, text: m.text, mine: m.uid === u.id, mgr: !!m.mgr, file: m.file ? { id: m.file.id, name: m.file.name, type: m.file.type, size: m.file.size, gone: !(C.files && C.files[m.file.id]) } : null })) });
       }
       if (P === "/api/chat/file" && M === "GET") {
         const fid = new URL(req.url, "http://x").searchParams.get("id") || ""; const f = C.files && C.files[fid];
@@ -680,7 +681,7 @@ const server = http.createServer(async (req, res) => {
         u.chatNick = nick; saveDb(); return send(res, 200, { ok: true, nick });
       }
       if (P === "/api/chat" && M === "POST") {
-        if (!need(res, !C.bans[u.id], 403, "You cannot write in the chat")) return;
+        if (!need(res, !chBanned(C, u.id), 403, "You cannot write in the chat")) return;
         if (!need(res, canWrite, 403, "The chat opens after the manager approves your account")) return;
         if (!need(res, u.chatNick, 400, "Choose a nickname first")) return;
         const text = String(b.text || "").trim().replace(/[ \t]+/g, " ").slice(0, 500);
@@ -1013,14 +1014,23 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/chat" && M === "GET") {
         const C = db.settings.chat || { msgs: [], bans: {} };
-        return send(res, 200, { msgs: C.msgs.slice(-200).map(m => ({ id: m.id, at: m.at, uid: m.uid, name: m.name, text: m.text + (m.file ? " [file: " + m.file.name + "]" : ""), mgr: !!m.mgr, reps: (m.reps || []).length, banned: !!C.bans[m.uid] })) });
+        const cnt = {}; C.msgs.forEach(m => { if (!m.mgr) cnt[m.uid] = (cnt[m.uid] || 0) + 1; });
+        const members = Object.values(db.users).filter(x => x.chatNick).map(x => ({ uid: x.id, nick: x.chatNick, handles: (x.accounts || []).filter(a => !a.demo).map(a => "@" + String((a.profile || {}).username || "").replace(/^@/, "")), approved: (x.accounts || []).some(a => a.adminStatus === "approved"), msgs: cnt[x.id] || 0, muted: chBanned(C, x.id) ? (C.bans[x.id] === true ? 0 : C.bans[x.id]) : -1 }));
+        const nowB = Object.keys(C.bans || {}).length; if (nowB) saveDb();
+        return send(res, 200, { members, msgs: C.msgs.slice(-200).map(m => ({ id: m.id, at: m.at, uid: m.uid, name: m.name, text: m.text, file: m.file ? { id: m.file.id, name: m.file.name, type: m.file.type, size: m.file.size, gone: !(C.files && C.files[m.file.id]) } : null, mgr: !!m.mgr, reps: (m.reps || []).length, banned: chBanned(C, m.uid) })) });
+      }
+      if (P === "/api/admin/chat/file" && M === "GET") {
+        const C = db.settings.chat || {}; const fid = new URL(req.url, "http://x").searchParams.get("id") || ""; const f = C.files && C.files[fid];
+        if (!f) return send(res, 404, { error: "gone" });
+        res.writeHead(200, { "Content-Type": f.type, "Content-Disposition": (f.type.startsWith("image/") ? "inline" : "attachment") + "; filename*=UTF-8''" + encodeURIComponent(f.name), "X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'" });
+        return res.end(Buffer.from(f.data, "base64"));
       }
       if (P === "/api/admin/chat/delete" && M === "POST") {
         const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; { const dm = C.msgs.find(m => m.id === b.id); if (dm && dm.file && C.files) delete C.files[dm.file.id]; } C.msgs = C.msgs.filter(m => m.id !== b.id); saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/chat/ban" && M === "POST") {
         const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; if (!need(res, b.uid && db.users[b.uid], 404, "no such user")) return;
-        if (b.on) C.bans[b.uid] = true; else delete C.bans[b.uid]; saveDb(); return send(res, 200, { ok: true });
+        if (b.on) { const hrs = Number(b.hours) || 0; C.bans[b.uid] = hrs > 0 ? Date.now() + Math.min(hrs, 24 * 365) * 3600000 : true; } else delete C.bans[b.uid]; saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/chat/say" && M === "POST") {
         const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; const text = String(b.text || "").trim().slice(0, 300); if (!need(res, text, 400, "write a message")) return;
