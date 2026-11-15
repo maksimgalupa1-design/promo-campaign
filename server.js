@@ -77,7 +77,7 @@ async function broadcast(audience, title, text, url, type, withMail) {
   saveDb(); return { sent, mails };
 }
 function edUserOfOpen(openId) { return Object.values(db.users).find(u => (u.accounts || []).some(a => a.open_id === openId)); }
-const NT_EN = { ord_approved: 'Your order for "{t}" was approved. Send your video links within 16 days.', ord_rejected: 'Your order for "{t}" was not taken.', ord_completed: 'Your videos for "{t}" were accepted. Payment is on the way.', ord_returned: 'Your links for "{t}" were returned. Please fix and send again.', ord_cancelled: 'The order for "{t}" was cancelled.', money_paid: 'Payment sent: {a} for "{t}". Open My orders to see the receipt.', acc_approved: "Your account {h} is verified.", acc_rejected: "Your account {h} was not taken.", acc_banned: "Your account {h} was blocked.", price_suggest: "The manager suggests a new price for {h}: {p}. Open your dashboard to accept." };
+const NT_EN = { ord_approved: 'Your order for "{t}" was approved. Send your video links within 16 days.', ord_rejected: 'Your order for "{t}" was not taken.', ord_completed: 'Your videos for "{t}" were accepted. Payment is on the way.', ord_returned: 'Your links for "{t}" were returned. Please fix and send again.', ord_cancelled: 'The order for "{t}" was cancelled.', money_paid: 'Payment sent: {a} for "{t}". Open My orders to see the receipt.', acc_approved: "Your account {h} is verified.", acc_rejected: "Your account {h} was not taken.", acc_banned: "Your account {h} was blocked.", price_ok: "The new price for {h} was approved: {p}.", price_no: "The manager kept the price {p} for {h}.", ord_reminder: 'Reminder: "{t}" — {d} left to send your video links.', price_suggest: "The manager suggests a new price for {h}: {p}. Open your dashboard to accept." };
 function ntText(key, v) { return String(NT_EN[key] || key).replace(/\{(\w+)\}/g, (m, k) => (v || {})[k] !== undefined ? v[k] : ""); }
 function notifyUser(kind, user, type, key, vars) {   // a private message for one editor or producer (shown in the bell)
   if (!user) return; inboxAdd({ audience: kind, to: user.id, type, key, vars: vars || {}, title: "", text: "", url: "/" });
@@ -289,7 +289,7 @@ function autoStars(acc) {
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
-    avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
+    avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
     analysis: A, price: acc.price || null, evaluation: PC.evaluate(A, acc.price), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
@@ -323,12 +323,36 @@ function deadlineDays(s){
 }
 function deadlineOk(s){var v=deadlineDays(s);return v===null||(!isNaN(v)&&v>=7-1e-9)}
 /* the video was not made: the money goes back to the track budget */
+/* bulk deals: a ladder per account, e.g. 3+ videos -5%, 6+ videos -10% */
+function cleanTiers(list) {
+  if (!Array.isArray(list)) return [];
+  const out = []; list.slice(0, 6).forEach(t => { const m = Math.round(Number(t && t.min)), p = Math.round(Number(t && t.pct)); if (m >= 2 && m <= 500 && p >= 1 && p <= 99) out.push({ min: m, pct: p }); });
+  out.sort((a, b) => a.min - b.min); return out.filter((t, i) => i === 0 || t.min !== out[i - 1].min);
+}
+function discountFor(acc, videos) {
+  const ts = acc.tiers || []; if (!ts.length) return acc.discount || 0;
+  let d = 0; ts.forEach(t => { if (videos >= t.min) d = Math.max(d, t.pct); }); return d;
+}
+function maxTier(acc) { return Math.max(acc.discount || 0, ...(acc.tiers || []).map(t => t.pct)); }
 function refundReq(r) { const t = db.tracks[r.trackId]; if (t && r.approvedAt) t.spent = Math.max(0, Math.round(((t.spent || 0) - reqCost(r)) * 100) / 100); }
 function expireOverdue() {
   let n = 0;
   Object.values(db.requests).forEach(r => { if (["approved", "returned"].includes(r.status) && r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000) { refundReq(r); r.status = "cancelled"; r.updated = Date.now(); n++; } });
   if (n) { saveDb(); notify(n + " order(s) expired after 16 days. The money went back to the track budget."); }
 }
+function remindEditors() {   // editors always get a nudge when an order's 16 days are running out
+  let n = 0;
+  Object.values(db.requests).forEach(r => {
+    if (!["approved", "returned"].includes(r.status) || !r.approvedAt || r.demo) return;
+    const left = r.approvedAt + 16 * 86400000 - Date.now(); if (left <= 0) return;
+    const stage = left <= 86400000 ? 1 : left <= 3 * 86400000 ? 3 : 0; if (!stage || (r.remStage && r.remStage <= stage)) return;
+    r.remStage = stage; n++;
+    notifyUser("editors", edUserOfOpen(r.openId), "orders", "ord_reminder", { t: (db.tracks[r.trackId] || {}).title || "", d: stage === 1 ? "less than 1 day" : "3 days or less" });
+  });
+  if (n) saveDb();
+}
+const HEX_AV = "data:image/jpeg;base64,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";
+const PIN_AV = "data:image/svg+xml;base64," + Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6a6c1"/><stop offset="1" stop-color="#7c5cff"/></linearGradient></defs><rect width="128" height="128" fill="url(#g)"/><circle cx="64" cy="64" r="34" fill="none" stroke="#fff" stroke-width="7" opacity=".9"/><circle cx="64" cy="64" r="12" fill="#fff" opacity=".9"/></svg>').toString("base64");
 const trackLeft = t => Math.max(0, Math.round(((t.budget || 0) - (t.spent || 0)) * 100) / 100);
 function cleanCats(list) { return Array.isArray(list) ? CATEGORIES.filter(c => list.includes(c)) : []; }
 function reqCost(r) { return Math.round(r.price * r.videos * (1 - (r.discount || 0) / 100) * 100) / 100; }
@@ -340,7 +364,7 @@ function reqView(r, withAdmin) {
     internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)); if (ou && ou.payout) o.payout = decObj(ou.payout.enc); }
-  if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
+  if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.tiers = acc.tiers || []; o.bulk = maxTier(acc); o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
   return o;
 }
 async function refreshStale(max) {
@@ -458,15 +482,26 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req), price = Number(b.price), acc = findAcc(u, b.id);
       if (!acc) return send(res, 404, { error: "no such account" });
       if (!(price >= 1 && price <= 200)) return send(res, 400, { error: "price 1..200" });
-      acc.price = Math.round(price * 100) / 100; saveDb(); return send(res, 200, view(u));
+      const np = Math.round(price * 100) / 100;
+      if (acc.demo || !acc.price || acc.adminStatus !== "approved") acc.price = np;
+      else if (np !== acc.price) { acc.priceReq = np; notify("An editor wants a new price for @" + ((acc.profile || {}).username || "") + ": $" + np + ". Open Waiting for your decision."); }
+      saveDb(); return send(res, 200, view(u));
     }
     if (P === "/api/account/update" && M === "POST") {   // internal name, categories, bulk discount (one account or all)
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
+      const before = JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []]);
       if (b.internalName !== undefined) acc.internal_name = String(b.internalName).slice(0, 60);
       if (b.categories !== undefined) acc.categories = cleanCats(b.categories);
       if (b.otherCategory !== undefined) acc.other_category = String(b.otherCategory).slice(0, 60);
       if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 600); if (!need(res, !ab || ab.split(/\s+/).length >= 3, 400, "Describe your account in at least 3 words")) return; acc.about = ab; }
+      if (b.tiers !== undefined) {
+        const ts = cleanTiers(b.tiers);
+        (b.discountAll ? u.accounts : [acc]).forEach(a => { a.tiers = ts; a.discount = ts.length ? Math.max(...ts.map(t => t.pct)) : 0; });
+      }
+      if (before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []]) && !acc.demo && acc.adminStatus === "approved") {
+        acc.adminStatus = "new"; notify("An editor changed account @" + ((acc.profile || {}).username || "") + ". It is waiting for your decision.");   // changes go to the manager for review
+      }
       if (b.discount !== undefined) {
         const d = Math.round(Number(b.discount) || 0);
         if (d < 0 || d > 99) return send(res, 400, { error: "discount 0..99" });
@@ -540,11 +575,9 @@ const server = http.createServer(async (req, res) => {
         const okCat = !(t.categories || []).length || (t.categories || []).some(c => (acc.categories || []).includes(c));
         if (!need(res, okCat, 400, "category does not match: " + (acc.profile && acc.profile.username))) return;
         if (Object.values(db.requests).some(r => r.trackId === t.id && r.openId === acc.open_id && ["pending", "approved", "submitted"].includes(r.status))) continue;
-        const dv = dmap[id] !== undefined && dmap[id] !== "" ? dmap[id] : (b.discount !== undefined && b.discount !== "" ? b.discount : undefined);
-        const disc = dv !== undefined ? Math.round(Number(dv)) : (acc.discount || 0);
+        const disc = discountFor(acc, videos);
         if (!need(res, disc >= 0 && disc <= 99, 400, "discount 0..99")) return;
-        if (dv !== undefined) acc.discount = disc;   // the discount belongs to the account
-        const r = { id: uid8(), trackId: t.id, openId: acc.open_id, price: acc.price, videos, discount: disc, priority: disc > 0 ? 5 : 0, status: "pending", links: [], created: Date.now(), updated: Date.now() };
+        const r = { id: uid8(), trackId: t.id, openId: acc.open_id, price: acc.price, videos, discount: disc, priority: maxTier(acc) > 0 ? 5 : 0, status: "pending", links: [], created: Date.now(), updated: Date.now() };
         db.requests[r.id] = r; out.push(reqView(r, false));
       }
       saveDb(); notify(out.length + " new request(s) from an editor"); return send(res, 200, { requests: out });
@@ -711,9 +744,15 @@ const server = http.createServer(async (req, res) => {
         const uid = "demo-editor"; let u = db.users[uid];
         if (!u) u = db.users[uid] = { id: uid, createdAt: Date.now(), accounts: [] };
         const now = Date.now(), vids = Array.from({ length: 14 }, (_, i) => ({ id: "9" + String(1e17 + i * 7919).slice(1), created: now - i * 2 * 86400000 - 3600000, views: Math.round(12000 + ((i * 7331) % 9) * 4200), likes: Math.round(1500 + ((i * 313) % 7) * 400), url: "" }));
-        let acc = u.accounts.find(a => a.demo);
-        if (!acc) { acc = { open_id: "demo_editor_acc", createdAt: now, categories: [], discount: 0, demo: true, profile: { username: "demo_editor", display_name: "Test editor" } }; u.accounts.push(acc); }
-        acc.videos = vids; acc.price = 3; acc.categories = ["gaming", "anime"]; acc.about = "Gaming and anime edits, fast cuts, three videos a week"; acc.adminStatus = "approved"; acc.analysisAt = now; acc.discount = 10; acc.internal_name = "Hex (test)";
+        const mkAcc = (oid, un, dn, av, price, cats, about, nm, mul) => {
+          let a = u.accounts.find(z => z.open_id === oid);
+          if (!a) { a = { open_id: oid, createdAt: now, categories: [], discount: 0, demo: true, profile: {} }; u.accounts.push(a); }
+          a.profile = { username: un, display_name: dn, avatar_url: av };
+          a.videos = vids.map(v => Object.assign({}, v, { views: Math.round(v.views * mul) })); a.price = price; a.categories = cats; a.about = about; a.adminStatus = "approved"; a.analysisAt = now;
+          a.tiers = [{ min: 3, pct: 5 }, { min: 6, pct: 10 }, { min: 12, pct: 15 }]; a.discount = 15; a.internal_name = nm; return a;
+        };
+        const acc = mkAcc("demo_editor_acc", "hexen0478", "HEXEN", HEX_AV, 3, ["gaming", "anime"], "Gaming and anime edits, fast cuts, three videos a week", "Hex (test)", 1);
+        mkAcc("demo_editor_acc2", "pinterest_vibes", "Pinterest vibes", PIN_AV, 2.5, ["visual", "memes"], "Soft aesthetic edits, moodboards and photo dumps", "Vibes (test)", 0.6);
         u.payout = { method: "paypal", coin: "", label: "d***@test.com", enc: encObj({ method: "paypal", coin: "", value: "demo@test.com", holder: "" }) };
         // a ready demo track and a few demo orders in every state, so the owner can click through the editor screens
         let dp = Object.values(db.producers).find(x => x.email === "demo-producer@promo.test");
@@ -756,6 +795,13 @@ const server = http.createServer(async (req, res) => {
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
         a.adminStatus = b.status; saveDb();
         if (["approved", "rejected", "banned"].includes(b.status)) notifyUser("editors", edUserOfOpen(a.open_id), "accounts", "acc_" + b.status, { h: "@" + ((a.profile || {}).username || "") });
+        return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/price-decision" && M === "POST") {   // the manager accepts or declines the price an editor asked for
+        const a = findAccAny(b.id); if (!need(res, a && a.priceReq, 404, "no price request")) return;
+        const ok = b.ok !== false, h = "@" + ((a.profile || {}).username || "");
+        if (ok) a.price = a.priceReq; delete a.priceReq; saveDb();
+        notifyUser("editors", edUserOfOpen(a.open_id), "accounts", ok ? "price_ok" : "price_no", { h, p: "$" + a.price });
         return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/suggest-price" && M === "POST") {   // the manager suggests a new price, the editor accepts or declines
@@ -802,6 +848,12 @@ const server = http.createServer(async (req, res) => {
         notifyUser("editors", edUserOfOpen(r.openId), "orders", "ord_" + st, { t: (db.tracks[r.trackId] || {}).title || "" });
         return send(res, 200, { ok: true });
       }
+      if (P === "/api/admin/request-videos" && M === "POST") {   // the manager decides how many videos; the bulk discount follows automatically
+        const r = db.requests[b.id]; if (!need(res, r && r.status === "pending", 404, "only a waiting request can be changed")) return;
+        const v = Math.round(Number(b.videos)); if (!need(res, v >= 1 && v <= 500, 400, "videos 1..500")) return;
+        const acc = findAccAny(r.openId); r.videos = v; r.discount = acc ? discountFor(acc, v) : 0; r.updated = Date.now(); saveDb();
+        return send(res, 200, { ok: true, videos: r.videos, discount: r.discount, cost: reqCost(r) });
+      }
       if (P === "/api/admin/eta" && M === "POST") {
         const r = db.requests[b.id]; if (!need(res, r, 404, "no such request")) return;
         r.eta = String(b.eta || "").trim().slice(0, 80); saveDb(); return send(res, 200, { ok: true });
@@ -836,5 +888,6 @@ const server = http.createServer(async (req, res) => {
 loadDb().then(() => {
   server.listen(PORT, () => console.log("Promo Campaign on " + PUBLIC_URL));
   setInterval(() => refreshStale(30).catch(e => console.error(e)), REFRESH_EVERY);
+  setInterval(() => { try { remindEditors(); } catch (e) { console.error(e); } }, 3600e3);
   setInterval(() => { try { expireOverdue(); } catch (e) { console.error(e); } }, 3600e3);
 }).catch(e => { console.error("Could not load the database:", e); process.exit(1); });
