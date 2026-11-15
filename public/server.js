@@ -362,7 +362,7 @@ function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
-    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
+    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)); if (ou && ou.payout) o.payout = decObj(ou.payout.enc); }
   if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.tiers = acc.tiers || []; o.bulk = maxTier(acc); o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
@@ -870,7 +870,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/proof" && M === "GET") { const img = await getProof(url.searchParams.get("id") || ""); return send(res, 200, { image: img }); }
       if (P === "/api/admin/payout" && M === "POST") {     // mark that the editor has been paid for a completed request
         const r = db.requests[b.id]; if (!need(res, r && r.status === "completed", 404, "no completed request")) return;
-        r.paid = !!b.paid; r.paidAt = r.paid ? Date.now() : 0; if (r.paid) notifyUser("editors", edUserOfOpen(r.openId), "money", "money_paid", { a: "$" + reqCost(r), t: (db.tracks[r.trackId] || {}).title || "" });
+        r.paid = !!b.paid; r.paidAt = r.paid ? Date.now() : 0; if (r.paid && b.paidBy !== undefined) r.paidBy = String(b.paidBy).trim().slice(0, 60); if (r.paid) notifyUser("editors", edUserOfOpen(r.openId), "money", "money_paid", { a: "$" + reqCost(r), t: (db.tracks[r.trackId] || {}).title || "" });
         if (b.image) { if (!need(res, /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.image) && b.image.length < 700000, 400, "bad image")) return; await putProof(r.id, b.image); r.proof = true; } saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
