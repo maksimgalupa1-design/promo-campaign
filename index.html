@@ -912,6 +912,16 @@ details.rqd[open]{box-shadow:var(--sh)}
 .rqc{font-style:normal;transition:transform .2s;color:var(--muted)}details.rqd[open] .rqc{transform:rotate(180deg)}
 details.rqd>.card{border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;margin:0;animation:none}
 .vdchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
+/* v41 trash */
+.chdelrow{display:flex;justify-content:flex-end;margin-top:4px}
+.chdel{all:unset;box-sizing:border-box;cursor:pointer;width:30px;height:28px;display:grid;place-items:center;border-radius:9px;background:#fff;color:#E5334A;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:transform .15s,background .15s,color .15s}
+.chdel svg{overflow:visible}
+.chdel .tlid{transform-box:fill-box;transform-origin:0% 100%;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.chdel:hover,.chdel:focus-visible{background:#E5334A;color:#fff;transform:scale(1.1)}
+.chdel:hover .tlid,.chdel:focus-visible .tlid{transform:rotate(-32deg) translate(-1px,-2px)}
+.chdel:active{transform:scale(.92)}
+.chm{transition:opacity .35s,transform .35s,max-height .35s,margin .35s,padding .35s}
+.chm.chbye{opacity:0;transform:translateX(40px) scale(.85) rotate(4deg);pointer-events:none}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1090,7 +1100,7 @@ details.rqd>.card{border:0;border-top:1px solid var(--line);border-radius:0;box-
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v40 · 16.11 01:10</span>
+  <span>© Promo Campaign · v41 · 16.11 01:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4431,15 +4441,17 @@ chGate=function(me){
   var f=document.querySelector("#chatOv .chath");if(f&&!f.querySelector(".chnick")&&j.me.canWrite&&j.me.nick){var b=document.createElement("button");b.type="button";b.className="btn sm chnick";b.setAttribute("data-l","chNickEdit");b.title=L("ch_nick_edit");b.textContent="✏️ "+j.me.nick;f.insertBefore(b,f.querySelector(".chbell"))}
   else if(f){var nb=f.querySelector(".chnick");if(nb&&j.me.nick)nb.textContent="✏️ "+j.me.nick}
 }})();
-/* own messages: delete button */
+/* own messages: animated red trash button, bottom right of the bubble */
+var TRASH='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="tlid"><path d="M4 7h16"/><path d="M9 7V5h6v2"/></g><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>';
 (function(){var o=chRender;chRender=function(j){
   var res=o.apply(this,arguments);
+  var ids=j.msgs.filter(function(x){return x.mine});
   document.querySelectorAll("#chatLog .chm.mine").forEach(function(m,i){
-    if(m.querySelector(".chdel"))return;var ids=j.msgs.filter(function(x){return x.mine});var x=ids[i];if(!x)return;
-    var n=m.querySelector(".chn");if(n){var b=document.createElement("button");b.type="button";b.className="chr chdel";b.setAttribute("data-l","chDel");b.setAttribute("data-id",x.id);b.title=L("ch_del");b.textContent="🗑";n.appendChild(b)}});
+    if(m.querySelector(".chdel"))return;var x=ids[i];if(!x)return;
+    var r=document.createElement("div");r.className="chdelrow";r.innerHTML='<button type="button" class="chdel" data-l="chDel" data-id="'+esc(x.id)+'" title="'+esc(L("ch_del"))+'" aria-label="'+esc(L("ch_del"))+'">'+TRASH+'</button>';m.appendChild(r)});
   return res}})();
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
-  if(a==="chDel"){e.stopImmediatePropagation();api("/api/chat/delete",{id:el.getAttribute("data-id")}).then(function(){CHT.sig="";chPoll()});return}
+  if(a==="chDel"){e.stopImmediatePropagation();var bub=el.closest(".chm");if(bub)bub.classList.add("chbye");el.disabled=true;setTimeout(function(){api("/api/chat/delete",{id:el.getAttribute("data-id")}).then(function(){CHT.sig="";chPoll()})},380);return}
   if(a==="chNickEdit"){CHT.editNick=true;var g=$("chGate");if(g)g.remove();chGate(CHT.me||{canWrite:true,nick:""});return}
   if(a==="chNickCancel"){CHT.editNick=false;var g2=$("chGate");if(g2)g2.remove();return}
 },true);
