@@ -297,7 +297,7 @@ function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
-    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidAt: r.paidAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
+    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)); if (ou && ou.payout) o.payout = decObj(ou.payout.enc); }
   if (withAdmin && acc) { const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
@@ -474,9 +474,10 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req), t = db.tracks[b.trackId];
       if (!need(res, t && t.status === "active" && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok"), 404, "track not available")) return;
       const ids = Array.isArray(b.accountIds) ? b.accountIds : [];
-      if (!need(res, ids.length > 0 && ids.length <= 50, 400, "choose accounts")) return;
+      if (!need(res, ids.length > 0 && ids.length <= 1000, 400, "choose accounts")) return;
       if (!need(res, u.payout, 403, "add your payment details first (Dashboard → Payment)")) return;
-      const videos = Math.max(1, Math.min(100, Math.round(Number(b.videos) || 1)));
+      const videos = Math.max(1, Math.min(100, Math.round(Number(b.videos) || 1))); // the manager decides the real number of videos
+      const dmap = b.discounts && typeof b.discounts === "object" ? b.discounts : {};
       const out = [];
       for (const id of ids) {
         const acc = findAcc(u, id); if (!need(res, acc, 404, "no such account")) return;
@@ -486,12 +487,21 @@ const server = http.createServer(async (req, res) => {
         const okCat = !(t.categories || []).length || (t.categories || []).some(c => (acc.categories || []).includes(c));
         if (!need(res, okCat, 400, "category does not match: " + (acc.profile && acc.profile.username))) return;
         if (Object.values(db.requests).some(r => r.trackId === t.id && r.openId === acc.open_id && ["pending", "approved", "submitted"].includes(r.status))) continue;
-        const disc = b.discount !== undefined && b.discount !== "" ? Math.round(Number(b.discount)) : (acc.discount || 0);
+        const dv = dmap[id] !== undefined && dmap[id] !== "" ? dmap[id] : (b.discount !== undefined && b.discount !== "" ? b.discount : undefined);
+        const disc = dv !== undefined ? Math.round(Number(dv)) : (acc.discount || 0);
         if (!need(res, disc >= 0 && disc <= 99, 400, "discount 0..99")) return;
+        if (dv !== undefined) acc.discount = disc;   // the discount belongs to the account
         const r = { id: uid8(), trackId: t.id, openId: acc.open_id, price: acc.price, videos, discount: disc, priority: disc > 0 ? 5 : 0, status: "pending", links: [], created: Date.now(), updated: Date.now() };
         db.requests[r.id] = r; out.push(reqView(r, false));
       }
       saveDb(); notify(out.length + " new request(s) from an editor"); return send(res, 200, { requests: out });
+    }
+    if (P === "/api/request/accept" && M === "POST") {    // the editor confirms: "I received the money"
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req, 2e4), r = db.requests[b.id || ""];
+      if (!need(res, r && r.paid && (u.accounts || []).some(a => a.open_id === r.openId), 404, "no paid order")) return;
+      if (!r.accepted) { r.accepted = true; r.acceptedAt = Date.now(); saveDb(); notify("editor accepted a payment receipt"); }
+      return send(res, 200, { ok: true });
     }
     if (P === "/api/request/proof" && M === "GET") {      // the editor sees the screenshot of the payment sent to them
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
