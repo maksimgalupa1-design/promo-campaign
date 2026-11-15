@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 40;
+const SERVER_VER = 41;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -871,6 +871,7 @@ const server = http.createServer(async (req, res) => {
         for (const k of ["spotify", "soundcloud", "tiktok", "mp3"]) { const v = String(src[k] || "").trim().slice(0, 400); if (v) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(v), 400, "link must start with https://")) return; const kk = classifyLink(v); if (!L[kk]) L[kk] = v; } }
         const plats = (Array.isArray(b.platforms) ? b.platforms : []).filter(x => PLATFORMS.includes(x));
         if (!need(res, !(plats.length ? plats : ["tiktok"]).includes("tiktok") || L.tiktok, 400, "add the TikTok sound link")) return;
+        if (!need(res, !L.tiktok || !/tiktok\.com\/@[^/\s]+\/(video|photo)\//i.test(L.tiktok), 400, "this is a link to a video, not to the sound. Open the sound in TikTok and copy the link tiktok.com/music/…")) return;
         if (!need(res, deadlineOk(b.deadline), 400, "The deadline must be at least 1 week (for example: 2 weeks, 1 month)")) return;
         if (!need(res, !b.descRule || String(b.descText || "").trim(), 400, "write what editors must put in the description")) return;
         const ig = String(b.instagram || "").trim().slice(0, 100); if (!need(res, ig, 400, "write your Instagram")) return;

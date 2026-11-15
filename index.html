@@ -1127,6 +1127,22 @@ header.bar .logo{flex:0 0 auto}header.bar .logo .mark{flex:none;min-width:28px}
  .tcard,.tkrow,.mkrow,.fdcard{content-visibility:auto;contain-intrinsic-size:auto 150px}
  .mkt{transition:none!important}.mkt:hover,.card:hover,.tcard:hover{transform:none!important}
 }
+/* v56 */
+.pill.hit{background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important;color:#fff!important;box-shadow:0 0 12px rgba(139,108,255,.55)}
+.srcopy{margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(139,108,255,.12);border:1px solid rgba(139,108,255,.35)}
+.srcopy small{display:block;opacity:.75;margin-bottom:6px}.srcr{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.srcr code{flex:1 1 140px;min-width:0;word-break:break-word;font-size:14px}
+.chrb{margin-left:auto;margin-right:6px}
+#chatOv .chath{gap:6px}
+@media(max-width:899px){#chatOv:not(.showrules) .chrule{display:none}}
+@media(min-width:900px){.chrb{display:none}}
+.payl1 input{font-weight:700}.paysm small{opacity:.7}.paysec{margin:14px 0 4px;font-weight:700;opacity:.85}
+.odsearch{margin-top:16px!important}
+#v-admin .ownmain .row+.odsearch,#v-admin .ownmain label.f+.odsearch{margin-top:18px!important}
+.tile.hot{background:var(--surface)!important;border-color:rgba(139,108,255,.35)!important}
+.tile.hot b,.tile.hot .n{color:inherit!important}
+.btn.chk-ed{background:var(--surface)!important;color:inherit!important;border:1px solid rgba(139,108,255,.45)!important;box-shadow:none!important}
+.agrp.g-ed,.agrp.g-pr,.agrp.g-st,.agrp.g-ov{background:var(--surface)!important;border-color:var(--line)!important;box-shadow:none!important}
+:root[data-theme="dark"] .agrp.g-ed,:root[data-theme="dark"] .agrp.g-pr,:root[data-theme="dark"] .agrp.g-st,:root[data-theme="dark"] .agrp.g-ov{background:rgba(255,255,255,.03)!important;border-color:rgba(255,255,255,.08)!important}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1305,7 +1321,7 @@ header.bar .logo{flex:0 0 auto}header.bar .logo .mark{flex:none;min-width:28px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v55 · 16.11 01:20</span>
+  <span>© Promo Campaign · v56 · 16.11 02:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2346,7 +2362,10 @@ function renderOwner(){
   }else if(LV.adTab==="pay"){
     var X=LV.payInfo||{},C=X.crypto||{};
     body='<div class="card form"><p class="hint">'+esc(L("a_pay_h"))+'</p>'+
-      [["paypal","p_to_paypal"],["card","p_to_card"],["cardHolder","p_to_holder"]].map(function(f){return '<label class="f" for="pay_'+f[0]+'"><span>'+esc(L(f[1]))+'</span><input id="pay_'+f[0]+'" type="text" maxlength="140" value="'+esc(X[f[0]]||"")+'"></label>'}).join("")+
+      '<label class="f payl1" for="pay_paypal"><span><b>'+esc(L("p_to_paypal"))+'</b></span><input id="pay_paypal" type="text" maxlength="140" value="'+esc(X.paypal||"")+'"></label>'+
+      '<label class="f" for="pay_card"><span>'+esc(L("p_to_card"))+'</span><input id="pay_card" type="text" maxlength="140" value="'+esc(X.card||"")+'"></label>'+
+      '<label class="f paysm" for="pay_cardHolder"><span><small>'+esc(L("p_to_holder"))+'</small></span><input id="pay_cardHolder" type="text" maxlength="140" value="'+esc(X.cardHolder||"")+'"></label>'+
+      '<div class="paysec">'+esc(L("pay_crypto"))+'</div>'+
       COINS.map(function(c){return '<label class="f" for="pay_c_'+c+'"><span>'+esc(coinL(c))+'</span><input id="pay_c_'+c+'" type="text" maxlength="140" value="'+esc(C[c]||"")+'"></label>'}).join("")+
       '<div class="row"><button class="btn primary" data-l="paySave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="payOk"></span></div></div>';
   }else{
@@ -2470,7 +2489,7 @@ function refreshPayBox(){
   var dr=$("nDescRow");if(dr)dr.hidden=!($("nDesc")&&$("nDesc").checked);
   var o=$("nOtherRow");if(o){var on=checked("nCats").indexOf("other")>=0;o.hidden=!on}
   var b=$("payBoxM");if(b)b.innerHTML=payBoxHtml(val("tMeth"),val("tAmt"),val("tCoin"));
-  var np=$("nPayBox");if(np)np.innerHTML=payBoxHtml(val("nMethod"),0,val("nCoin"),true);
+  var np=$("nPayBox");if(np)np.innerHTML=payBoxHtml(val("nMethod"),Number(val("nBudget"))||0,val("nCoin"),true);
   var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;if(a>0&&a<100){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=a>0?L("p_fee_line").replace("{f}",money(a*0.2)).replace("{n}",money(a*0.8)):L("p_fee");q.className=a>0?"hotnote":"hint"}}
   var so=$("sOtherRow");if(so&&$("sCats"))so.hidden=checked("sCats").indexOf("other")<0;
   var pc=$("pyCoinRow");if(pc)pc.hidden=val("pyMethod")!=="crypto";var ph=$("pyHolderRow");if(ph)ph.hidden=val("pyMethod")!=="card";
@@ -2512,7 +2531,7 @@ function drawProd(){
     '</div><h3 class="sub">'+esc(L("sec_pay"))+'</h3><div class="card form">'+
     '<label class="f" for="nMethod"><span>'+esc(L("p_method"))+'</span><select id="nMethod">'+methodOpts("paypal")+'</select></label>'+
     '<label class="f" id="nCoinRow" for="nCoin" hidden><span>'+esc(L("p_coin"))+'</span><select id="nCoin">'+coinOpts("solana")+'</select></label>'+
-    '<label class="f" for="nBudget"><span>'+esc(L("p_budget"))+'</span><input id="nBudget" type="number" min="100" inputmode="decimal" placeholder="100"></label><p class="hint" id="nBudgetInfo">'+esc(L("p_fee"))+'</p>'+
+    '<label class="f" for="nBudget"><span>'+esc(L("p_budget"))+'</span><input id="nBudget" type="number" min="100" inputmode="decimal" placeholder="2000" value="2000"></label><p class="hint" id="nBudgetInfo">'+esc(L("p_fee"))+'</p>'+
     '<div id="nPayBox">'+payBoxHtml("paypal",0,"solana",true)+'</div>'+
     '<label class="f" for="nProof"><span>'+esc(L("p_attach"))+'</span><input id="nProof" type="file" accept="image/*,application/pdf,.pdf"></label><p class="hint">'+esc(L("p_attach_h"))+'</p>'+
     '</div><h3 class="sub">'+esc(L("sec_links"))+'</h3><div class="card form">'+
@@ -5124,6 +5143,7 @@ window.addEventListener("click",function(e){var el=e.target.closest&&e.target.cl
   if(!val("nInsta"))return stop("nInsta",L("ig_need"));
   if($("nDesc")&&$("nDesc").checked&&!val("nDescText"))return stop("nDescText",L("desc_txt_need"));
   if(pt.indexOf("tiktok")>=0&&!val("nl_tiktok"))return stop("nl_tiktok",L("p_tt_need"));
+  if(/tiktok\.com\/@[^\/\s]+\/(video|photo)\//i.test(val("nl_tiktok")||""))return stop("nl_tiktok",L("tt_vid_bad"));
   if(pt.indexOf("instagram")>=0&&!val("nl_instagram"))return stop("nl_instagram",L("p_ig_need"));
   if(pt.indexOf("youtube")>=0&&!val("nl_youtube"))return stop("nl_youtube",L("p_yt_need"));
   if(!(Number(val("nBudget"))>=100))return stop("nBudget",L("p_min100"));
@@ -5144,7 +5164,7 @@ function ntHtml(){var a=rev();
   return '<h3 style="margin:0 0 12px">🎶 '+esc(L("nt_h"))+'</h3>'+(NT.msg?'<div class="note payok">'+esc(NT.msg)+'</div>':'')+'<div class="tklist">'+(a.length?a.map(function(t){
    var ln=Object.keys(t.links||{}).map(function(k){var u=t.links[k];return '<a class="tkl" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join("");
    return '<div class="card mkrow"><div class="mkh"><b>'+esc(t.title)+'</b><span>'+esc(t.artist||"")+'</span></div><div>'+esc(L("nt_by"))+': '+esc(t.producerName||"")+' · '+esc(t.producer||"")+'</div><div>'+esc(L("nt_bud"))+': <b>'+money(amt(t)||t.budget||0)+'</b> · '+esc((t.platforms||[]).join(", "))+'</div><div>'+catPills(t.categories,t.otherCategory)+'</div>'+(ln?'<div class="tklinks">'+ln+'</div>':'')+(t.message?'<div class="hint">'+esc(L("nt_msg"))+': '+esc(t.message)+'</div>':'')+(t.deadline?'<div class="hint">'+esc(t.deadline)+'</div>':'')+
-   '<div class="row"><button type="button" class="btn primary sm" data-l="ntOk" data-id="'+esc(t.id)+'">'+esc(L("nt_ok"))+'</button><button type="button" class="btn sm danger" data-l="ntNo" data-id="'+esc(t.id)+'">'+esc(L("nt_no"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("nt_none"))+'</div>')+'</div>'}
+   (/tiktok\.com\/@[^\/\s]+\/(video|photo)\//i.test((t.links||{}).tiktok||"")?'<div class="note err">⚠ '+esc(L("tt_vid_bad"))+'</div>':'')+'<div class="row"><button type="button" class="btn primary sm" data-l="ntOk" data-id="'+esc(t.id)+'">'+esc(L("nt_ok"))+'</button><button type="button" class="btn sm danger" data-l="ntNo" data-id="'+esc(t.id)+'">'+esc(L("nt_no"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("nt_none"))+'</div>')+'</div>'}
 var NT={msg:""};
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="newtracks"){var mn=document.querySelector(".ownmain")||$("adApp");if(mn)mn.innerHTML=ntHtml()}}catch(e){}return r}})();
 (function(){var o=ownItems;ownItems=function(){var it=o();rev().forEach(function(t){it.push({id:"nt"+t.id,t:"tracks",tab:"newtracks",txt:L("ow_i_nt").replace("{t}",t.title+(t.artist?" — "+t.artist:""))})});return it}})();
@@ -5162,6 +5182,37 @@ Object.assign(LT.en,{a_newtracks:"🎶 New tracks",ar_btn:"🗄 Track history",a
 (function(){var y=0,on=false;
 function sync(){var c=document.body.classList.contains("chatopen");if(c&&!on){on=true;y=window.scrollY;document.body.style.top=-y+"px";document.body.classList.add("lockpg")}else if(!c&&on){on=false;document.body.classList.remove("lockpg");document.body.style.top="";window.scrollTo(0,y)}}
 new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:["class"]});
+})();
+/* ===== v56: smooth screens, rules button, form keeps its values, description copy, topic highlight ===== */
+(function(){
+var N={en:{tt_vid_bad:"This is a link to a video, not to the sound. Open the sound in TikTok and copy its link (tiktok.com/music/…).",ch_rules_btn:"📜 Rules",pay_crypto:"Crypto",sr_copy:"Description for every video",sr_copy_btn:"Copy",sr_copied:"Copied"},
+ ru:{tt_vid_bad:"Это ссылка на видео, а не на звук. Откройте звук в TikTok и скопируйте его ссылку (tiktok.com/music/…).",ch_rules_btn:"📜 Правила",pay_crypto:"Крипта",sr_copy:"Описание для каждого видео",sr_copy_btn:"Копировать",sr_copied:"Скопировано"}};
+Object.assign(LT.en,N.en);Object.assign(LT.ru,N.ru);
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in N.en)if(!XLL[k][x])XLL[k][x]=N.en[x]});
+/* same screen: keep the scroll position when it is drawn again */
+var lastH=location.hash;
+(function(){var o=route;route=function(){var same=location.hash===lastH,y=window.scrollY;o.apply(this,arguments);lastH=location.hash;if(same){window.scrollTo(0,y);requestAnimationFrame(function(){window.scrollTo(0,y)})}}})();
+(function(){var o=renderOrders;renderOrders=function(){var h=$("ordersBody"),y=window.scrollY;if(h)h.style.minHeight=h.offsetHeight+"px";var r=o.apply(this,arguments);window.scrollTo(0,y);setTimeout(function(){var h2=$("ordersBody");if(h2)h2.style.minHeight=""},400);return r}})();
+/* the form keeps what was typed when the language changes */
+(function(){var o=setLang;setLang=function(l){var snap=[];
+  document.querySelectorAll("input,textarea,select").forEach(function(e){if(e.id==="langSel"||e.id==="themeSel"||e.type==="file"||e.type==="password")return;var cn=e.closest&&e.closest("[id]"),k=e.id||(e.name?e.name+":"+e.value:(cn&&cn!==e?"c:"+cn.id+":"+e.value:""));if(!k)return;snap.push([k,e.id?"id":(k.indexOf("c:")===0?"cn":"nm"),e.type==="checkbox"||e.type==="radio"?e.checked:e.value,e.type])});
+  var r=o.apply(this,arguments);
+  var put=function(){snap.forEach(function(s){var e=s[1]==="id"?document.getElementById(s[0]):s[1]==="cn"?(function(){var p=s[0].split(":"),cc=document.getElementById(p[1]);return cc?[].filter.call(cc.querySelectorAll("input"),function(x){return x.value===p.slice(2).join(":")})[0]:null})():document.querySelector('[name="'+s[0].split(":")[0]+'"][value="'+s[0].split(":").slice(1).join(":")+'"]');if(!e)return;if(s[3]==="checkbox"||s[3]==="radio"){if(e.checked!==s[2])e.checked=s[2]}else if(e.tagName==="SELECT"){if(e.value!==s[2]&&[].some.call(e.options,function(x){return x.value===s[2]}))e.value=s[2]}else if(e.value!==s[2]&&s[2]!==""&&e.id!=="nBudget"||e.id==="nBudget"&&s[2]!==""){e.value=s[2]}});try{refreshPayBox()}catch(x){}};
+  put();setTimeout(put,120);setTimeout(put,500);return r}})();
+/* chat: rules are hidden on phones, a button shows them */
+(function(){var o=openChat;openChat=function(){var r=o.apply(this,arguments);try{var h=document.querySelector("#chatOv .chath"),cl=h&&h.querySelector('[data-l="chClose"]');if(h&&cl&&!h.querySelector(".chrb")){var b=document.createElement("button");b.type="button";b.className="btn sm chrb";b.setAttribute("data-l","chRules");b.textContent=L("ch_rules_btn");cl.insertAdjacentElement("beforebegin",b)}}catch(e){}return r}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="chRules"]');if(!el)return;e.stopImmediatePropagation();var o=$("chatOv");if(o)o.classList.toggle("showrules")},true);
+/* sound rules: the description is written out and copies in one tap */
+(function(){var o=soundRules;soundRules=function(q){var h=o.apply(this,arguments);if(!q||!q.descRule)return h;var tx=q.descText||("Song: "+(q.track||""));
+  return h.replace('<div class="srwarn">','<div class="srcopy"><small>'+esc(L("sr_copy"))+'</small><div class="srcr"><code>'+esc(tx)+'</code><button type="button" class="btn sm primary" data-l="srCopy" data-v="'+esc(tx)+'">'+esc(L("sr_copy_btn"))+'</button></div></div><div class="srwarn">')}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="srCopy"]');if(!el)return;e.stopImmediatePropagation();var v=el.getAttribute("data-v");
+  var done=function(){el.textContent=L("sr_copied");setTimeout(function(){el.textContent=L("sr_copy_btn")},1500)};
+  try{navigator.clipboard.writeText(v).then(done,function(){var t=document.createElement("textarea");t.value=v;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(x){}t.remove();done()})}catch(x){done()}},true);
+/* manager: topics picked in the filter light up on the cards */
+function hit(){try{var sel=[];if(LV.adTab==="promos")sel=LV.pCats||[];else if(LV.adTab==="accounts")sel=LV.fCats||[];else return;
+  var set={};sel.forEach(function(c){set[L("c_"+c)]=1});var m=document.querySelector(".ownmain");if(!m)return;
+  m.querySelectorAll(".pill").forEach(function(p){if(set[p.textContent.trim()])p.classList.add("hit");else p.classList.remove("hit")})}catch(e){}}
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);hit();return r}})();
 })();
 /* ===== v51: owner toast for new tickets, dock highlight, "write to manager" ===== */
 (function(){
