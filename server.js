@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 34;
+const SERVER_VER = 35;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -825,6 +825,7 @@ const server = http.createServer(async (req, res) => {
       const th = D.threads[key] = D.threads[key] || { key, kind: pr0 ? "producer" : "editor", name: pr0 ? (pr0.name || pr0.email) : ((((eu0.accounts || [])[0] || {}).profile || {}).username ? "@" + eu0.accounts[0].profile.username : (eu0.chatNick || eu0.id)), sub: "", msgs: [], updated: 0, userSeen: 0, adminSeen: 0 };
       th.sub = pr0 ? [pr0.email, pr0.instagram && "IG " + pr0.instagram, pr0.tiktok && "TikTok " + pr0.tiktok, pr0.discord && "Discord " + pr0.discord].filter(Boolean).join(" · ") : (eu0.chatNick ? "chat: " + eu0.chatNick : "");
       const mine = () => th.msgs.filter(m => !m.hideU).slice(-200).map(m => ({ id: m.id, at: m.at, mgr: !!m.mgr, text: m.text }));
+      if (P === "/api/dm/unread" && M === "GET") return send(res, 200, { n: th.msgs.filter(m => m.mgr && !m.hideU && m.at > (th.userSeen || 0)).length });
       if (P === "/api/dm" && M === "GET") { th.userSeen = Date.now(); return send(res, 200, { msgs: mine() }); }
       if (P === "/api/dm" && M === "POST") {
         const b = await readBody(req), text = String(b.text || "").trim().replace(/[ \t]+/g, " ").slice(0, 1000);
