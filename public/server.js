@@ -6,6 +6,10 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const PC = require("./analysis.js");
+const SW_JS = "self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));" +
+  "self.addEventListener('push',e=>{let d={};try{d=e.data.json()}catch(x){d={title:'Promo Campaign',body:e.data?e.data.text():''}}" +
+  "e.waitUntil(Promise.all([self.registration.showNotification(d.title||'Promo Campaign',{body:d.body||'',data:{url:d.url||'/'},icon:'/favicon.ico'}),self.clients.matchAll({type:'window'}).then(cs=>cs.forEach(c=>c.postMessage({push:1,title:d.title,body:d.body})))]))});" +
+  "self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(self.clients.matchAll({type:'window'}).then(cs=>{for(const c of cs){if('focus' in c)return c.focus()}return self.clients.openWindow(e.notification.data&&e.notification.data.url||'/')}))});";
 const https = require("https");
 // Phone alerts for the owner through a Telegram bot (optional: TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID)
 function notify(text) {
@@ -15,6 +19,47 @@ function notify(text) {
     const q = https.request({ hostname: "api.telegram.org", path: "/bot" + tk + "/sendMessage", method: "POST", headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) } }, x => x.resume());
     q.on("error", () => {}); q.setTimeout(8000, () => q.destroy()); q.end(body);
   } catch (e) {}
+}
+/* ---- Web Push (no dependencies): VAPID + RFC 8291 payload encryption ---- */
+const b64u = b => Buffer.from(b).toString("base64url");
+function vapid() {
+  if (!db.settings.vapid) {
+    const kp = crypto.generateKeyPairSync("ec", { namedCurve: "prime256v1" }), j = kp.publicKey.export({ format: "jwk" }), d = kp.privateKey.export({ format: "jwk" });
+    db.settings.vapid = { pub: b64u(Buffer.concat([Buffer.from([4]), Buffer.from(j.x, "base64url"), Buffer.from(j.y, "base64url")])), jwk: d }; saveDb();
+  }
+  return db.settings.vapid;
+}
+function pushEncrypt(sub, text) {
+  const cPub = Buffer.from(sub.keys.p256dh, "base64url"), auth = Buffer.from(sub.keys.auth, "base64url");
+  const ecdh = crypto.createECDH("prime256v1"); ecdh.generateKeys(); const sPub = ecdh.getPublicKey(), shared = ecdh.computeSecret(cPub), salt = crypto.randomBytes(16);
+  const hk = (s, ikm, info, n) => Buffer.from(crypto.hkdfSync("sha256", ikm, s, info, n));
+  const prk = hk(auth, shared, Buffer.concat([Buffer.from("WebPush: info\0"), cPub, sPub]), 32);
+  const cek = hk(salt, prk, Buffer.from("Content-Encoding: aes128gcm\0"), 16), nonce = hk(salt, prk, Buffer.from("Content-Encoding: nonce\0"), 12);
+  const c = crypto.createCipheriv("aes-128-gcm", cek, nonce), ct = Buffer.concat([c.update(Buffer.concat([Buffer.from(text), Buffer.from([2])])), c.final(), c.getAuthTag()]);
+  const rs = Buffer.alloc(4); rs.writeUInt32BE(4096);
+  return Buffer.concat([salt, rs, Buffer.from([sPub.length]), sPub, ct]);
+}
+function pushSend(sub, payload) {
+  return new Promise(resolve => {
+    try {
+      const u = new URL(sub.endpoint), V = vapid();
+      const head = b64u(JSON.stringify({ typ: "JWT", alg: "ES256" })), body = b64u(JSON.stringify({ aud: u.origin, exp: Math.floor(Date.now() / 1000) + 43200, sub: "mailto:admin@promo.local" }));
+      const sig = crypto.sign("sha256", Buffer.from(head + "." + body), { key: crypto.createPrivateKey({ key: V.jwk, format: "jwk" }), dsaEncoding: "ieee-p1363" });
+      const data = pushEncrypt(sub, JSON.stringify(payload));
+      const q = https.request({ hostname: u.hostname, path: u.pathname + u.search, method: "POST", headers: { Authorization: "vapid t=" + head + "." + body + "." + b64u(sig) + ", k=" + V.pub, "Content-Encoding": "aes128gcm", "Content-Type": "application/octet-stream", "Content-Length": data.length, TTL: "86400" } }, x => { x.resume(); resolve(x.statusCode); });
+      q.on("error", () => resolve(0)); q.setTimeout(10000, () => { q.destroy(); resolve(0); }); q.end(data);
+    } catch (e) { resolve(0); }
+  });
+}
+async function broadcast(audience, title, text, url) {
+  db.settings.inbox = (db.settings.inbox || []).concat([{ id: uid8(), at: Date.now(), audience, title, text, url: url || "/" }]).slice(-30);
+  const subs = db.settings.push || {}; let sent = 0;
+  for (const [k, s] of Object.entries(subs)) {
+    if (audience !== "all" && s.role !== audience) continue;
+    const code = await pushSend(s.sub, { title, body: text, url: url || "/" });
+    if (code === 404 || code === 410) delete subs[k]; else if (code >= 200 && code < 300) sent++;
+  }
+  saveDb(); return sent;
 }
 function classifyLink(u) {
   const h = (u.match(/^https?:\/\/([^\/?#]+)/i) || [, ""])[1].toLowerCase();
@@ -395,6 +440,18 @@ const server = http.createServer(async (req, res) => {
       Object.values(db.requests).forEach(r => { if (r.openId === acc.open_id && r.status === "pending") r.status = "cancelled"; });
       saveDb(); return send(res, 200, view(u));
     }
+    if (P === "/sw.js" && M === "GET") { res.writeHead(200, { "Content-Type": "text/javascript", "Cache-Control": "no-cache" }); return res.end(SW_JS); }
+    if (P === "/api/push/key" && M === "GET") return send(res, 200, { key: vapid().pub });
+    if (P === "/api/push/subscribe" && M === "POST") {
+      const b = await readBody(req), sub = b.sub; if (!need(res, sub && /^https:\/\//.test(sub.endpoint || "") && sub.keys && sub.keys.p256dh && sub.keys.auth, 400, "bad subscription")) return;
+      const role = adminOk(req) ? "owner" : producerOf(req) ? "producers" : (sessionUser(req) ? "editors" : (b.role === "producers" ? "producers" : "editors"));
+      db.settings.push = db.settings.push || {}; db.settings.push[crypto.createHash("sha1").update(sub.endpoint).digest("hex")] = { sub: { endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } }, role, at: Date.now() };
+      saveDb(); return send(res, 200, { ok: true });
+    }
+    if (P === "/api/inbox" && M === "GET") {
+      const since = Number(new URL(req.url, "http://x").searchParams.get("since")) || 0;
+      return send(res, 200, { now: Date.now(), items: (db.settings.inbox || []).filter(x => x.at > since).slice(-5).map(x => ({ id: x.id, at: x.at, audience: x.audience, title: x.title, text: x.text, url: x.url })) });
+    }
     if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "" }); }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
@@ -567,6 +624,12 @@ const server = http.createServer(async (req, res) => {
         return send(res, 200, { track: t.title, budget, spent, left: rem, videos: plan.reduce((x, p) => x + p.videos, 0), expViews: plan.reduce((x, p) => x + p.expViews, 0), plan, candidates: cands.length });
       }
       if (P === "/api/admin/contacts" && M === "POST") { const tg = String(b.telegram || "").trim().replace(/^https?:\/\/t\.me\//i, "").replace(/^@/, "").slice(0, 60), dc = String(b.discord || "").trim().slice(0, 200); db.settings.contacts = { telegram: tg, discord: dc }; saveDb(); return send(res, 200, db.settings.contacts); }
+      if (P === "/api/admin/broadcast" && M === "POST") {
+        const text = String(b.text || "").trim().slice(0, 300), title = String(b.title || "Promo Campaign").trim().slice(0, 80), aud = ["editors", "producers", "all"].includes(b.audience) ? b.audience : "editors";
+        if (!need(res, text, 400, "write a message")) return;
+        const n = Object.values(db.settings.push || {}).filter(x => aud === "all" || x.role === aud).length, sent = await broadcast(aud, title, text, "/");
+        return send(res, 200, { ok: true, subscribers: n, delivered: sent });
+      }
       if (P === "/api/admin/demo" && M === "POST") {    // test producer with a ready track, only for the owner's own checks
         const email = "demo-producer@promo.test", pw = crypto.randomBytes(5).toString("hex") + "Aa1";
         let p = Object.values(db.producers).find(x => x.email === email); const salt = crypto.randomBytes(16).toString("hex");
@@ -579,7 +642,7 @@ const server = http.createServer(async (req, res) => {
         }
         t.budget = 80; t.spent = 0; t.status = "active";
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: 100, fee: 20, method: "paypal", coin: "", status: "confirmed", confirmedAt: Date.now(), created: Date.now(), demo: true };
-        db.topups[tp.id] = tp; saveDb(); return send(res, 200, { email, password: pw, track: t.title });
+        db.topups[tp.id] = tp; const sid = newSid(); db.psessions[sid] = { pid: p.id, exp: Date.now() + 12 * 3600000 }; saveDb(); return send(res, 200, { ok: true, track: t.title }, { "Set-Cookie": setCookie("psid", sid, 43200) });
       }
       if (P === "/api/admin/pay" && M === "GET") return send(res, 200, payInfo());
       if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) cr[k] = c(b.crypto, k); db.settings.pay = { paypal: c(b, "paypal"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), crypto: cr }; saveDb(); return send(res, 200, payInfo()); }
