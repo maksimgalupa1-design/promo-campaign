@@ -70,8 +70,8 @@ const pending = new Map();           // oauth state -> {exp, handle, uid}
 const loginTries = new Map();        // ip -> [timestamps], simple brute-force limit
 const sha = x => crypto.createHash("sha256").update(String(x)).digest();
 function clientIp(req) { return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim(); }
-function tooMany(ip) { const now = Date.now(), a = (loginTries.get(ip) || []).filter(t => now - t < 10 * 60000); loginTries.set(ip, a); return a.length >= 8; }
-function failTry(ip) { (loginTries.get(ip) || []).push(Date.now()); }
+function tooMany(ip, max) { const now = Date.now(), a = (loginTries.get(ip) || []).filter(t => now - t < 10 * 60000); loginTries.set(ip, a); return a.length >= (max || 8); }
+function failTry(ip) { if (!loginTries.has(ip)) loginTries.set(ip, []); loginTries.get(ip).push(Date.now()); }
 function newSid() { return crypto.randomBytes(24).toString("hex"); }
 function setCookie(name, val, maxAge, strict) { return name + "=" + val + "; HttpOnly; Secure; SameSite=" + (strict ? "Strict" : "Lax") + "; Path=/; Max-Age=" + maxAge; }
 function adminOk(req) {
@@ -181,7 +181,7 @@ function accView(acc) {
     analysis: A, price: acc.price || null, evaluation: PC.evaluate(A, acc.price), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, url: v.url })) };
 }
-function view(user) { return { accounts: (user.accounts || []).map(accView), categories: CATEGORIES }; }
+function view(user) { return { accounts: (user.accounts || []).map(accView), categories: CATEGORIES, payout: payoutLabel(user), coins: COINS }; }
 function accAdminView(acc) {
   const v = accView(acc), r = autoStars(acc);
   v.stars = { auto: r.stars, manual: acc.rating_manual == null ? null : acc.rating_manual, final: acc.rating_manual != null ? acc.rating_manual : r.stars };
@@ -191,7 +191,14 @@ function accAdminView(acc) {
 }
 const FEE = 0.2;   // site commission, taken from every confirmed payment
 const METHODS = ["paypal", "usdt", "card", "crypto"];
-function payInfo() { const x = db.settings.pay || {}; return { paypal: x.paypal || "", usdt: x.usdt || "", usdtNet: x.usdtNet || "", card: x.card || "", cardHolder: x.cardHolder || "" }; }
+const COINS = ["solana", "tron", "ethereum", "litecoin", "ton"];
+const PLATFORMS = ["tiktok", "instagram", "youtube"];
+function payInfo() { const x = db.settings.pay || {}, c = x.crypto || {}; const o = { paypal: x.paypal || "", card: x.card || "", cardHolder: x.cardHolder || "", crypto: {} }; for (const k of COINS) o.crypto[k] = c[k] || ""; return o; }
+const PKEY = () => crypto.scryptSync(ADMIN_TOKEN, "pc-payout-v1", 32);
+function encObj(o) { const iv = crypto.randomBytes(12), c = crypto.createCipheriv("aes-256-gcm", PKEY(), iv), ct = Buffer.concat([c.update(JSON.stringify(o), "utf8"), c.final()]); return [iv, c.getAuthTag(), ct].map(x => x.toString("base64")).join("."); }
+function decObj(str) { try { const [iv, tag, ct] = String(str).split(".").map(x => Buffer.from(x, "base64")), d = crypto.createDecipheriv("aes-256-gcm", PKEY(), iv); d.setAuthTag(tag); return JSON.parse(Buffer.concat([d.update(ct), d.final()]).toString("utf8")); } catch (e) { return null; } }
+function maskVal(m, v) { v = String(v); return m === "card" ? "•••• " + v.replace(/\D/g, "").slice(-4) : (m === "paypal" ? v.replace(/^(.{2}).*(@.*)$/, "$1•••$2") : v.slice(0, 4) + "…" + v.slice(-4)); }
+function payoutLabel(u) { return u.payout ? { set: true, method: u.payout.method, coin: u.payout.coin || "", label: u.payout.label } : { set: false }; }
 const trackLeft = t => Math.max(0, Math.round(((t.budget || 0) - (t.spent || 0)) * 100) / 100);
 function cleanCats(list) { return Array.isArray(list) ? CATEGORIES.filter(c => list.includes(c)) : []; }
 function reqCost(r) { return Math.round(r.price * r.videos * (1 - (r.discount || 0) / 100) * 100) / 100; }
@@ -201,6 +208,7 @@ function reqView(r, withAdmin) {
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
     internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created };
+  if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)); if (ou && ou.payout) o.payout = decObj(ou.payout.enc); }
   if (withAdmin && acc) { const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
   return o;
 }
@@ -223,8 +231,8 @@ function overview() {
       pendingRequests: reqs.filter(r => r.status === "pending").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
-    tracks: Object.values(db.tracks).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, status: t.status })),
-    topups: Object.values(db.topups).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, method: p.method, status: p.status, created: p.created })),
+    tracks: Object.values(db.tracks).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
+    topups: Object.values(db.topups).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     accounts: accs.map(accAdminView), categories: CATEGORIES
   };
 }
@@ -275,6 +283,19 @@ const server = http.createServer(async (req, res) => {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       return send(res, 200, view(u));
     }
+    if (P === "/api/payout" && M === "GET") { const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" }); return send(res, 200, payoutLabel(u)); }
+    if (P === "/api/payout" && M === "POST") {
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req), m = b.method, v = String(b.value || "").trim(), h = String(b.holder || "").trim().slice(0, 60), coin = b.coin;
+      let ok = false;
+      if (m === "paypal") ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) && v.length <= 120;
+      else if (m === "crypto") ok = COINS.includes(coin) && /^[A-Za-z0-9]{20,100}$/.test(v);
+      else if (m === "card") ok = /^\d{12,19}$/.test(v.replace(/\s/g, "")) && h.length >= 2;
+      if (!need(res, ok, 400, "check the payment details")) return;
+      const val = m === "card" ? v.replace(/\s/g, "") : v;
+      u.payout = { method: m, coin: m === "crypto" ? coin : "", label: maskVal(m, val), enc: encObj({ method: m, coin: m === "crypto" ? coin : "", value: val, holder: m === "card" ? h : "" }) };
+      saveDb(); return send(res, 200, payoutLabel(u));
+    }
     if (P === "/api/reanalyze" && M === "POST") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
@@ -309,7 +330,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
-      const list = Object.values(db.tracks).filter(t => t.status === "active" && trackLeft(t) > 0).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, categories: t.categories || [], otherCategory: t.otherCategory || "" }));
+      const list = Object.values(db.tracks).filter(t => t.status === "active" && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
       return send(res, 200, { tracks: list, signedIn: !!u });
     }
     if (P === "/api/requests" && M === "GET") {          // editor's own requests
@@ -320,15 +341,17 @@ const server = http.createServer(async (req, res) => {
     if (P === "/api/request" && M === "POST") {          // Send Request: choose accounts, only matching categories allowed
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), t = db.tracks[b.trackId];
-      if (!need(res, t && t.status === "active" && trackLeft(t) > 0, 404, "track not available")) return;
+      if (!need(res, t && t.status === "active" && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok"), 404, "track not available")) return;
       const ids = Array.isArray(b.accountIds) ? b.accountIds : [];
       if (!need(res, ids.length > 0 && ids.length <= 50, 400, "choose accounts")) return;
+      if (!need(res, u.payout, 403, "add your payment details first (Dashboard → Payment)")) return;
       const videos = Math.max(1, Math.min(100, Math.round(Number(b.videos) || 1)));
       const out = [];
       for (const id of ids) {
         const acc = findAcc(u, id); if (!need(res, acc, 404, "no such account")) return;
         const A = PC.analyze(acc.videos || [], Date.now());
         if (!need(res, A.accepted && acc.price > 0, 400, "account is not ready: " + (acc.profile && acc.profile.username))) return;
+        if (!need(res, acc.adminStatus === "approved", 403, "account is waiting for the manager's approval: " + (acc.profile && acc.profile.username))) return;
         const okCat = !(t.categories || []).length || (t.categories || []).some(c => (acc.categories || []).includes(c));
         if (!need(res, okCat, 400, "category does not match: " + (acc.profile && acc.profile.username))) return;
         if (Object.values(db.requests).some(r => r.trackId === t.id && r.openId === acc.open_id && ["pending", "approved", "submitted"].includes(r.status))) continue;
@@ -358,7 +381,7 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req), email = String(b.email || "").trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || String(b.password || "").length < 8) { failTry(ip); return send(res, 400, { error: "valid email and password of 8+ characters required" }); }
       if (Object.values(db.producers).some(p => p.email === email)) { failTry(ip); return send(res, 409, { error: "email already registered" }); }
-      const salt = crypto.randomBytes(16).toString("hex"), p = { id: uid8(), email, salt, hash: hashPw(b.password, salt), created: Date.now() };
+      const salt = crypto.randomBytes(16).toString("hex"), p = { id: uid8(), email, name: String(b.name || "").trim().slice(0, 60), salt, hash: hashPw(b.password, salt), created: Date.now() };
       db.producers[p.id] = p;
       const sid = newSid(); db.psessions[sid] = { pid: p.id, exp: Date.now() + 30 * 86400000 }; saveDb();
       return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("psid", sid, 2592000) });
@@ -378,17 +401,23 @@ const server = http.createServer(async (req, res) => {
     if (P.startsWith("/api/producer/")) {
       const p = producerOf(req); if (!p) return send(res, 401, { error: "not signed in" });
       const mine = () => Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
-      const pview = () => ({ email: p.email, fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created,
+      const pview = () => ({ email: p.email, name: p.name || "", fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule,
+        topups: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").map(x => ({ id: x.id, amount: x.amount, method: x.method, coin: x.coin || "" })),
         pendingTopup: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").reduce((s, x) => s + x.amount, 0) })) });
       if (P === "/api/producer/me" && M === "GET") return send(res, 200, pview());
       if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
         const b = await readBody(req), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
         if (!need(res, title && budget >= 1 && budget <= 1000000, 400, "title and budget (1..1000000) required")) return;
-        if (!need(res, !b.link || /^https?:\/\/\S+\.\S+/i.test(String(b.link).trim()), 400, "link must start with https://")) return;
-        const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: String(b.link || "").slice(0, 300), budget: 0, spent: 0,
-          categories: cleanCats(b.categories), otherCategory: String(b.otherCategory || "").slice(0, 60), status: "active", created: Date.now() };
+        const L = {}, src = b.links && typeof b.links === "object" ? b.links : {};
+        for (const k of ["spotify", "soundcloud", "tiktok", "mp3"]) { const v = String(src[k] || "").trim().slice(0, 400); if (v) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(v), 400, "link must start with https://")) return; L[k] = v; } }
+        if (!need(res, Object.keys(L).length > 0, 400, "add at least one link to the track")) return;
+        const plats = (Array.isArray(b.platforms) ? b.platforms : []).filter(x => PLATFORMS.includes(x));
+        const cats = cleanCats(b.categories);
+        const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0], links: L, budget: 0, spent: 0,
+          platforms: plats.length ? plats : ["tiktok"], descRule: !!b.descRule,
+          categories: cats, otherCategory: cats.includes("other") ? String(b.otherCategory || "").slice(0, 60) : "", status: "review", created: Date.now() };
         db.tracks[t.id] = t;
-        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(budget * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", status: "pending", created: Date.now() };
+        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(budget * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", coin: COINS.includes(b.coin) ? b.coin : "", status: "pending", created: Date.now() };
         db.topups[tp.id] = tp; saveDb(); return send(res, 200, pview());
       }
       if (P === "/api/producer/track/delete" && M === "POST") {  // track stays hidden but its data stays in the database
@@ -400,7 +429,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/producer/topup" && M === "POST") {     // "Add budget": owner confirms the payment by hand
         const b = await readBody(req), t = db.tracks[b.trackId], amount = Number(b.amount);
         if (!need(res, t && t.producerId === p.id && t.status !== "deleted" && amount >= 1 && amount <= 1000000, 400, "track and amount (1..1000000) required")) return;
-        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(amount * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", status: "pending", created: Date.now() };
+        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(amount * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", coin: COINS.includes(b.coin) ? b.coin : "", status: "pending", created: Date.now() };
         db.topups[tp.id] = tp; saveDb(); return send(res, 200, pview());
       }
       return send(res, 404, { error: "not found" });
@@ -408,8 +437,8 @@ const server = http.createServer(async (req, res) => {
 
     /* ----- owner ----- */
     if (P === "/api/admin/login" && M === "POST") {
-      const ip = clientIp(req);
-      if (tooMany(ip)) return send(res, 429, { error: "too many attempts" });
+      const ip = "adm:" + clientIp(req);
+      if (tooMany(ip, 30)) return send(res, 429, { error: "too many attempts, wait 10 minutes" });
       const b = await readBody(req);
       if (!crypto.timingSafeEqual(sha(b.password || ""), sha(ADMIN_TOKEN))) { failTry(ip); return send(res, 401, { error: "wrong password" }); }
       const sid = newSid(); db.admin[sid] = Date.now() + 12 * 3600000; saveDb();
@@ -425,7 +454,12 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/applicants" && M === "GET") return send(res, 200, allAccounts().map(accAdminView));
       const b = M === "POST" ? await readBody(req) : {};
       if (P === "/api/admin/pay" && M === "GET") return send(res, 200, payInfo());
-      if (P === "/api/admin/pay" && M === "POST") { const c = k => String(b[k] || "").trim().slice(0, 120); db.settings.pay = { paypal: c("paypal"), usdt: c("usdt"), usdtNet: c("usdtNet"), card: c("card"), cardHolder: c("cardHolder") }; saveDb(); return send(res, 200, payInfo()); }
+      if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) cr[k] = c(b.crypto, k); db.settings.pay = { paypal: c(b, "paypal"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), crypto: cr }; saveDb(); return send(res, 200, payInfo()); }
+      if (P === "/api/admin/track" && M === "POST") {   // owner approves a track before the producer pays
+        const t = db.tracks[b.id]; if (!need(res, t && t.status === "review", 404, "no track waiting for review")) return;
+        if (b.status === "approved") t.status = "active"; else if (b.status === "rejected") t.status = "rejected"; else return send(res, 400, { error: "bad status" });
+        saveDb(); return send(res, 200, { ok: true });
+      }
       if (P === "/api/admin/decision" && M === "POST") {
         if (!need(res, ["approved", "rejected", "new"].includes(b.status), 400, "bad status")) return;
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
@@ -451,6 +485,7 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
         const tp = db.topups[b.id]; if (!need(res, tp && tp.status === "pending", 404, "no pending payment")) return;
+        if (b.status === "confirmed" && !need(res, (db.tracks[tp.trackId] || {}).status === "active", 409, "approve the track first")) return;
         if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; }
         else if (b.status === "rejected") tp.status = "rejected";
         else return send(res, 400, { error: "bad status" });
