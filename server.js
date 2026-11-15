@@ -283,7 +283,8 @@ function findAccAny(openId) { return allAccounts().find(a => a.open_id === openI
 function autoStars(acc) {   // automatic rating: 2.0 .. 5.0 in steps of 0.1
   const A = PC.analyze(acc.videos || [], Date.now());
   const cpm = acc.price && A.refAvg ? acc.price / A.refAvg * 1000 : null;
-  let st = !A.accepted ? 2.5 : (cpm === null ? 3.2 : 5 - (cpm - 0.02) / 0.03);
+  if (!A.accepted) return { stars: A.status === "abandoned" ? 2.2 : 2.0, cpm };   // no views or no videos: 2.0, the lowest rating
+  let st = (cpm === null ? 3.2 : 5 - (cpm - 0.02) / 0.03);
   if (A.status === "dormant") st -= 0.8;
   if (A.status === "active" && A.week && A.week.videos === 0) st -= 0.4;
   if (A.refAvg) st += Math.min(0.4, A.refAvg / 250000);
@@ -296,7 +297,7 @@ function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
     avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
-    analysis: A, price: acc.price || null, evaluation: PC.evaluate(A, acc.price), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
+    analysis: A, price: acc.price || null, evaluation: (() => { const e = PC.evaluate(A, acc.price); if (!A.accepted) e.chance = A.status === "abandoned" ? 3 : 2; return e; })(), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
 function accPayoutRaw(user, acc) { return (acc && acc.payout) || (user && user.payout) || null; }   // every TikTok account can have its own payout details; the user-level ones are the fallback
@@ -609,7 +610,7 @@ const server = http.createServer(async (req, res) => {
       for (const id of ids) {
         const acc = findAcc(u, id); if (!need(res, acc, 404, "no such account")) return;
         const A = PC.analyze(acc.videos || [], Date.now());
-        if (!need(res, A.accepted && acc.price > 0, 400, "account is not ready: " + (acc.profile && acc.profile.username))) return;
+        if (!need(res, acc.price > 0, 400, "account is not ready: " + (acc.profile && acc.profile.username))) return;
         if (!need(res, acc.adminStatus === "approved", 403, "account is waiting for the manager's approval: " + (acc.profile && acc.profile.username))) return;
         if (!need(res, accPayoutRaw(u, acc), 403, "add payout details for @" + (acc.profile && acc.profile.username))) return;
         const okCat = !(t.categories || []).length || (t.categories || []).some(c => (acc.categories || []).includes(c));

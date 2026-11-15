@@ -691,6 +691,9 @@ body.hasdock #navSignup{display:none!important}
 body.isadmin #navSignup{display:none!important}
 @media (max-width:899px){.lang select{max-width:92px!important}.lang .themesel{max-width:70px!important}}
 
+@media (max-width:899px){#dock .dkd{display:none}}
+.supl{display:grid;gap:10px}.supb{justify-content:flex-start!important;font-size:16px;padding:14px 16px;text-decoration:none}.supb i{font-style:normal;font-size:22px}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -867,7 +870,7 @@ body.isadmin #navSignup{display:none!important}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v21 · 15.11 19:00</span>
+  <span>© Promo Campaign · v22 · 15.11 17:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -902,7 +905,7 @@ function analyze(videos,now){
 /* Chance of approval for a given price (USD per video). cpm = price per 1000 average views. */
 function evaluate(A,price){
   var r={good:[],bad:[],chance:0,decision:"no",cpm:null};
-  if(!A.accepted){r.bad.push(A.reject);return r}
+  if(!A.accepted){r.bad.push(A.reject);r.chance=A.status==="abandoned"?3:2;return r}
   var hasPrice=price>0&&A.refAvg>0;
   var cpm=hasPrice?price/A.refAvg*1000:null;r.cpm=cpm;
   if(A.status==="dormant"){
@@ -1186,7 +1189,7 @@ function gate(){
   var u=S.user;
   if(!u||!u.consent)return "signup";
   var A=getA();
-  if(!A.accepted||!u.reviewed)return "analysis";
+  if(!u.reviewed)return "analysis";
   return null;
 }
 
@@ -1283,16 +1286,15 @@ function renderAnalysis(){loadRanges();
     var h=winTable(A)+videoTable(u);
     if(!A.accepted){
       h+='<div class="blk"><h3>'+esc(t("rp_bad"))+'</h3>'+reasonList([A.reject],"b")+'<p class="hint" style="margin-top:8px">'+esc(t("rej_hint"))+'</p></div>'+
-        '<button class="btn primary" id="otherAcc">'+esc(t("rej_other"))+'</button>';
-    }else{
+        '<div class="note" style="margin-top:12px"><b>'+esc(L("rj_chance"))+'</b> '+esc(L("rj_note"))+'</div>';
+    }
       h+='<div class="card" style="margin-top:18px"><h3>'+esc(L("tp_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(L("tp_h"))+'</p>'+catChecks("anCats",u.categories||[])+(LIVE?'<label class="f" for="anAbout" style="margin-top:14px"><span>'+esc(L("an_about"))+'</span><textarea id="anAbout" rows="3" maxlength="600" placeholder="'+esc(L("dl_about_ph"))+'">'+esc(u.about||"")+'</textarea><span class="hint">'+esc(L("an_about_h"))+'</span></label><div class="note err" id="aboutErr" hidden>'+esc(L("an_about_err"))+'</div>':'')+'<div class="note err" id="topicErr" hidden style="margin-top:12px">'+esc(L("tp_err"))+'</div></div>'+
         '<div class="card" style="margin-top:18px"><h3>'+esc(t("price_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(t("price_hint"))+'</p><div class="note" id="rangeHint" hidden style="margin-bottom:12px"></div>'+
-        '<div class="pricebox"><span style="font-family:var(--display);font-size:24px;font-weight:700">$</span><input type="number" id="priceIn" min="1" max="200" step="0.5" inputmode="decimal" aria-label="'+esc(t("price_title"))+'" value="'+(u.price||PC.recommend(A))+'"></div>'+
+        '<div class="pricebox"><span style="font-family:var(--display);font-size:24px;font-weight:700">$</span><input type="number" id="priceIn" min="1" max="200" step="0.5" inputmode="decimal" aria-label="'+esc(t("price_title"))+'" value="'+(u.price||PC.recommend(A)||5)+'"></div>'+
         '<div class="note err" id="priceErr" hidden style="margin-top:12px">'+esc(t("price_err"))+'</div></div>'+
         '<button class="btn primary wide" id="sendReview" style="margin-top:16px">'+esc(t("an_send"))+'</button>';
-    }
     res.innerHTML=h;res.hidden=false;
-    if(A.accepted){RA=A;updRange()}
+    if(A.accepted){RA=A;updRange()}else{var rh=$("rangeHint");if(rh)rh.hidden=true}
   }
   if(u.analyzed){show();return}
   res.hidden=true;$("anTitle").textContent=t("an_title");paint(0,0);
@@ -1873,7 +1875,7 @@ function renderOwner(){
   }else if(LV.adTab==="promos"){
     body=moneySum(D)+promosHtml(D);
   }else if(LV.adTab==="waiting"){
-    var wl=D.accounts.filter(function(a){return isWait(a)}).map(function(a){return accCardHtml(a)}).join("");
+    var wl=D.accounts.filter(function(a){return isWait(a)}).sort(function(x,y){return ((y.stars&&y.stars.final)||0)-((x.stars&&x.stars.final)||0)}).map(function(a){return accCardHtml(a)}).join("");
     var wn=D.accounts.filter(function(a){return isWait(a)}).length;
     var wr=waitReqHtml(D);
     body=(wl?'<div class="waitbig">'+esc(L("a_wait_cnt").replace("{n}",wn))+'</div><div class="list">'+wl+'</div>':'')+(wr?'<h3 class="wrh">'+esc(L("wr_title"))+'</h3>'+wr:'')+((wl||wr)?'':'<div class="empty">'+esc(L("a_wait_none"))+'</div>');
@@ -3395,11 +3397,11 @@ function trackModalHtml(q){
 }
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="trOpen"]');if(!el)return;var q=(LV.reqs||[]).filter(function(x){return x.id===el.getAttribute("data-q")})[0];if(q)openModal(trackModalHtml(q))});
 /* ===== v21: dock navigation, stat widgets, budget converter ===== */
-Object.assign(LT.en,{dk_orders:"Orders",dk_pay:"Payments",dk_acc:"Accounts",dk_tracks:"My tracks",dk_add:"Add track",dk_role:"Change role",
+Object.assign(LT.en,{rj_chance:"Approval chance: 2–3%.",rj_note:"You can still send the account for review. The manager looks at it by hand, but the chance is very low.",dk_sup:"Support",sup_t:"Support",sup_h:"Write to the manager if something is wrong.",sup_none:"Contacts are not added yet.",dk_orders:"Orders",dk_pay:"Payments",dk_acc:"Accounts",dk_tracks:"My tracks",dk_add:"Add track",dk_role:"Change role",
  w_active:"In progress",w_wait:"Waiting",w_earned:"Earned",w_prog:"Money in progress",w_orders:"orders",
  cv_UAH:"Budget, UAH (₴)",cv_USDT:"Budget, USDT",cv_USD:"Budget, USD",cv_card_h:"You pay in hryvnia. We convert it to dollars for the budget.",cv_crypto_h:"Type the amount in USDT. Below is the same amount in other coins. Tap Copy to copy a number.",
  cv_usd:"Budget in dollars",cv_pay:"To pay",cv_rate:"Rate",cv_min:"Minimum",cv_copy:"Copy",cv_copied:"Copied",cv_approx:"Approximate rate (live rate is not available now)",cv_conv:"Same amount in other coins",cv_sel:"selected"});
-Object.assign(LT.ru,{dk_orders:"Заказы",dk_pay:"Платежи",dk_acc:"Аккаунты",dk_tracks:"Мои треки",dk_add:"Добавить",dk_role:"Сменить роль",
+Object.assign(LT.ru,{rj_chance:"Шанс одобрения: 2–3%.",rj_note:"Вы всё равно можете отправить аккаунт на проверку. Менеджер посмотрит его вручную, но шанс очень низкий.",dk_sup:"Поддержка",sup_t:"Поддержка",sup_h:"Напишите менеджеру, если что-то не так.",sup_none:"Контакты пока не добавлены.",dk_orders:"Заказы",dk_pay:"Платежи",dk_acc:"Аккаунты",dk_tracks:"Мои треки",dk_add:"Добавить",dk_role:"Сменить роль",
  w_active:"В работе",w_wait:"Ждут",w_earned:"Заработано",w_prog:"Деньги в работе",w_orders:"заказов",
  cv_UAH:"Бюджет, грн (₴)",cv_USDT:"Бюджет, USDT",cv_USD:"Бюджет, USD",cv_card_h:"Вы платите в гривнах. Мы пересчитаем в доллары для бюджета.",cv_crypto_h:"Впишите сумму в USDT. Ниже та же сумма в других монетах. Нажмите «Копировать», чтобы скопировать число.",
  cv_usd:"Бюджет в долларах",cv_pay:"К оплате",cv_rate:"Курс",cv_min:"Минимум",cv_copy:"Копировать",cv_copied:"Скопировано",cv_approx:"Примерный курс (живой сейчас недоступен)",cv_conv:"Эта же сумма в других монетах",cv_sel:"выбрано"});
@@ -3408,9 +3410,9 @@ Object.assign(LT.ru,{dk_orders:"Заказы",dk_pay:"Платежи",dk_acc:"А
 function dockItems(){
   var h=(location.hash||"#home").replace(/\?.*/,""),r=roleGet();
   if(!LIVE||h==="#admin"||h==="#home"||h===""||!r)return null;
-  if(r==="producer")return [["producer","🎵",L("dk_tracks"),""],["producer","➕",L("dk_add"),"add"],["home","⇄",L("dk_role"),"sw"]];
+  if(r==="producer")return [["producer","🎵",L("dk_tracks"),""],["producer","➕",L("dk_add"),"add"],["sup","🛟",L("dk_sup"),"sup"],["home","⇄",L("dk_role"),"sw"]];
   var pg=LV.dockPay;
-  return [["orders","🛒",L("dk_orders"),""],["dashboard","💳",L("dk_pay"),"pay"],["dashboard","👤",L("dk_acc"),""],["home","⇄",L("dk_role"),"sw"]];
+  return [["orders","🛒",L("dk_orders"),""],["dashboard","💳",L("dk_pay"),"pay"],["dashboard","👤",L("dk_acc"),""],["sup","🛟",L("dk_sup"),"sup"],["home","⇄",L("dk_role"),"sw"]];
 }
 function dockRender(){
   var h=(location.hash||"#home").replace(/\?.*/,""),items=dockItems(),d=$("dock");
@@ -3420,14 +3422,15 @@ function dockRender(){
   d.hidden=false;document.body.classList.add("hasdock");
   var cur=h.slice(1);
   d.innerHTML=items.map(function(it){
-    var on=it[0]===cur&&((it[3]==="pay")===!!LV.dockPay)&&it[3]!=="sw"&&it[3]!=="add";
-    return '<button type="button" data-dk="'+it[0]+'" data-x="'+it[3]+'"'+(on?' aria-current="page"':'')+(it[3]==="sw"?' class="dksw"':'')+'><i>'+it[1]+'</i><span>'+esc(it[2])+'</span></button>'}).join("");
+    var on=it[0]===cur&&((it[3]==="pay")===!!LV.dockPay)&&it[3]!=="sw"&&it[3]!=="add"&&it[3]!=="sup";
+    return '<button type="button" data-dk="'+it[0]+'" data-x="'+it[3]+'"'+(on?' aria-current="page"':'')+(it[3]==="sw"?' class="dksw"':(it[3]==="sup"?' class="dkd"':''))+'><i>'+it[1]+'</i><span>'+esc(it[2])+'</span></button>'}).join("");
   var sw=d.querySelector(".dksw");if(sw){var sp=document.createElement("span");sp.className="dkx";d.insertBefore(sp,sw)}
 }
 document.addEventListener("click",function(e){
   var b=e.target.closest("#dock [data-dk]");if(!b)return;
   var g=b.getAttribute("data-dk"),x=b.getAttribute("data-x");LV.dockPay=(x==="pay");
   if(x==="sw"){go("home");return}
+  if(x==="sup"){supOpen();return}
   var after=function(){
     var t=x==="pay"?$("payH1"):(x==="add"?document.querySelector("#v-lprod h3, #v-lprod .form, #nTitle"):null);
     if(x==="add"&&$("nTitle")){$("nTitle").closest("label").scrollIntoView({behavior:"smooth",block:"center"});return}
@@ -3534,6 +3537,17 @@ document.addEventListener("click",function(e){
       if($("nBudget")||$("tAmt")){var c=cvCtx();if(c&&!$("cvBox"))cvUpdate()}
       wgtInject()})}).observe(document.body,{childList:true,subtree:true});
 })();
+
+/* ---------- support window: the owner's contacts ---------- */
+function supOpen(){
+  var c=CONTACTS||{},ln=function(u,l,i){return '<a class="btn supb" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer"><i>'+i+'</i>'+esc(l)+'</a>'},rows=[];
+  var url=function(v,base){return /^https?:\/\//i.test(v)?v:base+String(v).replace(/^@/,"")};
+  if(c.telegram)rows.push(ln(url(c.telegram,"https://t.me/"),"Telegram","✈️"));
+  if(c.instagram)rows.push(ln(url(c.instagram,"https://instagram.com/"),"Instagram","📸"));
+  if(c.tiktok)rows.push(ln(url(c.tiktok,"https://tiktok.com/@"),"TikTok","🎵"));
+  if(c.discord)rows.push(/^https?:\/\//i.test(c.discord)?ln(c.discord,"Discord","🎮"):'<div class="btn supb"><i>🎮</i>Discord: '+esc(c.discord)+'</div>');
+  openModal('<h3>🛟 '+esc(L("sup_t"))+'</h3><p class="hint">'+esc(L("sup_h"))+'</p>'+(rows.length?'<div class="supl">'+rows.join("")+'</div>':'<div class="note">'+esc(L("sup_none"))+'</div>')+'<div class="row"><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');
+}
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
