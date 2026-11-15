@@ -274,17 +274,17 @@ const allAccounts = () => Object.values(db.users).flatMap(u => (u.accounts || []
 function findAccAny(openId) { return allAccounts().find(a => a.open_id === openId) || null; }
 
 /* ---- rating: stars 1..5 shown only to the owner. Manual stars override the automatic ones ---- */
-function autoStars(acc) {
+function autoStars(acc) {   // automatic rating: 2.0 .. 5.0 in steps of 0.1
   const A = PC.analyze(acc.videos || [], Date.now());
-  if (!A.accepted) return { stars: null, cpm: null };
   const cpm = acc.price && A.refAvg ? acc.price / A.refAvg * 1000 : null;
-  let st = cpm === null ? 3 : Math.max(1, Math.min(5, 5 - (cpm - 0.02) / 0.03));
-  if (A.status === "dormant") st -= 1;
-  if (A.status === "active" && A.week.videos === 0) st -= 0.5;
+  let st = !A.accepted ? 2.5 : (cpm === null ? 3.2 : 5 - (cpm - 0.02) / 0.03);
+  if (A.status === "dormant") st -= 0.8;
+  if (A.status === "active" && A.week && A.week.videos === 0) st -= 0.4;
+  if (A.refAvg) st += Math.min(0.4, A.refAvg / 250000);
   const mine = Object.values(db.requests).filter(r => r.openId === acc.open_id);
   const done = mine.filter(r => r.status === "completed").length, bad = mine.filter(r => r.status === "returned").length;
-  if (done + bad > 0) { const q = done / (done + bad); st += q >= 0.9 ? 0.5 : (q < 0.5 ? -1 : 0); }
-  return { stars: Math.round(Math.max(1, Math.min(5, st)) * 2) / 2, cpm };
+  if (done + bad > 0) { const q = done / (done + bad); st += q >= 0.9 ? 0.4 : (q < 0.5 ? -0.6 : 0); }
+  return { stars: Math.round(Math.max(2, Math.min(5, st)) * 10) / 10, cpm };
 }
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
@@ -298,6 +298,7 @@ function accAdminView(acc) {
   const v = accView(acc), r = autoStars(acc);
   v.stars = { auto: r.stars, manual: acc.rating_manual == null ? null : acc.rating_manual, final: acc.rating_manual != null ? acc.rating_manual : r.stars };
   v.cpm = r.cpm;
+  { const ou = Object.values(db.users).find(x => (x.accounts || []).some(z => z.open_id === acc.open_id)); v.payout = ou && ou.payout ? decObj(ou.payout.enc) : null; }
   v.videos = v.videos.slice(0, 40);
   return v;
 }
@@ -499,7 +500,7 @@ const server = http.createServer(async (req, res) => {
         const ts = cleanTiers(b.tiers);
         (b.discountAll ? u.accounts : [acc]).forEach(a => { a.tiers = ts; a.discount = ts.length ? Math.max(...ts.map(t => t.pct)) : 0; });
       }
-      if (before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []]) && !acc.demo && acc.adminStatus === "approved") {
+      if ((b.review || before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []])) && !acc.demo && ["approved", "new"].includes(acc.adminStatus || "new")) {
         acc.adminStatus = "new"; notify("An editor changed account @" + ((acc.profile || {}).username || "") + ". It is waiting for your decision.");   // changes go to the manager for review
       }
       if (b.discount !== undefined) {
@@ -508,6 +509,14 @@ const server = http.createServer(async (req, res) => {
         (b.discountAll ? u.accounts : [acc]).forEach(a => { a.discount = d; });
       }
       saveDb(); return send(res, 200, view(u));
+    }
+    if (P === "/api/account/review" && M === "POST") {   // the editor sends the account to the manager for a decision
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
+      if (!need(res, acc.adminStatus !== "banned", 403, "This account is blocked")) return;
+      if (!need(res, acc.price > 0, 400, "Set your price first")) return;
+      if (!need(res, (acc.about || "").trim().split(/\s+/).filter(Boolean).length >= 3, 400, "Describe your account in at least 3 words first")) return;
+      acc.adminStatus = "new"; acc.sentAt = Date.now(); notify("An editor sent account @" + ((acc.profile || {}).username || "") + " for review."); saveDb(); return send(res, 200, view(u));
     }
     if (P === "/api/account/suggest" && M === "POST") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
@@ -830,7 +839,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/rating" && M === "POST") {       // manual stars 1..5 (null = back to automatic)
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
         if (b.stars === null) delete a.rating_manual;
-        else { const s = Number(b.stars); if (!need(res, s >= 1 && s <= 5, 400, "stars 1..5")) return; a.rating_manual = Math.round(s * 2) / 2; }
+        else { const s = Number(b.stars); if (!need(res, s >= 2 && s <= 5, 400, "stars 2.0..5.0")) return; a.rating_manual = Math.round(s * 10) / 10; }
         saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/request" && M === "POST") {      // pending -> approved/rejected, submitted -> completed/returned

@@ -176,7 +176,7 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 /* ---- live screens: roles, producer, tracks, owner cabinet ---- */
 .roles{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:6px}
-.role{text-align:left;cursor:pointer;display:grid;gap:8px;font:inherit;color:inherit;padding:22px}
+.role{text-align:left;cursor:pointer;display:grid;gap:8px;font:inherit;color:inherit;padding:22px;transition:transform .18s ease,box-shadow .18s ease}.roles>.card{animation-fill-mode:backwards!important}.role:hover,.role:focus-visible{transform:translateY(-7px);box-shadow:0 14px 30px rgba(107,92,255,.28)}.role:active{transform:translateY(-3px)}
 .role b{font-family:var(--display);font-size:24px}
 .role span:not(.pill){color:var(--muted);font-size:14px}
 .role:hover{border-color:var(--accent)}
@@ -378,9 +378,9 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 .bellb{position:relative}.bdg{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:#EE3B5F;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
 
 /* v9 */
-.setcard{background:linear-gradient(180deg,#EAF8F0,#F6FCF9);border:1px solid #BFE6CF;border-radius:16px;padding:16px}
-:root[data-theme="dark"] .setcard{background:#12261b;border-color:#235a39}
-.setcard h3{color:#177a45}
+.setcard{background:linear-gradient(180deg,#E9F0FF,#F5F8FF);border:1px solid #BCD0F7;border-radius:16px;padding:16px}
+:root[data-theme="dark"] .setcard{background:#13203a;border-color:#2b4a85}
+.setcard h3{color:#2a63d6}
 .tierrow{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}.tierrow input{width:84px;text-align:center}
 .accsw{position:relative;margin:0 0 14px;z-index:20}
 .accsw-b{display:flex;align-items:center;gap:12px;width:100%;max-width:460px;padding:10px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);cursor:pointer;font:inherit;color:inherit;text-align:left;box-shadow:0 2px 10px rgba(107,92,255,.08)}
@@ -419,12 +419,31 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 :root[data-theme="dark"] .atb{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
 :root[data-theme="dark"] .ms.g{background:#12261b;border-color:#235a39}:root[data-theme="dark"] .ms.g b{color:#4CD08F}
 :root[data-theme="dark"] .ms.r{background:#35151c;border-color:#7a2a38}:root[data-theme="dark"] .ms.a{background:#1d1a3a;border-color:#3a3470}:root[data-theme="dark"] .ms.w{background:#33240f;border-color:#6b4a18}
-:root[data-theme="dark"] .setcard h3{color:#4CD08F}:root[data-theme="dark"] .pmvid{background:rgba(124,108,255,.2)}
+:root[data-theme="dark"] .setcard h3{color:#7FB0FF}:root[data-theme="dark"] .pmvid{background:rgba(124,108,255,.2)}
 :root[data-theme="dark"] .swit.add{color:#a99dff}
 .themesel{margin-left:6px}
 .efrow{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.efb{border:1px dashed var(--line);background:transparent;color:inherit;border-radius:999px;padding:5px 11px;font:600 13px inherit;cursor:pointer}.efb:hover{border-color:var(--accent);color:var(--accent)}
 .accsearch{width:100%;margin:0 0 10px;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit}
 textarea{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+.accfull{max-height:80vh;overflow:auto}.accfull .tbl{font-size:13px}
+.tieropt{padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin:6px 0;display:flex;gap:10px;align-items:center}.tieropt input{width:20px;height:20px}
+.tieropt.cust{display:block}.payto{border-left:4px solid #6B5CFF}.payto2{font-weight:600}
+
+.payok{background:rgba(47,181,116,.14);border:1px solid #2FB574;border-radius:14px}
+.payrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0;padding:10px 12px;border-radius:12px;background:rgba(47,181,116,.18)}
+.payl{font-weight:700;color:#2FB574;min-width:70px}.payv{flex:1;min-width:0;overflow-wrap:anywhere;font-size:15px}
+.copybtn{border:0;border-radius:999px;padding:8px 14px;background:#2FB574;color:#fff;font:700 13px inherit;cursor:pointer}.copybtn.copied{background:#177a45}
+.ratebox{margin:12px 0}.rtrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.rtw,.rtd,.rtauto{border:1px solid var(--line);background:transparent;color:inherit;border-radius:999px;padding:8px 14px;font:700 14px inherit;cursor:pointer}
+.rtw.on,.rtd.on{background:#6B5CFF;border-color:#6B5CFF;color:#fff}
+.rtauto{background:#F5C518;border-color:#F5C518;color:#3a2c00}.rtauto.on{box-shadow:0 0 0 3px rgba(245,197,24,.45)}
+.rtdec{margin-top:10px;padding:10px;border-radius:14px;border:1px dashed var(--line)}.rtdec>div{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+
+.atb{transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease}
+.atb:hover,.atb:focus-visible{transform:translateY(-3px);border-color:#E8445A;box-shadow:0 0 0 2px #E8445A,0 0 18px 4px rgba(232,68,90,.55)}
+.atb:active{transform:translateY(-1px)}
+
+.autosc{display:flex;align-items:center;gap:8px;font-size:13px;opacity:.8;margin:0 0 12px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -602,7 +621,7 @@ textarea{background:var(--bg);color:var(--fg);border:1px solid var(--line);borde
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign</span>
+  <span>© Promo Campaign · v12 · 15.11 13:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -1410,7 +1429,7 @@ function drawLCamps(){
   $("lchips").innerHTML=chips;
   var list=LV.tracks.filter(function(t){return LV.tCat==="all"||(t.categories||[]).indexOf(LV.tCat)>=0||!(t.categories||[]).length});
   $("lgrid").innerHTML=list.length?list.map(function(t){
-    return '<article class="card camp"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+'</div></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div>'+
+    return '<article class="card camp"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+'</div></div></div><div>'+trCats(t)+'</div>'+
       (t.link?'<a class="hint" href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer" style="overflow-wrap:anywhere">'+esc(t.link)+'</a>':'')+
       '<button class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
@@ -1422,12 +1441,12 @@ function openReq(tid){
   var t=LV.tracks.filter(function(x){return x.id===tid})[0];if(!t)return;
   LV.modal={type:"req",tid:tid};
   var okN=S.accounts.filter(function(a){return accReady(a)&&accMatch(a,t)}).length;
-  openModal('<h3>'+esc(t.title)+' · '+esc(t.artist)+'</h3><div>'+catPills(t.categories,t.otherCategory)+'</div><b>'+esc(L("rq_acc"))+'</b>'+
+  openModal('<h3>'+esc(t.title)+' · '+esc(t.artist)+'</h3><div>'+trCats(t)+'</div><b>'+esc(L("rq_acc"))+'</b>'+
     (okN>1?'<label class="accopt all"><input type="checkbox" id="rqAll"><span><b>'+esc(L("rq_all"))+' ('+okN+')</b></span></label>':'')+
-    '<div class="accscroll">'+S.accounts.map(function(a,i){
+    '<div class="accscroll">'+S.accounts.filter(function(a){return accMatch(a,t)}).map(function(a,i){
       var ready=accReady(a),match=accMatch(a,t),ok=ready&&match;
       return '<div class="accrow"><label class="accopt'+(ok?'':' dis')+'"><input type="checkbox" data-acc="'+esc(a.id)+'"'+(ok?'':' disabled')+'><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+'<br><span class="hint">'+(a.price?money(a.price)+' · ':'')+catPills(a.categories,a.otherCategory)+'</span>'+
-        (!ok?'<br><span class="hint" style="color:var(--bad)">'+esc(!ready?L("rq_no_price"):L("rq_cat_no"))+'</span>':'')+'</span></label>'+
+        (!ok?'<br><span class="hint" style="color:var(--bad)">'+esc(!ready?accWhy(a):L("rq_cat_no"))+'</span>':'')+'</span></label>'+
         (ok?'<div class="accdisc hint">★ '+esc(L("rq_disc_acc"))+': '+esc(tiersTxt(a.tiers))+'</div>':'')+'</div>';
     }).join("")+'</div><p class="hint">'+esc(L("rq_disc_h2"))+'</p>'+
     '<div class="note err" id="rqErr" hidden></div><div class="row"><button class="btn primary" data-l="rqSend">'+esc(L("rq_send"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');
@@ -1518,7 +1537,7 @@ function drawProd(){
     '<div class="list" style="margin-top:14px">'+(P.tracks.length?P.tracks.map(function(t){
       return '<div class="card ord"><div class="t"><div><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span></div><div class="row"><button class="btn sm" data-l="pTop" data-id="'+esc(t.id)+'">'+esc(L("p_addb"))+'</button><button class="btn sm danger" data-l="pDel" data-id="'+esc(t.id)+'">'+esc(L("p_del"))+'</button></div></div>'+
         '<div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div>'+
-        '<div>'+catPills(t.categories,t.otherCategory)+'</div>'+(t.pendingTopup?'<div class="note">'+esc(L("p_pending"))+': '+money(t.pendingTopup)+'</div>':'')+'</div>';
+        '<div>'+trCats(t)+'</div>'+(t.pendingTopup?'<div class="note">'+esc(L("p_pending"))+': '+money(t.pendingTopup)+'</div>':'')+'</div>';
     }).join(""):'<div class="empty">'+esc(L("p_none"))+'</div>')+'</div>'+
     '<h3 class="sub">'+esc(L("p_add"))+'</h3><div class="card form">'+
     '<label class="f" for="nTitle"><span>'+esc(L("p_title"))+'</span><input id="nTitle" type="text" maxlength="120"></label>'+
@@ -1562,7 +1581,7 @@ function renderOwner(){
   if(!ADM.ok||!D)return false;checkNew(D);
   var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -1618,7 +1637,7 @@ function renderOwner(){
         var sel=['<option value="auto">'+esc(L("a_auto"))+(a.stars.auto!=null?' ('+a.stars.auto+')':'')+'</option>'].concat([1,1.5,2,2.5,3,3.5,4,4.5,5].map(function(s){return '<option value="'+s+'"'+(a.stars.manual===s?' selected':'')+'>'+s+' ★</option>'})).join("");
         return '<details class="card arow v-'+verdictOf(a).k+'"><summary><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'</span><span class="hint">'+(a.price?money(a.price):"—")+(a.cpm?' · '+money(a.cpm)+' '+esc(L("a_per1k")):'')+' · '+n(a.analysis.refAvg||0)+'</span></summary>'+
           '<div style="margin-top:10px">'+catPills(a.categories,a.otherCategory)+'</div>'+
-          '<div class="row" style="margin:12px 0"><label class="f" for="rt_'+esc(a.id)+'" style="flex:0 1 180px"><span>'+esc(L("a_manual"))+'</span><select id="rt_'+esc(a.id)+'" data-l="rate" data-id="'+esc(a.id)+'">'+sel+'</select></label>'+
+          '<div class="row" style="margin:12px 0">'+ratingHtml(a)+
           '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
           winTable(a.analysis,{videos:a.videos,price:a.price})+videoTable({videos:a.videos})+'</details>';
       }).join(""):'<div class="empty">'+esc(L("a_no_acc"))+'</div>')+'</div>';
@@ -1636,7 +1655,7 @@ function renderOwner(){
       var lk=["spotify","soundcloud","tiktok","mp3"].filter(function(k){return t.links&&t.links[k]}).map(function(k){return '<a class="pill" href="'+esc(t.links[k])+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join(" ");
       var act=t.status==="review"?'<div class="row"><button class="btn sm primary" data-l="trAct" data-id="'+esc(t.id)+'" data-s="approved">'+esc(L("a_approve_t"))+'</button><button class="btn sm danger" data-l="trAct" data-id="'+esc(t.id)+'" data-s="rejected">'+esc(L("a_reject_t"))+'</button></div>':(t.status==="active"?'<div class="row"><button class="btn sm primary" data-l="bcTrack" data-id="'+esc(t.id)+'">📣 '+esc(L("bc_track"))+'</button></div>':'');
       act+='<div class="row"><button class="btn sm danger" data-l="trDel" data-id="'+esc(t.id)+'">🗑 '+esc(L("tr_del"))+'</button></div>';
-      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · Song: '+esc(t.title):'')+'</div>'+act+'</div>';
+      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+trCats(t)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · Song: '+esc(t.title):'')+'</div>'+act+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_tr"))+'</div>')+'</div>';
   }
   $("adApp").innerHTML='<div class="row" style="justify-content:space-between;margin-bottom:6px"><div style="flex:1 1 100%;min-width:0">'+tabs+'</div><button class="btn sm" id="admLogout">'+esc(t("ad_logout"))+'</button></div>'+body;
@@ -1739,7 +1758,7 @@ function payBoxHtml(method,amount,coin,compact){
   if(method==="crypto"){var ad=(x.crypto||{})[coin||"solana"];if(ad){rows.push([coinL(coin||"solana"),ad])}}
   if(method==="card"&&x.card){if(x.cardHolder)rows.push([L("p_recipient"),x.cardHolder]);rows.push([L("p_cardno"),x.card])}
   var a=Number(amount)||0,fee=Math.round(a*0.2*100)/100;
-  return '<div class="note"><b>'+esc(L("p_send_to"))+'</b>'+(rows.length?rows.map(function(r){return '<div style="overflow-wrap:anywhere">'+esc(r[0])+': <b>'+esc(r[1])+'</b></div>'}).join(""):'<div>'+esc(L("p_no_pay"))+'</div>')+
+  return '<div class="note payok"><b>'+esc(L("p_send_to"))+'</b>'+(rows.length?rows.map(function(r){return '<div class="payrow"><span class="payl">'+esc(r[0])+'</span><b class="payv">'+esc(r[1])+'</b><button type="button" class="copybtn" data-l="cpy" data-v="'+esc(r[1])+'">⧉ '+esc(L("cp_copy"))+'</button></div>'}).join(""):'<div>'+esc(L("p_no_pay"))+'</div>')+
     (compact?'':(a>0?'<div class="hotnote" style="margin-top:8px">'+esc(L("p_you_get"))+': <b>'+money(a-fee)+'</b> ('+money(a)+' − 20% = '+money(fee)+')<br><small>'+esc(L("p_fee_short"))+'</small></div>':'')+'<div class="hint" style="margin-top:6px">'+esc(L("p_fee"))+'</div>')+'</div>';
 }
 function refreshPayBox(){
@@ -1807,7 +1826,7 @@ function drawLCamps(){
       '<button class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
 }
-function accReady(a){return PC.analyze(a.videos||[],Date.now()).accepted&&a.price>0&&a.adminStatus==="approved"&&!!(LV.payout&&LV.payout.set)}
+function accReady(a){return a.price>0&&a.adminStatus==="approved"&&!!(LV.payout&&LV.payout.set)}
 function payoutBlock(){
   var c=LV.payout||{set:false},m=LV.pyM||"paypal";
   return '<div class="blk"><h3>'+esc(L("py_title"))+'</h3><p class="hint">'+esc(L("py_h"))+'</p>'+
@@ -1979,7 +1998,8 @@ loadContacts();
 function wordCount(s){return (String(s||"").trim().match(/\S+/g)||[]).length}
 function stepsHtml(u){
   var wc=wordCount(u.about),topic=(u.categories&&u.categories.length>0)||wc>=3;
-  var st=[{k:"st1",ok:true,go:""},{k:"st2",ok:topic,go:"sName"},{k:"st3",ok:!!u.price,go:"changePrice2"},{k:"st4",ok:(u.discount||0)>0,go:"sDisc",opt:true}];
+  var st=[{k:"st1",ok:true,go:""},{k:"st2",ok:topic,go:"sAbout"},{k:"st3",ok:!!u.price,go:"price"},{k:"st4",ok:(u.tiers||[]).length>0,go:"tOpt0",opt:true}];
+  if(st[1].ok&&st[2].ok)return "";   // everything required is done: no need to show the list
   var done=st.filter(function(s){return s.ok}).length,cur=st.findIndex(function(s){return !s.ok});
   return '<div class="stepsx card"><div class="stbar"><i style="width:'+Math.round(done/4*100)+'%"></i></div>'+st.map(function(s,i){
     return '<div class="st'+(s.ok?' done':(i===cur?' cur':''))+'" style="animation-delay:'+(i*0.12)+'s" data-l="stGo" data-g="'+s.go+'"><span class="stn">'+(s.ok?'✓':(i+1))+'</span><span class="stt"><b>'+esc(L(s.k))+(s.opt?' <em>'+esc(L("st_opt"))+'</em>':'')+'</b><small>'+esc(L(s.k+"h"))+'</small></span></div>'}).join("")+'</div>';
@@ -2162,7 +2182,7 @@ function ordGroup(q){return (q.status==="pending"||q.status==="submitted")?"wait
 function ordEnd(q){return (q.approvedAt||q.created)+16*86400000}
 function cdHtml(q){
   var end=ordEnd(q);
-  return '<div class="cdbox" data-end="'+end+'"><div class="cdt">'+esc(L("od_left"))+'</div><div class="cdn"><div><b data-p="d">0</b><span>'+esc(L("od_d"))+'</span></div><div><b data-p="h">00</b><span>'+esc(L("od_h"))+'</span></div><div><b data-p="m">00</b><span>'+esc(L("od_m"))+'</span></div><div><b data-p="s">00</b><span>'+esc(L("od_s"))+'</span></div></div><div class="cdover" hidden>'+esc(L("od_over"))+'</div></div>';
+  return '<div class="cdbox" data-end="'+end+'"><div class="cdt">⏱ '+esc(L("od_left"))+'</div><div class="cdn"><div><b data-p="d">0</b><span>'+esc(L("od_d"))+'</span></div><div><b data-p="h">00</b><span>'+esc(L("od_h"))+'</span></div><div><b data-p="m">00</b><span>'+esc(L("od_m"))+'</span></div><div><b data-p="s">00</b><span>'+esc(L("od_s"))+'</span></div></div><div class="cdover" hidden>'+esc(L("od_over"))+'</div></div>';
 }
 function tickCd(){
   document.querySelectorAll(".cdbox").forEach(function(b){
@@ -2367,7 +2387,7 @@ function renderDashLive(){
     stepsHtml(u)+priceBig(u)+
     statsHtml(u)+sugBanner(u)+actRow(u)+(LV.edit?'<div class="blk"><h3>'+esc(L("ad_set"))+'</h3>'+
     '<label class="f" for="sName"><span>'+esc(L("ad_label"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"><span class="hint">'+esc(L("ad_label_h"))+'</span></label>'+
-    '<div class="f"><span>'+esc(L("ad_tt"))+'</span><a class="ttlink" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">https://www.tiktok.com/'+esc(u.handle)+'</a></div>'+
+    '<div class="f"><span>'+esc(L("ad_tt"))+': </span> <a class="ttlink" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">https://www.tiktok.com/'+esc(u.handle)+'</a></div>'+
     '<div class="f"><span>'+esc(L("ad_price"))+'</span><div class="row" style="align-items:center"><b style="font-size:20px">'+(u.price?'$'+u.price:'—')+'</b><button type="button" class="btn sm primary" id="changePrice">'+esc(L("pr_btn"))+'</button></div></div>'+
     '<label class="f" for="sDisc"><span>'+esc(L("ad_disc"))+'</span><input id="sDisc" type="number" min="0" max="99" inputmode="numeric" value="'+(u.discount||"")+'" placeholder="0"><span class="hint">'+esc(L("ad_disc_h"))+'</span></label>'+
     (S.accounts.length>1?'<label class="chk" for="sAll"><input type="checkbox" id="sAll"><span>'+esc(L("dl_disc_all"))+'</span></label>':'')+
@@ -2463,7 +2483,7 @@ function sugBanner(u){
   return '<div class="sugban"><div class="sgi">💡</div><div class="sgt"><b>'+esc(L("sg_t"))+': '+esc(p)+'</b></div><div class="row"><button class="btn primary" data-l="sgAccept" data-id="'+esc(u.id)+'">'+esc(L("sg_acc").replace("{p}",p))+'</button><button class="btn" data-l="sgDecline" data-id="'+esc(u.id)+'">'+esc(L("sg_dec"))+'</button></div></div>';
 }
 function actRow(u){
-  return '<div class="efrow">'+[["sName","ef_name"],["sCats","ef_topics"],["sAbout","ef_about"],["tMin0","ef_deals"]].map(function(f){return '<button type="button" class="efb" data-l="editField" data-f="'+f[0]+'">+ '+esc(L(f[1]))+'</button>'}).join("")+'</div><div class="row actrow"><a class="btn" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("ad_open_tt"))+'</a></div>';
+  return '<div class="efrow">'+[["sName","ef_name"],["sCats","ef_topics"],["sAbout","ef_about"],["tMin0","ef_deals"]].map(function(f){return '<button type="button" class="efb" data-l="editField" data-f="'+f[0]+'">+ '+esc(L(f[1]))+'</button>'}).join("")+'</div><div class="row actrow">'+revBtn(u)+'<a class="btn" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("ad_open_tt"))+'</a></div>';
 }
 function summaryHtml(u){
   return '<div class="asum"><div><span>'+esc(L("ad_sum_label"))+'</span><b>'+esc(u.internalName||L("ad_sum_none"))+'</b></div><div><span>'+esc(L("ad_sum_disc"))+'</span><b>'+(u.discount?'−'+u.discount+'%':esc(L("ad_sum_none")))+'</b></div><div><span>'+esc(L("ad_cats"))+'</span>'+(u.categories&&u.categories.length?catPills(u.categories,u.otherCategory):'<b>'+esc(L("ad_sum_none"))+'</b>')+'</div><div><span>'+esc(L("ad_about"))+'</span><p>'+esc(u.about||L("ad_sum_none"))+'</p></div></div>';
@@ -2553,11 +2573,14 @@ Object.assign(LT.ru,{
  nt_ord_reminder:"Напоминание: «{t}»: осталось {d}, чтобы отправить ссылки на видео.",nt_price_ok:"Новая цена для {h} принята: {p}.",nt_price_no:"Менеджер оставил цену {p} для {h}."});
 function isWait(a){return a.adminStatus==="new"||!a.adminStatus||!!a.priceReq}
 function tiersTxt(ts){return (ts&&ts.length)?ts.map(function(x){return x.min+"+: −"+x.pct+"%"}).join(" · "):L("wt_none")}
+var TIER_OPTS=[[3,5],[6,10],[12,15]];
 function tiersHtml(u){
-  var ts=(u.tiers&&u.tiers.length)?u.tiers:[{min:3,pct:5},{min:6,pct:10},{min:12,pct:15}];ts=ts.slice(0,4);while(ts.length<4)ts.push({min:"",pct:""});
-  return '<div class="f tiers"><span>'+esc(L("tr_h"))+'</span><span class="hint">'+esc(L("tr_h2"))+'</span>'+ts.map(function(x,i){return '<div class="tierrow"><span>'+esc(L("tr_from"))+'</span><input id="tMin'+i+'" type="number" min="2" max="500" inputmode="numeric" value="'+x.min+'" placeholder="3"><span>'+esc(L("tr_vid"))+'</span><b>−</b><input id="tPct'+i+'" type="number" min="1" max="99" inputmode="numeric" value="'+x.pct+'" placeholder="5"><span>%</span></div>'}).join("")+'</div>';
+  var cur=u.tiers||[],pre=function(x){return TIER_OPTS.some(function(o){return o[0]===x.min&&o[1]===x.pct})},cust=cur.filter(function(x){return !pre(x)})[0]||{min:"",pct:""};
+  return '<div class="f tiers"><span>'+esc(L("tr_h"))+'</span><span class="hint">'+esc(L("tr_h3"))+'</span>'+TIER_OPTS.map(function(o,i){var on=cur.some(function(x){return x.min===o[0]&&x.pct===o[1]});return '<label class="chk tieropt" for="tOpt'+i+'"><input type="checkbox" id="tOpt'+i+'" data-min="'+o[0]+'" data-pct="'+o[1]+'"'+(on?' checked':'')+'><span><b>'+o[0]+' '+esc(L("tr_vid"))+'</b> → −'+o[1]+'%</span></label>'}).join("")+
+   '<div class="tieropt cust"><b>'+esc(L("tr_own"))+'</b><div class="tierrow"><span>'+esc(L("tr_from"))+'</span><input id="tcMin" type="number" min="2" max="500" inputmode="numeric" value="'+cust.min+'" placeholder="8"><span>'+esc(L("tr_vid"))+'</span><b>−</b><input id="tcPct" type="number" min="1" max="99" inputmode="numeric" value="'+cust.pct+'" placeholder="12"><span>%</span></div></div>'+
+   '<div class="row"><button type="button" class="btn primary" data-l="saveTiers">'+esc(L("tr_save"))+'</button></div></div>';
 }
-function readTiers(){var o=[];for(var i=0;i<4;i++){var m=val("tMin"+i),p=val("tPct"+i);if(m===""&&p==="")continue;m=Number(m);p=Number(p);if(!(m>=2&&m<=500&&p>=1&&p<=99))return null;o.push({min:m,pct:p})}return o}
+function readTiers(){var o=[];document.querySelectorAll(".tieropt input[data-min]:checked").forEach(function(c){o.push({min:Number(c.getAttribute("data-min")),pct:Number(c.getAttribute("data-pct"))})});var m=Number(val("tcMin")),p=Number(val("tcPct"));if(m>=2&&m<=500&&p>=1&&p<=99)o.push({min:m,pct:p});return o}
 (function(){var o=renderDashLive;renderDashLive=function(){
   o.apply(this,arguments);var u=S.user;
   var d=$("sDisc");if(d&&u){var lab=d.closest("label");if(lab)lab.outerHTML=tiersHtml(u)}
@@ -2571,10 +2594,10 @@ function saveAcc(){
   if(about.trim()&&wordCount(about)<3){if(ok){ok.textContent=L("ad_about_min");ok.style.color="var(--bad)"}return}
   var ts=readTiers();if(ts===null){if(ok){ok.textContent=L("p_err");ok.style.color="var(--bad)"}return}
   var id=u.id;
-  api("/api/account/update",{id:id,internalName:val("sName"),categories:checked("sCats"),otherCategory:val("sOther"),about:about,tiers:ts,discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){
+  api("/api/account/update",{id:id,internalName:val("sName"),categories:checked("sCats"),otherCategory:val("sOther"),about:about,tiers:ts,discountAll:!!($("sAll")&&$("sAll").checked),review:true}).then(function(r){
     if(!r.ok){if(ok)ok.textContent=(r.j&&r.j.error)||L("p_err");return}
     applyLive(r.j);var a=S.accounts.filter(function(x){return x.id===id})[0];LV.edit=false;LV.ok="";renderDashLive();
-    toast(a&&a.adminStatus==="new"?"⏳ "+L("ad_sent"):"✓ "+L("ad_saved"));
+    toast(L("ad_sent"));
   });
 }
 /* price: sent to the manager */
@@ -2665,6 +2688,83 @@ themeApply();
 }})();
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="accSearch"){var q=e.target.value.trim().toLowerCase();document.querySelectorAll("#profCard .acitem").forEach(function(b){b.hidden=!!q&&(b.getAttribute("data-q")||"").indexOf(q)<0})}});
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="editField"]');if(!el)return;var f=el.getAttribute("data-f");LV.edit=true;renderDashLive();var t=$(f)||document.querySelector("#"+f+" input")||document.querySelector('[name="'+f+'"]');if(!t&&f==="sCats")t=document.querySelector("#profCard .setcard input[type=checkbox]");if(t){t.scrollIntoView({behavior:"smooth",block:"center"});if(t.focus)setTimeout(function(){t.focus({preventScroll:true})},350)}});
+
+Object.assign(LT.en,{rv_send:"Send my account for review",rv_wait:"Sent. Waiting for the manager",rv_ok:"Account sent for review.",rv_open:"Open account",rv_stat:"Status",rv_avg:"Average views",rv_m_views:"Views, last 30 days",rv_m_vids:"Videos, last 30 days",rv_price:"Price per video",rv_close:"Close"});
+Object.assign(LT.ru,{rv_send:"Отправить аккаунт на проверку",rv_wait:"Отправлено. Ждёт менеджера",rv_ok:"Аккаунт отправлен на проверку.",rv_open:"Открыть аккаунт",rv_stat:"Статус",rv_avg:"Средние просмотры",rv_m_views:"Просмотры за 30 дней",rv_m_vids:"Видео за 30 дней",rv_price:"Цена за видео",rv_close:"Закрыть"});
+function revBtn(u){
+  var s=accState(u);if(s==="approved"||s==="banned")return "";
+  if(s==="review")return '<button type="button" class="btn" disabled>⏳ '+esc(L("rv_wait"))+'</button>';
+  return '<button type="button" class="btn primary" data-l="revSend">📤 '+esc(L("rv_send"))+'</button>';
+}
+/* owner: open the account inside the site (analysis, price, videos) */
+function accFullHtml(a){
+  var V=verdictOf(a),A=a.analysis||{};
+  return '<div class="accfull"><div class="pmtop">'+accAv(a,"acav big")+'<div class="pmwho"><b style="font-size:20px">'+esc(a.handle)+'</b>'+(a.internalName?'<small>'+esc(a.internalName)+'</small>':'')+'<div>'+catPills(a.categories,a.otherCategory)+'</div></div><span class="vbadge v-'+V.k+'">'+esc(L(V.t))+'</span></div>'+
+   (a.about?'<p class="wabout">“'+esc(a.about)+'”</p>':'')+
+   '<div class="msum"><div class="ms"><b>'+n(A.refAvg||0)+'</b><span>'+esc(L("rv_avg"))+'</span></div><div class="ms"><b>'+n(A.month?A.month.views:0)+'</b><span>'+esc(L("rv_m_views"))+'</span></div><div class="ms"><b>'+(A.month?A.month.videos:0)+'</b><span>'+esc(L("rv_m_vids"))+'</span></div><div class="ms g"><b>'+(a.price?'$'+a.price:'—')+'</b><span>'+esc(L("rv_price"))+'</span></div></div>'+
+   '<p class="hint"><b>'+esc(L("wt_tiers"))+':</b> '+esc(tiersTxt(a.tiers))+(a.priceReq?' · 💲 '+esc(L("wt_price"))+' $'+a.priceReq:'')+'</p>'+
+   (V.E?'<div class="blk">'+reasonList(V.E.good,"g")+reasonList(V.E.bad,"b")+'</div>':'')+
+   winTable(A,{videos:a.videos,price:a.price})+videoTable({videos:a.videos})+
+   '<div class="row" style="margin-top:12px"><button class="btn primary" data-l="decide2" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn" data-l="decide2" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn" data-l="decide2" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button><button class="btn" data-l="mclose2">'+esc(L("rv_close"))+'</button></div></div>';
+}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="revSend"){el.disabled=true;api("/api/account/review",{id:S.user.id}).then(function(r){if(!r.ok){el.disabled=false;toast((r.j&&r.j.error)||L("p_err"));return}applyLive(r.j);renderDashLive();toast("📤 "+L("rv_ok"))});return}
+  if(a==="accFull"){var ac=D0().accounts.filter(function(x){return x.id===id})[0];if(ac){LV.modal={type:"accfull",id:id};openModal(accFullHtml(ac))}return}
+  if(a==="decide2"){api("/api/admin/decision",{id:id,status:el.getAttribute("data-s")}).then(function(){closeModal();ownerReload()});return}
+});
+(function(){var o=accCardHtml;accCardHtml=function(a){var h=o(a);return h.replace(/<a class="btn sm" href="[^"]*"[^>]*>[^<]*<\/a>/,'<button class="btn sm primary" data-l="accFull" data-id="'+esc(a.id)+'">🔎 '+esc(L("rv_open"))+'</button>')}})();
+
+Object.assign(LT.en,{tr_h3:"Tick the deals you want to offer. Nothing is offered until you tick it and send for review.",ad_about:"About this account (at least 3 words)",ad_sent:"✓ Sent for review. The manager will decide soon."});
+Object.assign(LT.ru,{tr_h3:"Отметьте скидки, которые хотите предложить. Пока вы не отметите и не отправите на проверку, скидок нет.",ad_about:"Об аккаунте (минимум 3 слова)",ad_sent:"✓ Отправлено на проверку. Менеджер скоро решит."});
+
+Object.assign(LT.en,{tr_h:"Bulk deals",tr_h3:"Pick a ready deal, or make your own below, then press Save deals. Nothing is offered until you save.",tr_own:"Your own deal",tr_save:"Save deals",tr_saved:"✓ Deals sent to the manager.",pay_mine:"Where we send your money",pay_mine_h:"These are your payout details. You can change them at any time.",pay_none:"You have not added payout details yet. Add them so the manager can pay you.",ov_pay:"Pay this editor to",ov_nopay:"No payout details yet"});
+Object.assign(LT.ru,{tr_h:"Скидки за количество",tr_h3:"Выберите готовую скидку или сделайте свою ниже, потом нажмите «Сохранить скидки». Пока не сохранили, скидок нет.",tr_own:"Своя скидка",tr_save:"Сохранить скидки",tr_saved:"✓ Скидки отправлены менеджеру.",pay_mine:"Куда мы отправляем ваши деньги",pay_mine_h:"Это ваши реквизиты для выплат. Их можно изменить в любой момент.",pay_none:"Вы ещё не добавили реквизиты. Добавьте их, чтобы менеджер мог вам заплатить.",ov_pay:"Куда платить эдитору",ov_nopay:"Реквизитов пока нет"});
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="saveTiers"]');if(!el||!S.user)return;e.stopImmediatePropagation();
+  var ts=readTiers(),id=S.user.id;el.disabled=true;
+  api("/api/account/update",{id:id,tiers:ts,review:true,discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){el.disabled=false;if(!r.ok){toast((r.j&&r.j.error)||L("p_err"));return}applyLive(r.j);renderDashLive();toast(L("tr_saved"))})},true);
+/* editor: payout details always visible on the account page */
+(function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);
+  if(LV.acc&&S.user){var h=$("payH1");if(h){h.hidden=false;h.textContent=L("pay_mine")}$("payBox").innerHTML='<p class="hint">'+esc(L(S.user&&LV.payout&&LV.payout.set?"pay_mine_h":"pay_none"))+'</p>'+payoutBlock();try{refreshPayBox()}catch(e){}}
+}})();
+/* owner: where to pay */
+function payTxt(p){return p?esc((p.method==="crypto"?coinL(p.coin)+" ":p.method+" ")+p.value+(p.holder?" · "+p.holder:"")):""}
+(function(){var o=accFullHtml;accFullHtml=function(a){var h=o(a);return h.replace('<p class="hint"><b>'+esc(L("wt_tiers")),'<div class="note payto"><b>💳 '+esc(L("ov_pay"))+':</b> '+(a.payout?payTxt(a.payout):esc(L("ov_nopay")))+'</div><p class="hint"><b>'+esc(L("wt_tiers")))}})();
+(function(){var o=accCardHtml;accCardHtml=function(a){var h=o(a);return h.replace('<div class="wtier">','<div class="wtier payto2">💳 '+(a.payout?payTxt(a.payout):esc(L("ov_nopay")))+'</div><div class="wtier">')}})();
+
+/* ===== v11 ===== */
+Object.assign(LT.en,{cp_copy:"Copy",cp_done:"Copied",ad_about:"About this account * (at least 3 words)",ad_tt:"Link to your TikTok account",rq_nopay:"Add payout details first (Dashboard)",rq_wait:"Waiting for the manager's approval",rt_pick:"Pick the decimals",tr_alltopics:"All topics",od_timer:"⏱"});
+Object.assign(LT.ru,{cp_copy:"Копировать",cp_done:"Скопировано",ad_about:"Об аккаунте * (минимум 3 слова)",ad_tt:"Ссылка на ваш аккаунт",rq_nopay:"Сначала добавьте реквизиты для выплат (Кабинет)",rq_wait:"Ждёт одобрения менеджера",rt_pick:"Выберите десятые",tr_alltopics:"Все темы",od_timer:"⏱"});
+function accWhy(a){return !a.price?L("rq_no_price"):(a.adminStatus!=="approved"?L("rq_wait"):L("rq_nopay"))}
+function trCats(t){var c=t.categories||[];return c.length>=8?'<span class="pill">'+esc(L("tr_alltopics"))+'</span>':catPills(c,t.otherCategory)}
+/* one-click copy */
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="cpy"]');if(!el)return;var v=el.getAttribute("data-v")||"",old=el.textContent;
+  function ok(){el.classList.add("copied");el.textContent="✓ "+L("cp_done");setTimeout(function(){el.classList.remove("copied");el.textContent=old},1800)}
+  function fb(){var t=document.createElement("textarea");t.value=v;t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(x){}t.remove();ok()}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(ok,fb);else fb()});
+/* steps: jump to the right place */
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="stGo"]');if(!el)return;e.stopImmediatePropagation();var g=el.getAttribute("data-g");if(!g)return;
+  if(g==="price"){prOpen();return}
+  LV.edit=true;renderDashLive();var t=$(g);if(t){t.scrollIntoView({behavior:"smooth",block:"center"});if(t.focus)setTimeout(function(){try{t.focus({preventScroll:true})}catch(x){}},350)}},true);
+/* owner rating: pick the whole star, then the decimals (2.0 - 5.0). Auto is yellow */
+function ratingHtml(a){
+  var m=a.stars.manual,au=a.stars.auto,cur=m!=null?Math.floor(m):null;
+  var whole=[2,3,4,5].map(function(w){return '<button type="button" class="rtw'+(cur===w?' on':'')+'" data-l="rtWhole" data-w="'+w+'" data-id="'+esc(a.id)+'">'+w+' ★</button>'}).join("");
+  var dec=[2,3,4].map(function(w){var b="";for(var d=0;d<10;d++){var v=(w+d/10).toFixed(1);b+='<button type="button" class="rtd'+(m!=null&&m.toFixed(1)===v?' on':'')+'" data-l="rate2" data-v="'+v+'" data-id="'+esc(a.id)+'">'+v+'</button>'}return '<div class="rtdec" data-w="'+w+'" hidden><small>'+esc(L("rt_pick"))+'</small><div>'+b+'</div></div>'}).join("")+'<div class="rtdec" data-w="5" hidden><div><button type="button" class="rtd'+(m===5?' on':'')+'" data-l="rate2" data-v="5" data-id="'+esc(a.id)+'">5.0</button></div></div>';
+  return '<div class="ratebox"><span class="hint"><b>'+esc(L("a_manual"))+'</b></span><div class="rtrow"><button type="button" class="rtauto'+(m==null?' on':'')+'" data-l="rate2" data-v="auto" data-id="'+esc(a.id)+'">⚡ '+esc(L("a_auto"))+(au!=null?' ('+au+')':'')+'</button>'+whole+'</div>'+dec+'</div>';
+}
+document.addEventListener("click",function(e){var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="rtWhole"){var box=el.closest(".ratebox"),w=el.getAttribute("data-w");box.querySelectorAll(".rtdec").forEach(function(d){d.hidden=d.getAttribute("data-w")!==w});return}
+  if(a==="rate2"){var v=el.getAttribute("data-v");api("/api/admin/rating",{id:el.getAttribute("data-id"),stars:v==="auto"?null:Number(v)}).then(function(){ownerReload()});return}
+});
+/* owner tabs: scroll down to the opened section (can be switched off) */
+Object.assign(LT.en,{as_lbl:"Scroll down to the section when I tap a tab"});Object.assign(LT.ru,{as_lbl:"Прокручивать к разделу, когда нажимаю вкладку"});
+function autoScOn(){try{return localStorage.getItem("pc_autosc")!=="0"}catch(e){return true}}
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="autoSc"){try{localStorage.setItem("pc_autosc",e.target.checked?"1":"0")}catch(x){}}});
+document.addEventListener("click",function(e){if(!e.target.closest('[data-l="atab"]'))return;var y=window.scrollY,on=autoScOn();
+  [60,250].forEach(function(ms){setTimeout(function(){if(on){var g=document.querySelector(".autosc")||document.querySelector(".agroups");if(g)window.scrollTo({top:g.getBoundingClientRect().bottom+window.scrollY+4,behavior:ms>100?"smooth":"auto"})}else window.scrollTo(0,y)},ms)})},true);
+/* the pink "My dashboard" button duplicated the Dashboard tab */
+(function(){var nb=$("navSignup");if(nb)new MutationObserver(function(){if(S.user&&S.user.consent)nb.hidden=true;else nb.hidden=false}).observe(nb,{childList:true,attributes:true,attributeFilter:["data-go"]});if(nb&&S&&S.user&&S.user.consent)nb.hidden=true})();
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
