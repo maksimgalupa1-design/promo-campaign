@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -383,10 +383,10 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 .setcard h3{color:#177a45}
 .tierrow{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}.tierrow input{width:84px;text-align:center}
 .accsw{position:relative;margin:0 0 14px;z-index:20}
-.accsw-b{display:flex;align-items:center;gap:12px;width:100%;max-width:460px;padding:10px 14px;border:1px solid var(--line,#E5E2F5);border-radius:16px;background:var(--card,#fff);cursor:pointer;font:inherit;color:inherit;text-align:left;box-shadow:0 2px 10px rgba(107,92,255,.08)}
+.accsw-b{display:flex;align-items:center;gap:12px;width:100%;max-width:460px;padding:10px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);cursor:pointer;font:inherit;color:inherit;text-align:left;box-shadow:0 2px 10px rgba(107,92,255,.08)}
 .accsw-b .acav{width:46px;height:46px}.accsw-b .acn b{font-size:17px}.accsw-b .acn small{display:block;opacity:.65;font-size:13px}.accsw-b .acn{flex:1;min-width:0}
 .swarr{font-size:18px;opacity:.7}
-.accsw-menu{position:absolute;top:100%;left:0;margin-top:6px;width:100%;max-width:460px;background:var(--card,#fff);border:1px solid var(--line,#E5E2F5);border-radius:16px;box-shadow:0 12px 34px rgba(30,20,90,.2);padding:6px;display:flex;flex-direction:column;gap:2px}
+.accsw-menu{position:absolute;top:100%;left:0;margin-top:6px;width:100%;max-width:460px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 34px rgba(30,20,90,.2);padding:6px;display:flex;flex-direction:column;gap:2px}
 .accsw-menu[hidden]{display:none}
 .swit{display:flex;align-items:center;gap:12px;padding:9px 10px;border:0;background:transparent;border-radius:12px;cursor:pointer;font:inherit;color:inherit;text-align:left}
 .swit:hover,.swit.on{background:rgba(107,92,255,.1)}.swit .acav{width:40px;height:40px}.swit .acn{flex:1;min-width:0}.swit .acn b{font-size:16px}.swit .acn small{display:block;opacity:.65}
@@ -405,6 +405,27 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 .g-ed .atb[aria-pressed="true"]{background:#177a45;border-color:#177a45}.g-pr .atb[aria-pressed="true"]{background:#C77708;border-color:#C77708}.g-st .atb[aria-pressed="true"]{background:#4a5568;border-color:#4a5568}
 .cnt{font-style:normal;background:#E8445A;color:#fff;border-radius:999px;padding:1px 7px;font-size:12px;margin-left:3px}
 .tiers>span{display:block;margin-bottom:2px}.tiers>span.hint{margin-bottom:8px}
+.msum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:0 0 16px}.ms{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}.ms b{display:block;font-size:22px}.ms span{font-size:12px;opacity:.7}.ms.g{background:#E8F7EF;border-color:#BFE6CF}.ms.g b{color:#177a45}.ms.r{background:#FDECEF;border-color:#F4C2CB}.ms.a{background:#EFEDFF;border-color:#D8D3FF}.ms.w{background:#FFF3E3;border-color:#F5D9AE}
+
+.pmcard{border-left:6px solid #2FB574}.pmcard.pm-warn{border-left-color:#E8A91E}.pmcard.pm-bad{border-left-color:#E8445A}
+.pmtop{display:flex;gap:12px;align-items:center}.pmwho{flex:1;min-width:0}.pmwho b{font-size:16px}.pmwho small{display:block;opacity:.65}
+.pmvid{text-align:center;background:rgba(107,92,255,.1);border-radius:14px;padding:6px 12px}.pmvid b{display:block;font-size:26px;line-height:1}.pmvid span{font-size:11px;opacity:.75}
+.pmbot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}.pmtr{font-weight:600}
+.agroups{grid-template-columns:1fr 1fr;grid-template-areas:"ov ov" "ed pr" "st st"}
+.agrp.g-ov{grid-area:ov}.agrp.g-ed{grid-area:ed}.agrp.g-pr{grid-area:pr}.agrp.g-st{grid-area:st}
+@media(max-width:560px){.agroups{grid-template-columns:1fr;grid-template-areas:"ov" "ed" "pr" "st"}}
+
+/* v10 dark-friendly */
+:root[data-theme="dark"] .atb{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14)}
+:root[data-theme="dark"] .ms.g{background:#12261b;border-color:#235a39}:root[data-theme="dark"] .ms.g b{color:#4CD08F}
+:root[data-theme="dark"] .ms.r{background:#35151c;border-color:#7a2a38}:root[data-theme="dark"] .ms.a{background:#1d1a3a;border-color:#3a3470}:root[data-theme="dark"] .ms.w{background:#33240f;border-color:#6b4a18}
+:root[data-theme="dark"] .setcard h3{color:#4CD08F}:root[data-theme="dark"] .pmvid{background:rgba(124,108,255,.2)}
+:root[data-theme="dark"] .swit.add{color:#a99dff}
+.themesel{margin-left:6px}
+.efrow{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.efb{border:1px dashed var(--line);background:transparent;color:inherit;border-radius:999px;padding:5px 11px;font:600 13px inherit;cursor:pointer}.efb:hover{border-color:var(--accent);color:var(--accent)}
+.accsearch{width:100%;margin:0 0 10px;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit}
+textarea{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+.accfull{max-height:80vh;overflow:auto}.accfull .tbl{font-size:13px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1542,7 +1563,7 @@ function renderOwner(){
   if(!ADM.ok||!D)return false;checkNew(D);
   var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["waiting","requests","accounts","editorpay","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -1558,7 +1579,7 @@ function renderOwner(){
     planH='<div class="card" style="margin-bottom:14px"><h3 class="sub">'+esc(L("pl_title"))+'</h3><p class="hint">'+esc(L("pl_h"))+'</p><div class="row"><select id="planTrack" data-l="planTrack">'+activeTr.map(function(t){return '<option value="'+esc(t.id)+'"'+(LV.planTrack===t.id?' selected':'')+'>'+esc(t.title)+' · '+money(t.left)+'</option>'}).join("")+'</select><button class="btn sm primary" data-l="planGo">'+esc(L("pl_go"))+'</button></div>'+
       (LV.planErr?'<div class="note err">'+esc(LV.planErr)+'</div>':'')+
       (pl?'<p style="margin-top:10px"><b>'+esc(pl.track)+'</b>: '+pl.videos+' '+esc(L("pl_videos"))+' · '+money(pl.spent)+' / '+money(pl.budget)+' · '+esc(L("pl_left"))+' '+money(pl.left)+' · ~'+n(pl.expViews)+' '+esc(L("pl_views"))+'</p><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>'+esc(L("pl_acc"))+'</th><th>'+esc(L("rq_videos"))+'</th><th>'+esc(L("a_price"))+'</th><th>'+esc(L("pl_cost"))+'</th><th>'+esc(L("pl_views"))+'</th><th>★</th></tr></thead><tbody>'+pl.plan.map(function(p){return '<tr><td>'+esc(p.handle)+'</td><td>'+p.videos+'</td><td>'+money(p.unit)+(p.discount?' (−'+p.discount+'%)':'')+'</td><td>'+money(p.cost)+'</td><td>~'+n(p.expViews)+'</td><td>'+esc(starsTxt(p.stars))+'</td></tr>'}).join("")+'</tbody></table></div>'+(pl.plan.length?'':'<div class="empty">'+esc(L("pl_none"))+'</div>'):'')+'</div>';
-    body=planH+'<div class="row" style="margin-bottom:12px"><button class="btn sm chk-ed" data-l="chkEd">'+esc(L("a_chk_ed"))+'</button><button class="btn sm chk-ed" data-l="chkProd">'+esc(L("a_chk_pr"))+'</button><button class="btn sm" data-l="sndOpen">🔔 '+esc(L("a_notif"))+'</button><button class="btn sm primary" data-l="bcOpen">📣 '+esc(L("bc_btn"))+'</button></div>'+'<div class="tiles">'+tiles+'</div>'+
+    body=moneySum(D)+planH+'<div class="row" style="margin-bottom:12px"><button class="btn sm chk-ed" data-l="chkEd">'+esc(L("a_chk_ed"))+'</button><button class="btn sm chk-ed" data-l="chkProd">'+esc(L("a_chk_pr"))+'</button><button class="btn sm" data-l="sndOpen">🔔 '+esc(L("a_notif"))+'</button><button class="btn sm primary" data-l="bcOpen">📣 '+esc(L("bc_btn"))+'</button></div>'+'<div class="tiles">'+tiles+'</div>'+
       '<p class="hint">'+esc(L("a_paid_ed"))+': <b>'+money(S2.editorsPaidTotal)+'</b> · '+esc(L("a_30d"))+': <b>'+money(S2.editorsPaid30)+'</b></p>'+
       '<p class="hint">'+esc(L("a_paid_pr"))+': <b>'+money(S2.producersPaidTotal)+'</b> · '+esc(L("a_30d"))+': <b>'+money(S2.producersPaid30)+'</b></p>'+
       '<p class="hint">'+n(S2.purchasedLinksCounted)+' '+esc(L("a_links"))+' · '+esc(L("a_upd"))+': '+(S2.refreshedAt?new Date(S2.refreshedAt).toLocaleString(lang):"—")+'</p><p class="hint">'+esc(L("a_refresh_note"))+'</p>';
@@ -1583,6 +1604,8 @@ function renderOwner(){
   }else if(LV.adTab==="prices"){
     var RG=LV.ranges||{};
     body='<div class="card form"><p class="hint">'+esc(L("a_prices_h"))+'</p>'+CATS.map(function(c){var r=RG[c]||{};return '<div class="row" style="align-items:center"><span style="flex:1 1 200px">'+esc(L("c_"+c))+'</span><label>$ <input id="prmin_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.min||"")+'" placeholder="min"></label><label>– <input id="prmax_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.max||"")+'" placeholder="max"></label></div>'}).join("")+'<div class="row"><button class="btn primary" data-l="prSave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="prOk"></span></div></div>';
+  }else if(LV.adTab==="promos"){
+    body=moneySum(D)+promosHtml(D);
   }else if(LV.adTab==="waiting"){
     var wl=D.accounts.filter(function(a){return isWait(a)}).map(function(a){return accCardHtml(a)}).join("");
     var wn=D.accounts.filter(function(a){return isWait(a)}).length;
@@ -1610,7 +1633,7 @@ function renderOwner(){
       '<div class="row"><button class="btn primary" data-l="paySave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="payOk"></span></div></div>';
   }else{
     var tl=D.tracks.filter(function(t){return t.status!=="deleted"}).sort(function(x,y){return (x.status==="review"?0:1)-(y.status==="review"?0:1)});
-    body=addTrackHtml()+(LV.bcMsg?'<div class="note">'+esc(LV.bcMsg)+'</div>':'')+'<div class="list">'+(tl.length?tl.map(function(t){
+    body=moneySum(D)+addTrackHtml()+(LV.bcMsg?'<div class="note">'+esc(LV.bcMsg)+'</div>':'')+'<div class="list">'+(tl.length?tl.map(function(t){
       var lk=["spotify","soundcloud","tiktok","mp3"].filter(function(k){return t.links&&t.links[k]}).map(function(k){return '<a class="pill" href="'+esc(t.links[k])+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join(" ");
       var act=t.status==="review"?'<div class="row"><button class="btn sm primary" data-l="trAct" data-id="'+esc(t.id)+'" data-s="approved">'+esc(L("a_approve_t"))+'</button><button class="btn sm danger" data-l="trAct" data-id="'+esc(t.id)+'" data-s="rejected">'+esc(L("a_reject_t"))+'</button></div>':(t.status==="active"?'<div class="row"><button class="btn sm primary" data-l="bcTrack" data-id="'+esc(t.id)+'">📣 '+esc(L("bc_track"))+'</button></div>':'');
       act+='<div class="row"><button class="btn sm danger" data-l="trDel" data-id="'+esc(t.id)+'">🗑 '+esc(L("tr_del"))+'</button></div>';
@@ -2441,7 +2464,7 @@ function sugBanner(u){
   return '<div class="sugban"><div class="sgi">💡</div><div class="sgt"><b>'+esc(L("sg_t"))+': '+esc(p)+'</b></div><div class="row"><button class="btn primary" data-l="sgAccept" data-id="'+esc(u.id)+'">'+esc(L("sg_acc").replace("{p}",p))+'</button><button class="btn" data-l="sgDecline" data-id="'+esc(u.id)+'">'+esc(L("sg_dec"))+'</button></div></div>';
 }
 function actRow(u){
-  return '<div class="row actrow"><button class="btn primary" data-l="editToggle">✎ '+esc(L("ad_edit"))+'</button><a class="btn" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("ad_open_tt"))+'</a></div>';
+  return '<div class="efrow">'+[["sName","ef_name"],["sCats","ef_topics"],["sAbout","ef_about"],["tMin0","ef_deals"]].map(function(f){return '<button type="button" class="efb" data-l="editField" data-f="'+f[0]+'">+ '+esc(L(f[1]))+'</button>'}).join("")+'</div><div class="row actrow">'+revBtn(u)+'<a class="btn" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("ad_open_tt"))+'</a></div>';
 }
 function summaryHtml(u){
   return '<div class="asum"><div><span>'+esc(L("ad_sum_label"))+'</span><b>'+esc(u.internalName||L("ad_sum_none"))+'</b></div><div><span>'+esc(L("ad_sum_disc"))+'</span><b>'+(u.discount?'−'+u.discount+'%':esc(L("ad_sum_none")))+'</b></div><div><span>'+esc(L("ad_cats"))+'</span>'+(u.categories&&u.categories.length?catPills(u.categories,u.otherCategory):'<b>'+esc(L("ad_sum_none"))+'</b>')+'</div><div><span>'+esc(L("ad_about"))+'</span><p>'+esc(u.about||L("ad_sum_none"))+'</p></div></div>';
@@ -2600,6 +2623,75 @@ document.addEventListener("click",function(e){
   if(a.priceReq)extra+='<div class="note wtprice">💲 <b>'+esc(L("wt_price"))+': $'+a.priceReq+'</b> ('+esc(L("wt_old"))+' '+(a.price?'$'+a.price:'—')+') <div class="row" style="margin-top:8px"><button class="btn sm primary" data-l="pxOk" data-id="'+esc(a.id)+'">'+esc(L("wt_ok"))+'</button><button class="btn sm" data-l="pxNo" data-id="'+esc(a.id)+'">'+esc(L("wt_no"))+'</button></div></div>';
   return h.replace(/(<div class="card arow[^>]*>)/,'$1'+extra);
 }})();
+
+Object.assign(LT.en,{ms_act:"Active campaigns",ms_total:"Total budget",ms_spent:"Already spent",ms_free:"Free money to promote",ms_empty:"Campaigns with no money left",ms_rev:"Waiting for approval"});
+Object.assign(LT.ru,{ms_act:"Активные кампании",ms_total:"Общий бюджет",ms_spent:"Уже потрачено",ms_free:"Свободно для промоушена",ms_empty:"Кампаний без денег",ms_rev:"Ждут одобрения"});
+function moneySum(D){
+  var T=(D.tracks||[]).filter(function(t){return t.status==="active"}),tot=0,sp=0,fr=0,empty=0;
+  T.forEach(function(t){tot+=t.budget||0;sp+=t.spent||0;fr+=t.left||0;if((t.left||0)<=0)empty++});
+  var rev=(D.tracks||[]).filter(function(t){return t.status==="review"}).length;
+  return '<div class="msum"><div class="ms a"><b>'+T.length+'</b><span>'+esc(L("ms_act"))+'</span></div><div class="ms"><b>'+money(tot)+'</b><span>'+esc(L("ms_total"))+'</span></div><div class="ms"><b>'+money(sp)+'</b><span>'+esc(L("ms_spent"))+'</span></div><div class="ms g"><b>'+money(fr)+'</b><span>'+esc(L("ms_free"))+'</span></div><div class="ms r"><b>'+empty+'</b><span>'+esc(L("ms_empty"))+'</span></div><div class="ms w"><b>'+rev+'</b><span>'+esc(L("ms_rev"))+'</span></div></div>';
+}
+
+Object.assign(LT.en,{a_promos:"Active promos",pm_h:"Accounts with a promo right now. The closest deadline comes first.",pm_topic:"Topic",pm_all:"All topics",pm_left:"left",pm_days:"d",pm_hours:"h",pm_vids:"videos left",pm_sub:"waiting for your check",pm_none:"No active promos right now.",pm_done:"sent",pm_over:"time is over"});
+Object.assign(LT.ru,{a_promos:"Активные промо",pm_h:"Аккаунты, у которых сейчас идёт промо. Сначала те, у кого дедлайн ближе.",pm_topic:"Тема",pm_all:"Все темы",pm_left:"осталось",pm_days:"дн",pm_hours:"ч",pm_vids:"видео осталось",pm_sub:"ждут вашей проверки",pm_none:"Сейчас нет активных промо.",pm_done:"отправлено",pm_over:"время вышло"});
+function promosHtml(D){
+  var now=Date.now(),list=D.requests.filter(function(q){return ["approved","returned","submitted"].indexOf(q.status)>=0&&q.approvedAt}).map(function(q){q._end=q.approvedAt+16*86400000;q._left=q._end-now;return q}).sort(function(a,b){return a._end-b._end});
+  var topics={};list.forEach(function(q){(q.categories||[]).forEach(function(c){topics[c]=1})});
+  var f=LV.pTopic||"all",shown=list.filter(function(q){return f==="all"||(q.categories||[]).indexOf(f)>=0});
+  var sel='<label class="f" for="pTopic" style="max-width:260px"><span>'+esc(L("pm_topic"))+'</span><select id="pTopic"><option value="all">'+esc(L("pm_all"))+'</option>'+Object.keys(topics).map(function(c){return '<option value="'+c+'"'+(f===c?' selected':'')+'>'+esc(L("c_"+c))+'</option>'}).join("")+'</select></label>';
+  var cards=shown.map(function(q){
+    var ms=q._left,d=Math.floor(ms/86400000),h=Math.floor((ms%86400000)/3600000),cls=ms<=0?"bad":(d<2?"bad":(d<5?"warn":"ok"));
+    var txt=ms<=0?L("pm_over"):(d>0?d+L("pm_days")+" "+h+L("pm_hours"):h+L("pm_hours"))+" "+L("pm_left");
+    var sent=(q.links||[]).length,rem=Math.max(0,q.videos-sent),sub=q.status==="submitted";
+    return '<div class="card pmcard pm-'+cls+'"><div class="pmtop">'+accAv({handle:q.handle,avatar:q.avatar},"acav")+'<div class="pmwho"><b>'+esc(q.handle)+'</b>'+(q.internalName?'<small>'+esc(q.internalName)+'</small>':'')+'<div>'+catPills(q.categories,"")+'</div></div><div class="pmvid"><b>'+(sub?'✓':rem)+'</b><span>'+esc(sub?L("pm_sub"):L("pm_vids"))+'</span></div></div>'+
+      '<div class="pmbot"><span class="pmtr">🎵 '+esc(q.track)+'</span><span class="pill '+cls+'">⏰ '+esc(txt)+'</span><span class="hint">'+sent+'/'+q.videos+' '+esc(L("pm_done"))+'</span></div></div>';
+  }).join("");
+  return '<p class="hint">'+esc(L("pm_h"))+'</p>'+sel+'<div class="list" style="margin-top:12px">'+(cards||'<div class="empty">'+esc(L("pm_none"))+'</div>')+'</div>';
+}
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="pTopic"){LV.pTopic=e.target.value;renderOwner()}});
+
+Object.assign(LT.en,{ef_name:"Name",ef_topics:"Topics",ef_about:"About",ef_deals:"Bulk deals",acs_ph:"Search account by name",th_dark:"🌙 Dark",th_light:"☀️ Light",th_sys:"🖥 System",th_lbl:"Theme"});
+Object.assign(LT.ru,{ef_name:"Название",ef_topics:"Темы",ef_about:"Описание",ef_deals:"Скидки",acs_ph:"Найти аккаунт по имени",th_dark:"🌙 Тёмная",th_light:"☀️ Светлая",th_sys:"🖥 Системная",th_lbl:"Тема"});
+function themeGet(){try{return localStorage.getItem("pc_theme")||"dark"}catch(e){return "dark"}}
+function themeApply(){var m=themeGet(),r=m==="system"?(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches?"light":"dark"):m;document.documentElement.setAttribute("data-theme",r)}
+function themeOpts(){var s=$("themeSel");if(!s)return;var m=themeGet();s.setAttribute("aria-label",L("th_lbl"));s.innerHTML=[["dark","th_dark"],["light","th_light"],["system","th_sys"]].map(function(o){return '<option value="'+o[0]+'"'+(m===o[0]?' selected':'')+'>'+esc(L(o[1]))+'</option>'}).join("")}
+themeApply();
+(function(){var ls=$("langSel");if(ls&&!$("themeSel")){var s=document.createElement("select");s.id="themeSel";s.className="themesel";ls.insertAdjacentElement("afterend",s);themeOpts();s.addEventListener("change",function(){try{localStorage.setItem("pc_theme",s.value)}catch(e){}themeApply()});ls.addEventListener("change",function(){setTimeout(themeOpts,50)})}
+ if(window.matchMedia)matchMedia("(prefers-color-scheme: light)").addEventListener("change",function(){if(themeGet()==="system")themeApply()})})();
+/* account search + quick edit chips */
+(function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);
+  var list=document.querySelector("#profCard .aclist");
+  if(list&&!$("accSearch")){list.querySelectorAll(".acitem").forEach(function(b){b.setAttribute("data-q",b.textContent.toLowerCase())});list.insertAdjacentHTML("beforebegin",'<input id="accSearch" class="accsearch" type="search" autocomplete="off" placeholder="🔍 '+esc(L("acs_ph"))+'">')}
+}})();
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="accSearch"){var q=e.target.value.trim().toLowerCase();document.querySelectorAll("#profCard .acitem").forEach(function(b){b.hidden=!!q&&(b.getAttribute("data-q")||"").indexOf(q)<0})}});
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="editField"]');if(!el)return;var f=el.getAttribute("data-f");LV.edit=true;renderDashLive();var t=$(f)||document.querySelector("#"+f+" input")||document.querySelector('[name="'+f+'"]');if(!t&&f==="sCats")t=document.querySelector("#profCard .setcard input[type=checkbox]");if(t){t.scrollIntoView({behavior:"smooth",block:"center"});if(t.focus)setTimeout(function(){t.focus({preventScroll:true})},350)}});
+
+Object.assign(LT.en,{rv_send:"Send my account for review",rv_wait:"Sent. Waiting for the manager",rv_ok:"Account sent for review.",rv_open:"Open account",rv_stat:"Status",rv_avg:"Average views",rv_m_views:"Views, last 30 days",rv_m_vids:"Videos, last 30 days",rv_price:"Price per video",rv_close:"Close"});
+Object.assign(LT.ru,{rv_send:"Отправить аккаунт на проверку",rv_wait:"Отправлено. Ждёт менеджера",rv_ok:"Аккаунт отправлен на проверку.",rv_open:"Открыть аккаунт",rv_stat:"Статус",rv_avg:"Средние просмотры",rv_m_views:"Просмотры за 30 дней",rv_m_vids:"Видео за 30 дней",rv_price:"Цена за видео",rv_close:"Закрыть"});
+function revBtn(u){
+  var s=accState(u);if(s==="approved"||s==="banned")return "";
+  if(s==="review")return '<button type="button" class="btn" disabled>⏳ '+esc(L("rv_wait"))+'</button>';
+  return '<button type="button" class="btn primary" data-l="revSend">📤 '+esc(L("rv_send"))+'</button>';
+}
+/* owner: open the account inside the site (analysis, price, videos) */
+function accFullHtml(a){
+  var V=verdictOf(a),A=a.analysis||{};
+  return '<div class="accfull"><div class="pmtop">'+accAv(a,"acav big")+'<div class="pmwho"><b style="font-size:20px">'+esc(a.handle)+'</b>'+(a.internalName?'<small>'+esc(a.internalName)+'</small>':'')+'<div>'+catPills(a.categories,a.otherCategory)+'</div></div><span class="vbadge v-'+V.k+'">'+esc(L(V.t))+'</span></div>'+
+   (a.about?'<p class="wabout">“'+esc(a.about)+'”</p>':'')+
+   '<div class="msum"><div class="ms"><b>'+n(A.refAvg||0)+'</b><span>'+esc(L("rv_avg"))+'</span></div><div class="ms"><b>'+n(A.month?A.month.views:0)+'</b><span>'+esc(L("rv_m_views"))+'</span></div><div class="ms"><b>'+(A.month?A.month.videos:0)+'</b><span>'+esc(L("rv_m_vids"))+'</span></div><div class="ms g"><b>'+(a.price?'$'+a.price:'—')+'</b><span>'+esc(L("rv_price"))+'</span></div></div>'+
+   '<p class="hint"><b>'+esc(L("wt_tiers"))+':</b> '+esc(tiersTxt(a.tiers))+(a.priceReq?' · 💲 '+esc(L("wt_price"))+' $'+a.priceReq:'')+'</p>'+
+   (V.E?'<div class="blk">'+reasonList(V.E.good,"g")+reasonList(V.E.bad,"b")+'</div>':'')+
+   winTable(A,{videos:a.videos,price:a.price})+videoTable({videos:a.videos})+
+   '<div class="row" style="margin-top:12px"><button class="btn primary" data-l="decide2" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn" data-l="decide2" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn" data-l="decide2" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button><button class="btn" data-l="mclose2">'+esc(L("rv_close"))+'</button></div></div>';
+}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="revSend"){el.disabled=true;api("/api/account/review",{id:S.user.id}).then(function(r){if(!r.ok){el.disabled=false;toast((r.j&&r.j.error)||L("p_err"));return}applyLive(r.j);renderDashLive();toast("📤 "+L("rv_ok"))});return}
+  if(a==="accFull"){var ac=D0().accounts.filter(function(x){return x.id===id})[0];if(ac){LV.modal={type:"accfull",id:id};openModal(accFullHtml(ac))}return}
+  if(a==="decide2"){api("/api/admin/decision",{id:id,status:el.getAttribute("data-s")}).then(function(){closeModal();ownerReload()});return}
+});
+(function(){var o=accCardHtml;accCardHtml=function(a){var h=o(a);return h.replace(/<a class="btn sm" href="[^"]*"[^>]*>[^<]*<\/a>/,'<button class="btn sm primary" data-l="accFull" data-id="'+esc(a.id)+'">🔎 '+esc(L("rv_open"))+'</button>')}})();
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);

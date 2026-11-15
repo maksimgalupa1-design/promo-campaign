@@ -509,6 +509,14 @@ const server = http.createServer(async (req, res) => {
       }
       saveDb(); return send(res, 200, view(u));
     }
+    if (P === "/api/account/review" && M === "POST") {   // the editor sends the account to the manager for a decision
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
+      if (!need(res, acc.adminStatus !== "banned", 403, "This account is blocked")) return;
+      if (!need(res, acc.price > 0, 400, "Set your price first")) return;
+      if (!need(res, (acc.about || "").trim().split(/\s+/).filter(Boolean).length >= 3, 400, "Describe your account in at least 3 words first")) return;
+      acc.adminStatus = "new"; acc.sentAt = Date.now(); notify("An editor sent account @" + ((acc.profile || {}).username || "") + " for review."); saveDb(); return send(res, 200, view(u));
+    }
     if (P === "/api/account/suggest" && M === "POST") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req, 2e4), acc = findAcc(u, b.id); if (!need(res, acc && acc.suggested, 404, "no suggestion")) return;
