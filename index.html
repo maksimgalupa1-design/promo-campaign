@@ -15,29 +15,25 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%236D5CFF%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23A56BFF%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20d=%22M32%200A32%2032%200%200%201%2064%2032A32%2032%200%200%201%2032%2064H20A20%2020%200%200%201%200%2044V32A32%2032%200%200%201%2032%200Z%22%20fill=%22url(%23g)%22/%3E%3Ccircle%20cx=%2232%22%20cy=%2232%22%20r=%2212.5%22%20fill=%22%2314121F%22/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/icon.png"><meta name="theme-color" content="#0E1020">
 <meta name="claude:viewport-fit-sides" content="cover">
 <style id="pcSplashCss">
-#pcSplash{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(ellipse at 50% 45%,#1a1608 0,#0a0d14 62%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#f2d27a;font-family:"Bricolage Grotesque",system-ui,sans-serif;transition:opacity .45s ease,visibility .45s}
+#pcSplash{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(ellipse at 50% 42%,#1d1740 0,#0d0b18 60%,#09080f 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#efeaff;font-family:"Bricolage Grotesque",system-ui,sans-serif;transition:opacity .45s ease,visibility .45s}
 #pcSplash.off{opacity:0;visibility:hidden;pointer-events:none}
-#pcSplash .pcst{position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center}
-#pcSplash .pcr{position:absolute;inset:0;animation:pcspin 24s linear infinite}
-#pcSplash .pcr i{position:absolute;left:50%;top:50%;width:34px;height:150px;margin-left:-17px;margin-top:-150px;transform-origin:50% 100%;background:linear-gradient(#e0a80055,transparent);clip-path:polygon(35% 0,65% 0,100% 100%,0 100%)}
-#pcSplash svg{position:relative;width:150px;height:auto;animation:pcfloat 2.4s ease-in-out infinite}
-#pcSplash b{margin-top:10px;font-size:34px;font-weight:700;letter-spacing:.2px;background:linear-gradient(#ffe9a8,#d9a63a);-webkit-background-clip:text;background-clip:text;color:transparent}
-#pcSplash .pcbar{margin-top:34px;width:min(300px,60vw);height:5px;border-radius:9px;background:#1b2230;overflow:hidden}
-#pcSplash .pcbar u{display:block;height:100%;width:30%;border-radius:9px;background:linear-gradient(90deg,#d9a63a,#ffe9a8);animation:pcload 1.4s ease-in-out infinite}
-#pcSplash .pcc{position:absolute;top:-10%;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe08a,#c88a10);color:#7a4a00;font:700 14px/26px system-ui;text-align:center;font-style:normal;animation:pcfall linear infinite;box-shadow:0 0 10px #e0a80066}
-#pcSplash .pcmsg{margin-top:18px;max-width:80vw;text-align:center;font:500 15px/1.4 system-ui,sans-serif;color:#ffd7d7}
-#pcSplash .pcmsg button{margin-top:12px;padding:10px 22px;border:0;border-radius:99px;background:linear-gradient(#ffe9a8,#d9a63a);color:#2a1d00;font:600 15px system-ui;cursor:pointer}
-@keyframes pcspin{to{transform:rotate(360deg)}}@keyframes pcfloat{50%{transform:translateY(-8px)}}
+#pcSplash .pcst{position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center}
+#pcSplash .pcst::before,#pcSplash .pcst::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(139,108,255,.55);animation:pcring 2.4s ease-out infinite}
+#pcSplash .pcst::after{animation-delay:1.2s}
+#pcSplash svg{position:relative;width:92px;height:92px;filter:drop-shadow(0 0 22px rgba(139,108,255,.65));animation:pcfloat 2.4s ease-in-out infinite}
+#pcSplash b{margin-top:26px;font-size:30px;font-weight:700;letter-spacing:.3px;background:linear-gradient(90deg,#b9a8ff,#8B6CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+#pcSplash .pcbar{margin-top:28px;width:min(260px,56vw);height:4px;border-radius:9px;background:#221d3a;overflow:hidden}
+#pcSplash .pcbar u{display:block;height:100%;width:30%;border-radius:9px;background:linear-gradient(90deg,#6D5CFF,#A56BFF);animation:pcload 1.4s ease-in-out infinite}
+#pcSplash .pcmsg{margin-top:18px;max-width:80vw;text-align:center;font:500 15px/1.4 system-ui,sans-serif;color:#d9d2ff}
+#pcSplash .pcmsg button{margin-top:12px;padding:10px 22px;border:0;border-radius:99px;background:linear-gradient(90deg,#6D5CFF,#A56BFF);color:#fff;font:600 15px system-ui;cursor:pointer}
+@keyframes pcring{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+@keyframes pcfloat{50%{transform:translateY(-6px)}}
 @keyframes pcload{0%{margin-left:-30%}100%{margin-left:100%}}
-@keyframes pcfall{0%{transform:translateY(0) rotateY(0);opacity:0}15%{opacity:1}100%{transform:translateY(105vh) rotateY(720deg);opacity:.9}}
-@media(prefers-reduced-motion:reduce){#pcSplash *{animation:none!important}}
+@media(prefers-reduced-motion:reduce){#pcSplash *,#pcSplash::before{animation:none!important}}
 </style>
-<div id="pcSplash" role="status" aria-live="polite"><i class="pcc" style="left:14%;animation-delay:0.0s;animation-duration:3.4s">$</i><i class="pcc" style="left:78%;animation-delay:0.8s;animation-duration:3.9s">$</i><i class="pcc" style="left:30%;animation-delay:1.6s;animation-duration:3.2s">$</i><i class="pcc" style="left:62%;animation-delay:2.2s;animation-duration:4.1s">$</i><i class="pcc" style="left:48%;animation-delay:0.4s;animation-duration:3.6s">$</i><div class="pcst"><div class="pcr"><i style="transform:rotate(0deg)"></i><i style="transform:rotate(20deg)"></i><i style="transform:rotate(40deg)"></i><i style="transform:rotate(60deg)"></i><i style="transform:rotate(80deg)"></i><i style="transform:rotate(100deg)"></i><i style="transform:rotate(120deg)"></i><i style="transform:rotate(140deg)"></i><i style="transform:rotate(160deg)"></i><i style="transform:rotate(180deg)"></i><i style="transform:rotate(200deg)"></i><i style="transform:rotate(220deg)"></i><i style="transform:rotate(240deg)"></i><i style="transform:rotate(260deg)"></i><i style="transform:rotate(280deg)"></i><i style="transform:rotate(300deg)"></i><i style="transform:rotate(320deg)"></i><i style="transform:rotate(340deg)"></i></div>
-<svg viewBox="0 0 120 130" aria-hidden="true"><ellipse cx="60" cy="122" rx="38" ry="7" fill="#c88a10"/><ellipse cx="60" cy="117" rx="38" ry="7" fill="#e0a800"/><ellipse cx="60" cy="112" rx="36" ry="6" fill="#f3c94f"/>
-<line x1="60" y1="6" x2="60" y2="20" stroke="#3b9ae8" stroke-width="3"/><circle cx="60" cy="6" r="5" fill="#e0a800"/><ellipse cx="22" cy="34" rx="12" ry="16" fill="#3b9ae8"/><ellipse cx="98" cy="34" rx="12" ry="16" fill="#3b9ae8"/>
-<rect x="14" y="22" width="92" height="78" rx="30" fill="#2f9bf0"/><rect x="22" y="32" width="76" height="56" rx="22" fill="#0a0d14"/><circle cx="43" cy="55" r="9" fill="#fff"/><circle cx="77" cy="55" r="9" fill="#fff"/><circle cx="45" cy="57" r="4" fill="#0a0d14"/><circle cx="79" cy="57" r="4" fill="#0a0d14"/>
-<ellipse cx="32" cy="72" rx="8" ry="5" fill="#d9738f" opacity=".7"/><ellipse cx="88" cy="72" rx="8" ry="5" fill="#d9738f" opacity=".7"/><path d="M45 74 Q60 86 75 74" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg></div>
-<b>Promo App</b><div class="pcbar"><u></u></div><div class="pcmsg" id="pcMsg" hidden></div></div>
+<div id="pcSplash" role="status" aria-live="polite"><div class="pcst">
+<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="pcg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6D5CFF"/><stop offset="1" stop-color="#A56BFF"/></linearGradient></defs><path d="M32 0A32 32 0 0 1 64 32A32 32 0 0 1 32 64H20A20 20 0 0 1 0 44V32A32 32 0 0 1 32 0Z" fill="url(#pcg)"/><circle cx="32" cy="32" r="12.5" fill="#14121F"/></svg></div>
+<b>Promo Campaign</b><div class="pcbar"><u></u></div><div class="pcmsg" id="pcMsg" hidden></div></div>
 <script>
 (function(){var s=Date.now(),bad=false,H=false;
 function hide(){if(H||bad)return;H=true;var e=document.getElementById("pcSplash");if(!e)return;e.classList.add("off");setTimeout(function(){e.remove()},700)}
@@ -1282,7 +1278,7 @@ body.hasdock #tkToasts{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v52 · 15.11 23:55</span>
+  <span>© Promo Campaign · v53 · 16.11 00:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
