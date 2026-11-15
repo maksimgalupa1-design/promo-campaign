@@ -949,6 +949,20 @@ body.cmfull .cmlog{max-height:none;height:calc(100dvh - 330px);min-height:320px}
 .wgt.fresh::after,.wgt.plat::after{display:none}
 .wgedit{grid-column:1/-1;all:unset;cursor:pointer;justify-self:end;padding:6px 4px;color:var(--muted);font-size:15px}.wgedit:hover{color:var(--accent)}
 .wgpick{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+/* v43: violet heading, role colours, lighter mobile */
+.hero1 h1{background:linear-gradient(90deg,#7B5CFF,#B28CFF,#7B5CFF)!important;background-size:200% auto!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+.role:nth-child(1) b,.role:nth-child(1) .pill{color:#8B6CFF}
+.role:nth-child(1) .pill{border-color:#8B6CFF;background:rgba(139,108,255,.12)}
+.role:nth-child(2) b,.role:nth-child(2) .pill{color:#E0A800}
+.role:nth-child(2) .pill{border-color:#E0A800;background:rgba(224,168,0,.12)}
+.role:nth-child(1):hover{border-color:#8B6CFF}.role:nth-child(2):hover{border-color:#E0A800}
+@media (max-width:760px){
+ header.bar,.mbg,#dock,.chgate{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+ header.bar{background:var(--bg)!important}
+ .hero1 h1{animation:none!important}
+ .card{animation:none!important}
+}
+@media (max-width:520px){#navSignup{display:none!important}}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1127,7 +1141,7 @@ body.cmfull .cmlog{max-height:none;height:calc(100dvh - 330px);min-height:320px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v42 · 16.11 02:20</span>
+  <span>© Promo Campaign · v44 · 15.11 20:40</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4650,6 +4664,62 @@ document.addEventListener("change",function(e){var t=e.target;if(t&&t.getAttribu
 (function(){var o=ownItems;ownItems=function(){var it=o(),D=ADM.data;
   (D.requests||[]).forEach(function(q){if(["approved","returned","submitted"].indexOf(q.status)>=0&&!q.paid)it.push({id:"p"+q.id,t:"payouts",tab:"editorpay",txt:L("ow_i_pay").replace("{h}",q.handle).replace("{a}",money(q.cost)).replace("{t}",q.track)})});
   return it.filter(function(x){return ownOn(x.t)})}})();
+
+/* v43: resilient network (Render cold start / flaky mobile), friendly 401 in chat */
+(function(){
+  var raw=window.fetch?window.fetch.bind(window):null;
+  function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
+  if(raw){
+    window.fetch=function(u,o){
+      var m=((o&&o.method)||"GET").toUpperCase(),local=typeof u==="string"&&u.charAt(0)==="/";
+      if(!local)return raw(u,o);
+      var tries=0,max=m==="GET"?4:3;
+      function go1(){
+        return raw(u,o).then(function(r){
+          if((r.status===502||r.status===503||r.status===504)&&tries<max-1){tries++;return wait(1200*tries).then(go1)}
+          return r;
+        },function(err){
+          if(m==="GET"&&tries<max-1){tries++;return wait(1200*tries).then(go1)}
+          throw err;
+        });
+      }
+      return go1();
+    };
+  }
+  var N={en:{ch_exp:"Your session ended. Sign in again to use the chat.",ch_login:"Sign in",ch_wake:"The server is waking up, one moment…"},
+    ru:{ch_exp:"Сессия закончилась. Войдите заново, чтобы пользоваться чатом.",ch_login:"Войти",ch_wake:"Сервер просыпается, секунду…"}};
+  Object.assign(LT.en,N.en);Object.assign(LT.ru,N.ru);
+  ["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};XLL[k].ch_exp=XLL[k].ch_exp||N.en.ch_exp;XLL[k].ch_login=XLL[k].ch_login||N.en.ch_login;XLL[k].ch_wake=XLL[k].ch_wake||N.en.ch_wake});
+  var fails=0;
+  chDown=function(code){
+    var f=$("chatForm");if(!f)return;
+    if(code===401){f.innerHTML='<div class="note err chdown">'+esc(L("ch_exp"))+'</div><div class="row"><button class="btn primary" id="chRe">'+esc(L("ch_login"))+'</button></div>';return}
+    fails++;
+    if(fails<3){f.innerHTML='<div class="note chdown">'+esc(L("ch_wake"))+'</div>';return}
+    f.innerHTML='<div class="note err chdown">'+esc(L("ch_down"))+(code?' ('+code+')':'')+'</div><div class="row"><button class="btn primary" data-l="chRetry">'+esc(L("ch_retry"))+'</button></div>';
+  };
+  document.addEventListener("click",function(e){var t=e.target;if(t&&t.id==="chRe"){closeChat();try{localStorage.removeItem("pc_role")}catch(x){}location.hash="signup"}});
+  /* pause chat polling while the tab is hidden */
+  var op=chPoll;chPoll=function(){if(document.hidden)return;op()};var orr=chRender;chRender=function(j){fails=0;return orr(j)};
+})();
+
+/* v43: payment confirmation needs name + screenshot */
+(function(){
+  var N={en:{pb_ph:"For example: Maxim",po_need:"Fill in who paid and attach the payment screenshot first."},ru:{pb_ph:"Например: Максим",po_need:"Сначала впишите, кто заплатил, и прикрепите скриншот оплаты."}};
+  Object.assign(LT.en,N.en);Object.assign(LT.ru,N.ru);
+  ["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};XLL[k].po_need=N.en.po_need;XLL[k].pb_ph=N.en.pb_ph});
+  window.addEventListener("click",function(e){
+    var el=e.target.closest&&e.target.closest('#modalRoot [data-l="poAct2"]');
+    if(!el||el.getAttribute("data-p")!=="1")return;
+    var id=el.getAttribute("data-id"),nm=$("pb_"+id),sc=$("sc_"+id);
+    var ok=nm&&nm.value.trim().length>0&&sc&&sc.files&&sc.files.length>0;
+    if(ok)return;
+    e.stopImmediatePropagation();e.preventDefault();
+    var er=$("poNeed");if(!er){er=document.createElement("div");er.id="poNeed";er.className="note err";el.parentNode.parentNode.insertBefore(er,el.parentNode)}
+    er.textContent=L("po_need");
+    if(nm&&!nm.value.trim())nm.focus();
+  },true);
+})();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
