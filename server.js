@@ -292,6 +292,8 @@ function autoStars(acc) {   // automatic rating: 2.0 .. 5.0 in steps of 0.1
   const mine = Object.values(db.requests).filter(r => r.openId === acc.open_id);
   const done = mine.filter(r => r.status === "completed").length, bad = mine.filter(r => r.status === "returned").length;
   if (done + bad > 0) { const q = done / (done + bad); st += q >= 0.9 ? 0.4 : (q < 0.5 ? -0.6 : 0); }
+  const mv = (A.month && A.month.views) || 0;
+  if (mv < 10000) st = Math.min(st, mv === 0 ? 2 : 2.5);   // a very small account cannot rate high
   return { stars: Math.round(Math.max(2, Math.min(5, st)) * 10) / 10, cpm };
 }
 function accView(acc) {
@@ -612,6 +614,7 @@ const server = http.createServer(async (req, res) => {
         const acc = findAcc(u, id); if (!need(res, acc, 404, "no such account")) return;
         const A = PC.analyze(acc.videos || [], Date.now());
         if (!need(res, acc.price > 0, 400, "account is not ready: " + (acc.profile && acc.profile.username))) return;
+        if (!acc.demo && !need(res, ((A.month && A.month.views) || 0) >= 10000, 403, "Track requests are not available for this account yet: " + (acc.profile && acc.profile.username))) return;
         if (!need(res, acc.adminStatus === "approved", 403, "account is waiting for the manager's approval: " + (acc.profile && acc.profile.username))) return;
         if (!need(res, accPayoutRaw(u, acc), 403, "add payout details for @" + (acc.profile && acc.profile.username))) return;
         const okCat = !(t.categories || []).length || (t.categories || []).some(c => (acc.categories || []).includes(c));

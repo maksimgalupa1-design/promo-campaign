@@ -786,6 +786,16 @@ body.isadmin .wrap{max-width:1320px}
 @media (max-width:899px){body.isadmin #v-admin{padding-top:10px}body.isadmin .ownside .row{margin-bottom:0!important}}
 @media (max-width:899px){body.isadmin .ownlay,body.isadmin .ownside,body.isadmin .ownmain,body.isadmin .ownside .row,body.isadmin .ownside .row>div{min-width:0;max-width:100%}body.isadmin .ownlay{overflow-x:clip}}
 
+/* compact payouts grid */
+.pogrid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pogrid .empty{grid-column:1/-1}
+.pocard{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:14px;border-radius:18px;background:var(--surface);border:1px solid var(--line);min-width:0}
+.pocard b{font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pocard small{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pocard .poamt{font-size:20px;font-weight:800;font-family:var(--display)}
+.pocard.done{opacity:.65}
+@media (max-width:899px){.pogrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -962,7 +972,7 @@ body.isadmin .wrap{max-width:1320px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v29 · 15.11 19:05</span>
+  <span>© Promo Campaign · v30 · 15.11 19:25</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -1956,10 +1966,8 @@ function renderOwner(){
   }else if(LV.adTab==="editorpay"){
     var dl0=D.requests.filter(function(q){return q.status==="completed"}).sort(function(x,y){return (x.paid?1:0)-(y.paid?1:0)||(y.completedAt||0)-(x.completedAt||0)});
     var dl=dl0.filter(function(q){return !LV.eF||LV.eF==="all"||(LV.eF==="done"?q.paid:!q.paid)});
-    body=payBar("eF",[["all",dl0.length],["pending",dl0.filter(function(q){return !q.paid}).length],["done",dl0.filter(function(q){return q.paid}).length]])+'<div class="list">'+(dl.length?dl.map(function(q){
-      var po=q.payout?'<div class="note"><b>'+esc(L("a_pay_payout"))+':</b> '+esc((q.payout.method==="crypto"?coinL(q.payout.coin)+" ":q.payout.method+" ")+q.payout.value+(q.payout.holder?" · "+q.payout.holder:""))+'</div>':'<div class="note err">'+esc(L("a_no_payout"))+'</div>';
-      return '<div class="card ord"><div class="t"><div><span>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+'</span><b>'+money(q.cost)+'</b><span>'+esc(q.track)+' · '+esc(q.artist)+'</span></div><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></div>'+po+
-        (q.paid?'':'<label class="f" for="pb_'+esc(q.id)+'"><span>'+esc(L("pb_lbl"))+'</span><input id="pb_'+esc(q.id)+'" type="text" maxlength="60" placeholder="'+esc(L("pb_ph"))+'"></label><label class="f" for="sc_'+esc(q.id)+'"><span>'+esc(L("a_proof_pick"))+'</span><input id="sc_'+esc(q.id)+'" type="file" accept="image/*"></label>')+'<div class="row"><button class="btn sm '+(q.paid?'':'primary')+'" data-l="poAct2" data-id="'+esc(q.id)+'" data-p="'+(q.paid?0:1)+'">'+esc(L(q.paid?"a_unpaid":"a_mark_paid"))+'</button>'+(q.hasProof?'<button class="btn sm" data-l="admProof" data-id="'+esc(q.id)+'">'+esc(L("a_view_proof"))+'</button>':'')+'</div></div>';
+    body=payBar("eF",[["all",dl0.length],["pending",dl0.filter(function(q){return !q.paid}).length],["done",dl0.filter(function(q){return q.paid}).length]])+'<div class="list pogrid">'+(dl.length?dl.map(function(q){
+      return '<button type="button" class="card pocard'+(q.paid?' done':'')+'" data-l="poOpen" data-id="'+esc(q.id)+'"><b>'+esc(q.handle)+'</b><small>'+esc(q.internalName||q.track||"")+'</small><span class="poamt">'+money(q.cost)+'</span><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></button>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="prices"){
     var RG=LV.ranges||{};
@@ -3817,6 +3825,27 @@ document.addEventListener("click",function(e){
   adDockRender()}catch(e){}return r}})();
 (function(){var o=dockRender;dockRender=function(){o.apply(this,arguments);try{adDockRender()}catch(e){}}})();
 window.addEventListener("resize",function(){try{renderAdminLive()}catch(e){}});
+
+/* ===== v30: compact payouts + payment window ===== */
+Object.assign(LT.en,{po_sent:"I sent the money",po_where:"Where to pay",po_copy:"Copy",po_copied:"Copied",po_avg:"Average views",po_amt:"Amount",po_confirm:"Send confirmation to the editor",po_attach:"Attach the payment screenshot",po_done:"Paid",po_undo:"Mark as not paid"});
+Object.assign(LT.ru,{po_sent:"Я отправил деньги",po_where:"Куда платить",po_copy:"Копировать",po_copied:"Скопировано",po_avg:"Средние просмотры",po_amt:"Сумма",po_confirm:"Отправить подтверждение эдитору",po_attach:"Прикрепите скриншот оплаты",po_done:"Оплачено",po_undo:"Отметить как не оплачено"});
+function poModal(id){
+  var D=D0(),q=(D.requests||[]).filter(function(x){return x.id===id})[0];if(!q)return;
+  var ac=(D.accounts||[]).filter(function(a){return a.id===q.openId})[0],av=q.avgViews||(ac&&ac.analysis&&ac.analysis.refAvg)||0,p=q.payout;
+  var val2=p?(p.method==="crypto"?coinL(p.coin)+" ":p.method+" ")+p.value+(p.holder?" · "+p.holder:""):"";
+  var h='<h3>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+'</h3><div class="msum"><div class="ms"><b>'+money(q.cost)+'</b><span>'+esc(L("po_amt"))+'</span></div><div class="ms"><b>'+n(av)+'</b><span>'+esc(L("po_avg"))+'</span></div></div><p class="hint">'+esc(q.track||"")+' · '+esc(q.artist||"")+'</p>'+
+   (p?'<div class="note payto"><b>💳 '+esc(L("po_where"))+':</b> <span id="poVal">'+esc(val2)+'</span> <button type="button" class="btn sm" data-l="poCopy" data-v="'+esc(p.value)+'">'+esc(L("po_copy"))+'</button></div>':'<div class="note err">'+esc(L("a_no_payout"))+'</div>');
+  if(q.paid){h+='<div class="note payok">✅ '+esc(L("po_done"))+'</div><div class="row">'+(q.hasProof?'<button class="btn sm" data-l="admProof" data-id="'+esc(id)+'">'+esc(L("a_view_proof"))+'</button>':'')+'<button class="btn sm" data-l="poAct2" data-id="'+esc(id)+'" data-p="0">'+esc(L("po_undo"))+'</button></div>'}
+  else{h+='<label class="chk"><input type="checkbox" id="poChk"> '+esc(L("po_sent"))+'</label><div id="poSend" hidden><label class="f" for="pb_'+esc(id)+'"><span>'+esc(L("pb_lbl"))+'</span><input id="pb_'+esc(id)+'" type="text" maxlength="60" placeholder="'+esc(L("pb_ph"))+'"></label><label class="f" for="sc_'+esc(id)+'"><span>'+esc(L("po_attach"))+'</span><input id="sc_'+esc(id)+'" type="file" accept="image/*"></label><div class="row"><button class="btn primary" data-l="poAct2" data-id="'+esc(id)+'" data-p="1">'+esc(L("po_confirm"))+'</button></div></div>'}
+  h+='<div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("a_close"))+'</button></div>';
+  openModal(h);
+}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="poOpen"){e.stopImmediatePropagation();poModal(el.getAttribute("data-id"));return}
+  if(a==="poCopy"){e.stopImmediatePropagation();var v=el.getAttribute("data-v")||"";try{navigator.clipboard.writeText(v)}catch(x){}el.textContent=L("po_copied");return}
+},true);
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('#modalRoot [data-l="poAct2"]');if(el)setTimeout(closeModal,400)});
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="poChk"){var b=$("poSend");if(b)b.hidden=!e.target.checked}});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
