@@ -105,6 +105,7 @@ const PUBLIC_URL = (process.env.PUBLIC_URL || "http://localhost:" + PORT).replac
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 const REDIRECT = PUBLIC_URL + "/auth/tiktok/callback";
 const SCOPES = "user.info.basic,user.info.profile,user.info.stats,video.list";
+const SERVER_VER = 26;
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
@@ -954,6 +955,16 @@ const server = http.createServer(async (req, res) => {
       return send(res, 404, { error: "not found" });
     }
 
+    /* the page: take the NEWEST index.html from public/ or the repo root, so a wrong upload folder never hides an update */
+    function pickIndex() {
+      let best = null;
+      for (const f of [path.join(__dirname, "public", "index.html"), path.join(__dirname, "index.html")]) {
+        try { const h = fs.readFileSync(f, "utf8"), m = h.match(/Promo Campaign \u00b7 v(\d+)/); const v = m ? Number(m[1]) : 0; if (!best || v > best.v) best = { f, v, h }; } catch (e) {}
+      }
+      return best;
+    }
+    if (P === "/version" && M === "GET") { const b = pickIndex(); res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" }); return res.end("server v" + SERVER_VER + "\nsite v" + (b ? b.v : "?") + "\nfile " + (b ? path.relative(__dirname, b.f) : "none")); }
+    if ((P === "/" || P === "/index.html") && M === "GET") { const b = pickIndex(); if (b) { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }); return res.end(b.h); } }
     /* static site */
     const file = path.join(__dirname, "public", P === "/" ? "index.html" : P);
     if (file.startsWith(path.join(__dirname, "public")) && fs.existsSync(file) && fs.statSync(file).isFile()) {
