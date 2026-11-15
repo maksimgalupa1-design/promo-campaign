@@ -312,7 +312,7 @@ async function refreshStale(max) {
   }
 }
 function overview() {
-  const accs = allAccounts(), reqs = Object.values(db.requests);
+  const accs = allAccounts().filter(a => !a.demo), reqs = Object.values(db.requests);
   const live = reqs.filter(r => ["approved", "submitted", "completed"].includes(r.status));
   const now = Date.now(), D30 = 30 * 86400000;
   let views30 = 0; accs.forEach(a => { views30 += PC.analyze(a.videos || [], now).month.views; });
@@ -608,7 +608,7 @@ const server = http.createServer(async (req, res) => {
         const busy = new Set(Object.values(db.requests).filter(r => r.trackId === t.id && ["pending", "approved", "submitted"].includes(r.status)).map(r => r.openId));
         const cands = [];
         for (const acc of allAccounts()) {
-          if (acc.adminStatus !== "approved" || !(acc.price > 0) || busy.has(acc.open_id)) continue;
+          if (acc.demo || acc.adminStatus !== "approved" || !(acc.price > 0) || busy.has(acc.open_id)) continue;
           const v = accAdminView(acc), A = v.analysis;
           if (!A.accepted || !A.month || A.month.views < 1000 || !A.refAvg) continue;
           if (v.evaluation && v.evaluation.decision === "risky") continue;
@@ -637,6 +637,16 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, text, 400, "write a message")) return;
         const n = Object.values(db.settings.push || {}).filter(x => aud === "all" || x.role === aud).length, sent = await broadcast(aud, title, text, "/");
         return send(res, 200, { ok: true, subscribers: n, delivered: sent });
+      }
+      if (P === "/api/admin/demo-editor" && M === "POST") {    // test editor with fake videos, only for the owner's own checks
+        const uid = "demo-editor"; let u = db.users[uid];
+        if (!u) u = db.users[uid] = { id: uid, createdAt: Date.now(), accounts: [] };
+        const now = Date.now(), vids = Array.from({ length: 14 }, (_, i) => ({ id: "9" + String(1e17 + i * 7919).slice(1), created: now - i * 2 * 86400000 - 3600000, views: Math.round(12000 + ((i * 7331) % 9) * 4200), likes: Math.round(1500 + ((i * 313) % 7) * 400), url: "" }));
+        let acc = u.accounts.find(a => a.demo);
+        if (!acc) { acc = { open_id: "demo_editor_acc", createdAt: now, categories: [], discount: 0, demo: true, profile: { username: "demo_editor", display_name: "Test editor" } }; u.accounts.push(acc); }
+        acc.videos = vids; acc.price = null; acc.categories = []; acc.about = ""; acc.adminStatus = "approved"; acc.analysisAt = now; acc.discount = 0;
+        const sid = newSid(); db.sessions[sid] = u.id; saveDb();
+        return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("sid", sid, 43200) });
       }
       if (P === "/api/admin/demo" && M === "POST") {    // test producer with a ready track, only for the owner's own checks
         const email = "demo-producer@promo.test", pw = crypto.randomBytes(5).toString("hex") + "Aa1";

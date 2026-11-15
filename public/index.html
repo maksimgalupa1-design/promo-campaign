@@ -1381,6 +1381,15 @@ function checkNew(D){var s=D.stats||{},w=D.accounts.filter(function(a){return a.
   var cur=(s.pendingRequests||0)+(s.pendingTopups||0)+(s.pendingPayouts||0)+w+tr;
   if(LASTCNT!==null&&cur>LASTCNT){beep();try{if(window.Notification&&Notification.permission==="granted")new Notification("Promo Campaign",{body:L("a_new_items")})}catch(e){}}
   LASTCNT=cur}
+function chkOpen(ep,dest,btn){
+  var old=btn.textContent;btn.disabled=true;btn.textContent="…";
+  api(ep,{}).then(function(r){
+    btn.disabled=false;btn.textContent=old;
+    if(!r.ok){toast((r.j&&r.j.error)||L("p_err"));return}
+    var w=null;try{w=window.open(dest,"_blank")}catch(e){}
+    if(!w){location.href=dest;location.reload()}
+  }).catch(function(){btn.disabled=false;btn.textContent=old;toast(L("p_err"))});
+}
 function D0(){return ADM.data||{tracks:[]}}
 function renderOwner(){
   admNav();["adH1","adH2","adNote"].forEach(function(i){$(i).hidden=false});
@@ -1402,7 +1411,7 @@ function renderOwner(){
     planH='<div class="card" style="margin-bottom:14px"><h3 class="sub">'+esc(L("pl_title"))+'</h3><p class="hint">'+esc(L("pl_h"))+'</p><div class="row"><select id="planTrack" data-l="planTrack">'+activeTr.map(function(t){return '<option value="'+esc(t.id)+'"'+(LV.planTrack===t.id?' selected':'')+'>'+esc(t.title)+' · '+money(t.left)+'</option>'}).join("")+'</select><button class="btn sm primary" data-l="planGo">'+esc(L("pl_go"))+'</button></div>'+
       (LV.planErr?'<div class="note err">'+esc(LV.planErr)+'</div>':'')+
       (pl?'<p style="margin-top:10px"><b>'+esc(pl.track)+'</b>: '+pl.videos+' '+esc(L("pl_videos"))+' · '+money(pl.spent)+' / '+money(pl.budget)+' · '+esc(L("pl_left"))+' '+money(pl.left)+' · ~'+n(pl.expViews)+' '+esc(L("pl_views"))+'</p><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>'+esc(L("pl_acc"))+'</th><th>'+esc(L("rq_videos"))+'</th><th>'+esc(L("a_price"))+'</th><th>'+esc(L("pl_cost"))+'</th><th>'+esc(L("pl_views"))+'</th><th>★</th></tr></thead><tbody>'+pl.plan.map(function(p){return '<tr><td>'+esc(p.handle)+'</td><td>'+p.videos+'</td><td>'+money(p.unit)+(p.discount?' (−'+p.discount+'%)':'')+'</td><td>'+money(p.cost)+'</td><td>~'+n(p.expViews)+'</td><td>'+esc(starsTxt(p.stars))+'</td></tr>'}).join("")+'</tbody></table></div>'+(pl.plan.length?'':'<div class="empty">'+esc(L("pl_none"))+'</div>'):'')+'</div>';
-    body=planH+'<div class="row" style="margin-bottom:12px"><a class="btn sm chk-ed" href="#campaigns" target="_blank">'+esc(L("a_chk_ed"))+'</a><button class="btn sm chk-ed" data-l="chkProd">'+esc(L("a_chk_pr"))+'</button><button class="btn sm" data-l="sndOpen">🔔 '+esc(L("a_notif"))+'</button><button class="btn sm primary" data-l="bcOpen">📣 '+esc(L("bc_btn"))+'</button></div>'+'<div class="tiles">'+tiles+'</div>'+
+    body=planH+'<div class="row" style="margin-bottom:12px"><button class="btn sm chk-ed" data-l="chkEd">'+esc(L("a_chk_ed"))+'</button><button class="btn sm chk-ed" data-l="chkProd">'+esc(L("a_chk_pr"))+'</button><button class="btn sm" data-l="sndOpen">🔔 '+esc(L("a_notif"))+'</button><button class="btn sm primary" data-l="bcOpen">📣 '+esc(L("bc_btn"))+'</button></div>'+'<div class="tiles">'+tiles+'</div>'+
       '<p class="hint">'+esc(L("a_paid_ed"))+': <b>'+money(S2.editorsPaidTotal)+'</b> · '+esc(L("a_30d"))+': <b>'+money(S2.editorsPaid30)+'</b></p>'+
       '<p class="hint">'+esc(L("a_paid_pr"))+': <b>'+money(S2.producersPaidTotal)+'</b> · '+esc(L("a_30d"))+': <b>'+money(S2.producersPaid30)+'</b></p>'+
       '<p class="hint">'+n(S2.purchasedLinksCounted)+' '+esc(L("a_links"))+' · '+esc(L("a_upd"))+': '+(S2.refreshedAt?new Date(S2.refreshedAt).toLocaleString(lang):"—")+'</p><p class="hint">'+esc(L("a_refresh_note"))+'</p>';
@@ -1501,7 +1510,8 @@ document.addEventListener("click",function(e){
   if(a==="pTopGo"){var amt=Number(val("tAmt"));if(!(amt>=1))return;closeModal();prodCall("/api/producer/topup",{trackId:id,amount:amt,method:val("tMeth"),coin:val("tCoin")}).then(drawProd);return}
   if(a==="atab"){LV.adTab=el.getAttribute("data-k");if(LV.adTab==="prices"){fetch("/api/price-ranges").then(function(r){return r.json()}).then(function(j){LV.ranges=j.ranges||{};renderOwner()});return}if(LV.adTab==="pay"){api("/api/admin/pay").then(function(r){LV.payInfo=r.j||{};renderOwner()})}else renderOwner();return}
   if(a==="planGo"){var ptr=val("planTrack");LV.planTrack=ptr;LV.planErr="";api("/api/admin/plan",{trackId:ptr}).then(function(r){if(r.ok){LV.plan=r.j}else{LV.plan=null;LV.planErr=(r.j&&r.j.error)||L("p_err")}renderOwner()});return}
-  if(a==="chkProd"){var w=window.open("","_blank");api("/api/admin/demo",{}).then(function(r){if(r.ok&&w)w.location.href="/#producer";else if(w)w.close()});return}
+  if(a==="chkEd"){chkOpen("/api/admin/demo-editor","/#dashboard",el);return}
+  if(a==="chkProd"){chkOpen("/api/admin/demo","/#producer",el);return}
   if(a==="sndOpen"){sndModal();return}
   if(a==="bcOpen"){bcModal();return}
   if(a==="bcSend"){var tx=val("bcText");if(!tx){return}api("/api/admin/broadcast",{text:tx,title:val("bcTitle")||"Promo Campaign",audience:val("bcAud")}).then(function(r){var o=$("bcRes");if(o)o.textContent=r.ok?L("bc_done").replace("{d}",r.j.delivered).replace("{n}",r.j.subscribers):((r.j&&r.j.error)||L("p_err"))});return}
@@ -1913,6 +1923,8 @@ Object.assign(LT.en,{tp_title:"Your topic",tp_h:"Choose what your videos are abo
  st2:"Pick your topic and describe your account",st2h:"Choose a topic or write at least 8 words about your account.",st3:"Set your price",st3h:"We suggest a price for your topic and your views.",fl2h:"The bot looks at the views of your latest videos. Next: you pick your topic.",fl3:"Topic and price",fl3h:"Pick your topic. We suggest a price for it based on your views."});
 Object.assign(LT.ru,{tp_title:"Ваша тематика",tp_h:"Выберите, о чём ваши видео. Цена, которую мы предложим, зависит от тематики.",tp_err:"Сначала выберите хотя бы одну тематику.",tp_range:"Для «{t}» редакторам обычно платят от ${a} до ${b} за видео.",tp_sug:"Предлагаем вам цену ${p}.",a_prices:"Цены по тематикам",a_prices_h:"Укажите обычный диапазон цены за видео для каждой тематики. Редактор увидит диапазон своей тематики и получит предложенную цену внутри него. Если оставить пустым, цена считается только по просмотрам.",
  st2:"Выберите тематику и опишите аккаунт",st2h:"Выберите тематику или напишите про аккаунт минимум 8 слов.",st3:"Укажите цену",st3h:"Мы предложим цену под вашу тематику и просмотры.",fl2h:"Бот смотрит просмотры ваших последних видео. Дальше: вы выбираете тематику.",fl3:"Тематика и цена",fl3h:"Выберите тематику. Мы предложим цену под неё по вашим просмотрам."});
+Object.assign(LT.en,{a_chk_ed:"Check the site as an editor (test)",a_chk_pr:"Check the site as a producer (test)"});
+Object.assign(LT.ru,{a_chk_ed:"Проверить сайт как редактор (тест)",a_chk_pr:"Проверить сайт как продюсер (тест)"});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
