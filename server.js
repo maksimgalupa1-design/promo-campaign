@@ -300,7 +300,7 @@ function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
     avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
-    analysis: A, price: acc.price || null, evaluation: (() => { const e = PC.evaluate(A, acc.price); if (!A.accepted) e.chance = A.status === "abandoned" ? 3 : 2; return e; })(), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
+    analysis: A, price: acc.price || null, evaluation: (() => { const e = PC.evaluate(A, acc.price); if (!A.accepted) e.chance = A.status === "abandoned" ? 3 : 2; return e; })(), adminStatus: acc.adminStatus || "new", banInfo: acc.adminStatus === "banned" ? (acc.banInfo || { reason: "manager" }) : null, recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
 function accPayoutRaw(user, acc) { return (acc && acc.payout) || (user && user.payout) || null; }   // every TikTok account can have its own payout details; the user-level ones are the fallback
@@ -347,17 +347,22 @@ function discountFor(acc, videos) {
   let d = 0; ts.forEach(t => { if (videos >= t.min) d = Math.max(d, t.pct); }); return d;
 }
 function maxTier(acc) { return Math.max(acc.discount || 0, ...(acc.tiers || []).map(t => t.pct)); }
+function dlMs(r) { return (Number(r.days) > 0 ? Number(r.days) : 16) * 86400000; }
 function refundReq(r) { const t = db.tracks[r.trackId]; if (t && r.approvedAt) t.spent = Math.max(0, Math.round(((t.spent || 0) - reqCost(r)) * 100) / 100); }
 function expireOverdue() {
   let n = 0;
-  Object.values(db.requests).forEach(r => { if (["approved", "returned"].includes(r.status) && r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000) { refundReq(r); r.status = "cancelled"; r.updated = Date.now(); n++; } });
-  if (n) { saveDb(); notify(n + " order(s) expired after 16 days. The money went back to the track budget."); }
+  Object.values(db.requests).forEach(r => { if (["approved", "returned"].includes(r.status) && r.approvedAt && Date.now() - r.approvedAt > dlMs(r)) {
+    refundReq(r); r.status = "cancelled"; r.expired = true; r.updated = Date.now(); n++;
+    const acc = findAccAny(r.openId);   // the account is banned (not deleted): it moves to the archive, the manager can unban it
+    if (acc && !r.demo && !acc.demo && acc.adminStatus !== "banned") { acc.adminStatus = "banned"; acc.banInfo = { reason: "order", track: (db.tracks[r.trackId] || {}).title || "", at: Date.now() }; notifyUser("editors", edUserOfOpen(r.openId), "accounts", "acc_banned", { h: "@" + ((acc.profile || {}).username || "") }); }
+  } });
+  if (n) { saveDb(); notify(n + " order(s) expired. The money went back to the track budget; the accounts were banned."); }
 }
 function remindEditors() {   // a nudge every 3 days after approval, and a strong one on the last day (16-day deadline)
   let n = 0;
   Object.values(db.requests).forEach(r => {
     if (!["approved", "returned"].includes(r.status) || !r.approvedAt || r.demo) return;
-    const el = Date.now() - r.approvedAt, left = 16 * 86400000 - el; if (left <= 0) return;
+    const el = Date.now() - r.approvedAt, left = dlMs(r) - el; if (left <= 0) return;
     const stage = left <= 86400000 ? 99 : Math.floor(el / (3 * 86400000)); if (stage < 1 || stage <= (r.remN || 0)) return;
     r.remN = stage; n++;
     const title = (db.tracks[r.trackId] || {}).title || "", days = Math.floor(el / 86400000), l = Math.max(1, Math.ceil(left / 86400000));
@@ -395,7 +400,7 @@ function reqView(r, withAdmin) {
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
     internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, tdl: t.deadline || "", descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
-    overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
+    days: Number(r.days) > 0 ? Number(r.days) : 16, overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > dlMs(r) };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)), pp = accPayoutRaw(ou, acc); if (pp) o.payout = decObj(pp.enc); }
   if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.tiers = acc.tiers || []; o.bulk = maxTier(acc); o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
   return o;
@@ -859,7 +864,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/decision" && M === "POST") {
         if (!need(res, ["approved", "rejected", "new", "banned"].includes(b.status), 400, "bad status")) return;
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
-        a.adminStatus = b.status; saveDb();
+        a.adminStatus = b.status; if (b.status !== "banned") delete a.banInfo; saveDb();
         if (["approved", "rejected", "banned"].includes(b.status)) notifyUser("editors", edUserOfOpen(a.open_id), "accounts", "acc_" + b.status, { h: "@" + ((a.profile || {}).username || "") });
         return send(res, 200, { ok: true });
       }
@@ -925,11 +930,17 @@ const server = http.createServer(async (req, res) => {
           const t = db.tracks[r.trackId], cost = reqCost(r);
           if (!need(res, t && t.status === "active" && trackLeft(t) >= cost, 409, "not enough budget on the track")) return;
           t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100; r.approvedAt = Date.now();
+          const dd = Math.round(Number(b.days)); r.days = dd >= 1 && dd <= 180 ? dd : 16;
         }
         if (st === "cancelled") refundReq(r);
         r.status = st; r.updated = Date.now(); if (st === "completed") r.completedAt = Date.now(); saveDb();
         notifyUser("editors", edUserOfOpen(r.openId), "orders", "ord_" + st, { t: (db.tracks[r.trackId] || {}).title || "" });
         return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/request-days" && M === "POST") {   // the manager gives an editor more (or fewer) days for one order
+        const r = db.requests[b.id]; if (!need(res, r && ["approved", "returned"].includes(r.status), 404, "no such open order")) return;
+        const dd = Math.round(Number(b.days)); if (!need(res, dd >= 1 && dd <= 180, 400, "days 1..180")) return;
+        r.days = dd; r.remN = 0; saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/request-videos" && M === "POST") {   // the manager decides how many videos; the bulk discount follows automatically
         const r = db.requests[b.id]; if (!need(res, r && r.status === "pending", 404, "only a waiting request can be changed")) return;

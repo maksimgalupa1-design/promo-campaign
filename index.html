@@ -796,6 +796,12 @@ body.isadmin .wrap{max-width:1320px}
 .pocard.done{opacity:.65}
 @media (max-width:899px){.pogrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 
+.btn.gry,.tgo.gry{opacity:.45;filter:grayscale(1);cursor:not-allowed;box-shadow:none!important;transform:none!important}
+.banbox{margin-bottom:12px}#banBox{margin-bottom:16px}
+.ownside .atb[data-k=accarch]::before{content:"🗄"}
+.dayrow{align-items:flex-end}
+@media (min-width:1100px){#v-admin .ownmain .list:has(.rq-act,.rq-work,.rq-done){display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -972,7 +978,7 @@ body.isadmin .wrap{max-width:1320px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v30 · 15.11 19:25</span>
+  <span>© Promo Campaign · v31 · 15.11 19:55</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -1215,7 +1221,7 @@ privacy:'<p class="eyebrow">Черновик</p><h2>Политика конфи�
 '<h3>2. Разрешение на анализ просмотров</h3><p>Вы подключаете аккаунт через окно разрешения TikTok. Без разрешения зарегистрироваться нельзя, потому что шанс одобрения и оплата зависят от ваших просмотров. Пароль от TikTok мы не получаем. Разрешение можно отозвать в кабинете и в настройках TikTok.</p>'+
 '<h3>3. Зачем нам эти данные</h3><p>Чтобы оценить аккаунт, показать шанс одобрения, проверять выполнение условий кампании, начислять оплату и защищаться от накруток.</p>'+
 '<h3>4. Кому мы передаём данные</h3><p>Платёжным провайдерам для выплат и артистам или лейблам в виде итоговой статистики кампании. Мы не продаём персональные данные.</p>'+
-'<h3>5. Сроки хранения и удаление</h3><p>Данные хранятся, пока аккаунт активен и пока этого требует закон. Если автор не отправляет видео в срок, аккаунт блокируется, мы больше не заказываем у него, а запись о блокировке сохраняется. Реквизиты для выплат хранятся в зашифрованном виде. Удалить аккаунт можно по запросу в поддержку.</p>'+
+'<h3>5. Сроки хранения и удаление</h3><p>Данные хранятся, пока аккаунт активен и пока этого требует закон. Если автор не отправляет видео в срок, аккаунт блокируется и переносится в архив: мы больше не заказываем у него, а данные и запись о блокировке сохраняются, чтобы менеджер мог рассмотреть обращение и при необходимости разблокировать аккаунт. Реквизиты для выплат хранятся в зашифрованном виде. Удалить аккаунт можно по запросу в поддержку.</p>'+
 '<h3>6. Реквизиты для выплат и ответственность</h3><p>Реквизиты (PayPal, кошелёк или карту) вы вводите сами и перед сохранением подтверждаете, что они верные. Если вы указали неверный адрес или ошиблись, деньги нельзя вернуть, и это не наша ответственность. Вы всё равно обязаны выполнить заказ. Если заказ не выполнен, мы прекращаем сотрудничество навсегда.</p>'+
 '<h3>7. Контакты</h3><p>[адрес поддержки будет указан здесь]</p>',
 terms:'<p class="eyebrow">Черновик</p><h2>Условия использования</h2><p>Проект текста для прототипа. Перед запуском его должен проверить юрист.</p>'+
@@ -1223,7 +1229,7 @@ terms:'<p class="eyebrow">Черновик</p><h2>Условия использ�
 '<h3>2. Как устроены кампании</h3><p>Автор отправляет заявку на трек, менеджер проверяет аккаунт и одобряет заявку, затем автор публикует ролик со звуком кампании. На отправку ссылки отводится 16 дней. После проверки ссылки менеджером кампания считается завершённой, и выплата отправляется автору: в кабинете виден статус «оплата в пути», а после оплаты автор получает скриншот перевода.</p>'+
 '<h3>3. Цена и оплата</h3><p>Автор сам выбирает цену за видео. Выплата идёт на реквизиты, сохранённые в кабинете.</p>'+
 '<h3>4. Что запрещено</h3><ul><li>Накрутка просмотров и чужие аккаунты.</li><li>Контент, нарушающий правила площадки или права третьих лиц.</li></ul>'+
-'<h3>5. Последствия нарушений</h3><p>Мы можем отклонить ролик, приостановить аккаунт и потребовать возврата выплаты за нарушенные условия. Если автор не соблюдает сроки и не отправляет ссылку на видео в течение 16 дней после одобрения заявки, его аккаунт блокируется. Менеджер также может заблокировать аккаунт за нарушение условий.</p>'+
+'<h3>5. Последствия нарушений</h3><p>Мы можем отклонить ролик, приостановить аккаунт и потребовать возврата выплаты за нарушенные условия. Если автор не соблюдает сроки и не отправляет ссылку на видео в течение 16 дней после одобрения заявки (или в течение иного срока, который менеджер указал для конкретного заказа), его аккаунт автоматически блокируется, и мы больше никогда не работаем с этим аккаунтом. Данные заблокированного аккаунта не удаляются: он переносится в архив. Если вы не согласны с блокировкой, напишите менеджеру, он рассмотрит ситуацию и при необходимости разблокирует аккаунт.</p>'+
 '<h3>6. Скидки за количество</h3><p>Автор может указать скидку от 1% до 99% при заказе нескольких видео (например, 5% от 3 видео). Заявки со скидкой рассматриваются быстрее, менеджер видит размер скидки. Итоговая сумма считается с учётом скидки.</p>'+
 '<h3>7. Изменения</h3><p>Мы можем обновлять условия и сообщим об этом в кабинете.</p>'
 },
@@ -1233,7 +1239,7 @@ privacy:'<p class="eyebrow">Draft</p><h2>Privacy policy</h2><p>Sample text for t
 '<h3>2. Permission to analyze views</h3><p>You connect your account through TikTok’s permission window. You cannot register without it because your approval chance and payment depend on your views. We never receive your TikTok password. You can withdraw the permission in your dashboard and in TikTok settings.</p>'+
 '<h3>3. Why we use this data</h3><p>To evaluate the account, show your approval chance, check campaign terms, calculate payments and prevent fake views.</p>'+
 '<h3>4. Who receives data</h3><p>Payment providers for payouts, and artists or labels as aggregate campaign statistics. We do not sell personal data.</p>'+
-'<h3>5. Retention and deletion</h3><p>Data is kept while the account is active and as long as the law requires. If a creator does not send videos on time, the account is banned, we no longer order from it, and a record of the ban is kept. Payout details are stored encrypted. You can ask support to delete your account.</p>'+
+'<h3>5. Retention and deletion</h3><p>Data is kept while the account is active and as long as the law requires. If a creator does not send videos on time, the account is banned and moved to an archive: we no longer order from it, and its data and a record of the ban are kept so the manager can review an appeal and unban the account if needed. Payout details are stored encrypted. You can ask support to delete your account.</p>'+
 '<h3>6. Payout details and responsibility</h3><p>You enter your payout details (PayPal, crypto wallet or card) yourself and confirm that they are correct before saving. If you give a wrong address or make a mistake, the money cannot be recovered and this is not our responsibility. You must still complete the order. If an order is not completed, we stop working with you permanently.</p>'+
 '<h3>7. Contact</h3><p>[support address goes here]</p>',
 terms:'<p class="eyebrow">Draft</p><h2>Terms of use</h2><p>Sample text for the prototype. A lawyer must review it before launch.</p>'+
@@ -1241,7 +1247,7 @@ terms:'<p class="eyebrow">Draft</p><h2>Terms of use</h2><p>Sample text for the p
 '<h3>2. How campaigns work</h3><p>The creator requests a track, a manager checks the account and approves the request, then the creator posts a video with the campaign sound. The link is due within 16 days. After a manager checks the link, the campaign is complete and the payout is sent: the dashboard shows “payment on the way”, and once it is paid the creator receives a screenshot of the transfer.</p>'+
 '<h3>3. Price and payment</h3><p>The creator sets their own price per video. Payouts go to the details saved in the dashboard.</p>'+
 '<h3>4. Not allowed</h3><ul><li>Fake views and accounts that are not yours.</li><li>Content that breaks platform rules or third-party rights.</li></ul>'+
-'<h3>5. Consequences</h3><p>We may reject a video, suspend an account and ask for a refund of payments made for breached terms. If a creator misses deadlines and does not send the video link within 16 days after the request is approved, the account is banned. The manager may also ban an account for breaking these terms.</p>'+
+'<h3>5. Consequences</h3><p>We may reject a video, suspend an account and ask for a refund of payments made for breached terms. If a creator misses deadlines and does not send the video link within 16 days after the request is approved (or within another period the manager set for that order), the account is banned automatically and we never work with that account again. The data of a banned account is not deleted: it is moved to an archive. If you disagree with a ban, write to the manager, who will review the case and may unban the account.</p>'+
 '<h3>6. Bulk discounts</h3><p>A creator may offer a discount from 1% to 99% for several videos (for example 5% from 3 videos). Requests with a discount are reviewed faster and the manager sees the discount. The final amount is calculated with the discount applied.</p>'+
 '<h3>7. Changes</h3><p>We may update these terms and will announce it in your dashboard.</p>'
 }};
@@ -1795,7 +1801,7 @@ function openReq(tid){
   var okN=S.accounts.filter(function(a){return accReady(a)&&accMatch(a,t)&&!reqSent(t.id,a)}).length;
   openModal('<h3>'+esc(t.title)+' · '+esc(t.artist)+'</h3><div>'+trCats(t)+'</div><b>'+esc(L("rq_acc"))+'</b>'+
     (okN>1?'<label class="accopt all"><input type="checkbox" id="rqAll"><span><b>'+esc(L("rq_all"))+' ('+okN+')</b></span></label>':'')+
-    '<div class="accscroll">'+S.accounts.filter(function(a){return accMatch(a,t)}).map(function(a,i){
+    '<div class="accscroll">'+S.accounts.map(function(a,i){
       var ready=accReady(a),match=accMatch(a,t),sent=reqSent(t.id,a),ok=ready&&match&&!sent;
       return '<div class="accrow"><label class="accopt'+(ok?'':' dis')+'"><input type="checkbox" data-acc="'+esc(a.id)+'"'+(ok?'':' disabled')+'><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+'<br><span class="hint">'+(a.price?money(a.price)+' · ':'')+catPills(a.categories,a.otherCategory)+'</span>'+
         (!ok?'<br><span class="hint" style="color:var(--bad)">'+esc(sent?L("rq_sent"):(!ready?accWhy(a):L("rq_cat_no")))+'</span>':'')+'</span></label>'+
@@ -1931,9 +1937,9 @@ function renderOwner(){
   admNav();["adH1","adH2","adNote"].forEach(function(i){$(i).hidden=false});
   var D=ADM.data;
   if(!ADM.ok||!D)return false;checkNew(D);
-  var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&(WAITN+(S2.pendingRequests||0))?' <i class="cnt">'+(WAITN+(S2.pendingRequests||0))+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
+  var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -1977,20 +1983,24 @@ function renderOwner(){
   }else if(LV.adTab==="waiting"){
     var wl=D.accounts.filter(function(a){return isWait(a)}).sort(function(x,y){return ((y.stars&&y.stars.final)||0)-((x.stars&&x.stars.final)||0)}).map(function(a){return accCardHtml(a)}).join("");
     var wn=D.accounts.filter(function(a){return isWait(a)}).length;
-    var wr=waitReqHtml(D);
+    var wr="";
     body=(wl?'<div class="waitbig">'+esc(L("a_wait_cnt").replace("{n}",wn))+'</div><div class="list">'+wl+'</div>':'')+(wr?'<h3 class="wrh">'+esc(L("wr_title"))+'</h3>'+wr:'')+((wl||wr)?'':'<div class="empty">'+esc(L("a_wait_none"))+'</div>');
   }else if(LV.adTab==="accounts"){
     var fcs=LV.fCats||[];
-    var list=D.accounts.filter(function(a){if(a.adminStatus==='new'||!a.adminStatus)return false;var s=a.stars.final;var okS=LV.rgMin==null||(s!=null&&s>=LV.rgMin-0.001&&s<=LV.rgMax+0.001);return okS&&(LV.fDisc!=="yes"||(a.discount||0)>0)&&(!fcs.length||(a.categories||[]).some(function(c){return fcs.indexOf(c)>=0}))}).sort(function(x,y){return (y.stars.final||0)-(x.stars.final||0)||(y.discount||0)-(x.discount||0)||(x.cpm||9)-(y.cpm||9)});
+    var list=D.accounts.filter(function(a){if(a.adminStatus==='new'||!a.adminStatus||a.adminStatus==='banned')return false;var s=a.stars.final;var okS=LV.rgMin==null||(s!=null&&s>=LV.rgMin-0.001&&s<=LV.rgMax+0.001);return okS&&(LV.fDisc!=="yes"||(a.discount||0)>0)&&(!fcs.length||(a.categories||[]).some(function(c){return fcs.indexOf(c)>=0}))}).sort(function(x,y){return (y.stars.final||0)-(x.stars.final||0)||(y.discount||0)-(x.discount||0)||(x.cpm||9)-(y.cpm||9)});
     body='<div class="row" style="margin-bottom:12px;align-items:flex-start">'+multiChips("fCats",CATS,fcs,"a_f_cat")+rangeHtml()+'<label class="f" for="fDisc" style="flex:1 1 160px"><span>'+esc(L("a_bulk"))+'</span><select id="fDisc" data-l="fDisc"><option value="all">'+esc(L("a_disc_all"))+'</option><option value="yes"'+(LV.fDisc==="yes"?' selected':'')+'>'+esc(L("a_disc_yes"))+'</option></select></label></div><p class="hint" style="margin-bottom:10px">'+esc(L("a_acc_note"))+'</p>'+
       '<div class="list">'+(list.length?list.map(function(a){
         var sel=['<option value="auto">'+esc(L("a_auto"))+(a.stars.auto!=null?' ('+a.stars.auto+')':'')+'</option>'].concat([1,1.5,2,2.5,3,3.5,4,4.5,5].map(function(s){return '<option value="'+s+'"'+(a.stars.manual===s?' selected':'')+'>'+s+' ★</option>'})).join("");
         return '<details class="card arow v-'+verdictOf(a).k+'"><summary><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'</span><span class="hint">'+(a.price?money(a.price):"—")+(a.cpm?' · '+money(a.cpm)+' '+esc(L("a_per1k")):'')+' · '+n(a.analysis.refAvg||0)+'</span></summary>'+
           '<div style="margin-top:10px">'+catPills(a.categories,a.otherCategory)+'</div>'+
-          '<div class="row" style="margin:12px 0">'+ratingHtml(a)+
-          '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
+          '<div class="row" style="margin:12px 0"><a class="btn sm" href="https://www.tiktok.com/'+esc(a.handle.charAt(0)==="@"?a.handle:"@"+a.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("a_open_tt"))+'</a>'+ratingHtml(a)+
+          '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
           winTable(a.analysis,{videos:a.videos,price:a.price})+videoTable({videos:a.videos})+'</details>';
       }).join(""):'<div class="empty">'+esc(L("a_no_acc"))+'</div>')+'</div>';
+  }else if(LV.adTab==="accarch"){
+    var bl=D.accounts.filter(function(a){return a.adminStatus==="banned"});
+    body='<p class="hint">'+esc(L("arc_h"))+'</p><div class="list">'+(bl.length?bl.map(function(a){var bi=a.banInfo||{};
+      return '<div class="card ord"><div class="t"><div><b>'+esc(a.handle)+'</b><span>'+esc(a.internalName||"")+'</span><span class="hotnote">'+esc(bi.reason==="order"?L("arc_why_order").replace("{t}",bi.track||""):L("arc_why_mgr"))+'</span>'+(bi.at?'<span>'+esc(fmtDate(bi.at))+'</span>':'')+'</div><span class="pill bad">'+esc(L("arc_banned"))+'</span></div><div class="row"><a class="btn sm" href="https://www.tiktok.com/'+esc(a.handle.charAt(0)==="@"?a.handle:"@"+a.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("a_open_tt"))+'</a><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("arc_unban"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("arc_none"))+'</div>')+'</div>';
   }else if(LV.adTab==="contacts"){
     body='<div class="card form">'+'<p class="hint">'+esc(L("a_ct_h"))+'</p><label class="f" for="ct_tg"><span>Telegram (link)</span><input id="ct_tg" type="text" maxlength="200" placeholder="https://t.me/yourname" value="'+esc((CONTACTS||{}).telegram||"")+'"></label><label class="f" for="ct_dc"><span>Discord ('+esc(L("a_dc_h"))+')</span><input id="ct_dc" type="text" maxlength="200" placeholder="https://discord.gg/..." value="'+esc((CONTACTS||{}).discord||"")+'"></label><label class="f" for="ct_ig"><span>Instagram (link)</span><input id="ct_ig" type="text" maxlength="200" placeholder="https://instagram.com/yourname" value="'+esc((CONTACTS||{}).instagram||"")+'"></label><label class="f" for="ct_tk"><span>TikTok (link)</span><input id="ct_tk" type="text" maxlength="200" placeholder="https://www.tiktok.com/@yourname" value="'+esc((CONTACTS||{}).tiktok||"")+'"></label><div class="row"><button class="btn" data-l="ctSave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="ctOk"></span></div>'+'</div>';
   }else if(LV.adTab==="pay"){
@@ -2056,7 +2066,8 @@ document.addEventListener("click",function(e){
   if(a==="ctSave"){api("/api/admin/contacts",{telegram:val("ct_tg"),discord:val("ct_dc"),instagram:val("ct_ig"),tiktok:val("ct_tk")}).then(function(r){if(r.ok){CONTACTS=r.j;var o=$("ctOk");if(o)o.textContent=L("a_pay_saved");contactBtn()}});return}
   if(a==="ctToggle"){var bx=$("ctBox");if(bx)bx.hidden=!bx.hidden;return}
   if(a==="paySave"){api("/api/admin/pay",{paypal:val("pay_paypal"),card:val("pay_card"),cardHolder:val("pay_cardHolder"),crypto:COINS.reduce(function(o,c){o[c]=val("pay_c_"+c);return o},{})}).then(function(r){LV.payInfo=r.j||{};var o=$("payOk");if(o)o.textContent=L("a_pay_saved")});return}
-  if(a==="rAct"){api("/api/admin/request",{id:id,status:el.getAttribute("data-s")}).then(function(r){if(!r.ok)alert((r.j&&r.j.error)||"error");ownerReload()});return}
+  if(a==="daySave"){api("/api/admin/request-days",{id:id,days:Number(val("dy_"+id))}).then(function(r){toast(r.ok?"✓":((r.j&&r.j.error)||"error"));ownerReload()});return}
+  if(a==="rAct"){var bd={id:id,status:el.getAttribute("data-s")};if(bd.status==="approved"&&$("dy_"+id))bd.days=Number(val("dy_"+id));api("/api/admin/request",bd).then(function(r){if(!r.ok)alert((r.j&&r.j.error)||"error");ownerReload()});return}
   if(a==="trAct"){api("/api/admin/track",{id:id,status:el.getAttribute("data-s")}).then(function(){ownerReload()});return}
   if(a==="poAct"){api("/api/admin/payout",{id:id,paid:el.getAttribute("data-p")==="1"}).then(function(){ownerReload()});return}
   if(a==="tAct"){api("/api/admin/topup",{id:id,status:el.getAttribute("data-s")}).then(function(){ownerReload()});return}
@@ -2335,7 +2346,7 @@ function accCardHtml(a){
   var why=V.E?'<div class="blk">'+reasonList(V.E.good,"g")+reasonList(V.E.bad,"b")+'</div>':'';
   return '<div class="card arow v-'+V.k+'"><div class="row" style="justify-content:space-between"><span><b><a href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">'+esc(a.handle)+' ↗</a></b>'+(a.internalName?' · '+esc(a.internalName):'')+'</span><span class="vbadge v-'+V.k+'">'+esc(L(V.t))+'</span></div>'+
     '<div class="row" style="gap:18px;margin:8px 0"><span><b>'+(A.refAvg||0).toLocaleString()+'</b> '+esc(L("a_avg"))+'</span><span><b>'+(A.month?A.month.views:0).toLocaleString()+'</b> '+esc(L("a_m_views"))+'</span><span><b>'+(A.month?A.month.videos:0)+'</b> '+esc(L("a_m_videos"))+'</span><span><b>'+(a.price?'$'+a.price:'—')+'</b>'+(a.price?'':' ('+esc(L("a_price_none"))+')')+'</span></div>'+why+
-    '<div class="row"><a class="btn sm" href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">'+esc(L("a_open_tt"))+'</a><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button></div>'+sugRow(a)+'</div>';
+    '<div class="row"><a class="btn sm" href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">'+esc(L("a_open_tt"))+'</a><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button></div>'+sugRow(a)+'</div>';
 }
 Object.assign(LT.en,{a_waiting:"Waiting for your decision",a_wait_none:"No accounts are waiting for your decision.",a_from:"From"});
 Object.assign(LT.ru,{a_waiting:"Ждут решения",a_wait_none:"Нет аккаунтов, ожидающих решения.",a_from:"От кого"});
@@ -2540,7 +2551,7 @@ Object.assign(LT.ru,{nav_orders:"Мои заказы",od_title:"Мои зака�
 LV.of=LV.of||"all";LV.oq=LV.oq||"";
 function p2(x){return x<10?"0"+x:""+x}
 function ordGroup(q){return (q.status==="pending"||q.status==="submitted")?"wait":((q.status==="approved"||q.status==="returned")?"work":(q.status==="completed"?(q.paid?"done":"wait"):"other"))}
-function ordEnd(q){return (q.approvedAt||q.created)+16*86400000}
+function ordEnd(q){return (q.approvedAt||q.created)+(q.days||16)*86400000}
 function cdHtml(q){
   var end=ordEnd(q);
   return '<div class="cdbox" data-end="'+end+'"><div class="cdt">⏱ '+esc(L("od_left"))+'</div><div class="cdn"><div><b data-p="d">0</b><span>'+esc(L("od_d"))+'</span></div><div><b data-p="h">00</b><span>'+esc(L("od_h"))+'</span></div><div><b data-p="m">00</b><span>'+esc(L("od_m"))+'</span></div><div><b data-p="s">00</b><span>'+esc(L("od_s"))+'</span></div></div><div class="cdover" hidden>'+esc(L("od_over"))+'</div></div>';
@@ -2682,6 +2693,11 @@ Object.assign(LT.en,{rs_sort:"Sort",rs_smart:"Best first: discounts, then rating
 Object.assign(LT.ru,{rs_sort:"Сортировка",rs_smart:"Сначала лучшие: скидки, потом рейтинг",rs_stars:"Высокий рейтинг",rs_disc:"Большая скидка",rs_price:"Дешёвые сначала",rs_new:"Новые сначала",rf_act:"Ждут решения",rf_work:"В работе",rf_done:"Завершены",rf_all:"Все",rs_avg:"средние просмотры",rs_about:"Об аккаунте",rs_cancel:"Видео не сделано: деньги в бюджет",rs_cancel_h:"Заказ отменяется, деньги возвращаются в бюджет трека.",rs_none_f:"По этому фильтру ничего нет.",rs_cnt:"заявок"});
 LV.rSort=LV.rSort||"smart";LV.rSorts=LV.rSorts||[];LV.rFilter=(LV.rFilter&&LV.rFilter!=="act")?LV.rFilter:"work";
 function rGroup(q){return (q.status==="pending"||q.status==="submitted")?"act":((q.status==="approved"||q.status==="returned")?"work":(q.status==="completed"?"done":"other"))}
+function dayRow(q){
+  if(q.status==="pending")return '<div class="row dayrow"><label class="f" for="dy_'+esc(q.id)+'" style="flex:0 0 150px"><span>'+esc(L("dy_lbl"))+'</span><input id="dy_'+esc(q.id)+'" type="number" min="1" max="180" value="16"></label></div>';
+  if(q.status==="approved"||q.status==="returned")return '<div class="row dayrow"><label class="f" for="dy_'+esc(q.id)+'" style="flex:0 0 150px"><span>'+esc(L("dy_lbl"))+'</span><input id="dy_'+esc(q.id)+'" type="number" min="1" max="180" value="'+(q.days||16)+'"></label><button class="btn sm" data-l="daySave" data-id="'+esc(q.id)+'">'+esc(L("dy_save"))+'</button></div>';
+  return "";
+}
 function reqTabHtml(D){
   var all=D.requests.slice(),sorts=["smart","stars","disc","price","new"];
   var list=all.filter(function(q){return LV._onlyAct?rGroup(q)==="act":(LV.rFilter==="all"||rGroup(q)===LV.rFilter)});
@@ -2702,7 +2718,7 @@ function reqTabHtml(D){
     var av=q.avatar?'<img class="rsav" src="'+esc(q.avatar)+'" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'rsav ph\',textContent:\''+esc((q.handle||"@?").charAt(1).toUpperCase())+'\'}))">':'<span class="rsav ph">'+esc((q.handle||"@?").charAt(1).toUpperCase())+'</span>';
     var sum='<div class="accsum">'+av+'<div class="rsb"><div class="rsh"><button type="button" class="rshandle" data-l="accOpenH" data-oid="'+esc(q.openId)+'">'+esc(q.handle)+' 🔎</button>'+(q.internalName?'<span>'+esc(q.internalName)+'</span>':'')+'</div><div class="rsp"><span class="rstar">'+esc(starsTxt(q.stars))+'</span>'+(q.bulk>0?'<span class="rsdisc">★ '+esc(L("a_bulk"))+' '+esc(tiersTxt(q.tiers))+'</span>':'')+'<span>'+n(q.avgViews||0)+' '+esc(L("rs_avg"))+'</span></div>'+(q.categories&&q.categories.length?'<div>'+catPills(q.categories,"")+'</div>':'')+(q.about?'<details class="rsabout"><summary>'+esc(L("rs_about"))+'</summary><p>'+esc(q.about)+'</p></details>':'')+'</div></div>';
     return '<div class="card ord rq-'+rGroup(q)+'">'+sum+'<div class="t"><div><b>'+esc(q.track)+'</b><span>'+esc(q.artist)+'</span></div><div class="row">'+stL(q.status)+'</div></div>'+
-      '<div class="kv"><div><b>'+money(q.price)+'</b><span>'+esc(L("a_price"))+'</span></div><div><b>'+q.videos+'</b><span>'+esc(L("rq_videos"))+'</span></div><div><b>'+money(q.cost)+'</b><span>'+esc(t("o_price"))+'</span></div></div>'+(q.overdue?'<div class="note err">'+esc(L("a_overdue"))+'</div>':'')+vidRow(q)+(payNowHtml(q)||po)+eta+links+ackBadge(q)+act+cancel+'</div>';
+      '<div class="kv"><div><b>'+money(q.price)+'</b><span>'+esc(L("a_price"))+'</span></div><div><b>'+q.videos+'</b><span>'+esc(L("rq_videos"))+'</span></div><div><b>'+money(q.cost)+'</b><span>'+esc(t("o_price"))+'</span></div></div>'+(q.overdue?'<div class="note err">'+esc(L("a_overdue"))+'</div>':'')+vidRow(q)+dayRow(q)+eta+links+ackBadge(q)+act+cancel+'</div>';
   }).join("");
   return '<div class="rbar"><div class="chips" role="group">'+chips+'</div>'+sel+'</div><div class="list">'+(cards||'<div class="empty">'+esc(L(all.length?"rs_none_f":"a_no_req"))+'</div>')+'</div>';
 }
@@ -3023,7 +3039,7 @@ document.addEventListener("input",function(e){var t=e.target;if(!t||(t.id!=="pdM
 document.addEventListener("change",function(e){var t=e.target;if(t&&(t.id==="pdMin"||t.id==="pdMax"))renderOwner()});
 document.addEventListener("click",function(e){if(e.target&&e.target.id==="pdReset"){e.preventDefault();LV.pdMin=null;LV.pdMax=null;renderOwner()}});
 function promosHtml(D){
-  var now=Date.now(),list=D.requests.filter(function(q){return ["approved","returned","submitted"].indexOf(q.status)>=0&&q.approvedAt}).map(function(q){q._end=q.approvedAt+16*86400000;q._left=q._end-now;return q}).sort(function(a,b){return a._end-b._end});
+  var now=Date.now(),list=D.requests.filter(function(q){return ["approved","returned","submitted"].indexOf(q.status)>=0&&q.approvedAt}).map(function(q){q._end=q.approvedAt+(q.days||16)*86400000;q._left=q._end-now;return q}).sort(function(a,b){return a._end-b._end});
   var topics={};list.forEach(function(q){(q.categories||[]).forEach(function(c){topics[c]=1})});
   var fc=LV.pCats||[],f="all",dmn=LV.pdMin==null?0:LV.pdMin,dmx=LV.pdMax==null?16:LV.pdMax,dOn=LV.pdMin!=null,rm=Number(LV.pRate||0),dy=LV.pDisc==="yes",shown=list.filter(function(q){var st=typeof q.stars==="object"&&q.stars?q.stars.final:q.stars;var dl=Math.max(0,q._left/86400000);return (!fc.length||(q.categories||[]).some(function(c){return fc.indexOf(c)>=0}))&&(!dOn||(dl>=dmn-0.001&&dl<=dmx+0.999))&&(!rm||(st!=null&&st>=rm-0.001))&&(!dy||(q.discount||0)>0)});if(LV.pSort==="stars")shown.sort(function(a,b){var x=typeof a.stars==="object"&&a.stars?a.stars.final:a.stars,y=typeof b.stars==="object"&&b.stars?b.stars.final:b.stars;return (y||0)-(x||0)});
   var sel=multiChips("pCats",CATS,fc,"pm_topic")+dlRange(dmn,dmx,dOn)+
@@ -3074,7 +3090,7 @@ function accFullHtml(a){
    '<p class="hint"><b>'+esc(L("wt_tiers"))+':</b> '+esc(tiersTxt(a.tiers))+(a.priceReq?' · 💲 '+esc(L("wt_price"))+' $'+a.priceReq:'')+'</p>'+
    (V.E?'<div class="blk">'+reasonList(V.E.good,"g")+reasonList(V.E.bad,"b")+'</div>':'')+
    winTable(A,{videos:a.videos,price:a.price})+videoTable({videos:a.videos})+
-   '<div class="row" style="margin-top:12px"><button class="btn primary" data-l="decide2" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn" data-l="decide2" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn" data-l="decide2" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button><button class="btn" data-l="mclose2">'+esc(L("rv_close"))+'</button></div></div>';
+   '<div class="row" style="margin-top:12px"><button class="btn primary" data-l="decide2" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn" data-l="decide2" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn" data-l="mclose2">'+esc(L("rv_close"))+'</button></div></div>';
 }
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
@@ -3799,7 +3815,7 @@ Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Ос
   var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
 
 /* ===== v29: phone owner cabinet with bottom menu ===== */
-var AGRP=[["ov","🏠","a_overview",["overview"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["pr","🎵","g_pr",["producers","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
+var AGRP=[["ov","🏠","a_overview",["overview"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","prices"]],["pr","🎵","g_pr",["producers","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
 function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
 function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
   if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
@@ -3847,12 +3863,40 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('#modalRoot [data-l="poAct2"]');if(el)setTimeout(closeModal,400)});
 document.addEventListener("change",function(e){if(e.target&&e.target.id==="poChk"){var b=$("poSend");if(b)b.hidden=!e.target.checked}});
 
+/* ===== v31: archive, days, ban screen, labels ===== */
+Object.assign(LT.en,{a_waiting:"Waiting for your decision",a_wait_cnt:"Accounts waiting for your decision: {n}",a_requests:"Track requests",a_preq:"Track requests waiting",a_accarch:"Account archive",arc_h:"Banned accounts. They are not deleted: all data stays here. You can unban an account at any time.",arc_why_order:"Banned automatically: did not finish the order for “{t}” in time.",arc_why_mgr:"Banned by the manager.",arc_banned:"Banned",arc_unban:"Unban",arc_none:"No banned accounts.",dy_lbl:"Days to finish",dy_save:"Save",
+ ban_t:"Account {h} is banned",ban_why:"Reason: you did not complete the order for “{t}” in time.",ban_h:"If you do not agree with this, write to the manager. He will review it and may unban the account.",ban_btn:"Write to the manager"});
+Object.assign(LT.ru,{a_waiting:"Ждут вашего решения",a_wait_cnt:"Аккаунтов ждут вашего решения: {n}",a_requests:"Заявки на трек",a_preq:"Заявок на трек ждут",a_accarch:"Архив аккаунтов",arc_h:"Забаненные аккаунты. Они не удаляются: все данные остаются здесь. Аккаунт можно разблокировать в любой момент.",arc_why_order:"Забанен автоматически: не выполнил заказ «{t}» в срок.",arc_why_mgr:"Забанен менеджером.",arc_banned:"Бан",arc_unban:"Разблокировать",arc_none:"Забаненных аккаунтов нет.",dy_lbl:"Дней на выполнение",dy_save:"Сохранить",
+ ban_t:"Аккаунт {h} заблокирован",ban_why:"Причина: вы не выполнили заказ «{t}» в срок.",ban_h:"Если вы не согласны, напишите менеджеру. Он разберётся и при необходимости разблокирует аккаунт.",ban_btn:"Написать менеджеру"});
+function banBanner(){
+  var U=S&&S.user,as=(S&&S.accounts)||[];
+  var bl=as.filter(function(a){return a.adminStatus==="banned"});
+  var host=$("profCard")||$("v-dash");if(!host)return;
+  var old=$("banBox");if(old)old.remove();if(!bl.length)return;
+  var h=bl.map(function(a){var bi=a.banInfo||{};return '<div class="note err banbox"><b>⛔ '+esc(L("ban_t").replace("{h}",a.handle))+'</b><p>'+esc(bi.reason==="order"?L("ban_why").replace("{t}",bi.track||""):L("ban_why").replace("“{t}”","").replace(" «{t}»","")+"")+'</p><p class="hint">'+esc(L("ban_h"))+'</p></div>'}).join("");
+  host.insertAdjacentHTML("afterbegin",'<div id="banBox">'+h+'<button type="button" class="btn primary" data-l="supOpenBtn">'+esc(L("ban_btn"))+'</button></div>');
+}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="supOpenBtn"]');if(el){e.stopImmediatePropagation();supOpen()}},true);
+(function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);try{banBanner()}catch(e){}}})();
+/* editor: grey out a track the account cannot take (topic does not match) */
+function greyReq(){
+  if(!LIVE||!window.S||!S.accounts||!S.accounts.length||!LV.tracks)return;
+  Array.prototype.forEach.call(document.querySelectorAll('[data-l="req"][data-id]'),function(b){
+    var t=LV.tracks.filter(function(x){return x.id===b.getAttribute("data-id")})[0];if(!t)return;
+    var ok=S.accounts.some(function(a){return accMatch(a,t)});
+    if(!ok&&!b.classList.contains("gry")){b.classList.add("gry");b.setAttribute("aria-disabled","true")}
+    if(ok&&b.classList.contains("gry")){b.classList.remove("gry");b.removeAttribute("aria-disabled")}
+  });
+}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest('[data-l="req"].gry');if(b){e.stopImmediatePropagation();e.preventDefault();toast(L("rq_cat_no"))}},true);
+(function(){var t=null;new MutationObserver(function(){clearTimeout(t);t=setTimeout(greyReq,60)}).observe(document.body,{childList:true,subtree:true})})();
+
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
 function applyLive(d){
   if(typeof LV!=="undefined")LV.payout=d.payout||{set:false};
   var oldMap={};S.accounts.forEach(function(a){oldMap[a.id]=a});
-  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,avatar:a.avatar||"",suggestedPrice:a.suggestedPrice||null,internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0,tiers:a.tiers||[],priceReq:a.priceReq||null}});
+  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,banInfo:a.banInfo||null,avatar:a.avatar||"",suggestedPrice:a.suggestedPrice||null,internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0,tiers:a.tiers||[],priceReq:a.priceReq||null}});
   S.accounts.forEach(function(x,i){x.payout=((d.accounts||[])[i]||{}).payout||{set:false}});S.active=Math.min(S.active,Math.max(0,S.accounts.length-1));sync();save();
 }
 /* When the page is served by server.js it talks to /api; anywhere else (this preview) it stays in demo mode */
