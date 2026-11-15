@@ -207,6 +207,21 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
 .cats label.soon{opacity:.45;cursor:not-allowed}
 .v-green{border-color:#1FA85A!important;background:rgba(31,168,90,.09)}.v-yellow{border-color:#E8A91E!important;background:rgba(232,169,30,.12)}.v-red{border-color:#D8445A!important;background:rgba(216,68,90,.08)}
 .vbadge{font-weight:700;font-size:13px;padding:5px 10px;border-radius:999px;color:#fff}.vbadge.v-green{background:#1FA85A}.vbadge.v-yellow{background:#C98A0C}.vbadge.v-red{background:#D8445A}
+.stepsx{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;overflow:hidden}
+.stbar{height:6px;border-radius:999px;background:rgba(127,127,127,.2);overflow:hidden}.stbar i{display:block;height:100%;background:linear-gradient(90deg,#7C5CFF,#1FA85A);border-radius:999px;transition:width .9s cubic-bezier(.2,.8,.2,1);animation:grow 1.1s cubic-bezier(.2,.8,.2,1)}
+.st{display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;border:1px solid rgba(127,127,127,.25);cursor:pointer;opacity:0;animation:stIn .6s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .2s,box-shadow .2s,border-color .2s}
+.st:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,92,255,.18)}
+.stn{flex:0 0 36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:rgba(127,127,127,.18)}
+.stt{display:grid;gap:2px;min-width:0}.stt small{opacity:.7}.stt em{font-style:normal;font-size:12px;opacity:.7}
+.st.done{border-color:#1FA85A;background:rgba(31,168,90,.08)}.st.done .stn{background:#1FA85A;color:#fff;animation:popIn .5s .3s both}
+.st.cur{border-color:#7C5CFF;background:rgba(124,92,255,.1)}.st.cur .stn{background:#7C5CFF;color:#fff;animation:ring 1.8s infinite}
+@keyframes stIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+@keyframes grow{from{width:0}}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(124,92,255,.55)}70%{box-shadow:0 0 0 12px rgba(124,92,255,0)}100%{box-shadow:0 0 0 0 rgba(124,92,255,0)}}
+.chk-ed{background:#2F7BFF!important;color:#fff!important;border-color:#2F7BFF!important}.chk-pr{background:#1FA85A!important;color:#fff!important;border-color:#1FA85A!important}.chk-demo{background:#E8A91E!important;color:#1a1a1a!important;border-color:#E8A91E!important}
+.ctfloat{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:50;display:grid;gap:8px;justify-items:end}
+.ctfloat #ctBox{background:var(--surface);color:var(--fg);border:1px solid rgba(127,127,127,.3);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:grid;gap:8px;animation:popIn .3s both}
+.ct-tg{background:#27A7E7!important;color:#fff!important}.ct-dc{background:#5865F2!important;color:#fff!important}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1218,12 +1233,13 @@ function renderDashLive(){
   var earn=0,prog=0,done=0;LV.reqs.forEach(function(q){if(q.status==="completed"){earn+=q.cost;done++}else if(q.status==="approved"||q.status==="submitted"||q.status==="returned")prog+=q.cost});
   $("dashTitle").textContent=u.handle+(u.internalName?" · "+u.internalName:"");
   $("tiles").innerHTML=[[money(earn),"dl_earn"],[money(prog),"dl_prog"],[done,"dl_done"],[u.price?money(u.price):"—","a_price"]].map(function(x){return '<div class="card tile"><b>'+esc(x[0])+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("");
-  $("profCard").innerHTML=accBar()+'<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A)+videoTable(u)+
+  $("profCard").innerHTML=stepsHtml(u)+accBar()+'<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A)+videoTable(u)+
     '<div class="row" style="margin-top:14px"><button class="btn sm" id="reanalyze">'+esc(t("d_reanalyze"))+'</button><button class="btn sm" id="changePrice2">'+esc(t("d_pricebtn"))+(u.price?' ($'+u.price+')':'')+'</button></div>'+
     '<div class="blk"><h3>'+esc(L("dl_acc"))+'</h3>'+
     '<label class="f" for="sName"><span>'+esc(L("dl_name"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"></label>'+
     '<b>'+esc(L("dl_cats"))+'</b>'+catChecks("sCats",u.categories)+
     '<label class="f" id="sOtherRow" for="sOther"'+((u.categories||[]).indexOf("other")>=0?'':' hidden')+'><span>'+esc(L("dl_other"))+'</span><input id="sOther" type="text" maxlength="60" value="'+esc(u.otherCategory||"")+'"></label>'+
+    '<label class="f" for="sAbout"><span>'+esc(L("dl_about"))+'</span><textarea id="sAbout" rows="3" maxlength="600" placeholder="'+esc(L("dl_about_ph"))+'">'+esc(u.about||"")+'</textarea><span class="hint" id="sAboutN"></span></label>'+
     '<label class="f" for="sDisc"><span>'+esc(L("dl_disc"))+'</span><input id="sDisc" type="number" min="0" max="99" inputmode="numeric" value="'+(u.discount||"")+'" placeholder="0"><span class="hint">'+esc(L("dl_disc_h"))+'</span></label>'+
     (S.accounts.length>1?'<label class="chk" for="sAll"><input type="checkbox" id="sAll"><span>'+esc(L("dl_disc_all"))+'</span></label>':'')+
     '<div class="row"><button class="btn primary" data-l="saveAcc">'+esc(L("dl_save"))+'</button><span class="hint" id="sOk">'+esc(LV.ok)+'</span></div></div>';
@@ -1243,7 +1259,7 @@ function renderDashLive(){
 function saveAcc(){
   var u=S.user;if(!u)return;
   var d=val("sDisc");
-  api("/api/account/update",{id:u.id,internalName:val("sName"),categories:checked("sCats"),otherCategory:val("sOther"),discount:d===""?0:Number(d),discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){
+  api("/api/account/update",{id:u.id,internalName:val("sName"),categories:checked("sCats"),otherCategory:val("sOther"),about:val("sAbout"),discount:d===""?0:Number(d),discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){
     if(!r.ok){$("sOk").textContent=(r.j&&r.j.error)||L("p_err");return}
     applyLive(r.j);LV.ok=L("dl_saved");renderDashLive();setTimeout(function(){LV.ok="";var e=$("sOk");if(e)e.textContent=""},2500);
   });
@@ -1321,7 +1337,7 @@ function renderOwner(){
       '<div class="card tile'+(S2.pendingRequests?' hot':'')+'" data-l="atab" data-k="requests" style="cursor:pointer"><b>'+S2.pendingRequests+'</b><span>'+esc(L("a_preq"))+'</span></div>',
       '<div class="card tile'+(S2.pendingTopups?' hot':'')+'" data-l="atab" data-k="payments" style="cursor:pointer"><b>'+S2.pendingTopups+'</b><span>'+esc(L("a_ppay"))+'</span></div>',
       '<div class="card tile'+(S2.pendingPayouts?' hot':'')+'" data-l="atab" data-k="editorpay" style="cursor:pointer"><b>'+S2.pendingPayouts+'</b><span>'+esc(L("a_pedit"))+'</span></div>'].join("");
-    body='<div class="row" style="margin-bottom:12px"><a class="btn sm" href="#campaigns" target="_blank">'+esc(L("a_chk_ed"))+'</a><a class="btn sm" href="#producer" target="_blank">'+esc(L("a_chk_pr"))+'</a><button class="btn sm" data-l="notifOn">'+esc(L("a_notif"))+'</button></div><div class="tiles">'+tiles+'</div>'+
+    body='<div class="row" style="margin-bottom:12px"><a class="btn sm chk-ed" href="#campaigns" target="_blank">'+esc(L("a_chk_ed"))+'</a><a class="btn sm chk-pr" href="#producer" target="_blank">'+esc(L("a_chk_pr"))+'</a><button class="btn sm chk-demo" data-l="demoMk">'+esc(L("a_demo"))+'</button><button class="btn sm" data-l="notifOn">'+esc(L("a_notif"))+'</button><span class="hint" id="notifMsg"></span></div>'+(LV.demo?'<div class="card hotnote" style="margin-bottom:12px">'+esc(L("a_demo_ok"))+'<br><b>'+esc(LV.demo.email)+'</b> / <b>'+esc(LV.demo.password)+'</b><br>'+esc(LV.demo.track)+' · <a href="#producer" target="_blank">'+esc(L("a_chk_pr"))+'</a></div>':'')+'<div class="tiles">'+tiles+'</div>'+
       '<p class="hint">'+esc(L("a_paid_ed"))+': <b>'+money(S2.editorsPaidTotal)+'</b> · '+esc(L("a_30d"))+': <b>'+money(S2.editorsPaid30)+'</b></p>'+
       '<p class="hint">'+esc(L("a_paid_pr"))+': <b>'+money(S2.producersPaidTotal)+'</b> · '+esc(L("a_30d"))+': <b>'+money(S2.producersPaid30)+'</b></p>'+
       '<p class="hint">'+n(S2.purchasedLinksCounted)+' '+esc(L("a_links"))+' · '+esc(L("a_upd"))+': '+(S2.refreshedAt?new Date(S2.refreshedAt).toLocaleString(lang):"—")+'</p><p class="hint">'+esc(L("a_refresh_note"))+'</p>';
@@ -1371,6 +1387,7 @@ function renderOwner(){
     body='<div class="card form"><p class="hint">'+esc(L("a_pay_h"))+'</p>'+
       [["paypal","p_to_paypal"],["card","p_to_card"],["cardHolder","p_to_holder"]].map(function(f){return '<label class="f" for="pay_'+f[0]+'"><span>'+esc(L(f[1]))+'</span><input id="pay_'+f[0]+'" type="text" maxlength="140" value="'+esc(X[f[0]]||"")+'"></label>'}).join("")+
       COINS.map(function(c){return '<label class="f" for="pay_c_'+c+'"><span>'+esc(coinL(c))+'</span><input id="pay_c_'+c+'" type="text" maxlength="140" value="'+esc(C[c]||"")+'"></label>'}).join("")+
+      '<h3 class="sub" style="margin-top:14px">'+esc(L("a_contacts"))+'</h3><label class="f" for="ct_tg"><span>Telegram</span><input id="ct_tg" type="text" maxlength="60" placeholder="username" value="'+esc((CONTACTS||{}).telegram||"")+'"></label><label class="f" for="ct_dc"><span>Discord ('+esc(L("a_dc_h"))+')</span><input id="ct_dc" type="text" maxlength="200" placeholder="https://discord.gg/..." value="'+esc((CONTACTS||{}).discord||"")+'"></label><div class="row"><button class="btn" data-l="ctSave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="ctOk"></span></div>'+
       '<div class="row"><button class="btn primary" data-l="paySave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="payOk"></span></div></div>';
   }else{
     var tl=D.tracks.filter(function(t){return t.status!=="deleted"}).sort(function(x,y){return (x.status==="review"?0:1)-(y.status==="review"?0:1)});
@@ -1415,6 +1432,12 @@ document.addEventListener("click",function(e){
   if(a==="pTopOld"){LV.modal={type:"top",id:id};openModal('<h3>'+esc(L("p_addb"))+'</h3><label class="f" for="tAmt"><span>'+esc(L("p_amount"))+'</span><input id="tAmt" type="number" min="1" inputmode="decimal"></label><label class="f" for="tMeth"><span>'+esc(L("p_method"))+'</span><select id="tMeth">'+methodOpts("paypal")+'</select></label><div id="payBoxM">'+payBoxHtml("paypal",0)+'</div><div class="row"><button class="btn primary" data-l="pTopGo" data-id="'+esc(id)+'">'+esc(L("p_topup"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
   if(a==="pTopGo"){var amt=Number(val("tAmt"));if(!(amt>=1))return;closeModal();prodCall("/api/producer/topup",{trackId:id,amount:amt,method:val("tMeth"),coin:val("tCoin")}).then(drawProd);return}
   if(a==="atab"){LV.adTab=el.getAttribute("data-k");if(LV.adTab==="pay"){api("/api/admin/pay").then(function(r){LV.payInfo=r.j||{};renderOwner()})}else renderOwner();return}
+  if(a==="notifOn"){var nm=$("notifMsg");function say(k){if(nm)nm.textContent=L(k)}
+    beep();if(!window.Notification){say("a_notif_na");return}
+    try{Notification.requestPermission().then(function(p){if(p==="granted"){say("a_notif_ok");try{new Notification("Promo Campaign",{body:L("a_new_items")})}catch(e){}}else say("a_notif_no")})}catch(e){say("a_notif_na")}return}
+  if(a==="demoMk"){api("/api/admin/demo",{}).then(function(r){LV.demo=r.ok?r.j:null;renderOwner()});return}
+  if(a==="ctSave"){api("/api/admin/contacts",{telegram:val("ct_tg"),discord:val("ct_dc")}).then(function(r){if(r.ok){CONTACTS=r.j;var o=$("ctOk");if(o)o.textContent=L("a_pay_saved");contactBtn()}});return}
+  if(a==="ctToggle"){var bx=$("ctBox");if(bx)bx.hidden=!bx.hidden;return}
   if(a==="paySave"){api("/api/admin/pay",{paypal:val("pay_paypal"),card:val("pay_card"),cardHolder:val("pay_cardHolder"),crypto:COINS.reduce(function(o,c){o[c]=val("pay_c_"+c);return o},{})}).then(function(r){LV.payInfo=r.j||{};var o=$("payOk");if(o)o.textContent=L("a_pay_saved")});return}
   if(a==="rAct"){api("/api/admin/request",{id:id,status:el.getAttribute("data-s")}).then(function(r){if(!r.ok)alert((r.j&&r.j.error)||"error");ownerReload()});return}
   if(a==="trAct"){api("/api/admin/track",{id:id,status:el.getAttribute("data-s")}).then(function(){ownerReload()});return}
@@ -1426,7 +1449,6 @@ document.addEventListener("change",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;
   var a=el.getAttribute("data-l");
   if(a==="fCat"){LV.fCat=el.value;renderOwner();return}
-  if(a==="notifOn"){try{Notification.requestPermission().then(function(){beep()})}catch(e){beep()}return}
   if(a==="ovTrack"){LV.ovTrack=el.value;renderOwner();return}
   if(a==="fDisc"){LV.fDisc=el.value;renderOwner();return}
   if(a==="fStars"){LV.fStars=el.value;renderOwner();return}
@@ -1620,6 +1642,7 @@ function navRole(){
   document.querySelectorAll("nav .lnk").forEach(function(b){b.hidden=off||!show[b.getAttribute("data-go")]});
   var sw=$("navSwitch");if(sw){sw.textContent=L("nav_switch");sw.hidden=off||!r}
   var nb=$("navSignup");if(nb)nb.hidden=off||r!=="editor";
+  contactBtn();
 }
 Object.assign(LT.en,{a_producers:"Producers",a_pr_none:"No producers yet.",a_pr_tracks:"tracks",a_pr_paid:"paid in total",a_pr_joined:"joined",a_f_all_rated:"All accounts (including below 2 stars and unrated)",a_open_acc:"Open accounts"});
 Object.assign(LT.ru,{a_producers:"Продюсеры",a_pr_none:"Продюсеров пока нет.",a_pr_tracks:"треков",a_pr_paid:"оплачено всего",a_pr_joined:"зарегистрирован",a_f_all_rated:"Все аккаунты (в том числе ниже 2 звёзд и без оценки)",a_open_acc:"Открыть аккаунты"});
@@ -1660,12 +1683,36 @@ Object.assign(LT.ru,{a_chk_ed:"Проверить сайт как редакто
 Object.assign(LT.en,{p_msg:"Message to the manager (optional)",p_msg_ph:"For example: my Telegram is @name, write me if you have questions"});
 Object.assign(LT.ru,{p_msg:"Сообщение менеджеру (необязательно)",p_msg_ph:"Например: мой Telegram @name, пишите, если будут вопросы"});
 
+var CONTACTS=null;
+function loadContacts(){fetch("/api/contacts",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){CONTACTS=j;contactBtn()}).catch(function(){})}
+function contactBtn(){
+  if(!LIVE)return;var el=$("ctFloat");
+  var off=/^#admin/.test(location.hash),c=CONTACTS||{};
+  if(!el){el=document.createElement("div");el.id="ctFloat";el.className="ctfloat";document.body.appendChild(el)}
+  var tg=c.telegram?'<a class="btn sm ct-tg" href="https://t.me/'+esc(c.telegram)+'" target="_blank" rel="noopener noreferrer">Telegram @'+esc(c.telegram)+'</a>':"",dc=c.discord&&/^https?:\/\//.test(c.discord)?'<a class="btn sm ct-dc" href="'+esc(c.discord)+'" target="_blank" rel="noopener noreferrer">Discord</a>':(c.discord?'<span class="pill">Discord: '+esc(c.discord)+'</span>':"");
+  el.hidden=off||!(tg||dc);
+  el.innerHTML='<div id="ctBox" hidden><b>'+esc(L("ct_title"))+'</b><div class="row">'+tg+dc+'</div></div><button class="btn primary" data-l="ctToggle">💬 '+esc(L("ct_btn"))+'</button>';
+}
+loadContacts();
+function wordCount(s){return (String(s||"").trim().match(/\S+/g)||[]).length}
+function stepsHtml(u){
+  var wc=wordCount(u.about),topic=(u.categories&&u.categories.length>0)||wc>=8;
+  var st=[{k:"st1",ok:true,go:""},{k:"st2",ok:!!u.price,go:"changePrice2"},{k:"st3",ok:topic,go:"sName"},{k:"st4",ok:(u.discount||0)>0,go:"sDisc",opt:true}];
+  var done=st.filter(function(s){return s.ok}).length,cur=st.findIndex(function(s){return !s.ok});
+  return '<div class="stepsx card"><div class="stbar"><i style="width:'+Math.round(done/4*100)+'%"></i></div>'+st.map(function(s,i){
+    return '<div class="st'+(s.ok?' done':(i===cur?' cur':''))+'" style="animation-delay:'+(i*0.12)+'s" data-l="stGo" data-g="'+s.go+'"><span class="stn">'+(s.ok?'✓':(i+1))+'</span><span class="stt"><b>'+esc(L(s.k))+(s.opt?' <em>'+esc(L("st_opt"))+'</em>':'')+'</b><small>'+esc(L(s.k+"h"))+'</small></span></div>'}).join("")+'</div>';
+}
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="stGo"]');if(!el)return;var g=el.getAttribute("data-g"),t=g&&$(g);if(t){t.scrollIntoView({behavior:"smooth",block:"center"});if(t.focus)try{t.focus()}catch(x){}}});
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="sAbout"){var n=$("sAboutN");if(n)n.textContent=wordCount(e.target.value)+" / 8 "+L("dl_words")}});
+Object.assign(LT.en,{st1:"Connect your TikTok",st1h:"Done. Your account is connected.",st2:"Set your price",st2h:"Price per video. We check it against your real views.",st3:"Pick your topic and describe your account",st3h:"Choose a topic or write at least 8 words about your account.",st4:"Add a discount",st4h:"With a discount you have a bigger chance to be taken.",st_opt:"optional",dl_about:"Describe your account (at least 8 words)",dl_about_ph:"What do you post, who watches you, which countries",dl_words:"words",ct_btn:"Write to the manager",ct_title:"Contact the manager",a_contacts:"Your contacts for users",a_dc_h:"invite link",a_demo:"Create a test producer",a_demo_ok:"Test producer is ready. Log in at the producer page with:",a_notif_ok:"Notifications are on",a_notif_no:"Notifications are blocked in this browser. Allow them in the address bar settings.",a_notif_na:"This browser cannot show notifications. Open the site in Chrome. The sound still works."});
+Object.assign(LT.ru,{st1:"Подключите TikTok",st1h:"Готово. Аккаунт подключён.",st2:"Укажите цену",st2h:"Цена за одно видео. Мы сверим её с вашими просмотрами.",st3:"Выберите тематику и опишите аккаунт",st3h:"Выберите тематику или напишите про аккаунт минимум 8 слов.",st4:"Добавьте скидку",st4h:"Со скидкой больше шансов, что вас возьмут.",st_opt:"по желанию",dl_about:"Опишите свой аккаунт (минимум 8 слов)",dl_about_ph:"Что вы публикуете, кто вас смотрит, из каких стран",dl_words:"слов",ct_btn:"Написать менеджеру",ct_title:"Связаться с менеджером",a_contacts:"Ваши контакты для пользователей",a_dc_h:"ссылка-приглашение",a_demo:"Создать тестового продюсера",a_demo_ok:"Тестовый продюсер готов. Войдите на странице продюсера:",a_notif_ok:"Уведомления включены",a_notif_no:"Уведомления заблокированы в этом браузере. Разрешите их в настройках рядом с адресом сайта.",a_notif_na:"Этот браузер не умеет показывать уведомления. Откройте сайт в Chrome. Звук всё равно работает."});
+
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
 function applyLive(d){
   if(typeof LV!=="undefined")LV.payout=d.payout||{set:false};
   var oldMap={};S.accounts.forEach(function(a){oldMap[a.id]=a});
-  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,internalName:a.internalName||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0}});
+  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0}});
   S.active=Math.min(S.active,Math.max(0,S.accounts.length-1));sync();save();
 }
 /* When the page is served by server.js it talks to /api; anywhere else (this preview) it stays in demo mode */
