@@ -322,6 +322,40 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 .accrow .accopt{min-width:0}.accdisc{display:flex;flex-direction:column;font-size:11px;gap:3px;width:78px}.accdisc input{padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:inherit;font:inherit;width:100%;box-sizing:border-box}
 .accopt.all{background:rgba(47,107,255,.1);margin:6px 0}
 
+.pricebig{display:flex;align-items:center;gap:14px;width:100%;margin:14px 0;padding:16px 18px;border:0;border-radius:18px;cursor:pointer;font:inherit;color:#fff;text-align:left;background:linear-gradient(120deg,#EE3B5F,#6B5CFF);box-shadow:0 10px 28px -10px rgba(107,92,255,.7);animation:prpulse 2.6s ease-in-out infinite;transition:transform .2s}
+.pricebig:hover{transform:translateY(-2px)}.pricebig .pbi{font-size:28px}.pricebig .pbt{flex:1;display:flex;flex-direction:column}.pricebig b{font-size:18px}.pricebig small{opacity:.9;font-size:13px}.pricebig .pba{font-size:28px;opacity:.85}
+@keyframes prpulse{0%,100%{box-shadow:0 10px 28px -10px rgba(107,92,255,.7)}50%{box-shadow:0 10px 34px -6px rgba(238,59,95,.75)}}
+.prm h3{margin:0 0 4px}.prbig{display:grid;grid-template-columns:56px 1fr 56px;gap:10px;align-items:center;margin:16px 0 8px}
+.prstep{height:56px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:inherit;font-size:30px;cursor:pointer;transition:transform .15s,background .15s}.prstep:active{transform:scale(.92)}.prstep:hover{background:rgba(47,107,255,.12)}
+.prnum{display:flex;align-items:baseline;justify-content:center;gap:2px;flex-wrap:wrap}.prnum span{font-size:30px;font-weight:700}
+.prnum input{width:100px;font-size:48px;font-weight:800;text-align:center;border:0;background:transparent;color:inherit;font-family:inherit;outline:none;border-bottom:3px solid #6B5CFF;border-radius:0}
+.prnum small{flex-basis:100%;text-align:center;opacity:.65;font-size:12px}
+.prnum.bump input{animation:prbump .35s}@keyframes prbump{0%{transform:scale(1)}40%{transform:scale(1.15);color:#6B5CFF}100%{transform:scale(1)}}
+.prslide{width:100%;accent-color:#6B5CFF;margin:6px 0 10px}
+.prverd{--c:#1FA85A;border-radius:14px;padding:12px 14px;background:color-mix(in srgb,var(--c) 14%,transparent);border-left:4px solid var(--c);margin-bottom:12px;transition:all .3s}.prverd:empty{display:none}.prverd b{font-size:18px;color:var(--c)}.prverd span{font-size:12px;opacity:.75}.prverd div{margin-top:4px;font-weight:600}
+.prhints{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.prhint{border:1px dashed #6B5CFF;background:rgba(107,92,255,.08);border-radius:14px;padding:10px;text-align:left;cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;gap:2px;transition:transform .15s}.prhint:hover{transform:translateY(-2px)}.prhint small{font-size:11px;opacity:.75}.prhint b{font-size:20px}.prhint em{font-size:12px;color:#6B5CFF;font-style:normal;font-weight:600}
+.prsave{flex:1;padding:14px 18px;font-size:16px}
+
+.rbar{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;margin-bottom:12px}.rsort{min-width:220px;flex:1 1 220px;max-width:340px}
+.accsum{display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:14px;background:rgba(107,92,255,.07);margin-bottom:10px}
+.rsav{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none;background:linear-gradient(135deg,#EE3B5F,#6B5CFF)}.rsav.ph{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
+.rsb{min-width:0;flex:1}.rsh{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}.rsh span{opacity:.7;font-size:13px}
+.rsp{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0;font-size:13px}.rsp>span{padding:2px 9px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+.rsp .rstar{background:rgba(232,169,30,.18);border-color:transparent;font-weight:700}.rsp .rsdisc{background:rgba(31,168,90,.16);border-color:transparent;color:#15803d;font-weight:700}
+.rsabout summary{cursor:pointer;font-size:12px;opacity:.8;margin-top:4px}.rsabout p{margin:6px 0 0;font-size:13px;overflow-wrap:anywhere}
+.rq-act{border-left:4px solid #E8A91E}.rq-work{border-left:4px solid #2F6BFF}.rq-done{border-left:4px solid #1FA85A}
+
+.aclist{display:grid;gap:10px;margin-top:10px}
+.acitem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:inherit;font:inherit;cursor:pointer;opacity:0;animation:cardIn .5s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .2s,box-shadow .2s}
+.acitem:hover{transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(107,92,255,.6)}
+.acav{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;background:linear-gradient(135deg,#EE3B5F,#6B5CFF)}.acav.ph{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px}.acav.big{width:72px;height:72px;font-size:28px}
+.acn{flex:1;min-width:0;display:flex;flex-direction:column}.acn b{font-size:16px;overflow-wrap:anywhere}.acn small{opacity:.7}.acarr{font-size:24px;opacity:.5}
+.achd{display:flex;gap:14px;align-items:center;margin:14px 0}.achd b{font-size:20px}
+.ttlink{overflow-wrap:anywhere;color:#2F6BFF}
+.delzone{margin-top:28px;padding:16px;border-radius:16px;border:1px dashed #D8445A}.delrule{font-size:14px;margin:6px 0 12px}
+.refbig{font-size:22px;line-height:1.3;font-weight:800;padding:18px 20px;border-radius:18px;margin:12px 0 18px;background:linear-gradient(120deg,rgba(31,168,90,.18),rgba(47,107,255,.16));border-left:6px solid #1FA85A}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1353,8 +1387,8 @@ function renderDashLive(){
   var earn=0,prog=0,done=0;LV.reqs.forEach(function(q){if(q.status==="completed"){earn+=q.cost;done++}else if(q.status==="approved"||q.status==="submitted"||q.status==="returned")prog+=q.cost});
   $("dashTitle").textContent=u.handle+(u.internalName?" · "+u.internalName:"");
   $("tiles").innerHTML=[[money(earn),"dl_earn"],[money(prog),"dl_prog"],[done,"dl_done"],[u.price?money(u.price):"—","a_price"]].map(function(x){return '<div class="card tile"><b>'+esc(x[0])+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("");
-  $("profCard").innerHTML=stepsHtml(u)+accBar()+'<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A,u)+videoTable(u)+
-    '<div class="row" style="margin-top:14px"><button class="btn sm" id="reanalyze">'+esc(t("d_reanalyze"))+'</button><button class="btn sm" id="changePrice2">'+esc(t("d_pricebtn"))+(u.price?' ($'+u.price+')':'')+'</button></div>'+
+  $("profCard").innerHTML=stepsHtml(u)+accBar()+priceBig(u)+'<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A,u)+videoTable(u)+
+    '<div class="row" style="margin-top:14px"><button class="btn sm" id="reanalyze">'+esc(t("d_reanalyze"))+'</button></div>'+
     '<div class="blk"><h3>'+esc(L("dl_acc"))+'</h3>'+
     '<label class="f" for="sName"><span>'+esc(L("dl_name"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"></label>'+
     '<b>'+esc(L("dl_cats"))+'</b>'+catChecks("sCats",u.categories)+
@@ -1476,26 +1510,19 @@ function renderOwner(){
       '<p class="hint">'+esc(L("a_paid_pr"))+': <b>'+money(S2.producersPaidTotal)+'</b> · '+esc(L("a_30d"))+': <b>'+money(S2.producersPaid30)+'</b></p>'+
       '<p class="hint">'+n(S2.purchasedLinksCounted)+' '+esc(L("a_links"))+' · '+esc(L("a_upd"))+': '+(S2.refreshedAt?new Date(S2.refreshedAt).toLocaleString(lang):"—")+'</p><p class="hint">'+esc(L("a_refresh_note"))+'</p>';
   }else if(LV.adTab==="requests"){
-    body='<div class="list">'+(D.requests.length?D.requests.map(function(q){
-      var act="";
-      if(q.status==="pending")act='<div class="row"><button class="btn sm primary" data-l="rAct" data-id="'+esc(q.id)+'" data-s="approved">'+esc(L("a_approve"))+'</button><button class="btn sm danger" data-l="rAct" data-id="'+esc(q.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>';
-      if(q.status==="submitted")act='<div class="row"><button class="btn sm primary" data-l="rAct" data-id="'+esc(q.id)+'" data-s="completed">'+esc(L("a_complete"))+'</button><button class="btn sm danger" data-l="rAct" data-id="'+esc(q.id)+'" data-s="returned">'+esc(L("a_return"))+'</button></div>';
-      var eta=(q.status==="approved"||q.status==="submitted"||q.status==="completed")&&!q.paid?'<div class="row"><label class="f" for="eta_'+esc(q.id)+'" style="flex:1 1 220px"><span>'+esc(L("a_eta"))+'</span><input id="eta_'+esc(q.id)+'" type="text" maxlength="80" value="'+esc(q.eta||"")+'"></label><button class="btn sm" data-l="etaSave" data-id="'+esc(q.id)+'">'+esc(L("a_eta_save"))+'</button></div>':'';
-      var po=q.payout?'<div class="note"><b>'+esc(L("a_pay_payout"))+':</b> '+esc((q.payout.method==="crypto"?coinL(q.payout.coin)+" ":q.payout.method+" ")+q.payout.value+(q.payout.holder?" · "+q.payout.holder:""))+'</div>':'';
-      var links=(q.links||[]).map(function(l){return '<div class="hint" style="overflow-wrap:anywhere"><a href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.url)+'</a> · '+(l.views!=null?n(l.views):"—")+'</div>'}).join("");
-      return '<div class="card ord"><div class="t"><div><span>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+' · '+esc(starsTxt(q.stars))+'</span><b>'+esc(q.track)+'</b><span>'+esc(q.artist)+'</span></div><div class="row">'+discBadge(q.discount)+stL(q.status)+'</div></div>'+
-        '<div class="kv"><div><b>'+money(q.price)+'</b><span>'+esc(L("a_price"))+'</span></div><div><b>'+q.videos+'</b><span>'+esc(L("rq_videos"))+'</span></div><div><b>'+money(q.cost)+'</b><span>'+esc(t("o_price"))+'</span></div></div>'+(q.overdue?'<div class="note err">'+esc(L("a_overdue"))+'</div>':'')+po+eta+links+act+'</div>';
-    }).join(""):'<div class="empty">'+esc(L("a_no_req"))+'</div>')+'</div>';
+    body=reqTabHtml(D);
   }else if(LV.adTab==="payments"){
-    body='<div class="list">'+(D.topups.length?D.topups.map(function(p){
+    var tps=D.topups.filter(function(p){return !LV.pF||LV.pF==="all"||(LV.pF==="done"?p.status!=="pending":p.status==="pending")});
+    body=payBar("pF",[["all",D.topups.length],["pending",D.topups.filter(function(p){return p.status==="pending"}).length],["done",D.topups.filter(function(p){return p.status!=="pending"}).length]])+'<div class="list">'+(tps.length?tps.map(function(p){
       return '<div class="card ord"><div class="t"><div><span>'+esc(L("a_from"))+': '+esc(p.producerName?p.producerName+" · ":"")+esc(p.producer||"")+'</span><b>'+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' 20%: '+money(Math.round(p.amount*20)/100)+'</span><span>'+esc(p.track||"")+'</span>'+(p.message?'<span class="hotnote">'+esc(p.message)+'</span>':'')+(p.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(p.deadline)+'</span>':'')+'</div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
         (p.hasProof?'<div class="row"><button class="btn sm" data-l="admProofT" data-id="'+esc(p.id)+'">'+esc(L("a_view_proof"))+'</button></div>':'')+(p.status==="pending"?'<div class="row"><button class="btn sm primary" data-l="tAct" data-id="'+esc(p.id)+'" data-s="confirmed">'+esc(L("a_confirm"))+'</button><button class="btn sm danger" data-l="tAct" data-id="'+esc(p.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>':'')+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="producers"){
     body='<div class="list">'+((D.producers||[]).length?D.producers.map(function(p){return '<div class="card ord"><div class="t"><div><b>'+esc(p.name||"—")+'</b><span>'+esc(p.email)+'</span><span>'+esc(L("a_pr_joined"))+' '+fmtDate(p.created)+'</span></div><div class="kv" style="grid-template-columns:1fr 1fr"><div><b>'+p.tracks.length+'</b><span>'+esc(L("a_pr_tracks"))+'</span></div><div><b>'+money(p.paid)+'</b><span>'+esc(L("a_pr_paid"))+'</span></div></div></div>'+p.tracks.map(function(t){return '<div class="hint">'+esc(t.title)+' · '+esc(t.status)+' · '+money(t.left)+' '+esc(L("a_left"))+'</div>'}).join("")+'</div>'}).join(""):'<div class="empty">'+esc(L("a_pr_none"))+'</div>')+'</div>';
   }else if(LV.adTab==="editorpay"){
-    var dl=D.requests.filter(function(q){return q.status==="completed"}).sort(function(x,y){return (x.paid?1:0)-(y.paid?1:0)||(y.completedAt||0)-(x.completedAt||0)});
-    body='<div class="list">'+(dl.length?dl.map(function(q){
+    var dl0=D.requests.filter(function(q){return q.status==="completed"}).sort(function(x,y){return (x.paid?1:0)-(y.paid?1:0)||(y.completedAt||0)-(x.completedAt||0)});
+    var dl=dl0.filter(function(q){return !LV.eF||LV.eF==="all"||(LV.eF==="done"?q.paid:!q.paid)});
+    body=payBar("eF",[["all",dl0.length],["pending",dl0.filter(function(q){return !q.paid}).length],["done",dl0.filter(function(q){return q.paid}).length]])+'<div class="list">'+(dl.length?dl.map(function(q){
       var po=q.payout?'<div class="note"><b>'+esc(L("a_pay_payout"))+':</b> '+esc((q.payout.method==="crypto"?coinL(q.payout.coin)+" ":q.payout.method+" ")+q.payout.value+(q.payout.holder?" · "+q.payout.holder:""))+'</div>':'<div class="note err">'+esc(L("a_no_payout"))+'</div>';
       return '<div class="card ord"><div class="t"><div><span>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+'</span><b>'+money(q.cost)+'</b><span>'+esc(q.track)+' · '+esc(q.artist)+'</span></div><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></div>'+po+
         (q.paid?'':'<label class="f" for="sc_'+esc(q.id)+'"><span>'+esc(L("a_proof_pick"))+'</span><input id="sc_'+esc(q.id)+'" type="file" accept="image/*"></label>')+'<div class="row"><button class="btn sm '+(q.paid?'':'primary')+'" data-l="poAct2" data-id="'+esc(q.id)+'" data-p="'+(q.paid?0:1)+'">'+esc(L(q.paid?"a_unpaid":"a_mark_paid"))+'</button>'+(q.hasProof?'<button class="btn sm" data-l="admProof" data-id="'+esc(q.id)+'">'+esc(L("a_view_proof"))+'</button>':'')+'</div></div>';
@@ -1722,6 +1749,7 @@ document.addEventListener("click",function(e){
     var b={title:val("nTitle"),artist:val("nArtist"),links:links,budget:Number(val("nBudget")),method:val("nMethod"),coin:val("nCoin"),categories:checked("nCats"),otherCategory:val("nOther"),platforms:checked("nPlat"),descRule:!!($("nDesc")&&$("nDesc").checked),message:val("nMsg"),deadline:val("nDeadline")};
     var ne=$("nErr");function bad(m){ne.textContent=m;ne.hidden=false}
     if(!b.title){bad(L("p_bad"));return}
+    if(!deadlineOk(b.deadline)){bad(L("p_dl_min"));return}
     if(!(b.budget>=100)){bad(L("p_min100"));return}
     var badL=Object.keys(links).some(function(k){return !/^https?:\/\/\S+\.\S+/i.test(links[k])});
     var mf=$("nMp3")&&$("nMp3").files&&$("nMp3").files[0];
@@ -2131,12 +2159,174 @@ Object.assign(LT.en,{rq_all:"Select all accounts",rq_disc_acc:"Bulk discount",rq
 Object.assign(LT.ru,{rq_all:"Выбрать все аккаунты",rq_disc_acc:"Скидка за объём",rq_disc_h2:"Скидка сохраняется отдельно для каждого аккаунта. Аккаунтов может быть сколько угодно. Сколько видео делает каждый аккаунт, решает менеджер.",a_contacts:"Контакты",a_ct_h:"Добавьте свои ссылки. Кнопка «Написать менеджеру» появится у редакторов и продюсеров, как только заполнено хотя бы одно поле."});
 document.addEventListener("change",function(e){var t=e.target;if(t&&t.id==="rqAll"){document.querySelectorAll("#modalRoot input[data-acc]:not(:disabled)").forEach(function(i){i.checked=t.checked})}});
 
+/* ---- easy price change: one popup instead of starting the whole flow again ---- */
+Object.assign(LT.en,{pr_btn:"Change price",pr_now:"Your price now",pr_per:"per video",pr_title:"Change your price",pr_acc:"Account",pr_rec:"Recommended by your views",pr_range:"Range for your topic",pr_save:"Save price",pr_saved:"Price saved",pr_cpm:"Price for 1,000 views",pr_great:"Very attractive: managers will take you faster",pr_fair:"Fair price",pr_high:"A bit high: you may get fewer requests",pr_use:"Use",pr_bad:"Enter a price from 1 to 200.",pr_tip:"No need to start over. Change the number and save."});
+Object.assign(LT.ru,{pr_btn:"Изменить цену",pr_now:"Ваша цена сейчас",pr_per:"за видео",pr_title:"Измените вашу цену",pr_acc:"Аккаунт",pr_rec:"Рекомендуем по вашим просмотрам",pr_range:"Вилка для вашей тематики",pr_save:"Сохранить цену",pr_saved:"Цена сохранена",pr_cpm:"Цена за 1000 просмотров",pr_great:"Очень привлекательная цена: вас возьмут быстрее",pr_fair:"Нормальная цена",pr_high:"Немного дорого: заявок может быть меньше",pr_use:"Взять",pr_bad:"Введите цену от 1 до 200.",pr_tip:"Начинать заново не нужно. Поменяйте число и сохраните."});
+function priceBig(u){
+  return '<button type="button" class="pricebig" id="changePrice2"><span class="pbi">💲</span><span class="pbt"><b>'+esc(L("pr_btn"))+'</b><small>'+esc(L("pr_now"))+': '+(u.price?'$'+u.price+' '+esc(L("pr_per")):'—')+'</small></span><span class="pba">›</span></button>';
+}
+function prAcc(){return S.accounts[S.active]||S.accounts[0]}
+function prOpen(accId){
+  var a=S.accounts.filter(function(x){return x.id===accId})[0]||prAcc();if(!a)return;
+  var A=PC.analyze(a.videos||[],Date.now()),rec=PC.recommend(A),avg=A.refAvg||0,cats=a.categories||[],mn=null,mx=null;
+  cats.forEach(function(c){var r=PRANGES&&PRANGES[c];if(r){mn=mn===null?r.min:Math.min(mn,r.min);mx=mx===null?r.max:Math.max(mx,r.max)}});
+  var cur=a.price||(mn!==null?Math.max(mn,Math.min(mx,rec)):rec);
+  LV.modal={type:"price",id:a.id,avg:avg};
+  var sw=S.accounts.length>1?'<label class="f" for="prAcc"><span>'+esc(L("pr_acc"))+'</span><select id="prAcc">'+S.accounts.map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===a.id?' selected':'')+'>'+esc(x.handle)+'</option>'}).join("")+'</select></label>':'<div class="hint"><b>'+esc(a.handle)+'</b></div>';
+  openModal('<div class="prm"><h3>'+esc(L("pr_title"))+'</h3><p class="hint">'+esc(L("pr_tip"))+'</p>'+sw+
+    '<div class="prbig"><button type="button" class="prstep" data-l="prStep" data-d="-0.5" aria-label="-">−</button><div class="prnum"><span>$</span><input id="prVal" type="number" min="1" max="200" step="0.5" inputmode="decimal" value="'+cur+'"><small>'+esc(L("pr_per"))+'</small></div><button type="button" class="prstep" data-l="prStep" data-d="0.5" aria-label="+">+</button></div>'+
+    '<input id="prSlide" class="prslide" type="range" min="1" max="30" step="0.5" value="'+Math.min(30,cur)+'">'+
+    '<div class="prverd" id="prVerd"></div>'+
+    '<div class="prhints"><button type="button" class="prhint" data-l="prUse" data-v="'+rec+'"><small>'+esc(L("pr_rec"))+'</small><b>$'+rec+'</b><em>'+esc(L("pr_use"))+'</em></button>'+(mn!==null?'<button type="button" class="prhint" data-l="prUse" data-v="'+Math.max(mn,Math.min(mx,rec))+'"><small>'+esc(L("pr_range"))+'</small><b>$'+mn+'–$'+mx+'</b><em>'+esc(L("pr_use"))+'</em></button>':'')+'</div>'+
+    '<div class="note err" id="prErr" hidden></div><div class="row"><button class="btn primary prsave" data-l="prSave">'+esc(L("pr_save"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div></div>');
+  prVerd();
+}
+function prVerd(){
+  var i=$("prVal");if(!i)return;var v=Number(i.value),el=$("prVerd"),avg=(LV.modal&&LV.modal.avg)||0;
+  if(!(v>0)||!avg){if(el)el.innerHTML="";return}
+  var cpm=v/avg*1000,k=cpm<0.05?["great","#1FA85A"]:(cpm<0.1?["fair","#E8A91E"]:["high","#D8445A"]);
+  el.style.setProperty("--c",k[1]);el.innerHTML='<b>$'+cpm.toFixed(2)+'</b> <span>'+esc(L("pr_cpm"))+'</span><div>'+esc(L("pr_"+k[0]))+'</div>';
+  var bar=document.createElement("i");
+}
+function prSet(v){v=Math.max(1,Math.min(200,Math.round(v*2)/2));var i=$("prVal"),s=$("prSlide");if(i)i.value=v;if(s)s.value=Math.min(30,v);var n=document.querySelector(".prnum");if(n){n.classList.remove("bump");void n.offsetWidth;n.classList.add("bump")}prVerd()}
+document.addEventListener("click",function(e){
+  var big=e.target.closest("#changePrice2,#changePrice");
+  if(big&&LIVE&&S.user){e.stopImmediatePropagation();e.preventDefault();prOpen();return}
+},true);
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="prStep"){prSet(Number(($("prVal")||{}).value||0)+Number(el.getAttribute("data-d")));return}
+  if(a==="prUse"){prSet(Number(el.getAttribute("data-v")));return}
+  if(a==="prSave"){
+    var v=Number(($("prVal")||{}).value),er=$("prErr"),id=LV.modal&&LV.modal.id;
+    if(!(v>=1&&v<=200)){er.textContent=L("pr_bad");er.hidden=false;return}
+    el.disabled=true;api("/api/price",{id:id,price:v}).then(function(r){el.disabled=false;if(!r.ok){er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false;return}applyLive(r.j);closeModal();renderDash();toast(L("pr_saved")+": $"+v)});return}
+});
+document.addEventListener("input",function(e){var t=e.target;if(!t)return;if(t.id==="prSlide"){prSet(Number(t.value))}else if(t.id==="prVal"){var s=$("prSlide");if(s)s.value=Math.min(30,Number(t.value)||1);prVerd()}});
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="prAcc"){prOpen(e.target.value)}});
+
+function deadlineDays(s){
+  s=String(s||"").trim().toLowerCase();if(!s)return null;
+  var d=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/),e=s.match(/^(\d{1,2})[.\/](\d{1,2})(?:[.\/](\d{2,4}))?$/),dt=null;
+  if(d)dt=new Date(+d[1],+d[2]-1,+d[3]);else if(e){var y=e[3]?(+e[3]<100?2000+ +e[3]:+e[3]):new Date().getFullYear();dt=new Date(y,+e[2]-1,+e[1]);if(!e[3]&&dt<new Date())dt=new Date(y+1,+e[2]-1,+e[1])}
+  if(dt&&!isNaN(dt))return (dt-Date.now())/86400000;
+  var m=s.match(/(\d+(?:[.,]\d+)?)?\s*(week|нед|month|мес|year|год|лет|hour|час|hr|day|сут|д(?:ень|ня|ней|н))/);
+  if(!m)return NaN;
+  var q=m[1]?parseFloat(m[1].replace(",",".")):1,u=m[2],k=/^(week|нед)/.test(u)?7:/^(month|мес)/.test(u)?30:/^(year|год|лет)/.test(u)?365:/^(hour|час|hr)/.test(u)?1/24:1;
+  return q*k;
+}
+function deadlineOk(s){var v=deadlineDays(s);return v===null||(!isNaN(v)&&v>=7-1e-9)}
+Object.assign(LT.en,{p_deadline_ph:"for example: 2 weeks, 1 month (minimum 1 week)",p_deadline_h:"Optional. Write it in words: 2 weeks, 1 month, or a date. The minimum is 1 week. We recommend at least 2 weeks so editors have time to make good videos.",p_dl_min:"The deadline must be at least 1 week. For example: 2 weeks or 1 month."});
+Object.assign(LT.ru,{p_deadline_ph:"например: 2 недели, 1 месяц (минимум 1 неделя)",p_deadline_h:"Необязательно. Пишите словами: 2 недели, 1 месяц или датой. Минимум 1 неделя. Советуем минимум 2 недели, чтобы ребята успели сделать хорошие видео.",p_dl_min:"Срок должен быть не меньше 1 недели. Например: 2 недели или 1 месяц."});
+
+/* ---- owner: incoming requests with account description, filters and sorting ---- */
+Object.assign(LT.en,{rs_sort:"Sort",rs_smart:"Best first: discounts, then rating",rs_stars:"Highest rating",rs_disc:"Biggest discount",rs_price:"Cheapest price",rs_new:"Newest",rf_act:"Needs a decision",rf_work:"In progress",rf_done:"Completed",rf_all:"All",rs_avg:"avg views",rs_about:"About the account",rs_cancel:"Video not made: money back to budget",rs_cancel_h:"The order is cancelled and the money returns to the track budget.",rs_none_f:"Nothing here for this filter.",rs_cnt:"requests"});
+Object.assign(LT.ru,{rs_sort:"Сортировка",rs_smart:"Сначала лучшие: скидки, потом рейтинг",rs_stars:"Высокий рейтинг",rs_disc:"Большая скидка",rs_price:"Дешёвые сначала",rs_new:"Новые сначала",rf_act:"Ждут решения",rf_work:"В работе",rf_done:"Завершены",rf_all:"Все",rs_avg:"средние просмотры",rs_about:"Об аккаунте",rs_cancel:"Видео не сделано: деньги в бюджет",rs_cancel_h:"Заказ отменяется, деньги возвращаются в бюджет трека.",rs_none_f:"По этому фильтру ничего нет.",rs_cnt:"заявок"});
+LV.rSort=LV.rSort||"smart";LV.rFilter=LV.rFilter||"act";
+function rGroup(q){return (q.status==="pending"||q.status==="submitted")?"act":((q.status==="approved"||q.status==="returned")?"work":(q.status==="completed"?"done":"other"))}
+function reqTabHtml(D){
+  var all=D.requests.slice(),sorts=["smart","stars","disc","price","new"];
+  var list=all.filter(function(q){return LV.rFilter==="all"||rGroup(q)===LV.rFilter});
+  var st=function(q){return q.stars==null?0:q.stars};
+  list.sort(function(a,b){
+    if(LV.rSort==="stars")return st(b)-st(a)||(b.discount||0)-(a.discount||0)||b.created-a.created;
+    if(LV.rSort==="disc")return (b.discount||0)-(a.discount||0)||st(b)-st(a)||b.created-a.created;
+    if(LV.rSort==="price")return (a.price||0)-(b.price||0)||b.created-a.created;
+    if(LV.rSort==="new")return b.created-a.created;
+    return ((b.discount>0?1:0)-(a.discount>0?1:0))||st(b)-st(a)||(b.discount||0)-(a.discount||0)||b.created-a.created;
+  });
+  var cnt={act:0,work:0,done:0};all.forEach(function(q){var g=rGroup(q);if(cnt[g]!==undefined)cnt[g]++});
+  var chips=["act","work","done","all"].map(function(f){return '<button type="button" class="chip" data-l="rFil" data-f="'+f+'" aria-pressed="'+(LV.rFilter===f)+'">'+esc(L("rf_"+f))+(f==="all"?' ('+all.length+')':(cnt[f]?' ('+cnt[f]+')':''))+'</button>'}).join("");
+  var sel='<label class="f rsort" for="rSort"><span>'+esc(L("rs_sort"))+'</span><select id="rSort" data-l="rSort">'+sorts.map(function(k){return '<option value="'+k+'"'+(LV.rSort===k?' selected':'')+'>'+esc(L("rs_"+k))+'</option>'}).join("")+'</select></label>';
+  var cards=list.map(function(q){
+    var act="";
+    if(q.status==="pending")act='<div class="row"><button class="btn sm primary" data-l="rAct" data-id="'+esc(q.id)+'" data-s="approved">'+esc(L("a_approve"))+'</button><button class="btn sm danger" data-l="rAct" data-id="'+esc(q.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>';
+    if(q.status==="submitted")act='<div class="row"><button class="btn sm primary" data-l="rAct" data-id="'+esc(q.id)+'" data-s="completed">'+esc(L("a_complete"))+'</button><button class="btn sm danger" data-l="rAct" data-id="'+esc(q.id)+'" data-s="returned">'+esc(L("a_return"))+'</button></div>';
+    var cancel=(q.status==="approved"||q.status==="returned"||q.status==="submitted")?'<div class="row"><button class="btn sm danger" data-l="rAct" data-id="'+esc(q.id)+'" data-s="cancelled" title="'+esc(L("rs_cancel_h"))+'">↩ '+esc(L("rs_cancel"))+'</button></div>':'';
+    var eta=(q.status==="approved"||q.status==="submitted"||q.status==="completed")&&!q.paid?'<div class="row"><label class="f" for="eta_'+esc(q.id)+'" style="flex:1 1 220px"><span>'+esc(L("a_eta"))+'</span><input id="eta_'+esc(q.id)+'" type="text" maxlength="80" value="'+esc(q.eta||"")+'"></label><button class="btn sm" data-l="etaSave" data-id="'+esc(q.id)+'">'+esc(L("a_eta_save"))+'</button></div>':'';
+    var po=q.payout?'<div class="note"><b>'+esc(L("a_pay_payout"))+':</b> '+esc((q.payout.method==="crypto"?coinL(q.payout.coin)+" ":q.payout.method+" ")+q.payout.value+(q.payout.holder?" · "+q.payout.holder:""))+'</div>':'';
+    var links=(q.links||[]).map(function(l){return '<div class="hint" style="overflow-wrap:anywhere"><a href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.url)+'</a> · '+(l.views!=null?n(l.views):"—")+'</div>'}).join("");
+    var av=q.avatar?'<img class="rsav" src="'+esc(q.avatar)+'" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'rsav ph\',textContent:\''+esc((q.handle||"@?").charAt(1).toUpperCase())+'\'}))">':'<span class="rsav ph">'+esc((q.handle||"@?").charAt(1).toUpperCase())+'</span>';
+    var sum='<div class="accsum">'+av+'<div class="rsb"><div class="rsh"><b>'+esc(q.handle)+'</b>'+(q.internalName?'<span>'+esc(q.internalName)+'</span>':'')+'</div><div class="rsp"><span class="rstar">'+esc(starsTxt(q.stars))+'</span>'+(q.discount>0?'<span class="rsdisc">★ '+esc(L("a_bulk"))+' −'+q.discount+'%</span>':'')+'<span>'+money(q.accPrice||q.price)+' '+esc(L("pr_per"))+'</span><span>'+n(q.avgViews||0)+' '+esc(L("rs_avg"))+'</span></div>'+(q.categories&&q.categories.length?'<div>'+catPills(q.categories,"")+'</div>':'')+(q.about?'<details class="rsabout"><summary>'+esc(L("rs_about"))+'</summary><p>'+esc(q.about)+'</p></details>':'')+'</div></div>';
+    return '<div class="card ord rq-'+rGroup(q)+'">'+sum+'<div class="t"><div><b>'+esc(q.track)+'</b><span>'+esc(q.artist)+'</span></div><div class="row">'+stL(q.status)+'</div></div>'+
+      '<div class="kv"><div><b>'+money(q.price)+'</b><span>'+esc(L("a_price"))+'</span></div><div><b>'+q.videos+'</b><span>'+esc(L("rq_videos"))+'</span></div><div><b>'+money(q.cost)+'</b><span>'+esc(t("o_price"))+'</span></div></div>'+(q.overdue?'<div class="note err">'+esc(L("a_overdue"))+'</div>':'')+po+eta+links+act+cancel+'</div>';
+  }).join("");
+  return '<div class="rbar"><div class="chips" role="group">'+chips+'</div>'+sel+'</div><div class="list">'+(cards||'<div class="empty">'+esc(L(all.length?"rs_none_f":"a_no_req"))+'</div>')+'</div>';
+}
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="rFil"]');if(!el)return;LV.rFilter=el.getAttribute("data-f");renderOwner()});
+document.addEventListener("change",function(e){var t=e.target;if(t&&t.id==="rSort"){LV.rSort=t.value;renderOwner()}});
+
+Object.assign(LT.en,{pf_all:"All",pf_pending:"Waiting",pf_done:"Done",a_payments:"Payments from producers",a_editorpay:"Payouts to editors"});
+Object.assign(LT.ru,{pf_all:"Все",pf_pending:"Ждут",pf_done:"Готово",a_payments:"Платежи от продюсеров",a_editorpay:"Выплаты редакторам"});
+function payBar(key,arr){return '<div class="chips" role="group" style="margin-bottom:12px">'+arr.map(function(a){return '<button type="button" class="chip" data-l="pFil" data-key="'+key+'" data-f="'+a[0]+'" aria-pressed="'+((LV[key]||"all")===a[0])+'">'+esc(L("pf_"+a[0]))+' ('+a[1]+')</button>'}).join("")+'</div>'}
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="pFil"]');if(!el)return;LV[el.getAttribute("data-key")]=el.getAttribute("data-f");renderOwner()});
+
+/* ---- editor dashboard: list of accounts, then one account page ---- */
+Object.assign(LT.en,{ad_title:"My accounts",ad_pick:"Tap an account to open its settings.",ad_add:"+ Add another account",ad_back:"← All accounts",ad_set:"Account settings",ad_label:"Account name (only you see it)",ad_label_h:"Call it as you like, for example Vasya or Hex.",ad_tt:"Link to your TikTok account",ad_price:"Price per video",ad_disc:"Bulk deals: discount in percent",ad_disc_h:"Orders with a discount are taken first. 0 means no discount.",ad_about:"About this account",ad_about_h:"At least 8 words. Managers read this.",ad_about_min:"Write at least 8 words about the account. Managers read it.",ad_cats:"Content topics (you can change them any time)",ad_wc:"words",ad_del_t:"Delete this account",ad_del_rule:"You can delete an account only when it has no open orders. If you have open orders, finish them first.",ad_del_open:"This account has {n} open order(s). Finish them first, then you can delete it.",ad_st_approved:"Approved",ad_st_new:"Waiting for the manager",ad_st_rejected:"Not taken",ad_st_banned:"Blocked",ad_saved:"Saved",od_over:"The time is over. The order is cancelled and the money goes back to the track budget.",ref_big:"If an editor does not make the video, the money goes back to your track budget."});
+Object.assign(LT.ru,{ad_title:"Мои аккаунты",ad_pick:"Нажмите на аккаунт, чтобы открыть его настройки.",ad_add:"+ Добавить ещё аккаунт",ad_back:"← Все аккаунты",ad_set:"Настройки аккаунта",ad_label:"Название аккаунта (видите только вы)",ad_label_h:"Назовите как хотите, например Вася или Hex.",ad_tt:"Ссылка на ваш TikTok аккаунт",ad_price:"Цена за видео",ad_disc:"Bulk deals: скидка в процентах",ad_disc_h:"Заказы со скидкой берут в первую очередь. 0 значит без скидки.",ad_about:"Об этом аккаунте",ad_about_h:"Минимум 8 слов. Это читает менеджер.",ad_about_min:"Напишите об аккаунте минимум 8 слов. Это читает менеджер.",ad_cats:"Тематика контента (можно менять в любой момент)",ad_wc:"слов",ad_del_t:"Удалить этот аккаунт",ad_del_rule:"Аккаунт можно удалить, только если по нему нет открытых заказов. Если заказы открыты, сначала завершите их.",ad_del_open:"По этому аккаунту открытых заказов: {n}. Сначала завершите их, потом можно удалить.",ad_st_approved:"Одобрен",ad_st_new:"Ждёт менеджера",ad_st_rejected:"Не взяли",ad_st_banned:"Заблокирован",ad_saved:"Сохранено",od_over:"Время вышло. Заказ отменён, деньги вернулись в бюджет трека.",ref_big:"Если эдитор не сделал видео, деньги возвращаются в бюджет вашего трека."});
+LV.acc=LV.acc||null;
+function accAv(a,cls){var ch=esc((a.handle||"@?").charAt(1).toUpperCase());return a.avatar?'<img class="'+cls+'" src="'+esc(a.avatar)+'" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\''+cls+' ph\',textContent:\''+ch+'\'}))">':'<span class="'+cls+' ph">'+ch+'</span>'}
+function openOrdersOf(a){return (LV.reqs||[]).filter(function(q){return q.openId===a.id&&["approved","submitted","returned"].indexOf(q.status)>=0}).length}
+function accStPill(a){var s=a.adminStatus||"new",cls={approved:"ok",new:"warn",rejected:"bad",banned:"bad"}[s]||"";return '<span class="pill '+cls+'">'+esc(L("ad_st_"+s))+'</span>'}
+function renderDashLive(){
+  var u=S.user,oh=document.querySelector('#v-dashboard h3[data-i18n="d_orders"]');if(oh)oh.hidden=true;
+  if(!u){$("dashTitle").textContent=L("h_who");$("tiles").innerHTML='<div class="empty" style="grid-column:1/-1"><button class="btn primary" data-go="signup">'+esc(t("nav_signup"))+'</button></div>';["profCard","orders","payBox","hist","consentRow"].forEach(function(i){$(i).innerHTML=""});return}
+  var earn=0,prog=0,done=0;(LV.reqs||[]).forEach(function(q){if(q.status==="completed"){earn+=q.cost;done++}else if(q.status==="approved"||q.status==="submitted"||q.status==="returned")prog+=q.cost});
+  var cur=LV.acc&&S.accounts.filter(function(a){return a.id===LV.acc})[0];
+  $("orders").innerHTML="";$("hist").innerHTML="";$("payH2").hidden=true;
+  if(!cur){
+    LV.acc=null;$("dashTitle").textContent=L("ad_title");
+    $("tiles").innerHTML=[[money(earn),"dl_earn"],[money(prog),"dl_prog"],[done,"dl_done"]].map(function(x){return '<div class="card tile"><b>'+esc(x[0])+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("");
+    $("profCard").innerHTML='<p class="hint">'+esc(L("ad_pick"))+'</p><div class="aclist">'+S.accounts.map(function(a,i){return '<button type="button" class="acitem" data-l="accOpen" data-id="'+esc(a.id)+'" style="animation-delay:'+Math.min(i,8)*0.06+'s">'+accAv(a,"acav")+'<span class="acn"><b>'+esc(a.handle)+'</b><small>'+esc(a.internalName||L("ad_label").split(" (")[0])+(a.price?' · $'+a.price:'')+(a.discount?' · −'+a.discount+'%':'')+'</small></span>'+accStPill(a)+'<span class="acarr">›</span></button>'}).join("")+'</div><button type="button" class="btn wide" id="addAcc" style="margin-top:12px">'+esc(L("ad_add"))+'</button>';
+    $("payH1").hidden=false;
+    $("payBox").innerHTML=(u.adminStatus==="banned"?'<div class="note err">'+esc(L("d_banned"))+'</div>':(u.adminStatus!=="approved"?'<div class="note">'+esc(L("d_wait"))+'</div>':""))+payoutBlock();refreshPayBox();
+    $("consentRow").innerHTML="";return;
+  }
+  S.active=S.accounts.indexOf(cur);sync();u=S.user;
+  var A=PC.analyze(u.videos||[],Date.now()),open=openOrdersOf(u),wc=wordCount(u.about);
+  $("dashTitle").textContent=u.handle;$("tiles").innerHTML="";$("payH1").hidden=true;$("payBox").innerHTML="";
+  $("profCard").innerHTML='<button type="button" class="btn sm" data-l="accBack">'+esc(L("ad_back"))+'</button>'+
+    '<div class="achd">'+accAv(u,"acav big")+'<div><b>'+esc(u.handle)+'</b><div>'+accStPill(u)+'</div></div></div>'+
+    stepsHtml(u)+priceBig(u)+
+    '<div class="blk"><h3>'+esc(L("ad_set"))+'</h3>'+
+    '<label class="f" for="sName"><span>'+esc(L("ad_label"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"><span class="hint">'+esc(L("ad_label_h"))+'</span></label>'+
+    '<div class="f"><span>'+esc(L("ad_tt"))+'</span><a class="ttlink" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">https://www.tiktok.com/'+esc(u.handle)+'</a></div>'+
+    '<div class="f"><span>'+esc(L("ad_price"))+'</span><div class="row" style="align-items:center"><b style="font-size:20px">'+(u.price?'$'+u.price:'—')+'</b><button type="button" class="btn sm primary" id="changePrice">'+esc(L("pr_btn"))+'</button></div></div>'+
+    '<label class="f" for="sDisc"><span>'+esc(L("ad_disc"))+'</span><input id="sDisc" type="number" min="0" max="99" inputmode="numeric" value="'+(u.discount||"")+'" placeholder="0"><span class="hint">'+esc(L("ad_disc_h"))+'</span></label>'+
+    (S.accounts.length>1?'<label class="chk" for="sAll"><input type="checkbox" id="sAll"><span>'+esc(L("dl_disc_all"))+'</span></label>':'')+
+    '<label class="f" for="sAbout"><span>'+esc(L("ad_about"))+'</span><textarea id="sAbout" rows="4" maxlength="600" placeholder="'+esc(L("dl_about_ph"))+'">'+esc(u.about||"")+'</textarea><span class="hint" id="sAboutN">'+wc+' '+esc(L("ad_wc"))+' · '+esc(L("ad_about_h"))+'</span></label>'+
+    '<b>'+esc(L("ad_cats"))+'</b>'+catChecks("sCats",u.categories)+
+    '<label class="f" id="sOtherRow" for="sOther"'+((u.categories||[]).indexOf("other")>=0?'':' hidden')+'><span>'+esc(L("dl_other"))+'</span><input id="sOther" type="text" maxlength="60" value="'+esc(u.otherCategory||"")+'"></label>'+
+    '<div class="row"><button class="btn primary" data-l="saveAcc">'+esc(L("dl_save"))+'</button><span class="hint" id="sOk">'+esc(LV.ok)+'</span></div></div>'+
+    '<div class="row" style="justify-content:space-between;margin:18px 0 10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A,u)+videoTable(u)+
+    '<div class="delzone"><h3>'+esc(L("ad_del_t"))+'</h3><p class="delrule">'+esc(L("ad_del_rule"))+'</p>'+(open>0?'<div class="note err">'+esc(L("ad_del_open").replace("{n}",open))+'</div><button class="btn sm danger" disabled>'+esc(t("acc_del"))+' '+esc(u.handle)+'</button>':delBox(u))+'</div>';
+  $("consentRow").innerHTML="";
+}
+function saveAcc(){
+  var u=S.user;if(!u)return;
+  var about=val("sAbout");
+  if(about.trim()&&wordCount(about)<8){var o0=$("sOk");if(o0){o0.textContent=L("ad_about_min");o0.style.color="var(--bad)"}return}
+  var d=val("sDisc");
+  api("/api/account/update",{id:u.id,internalName:val("sName"),categories:checked("sCats"),otherCategory:val("sOther"),about:about,discount:d===""?0:Number(d),discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){
+    if(!r.ok){$("sOk").textContent=(r.j&&r.j.error)||L("p_err");return}
+    applyLive(r.j);LV.ok=L("ad_saved");renderDashLive();setTimeout(function(){LV.ok="";var e=$("sOk");if(e)e.textContent=""},2500);
+  });
+}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="accOpen"){LV.acc=el.getAttribute("data-id");renderDashLive();window.scrollTo(0,0);return}
+  if(a==="accBack"){LV.acc=null;renderDashLive();window.scrollTo(0,0);return}
+});
+document.addEventListener("click",function(e){if(e.target.closest("#delYes"))setTimeout(function(){LV.acc=null},0)},true);
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="sAbout"){var s=$("sAboutN");if(s)s.textContent=wordCount(e.target.value)+" "+L("ad_wc")+" · "+L("ad_about_h")}});
+(function(){var o=drawProd;drawProd=function(){o.apply(this,arguments);var b=$("lprodBody");if(b&&LV.prod&&!b.querySelector(".refbig"))b.insertAdjacentHTML("afterbegin",'<div class="refbig">💸 '+esc(L("ref_big"))+'</div>')}})();
+
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
 function applyLive(d){
   if(typeof LV!=="undefined")LV.payout=d.payout||{set:false};
   var oldMap={};S.accounts.forEach(function(a){oldMap[a.id]=a});
-  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0}});
+  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,avatar:a.avatar||"",internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0}});
   S.active=Math.min(S.active,Math.max(0,S.accounts.length-1));sync();save();
 }
 /* When the page is served by server.js it talks to /api; anywhere else (this preview) it stays in demo mode */

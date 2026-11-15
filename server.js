@@ -267,7 +267,7 @@ function autoStars(acc) {
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
-    internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
+    avatar: (acc.profile && acc.profile.avatar_url) || "", internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
     analysis: A, price: acc.price || null, evaluation: PC.evaluate(A, acc.price), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
@@ -289,6 +289,24 @@ function encObj(o) { const iv = crypto.randomBytes(12), c = crypto.createCipheri
 function decObj(str) { try { const [iv, tag, ct] = String(str).split(".").map(x => Buffer.from(x, "base64")), d = crypto.createDecipheriv("aes-256-gcm", PKEY(), iv); d.setAuthTag(tag); return JSON.parse(Buffer.concat([d.update(ct), d.final()]).toString("utf8")); } catch (e) { return null; } }
 function maskVal(m, v) { v = String(v); return m === "card" ? "•••• " + v.replace(/\D/g, "").slice(-4) : (m === "paypal" ? v.replace(/^(.{2}).*(@.*)$/, "$1•••$2") : v.slice(0, 4) + "…" + v.slice(-4)); }
 function payoutLabel(u) { return u.payout ? { set: true, method: u.payout.method, coin: u.payout.coin || "", label: u.payout.label } : { set: false }; }
+function deadlineDays(s){
+  s=String(s||"").trim().toLowerCase();if(!s)return null;
+  var d=s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/),e=s.match(/^(\d{1,2})[.\/](\d{1,2})(?:[.\/](\d{2,4}))?$/),dt=null;
+  if(d)dt=new Date(+d[1],+d[2]-1,+d[3]);else if(e){var y=e[3]?(+e[3]<100?2000+ +e[3]:+e[3]):new Date().getFullYear();dt=new Date(y,+e[2]-1,+e[1]);if(!e[3]&&dt<new Date())dt=new Date(y+1,+e[2]-1,+e[1])}
+  if(dt&&!isNaN(dt))return (dt-Date.now())/86400000;
+  var m=s.match(/(\d+(?:[.,]\d+)?)?\s*(week|нед|month|мес|year|год|лет|hour|час|hr|day|сут|д(?:ень|ня|ней|н))/);
+  if(!m)return NaN;
+  var q=m[1]?parseFloat(m[1].replace(",",".")):1,u=m[2],k=/^(week|нед)/.test(u)?7:/^(month|мес)/.test(u)?30:/^(year|год|лет)/.test(u)?365:/^(hour|час|hr)/.test(u)?1/24:1;
+  return q*k;
+}
+function deadlineOk(s){var v=deadlineDays(s);return v===null||(!isNaN(v)&&v>=7-1e-9)}
+/* the video was not made: the money goes back to the track budget */
+function refundReq(r) { const t = db.tracks[r.trackId]; if (t && r.approvedAt) t.spent = Math.max(0, Math.round(((t.spent || 0) - reqCost(r)) * 100) / 100); }
+function expireOverdue() {
+  let n = 0;
+  Object.values(db.requests).forEach(r => { if (["approved", "returned"].includes(r.status) && r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000) { refundReq(r); r.status = "cancelled"; r.updated = Date.now(); n++; } });
+  if (n) { saveDb(); notify(n + " order(s) expired after 16 days. The money went back to the track budget."); }
+}
 const trackLeft = t => Math.max(0, Math.round(((t.budget || 0) - (t.spent || 0)) * 100) / 100);
 function cleanCats(list) { return Array.isArray(list) ? CATEGORIES.filter(c => list.includes(c)) : []; }
 function reqCost(r) { return Math.round(r.price * r.videos * (1 - (r.discount || 0) / 100) * 100) / 100; }
@@ -300,7 +318,7 @@ function reqView(r, withAdmin) {
     internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)); if (ou && ou.payout) o.payout = decObj(ou.payout.enc); }
-  if (withAdmin && acc) { const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
+  if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
   return o;
 }
 async function refreshStale(max) {
@@ -437,6 +455,7 @@ const server = http.createServer(async (req, res) => {
     if (P === "/api/account/delete" && M === "POST") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
+      if (!need(res, !Object.values(db.requests).some(r => r.openId === acc.open_id && ["approved", "submitted", "returned"].includes(r.status)), 409, "You have open orders on this account. Finish them first.")) return;
       u.accounts = u.accounts.filter(x => x !== acc); delete db.byOpen[acc.open_id];
       Object.values(db.requests).forEach(r => { if (r.openId === acc.open_id && r.status === "pending") r.status = "cancelled"; });
       saveDb(); return send(res, 200, view(u));
@@ -573,6 +592,7 @@ const server = http.createServer(async (req, res) => {
         for (const k of ["spotify", "soundcloud", "tiktok", "mp3"]) { const v = String(src[k] || "").trim().slice(0, 400); if (v) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(v), 400, "link must start with https://")) return; const kk = classifyLink(v); if (!L[kk]) L[kk] = v; } }
         if (!need(res, Object.keys(L).length > 0 || b.willUpload, 400, "add at least one link or an mp3 file")) return;
         const plats = (Array.isArray(b.platforms) ? b.platforms : []).filter(x => PLATFORMS.includes(x));
+        if (!need(res, deadlineOk(b.deadline), 400, "The deadline must be at least 1 week (for example: 2 weeks, 1 month)")) return;
         const cats = cleanCats(b.categories);
         const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0] || "", links: L, budget: 0, spent: 0,
           platforms: plats.length ? plats : ["tiktok"], descRule: !!b.descRule, message: String(b.message || "").trim().slice(0, 600), deadline: String(b.deadline || "").trim().slice(0, 60),
@@ -698,13 +718,14 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/request" && M === "POST") {      // pending -> approved/rejected, submitted -> completed/returned
         const r = db.requests[b.id]; if (!need(res, r, 404, "no such request")) return;
         const st = b.status, from = r.status;
-        const allowed = { pending: ["approved", "rejected"], submitted: ["completed", "returned"] };
+        const allowed = { pending: ["approved", "rejected"], submitted: ["completed", "returned", "cancelled"], approved: ["cancelled"], returned: ["cancelled"] };
         if (!need(res, (allowed[from] || []).includes(st), 409, "cannot change " + from + " to " + st)) return;
         if (st === "approved") {
           const t = db.tracks[r.trackId], cost = reqCost(r);
           if (!need(res, t && t.status === "active" && trackLeft(t) >= cost, 409, "not enough budget on the track")) return;
           t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100; r.approvedAt = Date.now();
         }
+        if (st === "cancelled") refundReq(r);
         r.status = st; r.updated = Date.now(); if (st === "completed") r.completedAt = Date.now(); saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/eta" && M === "POST") {
@@ -741,4 +762,5 @@ const server = http.createServer(async (req, res) => {
 loadDb().then(() => {
   server.listen(PORT, () => console.log("Promo Campaign on " + PUBLIC_URL));
   setInterval(() => refreshStale(30).catch(e => console.error(e)), REFRESH_EVERY);
+  setInterval(() => { try { expireOverdue(); } catch (e) { console.error(e); } }, 3600e3);
 }).catch(e => { console.error("Could not load the database:", e); process.exit(1); });
