@@ -12,7 +12,7 @@
 <meta property="og:description" content="Earn from TikTok videos with artists' tracks, or promote your music with real creators.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="/icon.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Cpath%20d=%22M32%200A32%2032%200%200%201%2064%2032A32%2032%200%200%201%2032%2064H20A20%2020%200%200%201%200%2044V32A32%2032%200%200%201%2032%200Z%22%20fill=%22%23FF5C80%22/%3E%3Ccircle%20cx=%2232%22%20cy=%2232%22%20r=%2212.5%22%20fill=%22%230E1020%22/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/icon.png"><meta name="theme-color" content="#0E1020">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22g%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%236D5CFF%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23A56BFF%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20d=%22M32%200A32%2032%200%200%201%2064%2032A32%2032%200%200%201%2032%2064H20A20%2020%200%200%201%200%2044V32A32%2032%200%200%201%2032%200Z%22%20fill=%22url(%23g)%22/%3E%3Ccircle%20cx=%2232%22%20cy=%2232%22%20r=%2212.5%22%20fill=%22%2314121F%22/%3E%3C/svg%3E"><link rel="apple-touch-icon" href="/icon.png"><meta name="theme-color" content="#0E1020">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&display=swap">
 <style>
@@ -589,7 +589,7 @@ h2{font-size:clamp(24px,3vw,30px)}
 header.bar{background:color-mix(in srgb,var(--bg) 72%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);padding-block:10px}
 .bar .wrap{flex-wrap:nowrap;gap:10px}
 .logo{font-size:18px;white-space:nowrap}
-.mark{background:linear-gradient(135deg,var(--accent),#8B6CFF);box-shadow:var(--glow)}
+.mark{background:linear-gradient(135deg,#6D5CFF,#A56BFF);box-shadow:var(--glow)}
 .mark::after{background:var(--bg)}
 .lang{border:0;background:none;gap:6px;align-items:center;flex-wrap:nowrap;overflow:visible}
 .lang .langL{display:none}
@@ -693,6 +693,29 @@ body.isadmin #navSignup{display:none!important}
 
 @media (max-width:899px){#dock .dkd{display:none}}
 .supl{display:grid;gap:10px}.supb{justify-content:flex-start!important;font-size:16px;padding:14px 16px;text-decoration:none}.supb i{font-style:normal;font-size:22px}
+/* owner: left menu + right content */
+body.isadmin .wrap{max-width:1320px}
+.ownlay{display:block}
+@media (min-width:900px){
+ .ownlay{display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;align-items:start}
+ .ownside{position:sticky;top:78px;max-height:calc(100vh - 96px);overflow:auto;padding-right:2px}
+ .ownside>.row{display:block!important}
+ .ownside>.row>div{margin:0}
+ .ownside label{display:none!important}
+ .ownside .agroups{display:grid;grid-template-columns:1fr!important;grid-template-areas:none!important;gap:10px;margin:0 0 12px}
+ .ownside .agrp{grid-area:auto!important;padding:10px 10px 8px;border-radius:20px}
+ .ownside .agh{padding:2px 8px 6px;font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+ .ownside .agb{flex-direction:column;flex-wrap:nowrap;gap:2px}
+ .ownside .atb{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0!important;background:transparent!important;border-radius:13px!important;padding:10px 12px;font-size:14.5px}
+ .ownside .atb:hover{background:rgba(255,255,255,.07)!important}
+ .ownside .agrp .atb[aria-pressed="true"]{background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important;color:#fff;box-shadow:0 6px 18px rgba(109,92,255,.35)}
+ .ownside .atb .cnt{margin-left:auto}
+ .ownside .atb::before{font-size:16px;width:22px;text-align:center}
+ .ownside .atb[data-k=overview]::before{content:"📊"}.ownside .atb[data-k=promos]::before{content:"🔥"}.ownside .atb[data-k=waiting]::before{content:"⏳"}.ownside .atb[data-k=requests]::before{content:"📥"}.ownside .atb[data-k=accounts]::before{content:"👥"}.ownside .atb[data-k=editorpay]::before{content:"💸"}.ownside .atb[data-k=prices]::before{content:"🏷️"}.ownside .atb[data-k=producers]::before{content:"🎤"}.ownside .atb[data-k=payments]::before{content:"💳"}.ownside .atb[data-k=tracks]::before{content:"🎵"}.ownside .atb[data-k=pay]::before{content:"🏦"}.ownside .atb[data-k=contacts]::before{content:"📞"}
+ .ownside #admLogout{width:100%;margin-top:4px}
+ .ownmain{min-width:0}
+}
+#v-admin>h2{margin-bottom:16px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -870,7 +893,7 @@ body.isadmin #navSignup{display:none!important}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v22 · 15.11 17:50</span>
+  <span>© Promo Campaign · v23 · 15.11 18:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -3548,6 +3571,18 @@ function supOpen(){
   if(c.discord)rows.push(/^https?:\/\//i.test(c.discord)?ln(c.discord,"Discord","🎮"):'<div class="btn supb"><i>🎮</i>Discord: '+esc(c.discord)+'</div>');
   openModal('<h3>🛟 '+esc(L("sup_t"))+'</h3><p class="hint">'+esc(L("sup_h"))+'</p>'+(rows.length?'<div class="supl">'+rows.join("")+'</div>':'<div class="note">'+esc(L("sup_none"))+'</div>')+'<div class="row"><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');
 }
+
+/* ---------- owner cabinet: menu on the left, the opened section on the right ---------- */
+function ownLayout(){
+  var app=$("adApp");if(!app||!app.firstElementChild||app.querySelector(".ownlay"))return;
+  var kids=Array.prototype.slice.call(app.children),head=kids[0];
+  var lay=document.createElement("div");lay.className="ownlay";
+  var side=document.createElement("aside");side.className="ownside";side.appendChild(head);
+  var main=document.createElement("section");main.className="ownmain";kids.slice(1).forEach(function(k){main.appendChild(k)});
+  lay.appendChild(side);lay.appendChild(main);app.appendChild(lay);
+}
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{ownLayout()}catch(e){}return r}})();
+(function(){var o=autoScOn;autoScOn=function(){return window.innerWidth>=900?false:o()}})();
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
