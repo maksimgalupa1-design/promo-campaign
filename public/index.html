@@ -276,6 +276,8 @@ input[type=file]{width:100%;padding:14px;border:2px dashed #2F7BFF;border-radius
 input[type=file]:hover{background:rgba(47,123,255,.16);border-color:#7C5CFF}
 input[type=file]::file-selector-button{margin-right:14px;padding:10px 18px;border:0;border-radius:10px;background:linear-gradient(135deg,#2F7BFF,#7C5CFF);color:#fff;font:inherit;font-weight:700;cursor:pointer;transition:transform .15s,filter .15s}
 input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.bellb{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 11px;font-size:17px;cursor:pointer;margin-right:8px;transition:transform .15s}.bellb:hover{transform:rotate(-12deg) scale(1.08)}.bellb[hidden]{display:none}
+.lang{display:flex;align-items:center}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -309,7 +311,7 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
     <button class="btn primary sm" data-go="signup" id="navSignup"></button>
   </nav>
   <div class="lang" role="group" aria-label="Language">
-    <span class="langL">Language</span><select id="langSel" aria-label="Language"></select>
+    <button class="bellb" id="navBell" data-l="sndOpen" aria-label="Notifications" title="Notifications">🔔</button><span class="langL">Language</span><select id="langSel" aria-label="Language"></select>
   </div>
 </div></header>
 
@@ -1439,7 +1441,7 @@ function renderOwner(){
     }).join(""):'<div class="empty">'+esc(L("a_no_req"))+'</div>')+'</div>';
   }else if(LV.adTab==="payments"){
     body='<div class="list">'+(D.topups.length?D.topups.map(function(p){
-      return '<div class="card ord"><div class="t"><div><span>'+esc(L("a_from"))+': '+esc(p.producerName?p.producerName+" · ":"")+esc(p.producer||"")+'</span><b>'+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' 20%: '+money(Math.round(p.amount*20)/100)+'</span><span>'+esc(p.track||"")+'</span>'+(p.message?'<span class="hotnote">'+esc(p.message)+'</span>':'')+'</div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
+      return '<div class="card ord"><div class="t"><div><span>'+esc(L("a_from"))+': '+esc(p.producerName?p.producerName+" · ":"")+esc(p.producer||"")+'</span><b>'+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' 20%: '+money(Math.round(p.amount*20)/100)+'</span><span>'+esc(p.track||"")+'</span>'+(p.message?'<span class="hotnote">'+esc(p.message)+'</span>':'')+(p.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(p.deadline)+'</span>':'')+'</div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
         (p.hasProof?'<div class="row"><button class="btn sm" data-l="admProofT" data-id="'+esc(p.id)+'">'+esc(L("a_view_proof"))+'</button></div>':'')+(p.status==="pending"?'<div class="row"><button class="btn sm primary" data-l="tAct" data-id="'+esc(p.id)+'" data-s="confirmed">'+esc(L("a_confirm"))+'</button><button class="btn sm danger" data-l="tAct" data-id="'+esc(p.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>':'')+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="producers"){
@@ -1482,7 +1484,7 @@ function renderOwner(){
     body=(LV.bcMsg?'<div class="note">'+esc(LV.bcMsg)+'</div>':'')+'<div class="list">'+(tl.length?tl.map(function(t){
       var lk=["spotify","soundcloud","tiktok","mp3"].filter(function(k){return t.links&&t.links[k]}).map(function(k){return '<a class="pill" href="'+esc(t.links[k])+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join(" ");
       var act=t.status==="review"?'<div class="row"><button class="btn sm primary" data-l="trAct" data-id="'+esc(t.id)+'" data-s="approved">'+esc(L("a_approve_t"))+'</button><button class="btn sm danger" data-l="trAct" data-id="'+esc(t.id)+'" data-s="rejected">'+esc(L("a_reject_t"))+'</button></div>':(t.status==="active"?'<div class="row"><button class="btn sm primary" data-l="bcTrack" data-id="'+esc(t.id)+'">📣 '+esc(L("bc_track"))+'</button></div>':'');
-      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · Song: '+esc(t.title):'')+'</div>'+act+'</div>';
+      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · Song: '+esc(t.title):'')+'</div>'+act+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_tr"))+'</div>')+'</div>';
   }
   $("adApp").innerHTML='<div class="row" style="justify-content:space-between;margin-bottom:6px"><div class="tabs" style="margin:0">'+tabs+'</div><button class="btn sm" id="admLogout">'+esc(t("ad_logout"))+'</button></div>'+body;
@@ -1556,7 +1558,7 @@ p_name:"Your name (producer or label)",p_review:"Submit for review",p_review_not
 p_st_review:"Waiting for the manager's approval",p_st_rejected:"Rejected by the manager",p_st_active:"Approved",p_pay_now:"Approved. Pay now",
 p_platforms:"Where should the videos be posted?",pl_tiktok:"TikTok",pl_instagram:"Instagram Reels (soon)",pl_youtube:"YouTube Shorts (soon)",
 p_desc_rule:"Editors must write “Song: track name” in the video description",p_links:"Links to the track",p_links_h:"Add at least one link so editors can listen or download.",
-l_spotify:"Spotify link",l_soundcloud:"SoundCloud link",l_tiktok:"TikTok sound link",l_mp3:"MP3 download link (Google Drive, Dropbox…)",
+l_spotify:"Spotify link",l_soundcloud:"SoundCloud link",l_tiktok:"TikTok sound link",l_mp3:"MP3 download link (Google Drive, Dropbox…) — optional, you already attach the file above",
 p_other_h:"Describe the topic you want",p_coin:"Which coin",
 t_desc_rule:"Important: put “Song: {t}” in the description of every video.",t_by:"by",
 py_title:"Payment",py_h:"Where should we pay you? Without payment details and the manager's approval of your account you cannot take orders.",py_method:"Method",py_value_paypal:"PayPal email",py_value_crypto:"Wallet address",py_value_card:"Card number",py_holder:"Card holder name",py_save:"Save payment details",py_saved:"Saved",py_bad:"Check the payment details.",py_cvv:"Never enter a CVV or card password. It is not needed.",py_current:"Current",py_none:"Not set yet",py_enc:"Stored encrypted; only the manager sees it to pay you.",
@@ -1569,7 +1571,7 @@ p_name:"Ваше имя (продюсер или лейбл)",p_review:"Отпр
 p_st_review:"Ждёт одобрения менеджера",p_st_rejected:"Отклонён менеджером",p_st_active:"Одобрен",p_pay_now:"Одобрено. Оплатите",
 p_platforms:"Где должны быть выложены видео?",pl_tiktok:"TikTok",pl_instagram:"Instagram Reels (скоро)",pl_youtube:"YouTube Shorts (скоро)",
 p_desc_rule:"Редакторы должны писать «Song: название трека» в описании видео",p_links:"Ссылки на трек",p_links_h:"Добавьте хотя бы одну ссылку, чтобы редакторы могли послушать или скачать.",
-l_spotify:"Ссылка Spotify",l_soundcloud:"Ссылка SoundCloud",l_tiktok:"Ссылка на звук в TikTok",l_mp3:"Ссылка на скачивание MP3 (Google Drive, Dropbox…)",
+l_spotify:"Ссылка Spotify",l_soundcloud:"Ссылка SoundCloud",l_tiktok:"Ссылка на звук в TikTok",l_mp3:"Ссылка на скачивание MP3 (Google Drive, Dropbox…) — необязательно, файл уже прикреплён выше",
 p_other_h:"Опишите, какая тематика нужна",p_coin:"Какая монета",
 t_desc_rule:"Важно: в описании каждого видео напишите «Song: {t}».",t_by:"от",
 py_title:"Оплата",py_h:"Куда вам платить? Без реквизитов и без одобрения вашего аккаунта менеджером брать заказы нельзя.",py_method:"Способ",py_value_paypal:"Email PayPal",py_value_crypto:"Адрес кошелька",py_value_card:"Номер карты",py_holder:"Имя владельца карты",py_save:"Сохранить реквизиты",py_saved:"Сохранено",py_bad:"Проверьте реквизиты.",py_cvv:"Никогда не вводите CVV и пароль от карты. Они не нужны.",py_current:"Сейчас",py_none:"Пока не указано",py_enc:"Хранятся в зашифрованном виде; видит только менеджер, чтобы вам заплатить.",
@@ -1616,7 +1618,7 @@ function drawProd(){
   $("lprodBody").innerHTML='<div class="row" style="justify-content:space-between"><h2>'+esc(L("p_tracks"))+'</h2><div class="row"><span class="hint">'+esc(P.name?P.name+" · ":"")+esc(P.email)+'</span><button class="btn sm" data-l="pOut">'+esc(L("p_logout"))+'</button></div></div>'+
     '<div class="list" style="margin-top:14px">'+(P.tracks.length?P.tracks.map(function(t){
       var stc={review:"warn",active:"ok",rejected:"bad"}[t.status]||"";
-      var pays=(t.status==="active"&&t.topups&&t.topups.length)?t.topups.map(function(tp){return '<div><b>'+esc(L("p_pay_now"))+': '+money(tp.amount)+'</b>'+payBoxHtml(tp.method,tp.amount,tp.coin)+(tp.proof?'<div class="note">'+esc(L("p_proof_sent"))+'</div>':'')+'<label class="f" for="ps_'+esc(tp.id)+'"><span>'+esc(L("p_proof_pick"))+'</span><input id="ps_'+esc(tp.id)+'" type="file" accept="image/*"></label><div class="note err" id="pe_'+esc(tp.id)+'" hidden></div><button class="btn sm primary" data-l="proofSend" data-id="'+esc(tp.id)+'">'+esc(L("p_proof_send"))+'</button></div>'}).join(""):'';
+      var pays=(t.status==="active"&&t.topups&&t.topups.length)?t.topups.map(function(tp){return '<div><b>'+esc(L("p_pay_now"))+': '+money(tp.amount)+'</b>'+payBoxHtml(tp.method,tp.amount,tp.coin)+(tp.proof?'<div class="note">'+esc(L("p_proof_sent"))+'</div>':'')+'<label class="f" for="ps_'+esc(tp.id)+'"><span>'+esc(L("p_proof_pick"))+'</span><input id="ps_'+esc(tp.id)+'" type="file" accept="image/*,application/pdf,.pdf"></label><div class="note err" id="pe_'+esc(tp.id)+'" hidden></div><button class="btn sm primary" data-l="proofSend" data-id="'+esc(tp.id)+'">'+esc(L("p_proof_send"))+'</button></div>'}).join(""):'';
       return '<div class="card ord"><div class="t"><div><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span><span class="pill '+stc+'">'+esc(L("p_st_"+t.status))+'</span></div><div class="row">'+(t.status==="active"?'<button class="btn sm" data-l="pTop" data-id="'+esc(t.id)+'">'+esc(L("p_addb"))+'</button>':'')+'<button class="btn sm danger" data-l="pDel" data-id="'+esc(t.id)+'">'+esc(L("p_del"))+'</button></div></div>'+
         '<div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div>'+
         '<div>'+catPills(t.categories,t.otherCategory)+(t.hasMp3?' <span class="pill ok">MP3</span>':'')+'</div>'+pays+'</div>';
@@ -1632,10 +1634,10 @@ function drawProd(){
     '<label class="f" for="nMethod"><span>'+esc(L("p_method"))+'</span><select id="nMethod">'+methodOpts("paypal")+'</select></label>'+
     '<label class="f" id="nCoinRow" for="nCoin" hidden><span>'+esc(L("p_coin"))+'</span><select id="nCoin">'+coinOpts("solana")+'</select></label>'+
     '<div id="nPayBox">'+payBoxHtml("paypal",0,"solana",true)+'</div>'+
-    '<label class="f" for="nProof"><span>'+esc(L("p_attach"))+'</span><input id="nProof" type="file" accept="image/*"></label><p class="hint">'+esc(L("p_attach_h"))+'</p>'+
+    '<label class="f" for="nProof"><span>'+esc(L("p_attach"))+'</span><input id="nProof" type="file" accept="image/*,application/pdf,.pdf"></label><p class="hint">'+esc(L("p_attach_h"))+'</p>'+
     '<details class="card" open><summary><b>'+esc(L("p_links"))+'</b></summary><p class="hint">'+esc(L("p_links_h"))+'</p><label class="f" for="nMp3"><span>'+esc(L("p_mp3_file"))+'</span><input id="nMp3" type="file" accept=".mp3,audio/mpeg"></label>'+
     ["spotify","soundcloud","tiktok","mp3"].map(function(k){return '<label class="f" for="nl_'+k+'"><span>'+esc(L("l_"+k))+'</span><input id="nl_'+k+'" type="text" inputmode="url" placeholder="https://"></label>'}).join("")+'</details>'+
-    '<label class="f" for="nMsg"><span>'+esc(L("p_msg"))+'</span><textarea id="nMsg" rows="3" maxlength="600" placeholder="'+esc(L("p_msg_ph"))+'"></textarea></label>'+
+    '<label class="f" for="nDeadline"><span>'+esc(L("p_deadline"))+'</span><input id="nDeadline" type="text" maxlength="60" placeholder="'+esc(L("p_deadline_ph"))+'"></label><p class="hint">'+esc(L("p_deadline_h"))+'</p><label class="f" for="nMsg"><span>'+esc(L("p_msg"))+'</span><textarea id="nMsg" rows="3" maxlength="600" placeholder="'+esc(L("p_msg_ph"))+'"></textarea></label>'+
     '<p class="hint">'+esc(L("p_review_note"))+'</p>'+
     '<div class="note err" id="nErr" hidden></div>'+
     '<div><button class="btn primary" data-l="pAdd">'+esc(L("p_review"))+'</button></div></div>';
@@ -1669,7 +1671,7 @@ document.addEventListener("click",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
   if(a==="pAdd"){
     var links={};["spotify","soundcloud","tiktok","mp3"].forEach(function(k){var v=val("nl_"+k);if(v)links[k]=v});
-    var b={title:val("nTitle"),artist:val("nArtist"),links:links,budget:Number(val("nBudget")),method:val("nMethod"),coin:val("nCoin"),categories:checked("nCats"),otherCategory:val("nOther"),platforms:checked("nPlat"),descRule:!!($("nDesc")&&$("nDesc").checked),message:val("nMsg")};
+    var b={title:val("nTitle"),artist:val("nArtist"),links:links,budget:Number(val("nBudget")),method:val("nMethod"),coin:val("nCoin"),categories:checked("nCats"),otherCategory:val("nOther"),platforms:checked("nPlat"),descRule:!!($("nDesc")&&$("nDesc").checked),message:val("nMsg"),deadline:val("nDeadline")};
     var ne=$("nErr");function bad(m){ne.textContent=m;ne.hidden=false}
     if(!b.title){bad(L("p_bad"));return}
     if(!(b.budget>=100)){bad(L("p_min100"));return}
@@ -1689,7 +1691,7 @@ document.addEventListener("click",function(e){
       }
       function stepProof(){
         if(!pf||!mine.topups||!mine.topups[0])return Promise.resolve();
-        return new Promise(function(res){shrinkImage(pf,function(img){if(!img){res();return}api("/api/producer/proof",{id:mine.topups[0].id,image:img}).then(function(u){if(u.ok)LV.prod=u.j;res()})})});
+        return new Promise(function(res){proofFile(pf,function(img){if(!img){res();return}api("/api/producer/proof",{id:mine.topups[0].id,image:img}).then(function(u){if(u.ok)LV.prod=u.j;res()})})});
       }
       stepMp3().then(stepProof).then(function(){drawProd()}).catch(function(){drawProd()});
     });return}
@@ -1715,8 +1717,8 @@ function payAllHtml(P){
 
 function payAllHtml(){return ""}
 /* ===== round 3: payment timeline, screenshots, eta, ban ===== */
-Object.assign(LT.en,{p_proof_pick:"Screenshot or photo of your payment",p_proof_send:"I paid, send screenshot",p_proof_sent:"Screenshot sent. The manager will check your payment.",p_proof_bad:"Choose an image file first.",tl_sent:"Request sent",tl_ok:"Account checked, request approved",tl_link:"Video link sent",tl_acc:"Video accepted",tl_way:"Payment on the way",tl_paid:"Paid",tl_eta:"Expected",tl_proof:"View payment screenshot",tl_overdue:"The deadline has passed. Send the video link or the account will be banned.",tl_rej:"Request rejected",tl_ret:"Returned: fix the video and send the link again",d_banned:"Your account is banned for breaking the terms. Contact the manager.",a_ban:"Ban",a_eta:"Payment expected (date or note)",a_eta_save:"Save",a_overdue:"Overdue",a_proof_pick:"Payment screenshot (optional)",a_view_proof:"View screenshot",a_banned:"banned",a_close:"Close"});
-Object.assign(LT.ru,{p_proof_pick:"Скриншот или фото вашей оплаты",p_proof_send:"Я оплатил, отправить скриншот",p_proof_sent:"Скриншот отправлен. Менеджер проверит вашу оплату.",p_proof_bad:"Сначала выберите файл-картинку.",tl_sent:"Заявка отправлена",tl_ok:"Аккаунт проверен, заявка одобрена",tl_link:"Ссылка на видео отправлена",tl_acc:"Видео принято",tl_way:"Оплата в пути",tl_paid:"Оплачено",tl_eta:"Ожидается",tl_proof:"Посмотреть скриншот оплаты",tl_overdue:"Срок прошёл. Отправьте ссылку на видео, иначе аккаунт будет заблокирован.",tl_rej:"Заявка отклонена",tl_ret:"Возвращено: исправьте видео и отправьте ссылку снова",d_banned:"Ваш аккаунт заблокирован за нарушение условий. Свяжитесь с менеджером.",a_ban:"Заблокировать",a_eta:"Когда ожидается оплата (дата или заметка)",a_eta_save:"Сохранить",a_overdue:"Просрочено",a_proof_pick:"Скриншот оплаты (по желанию)",a_view_proof:"Показать скриншот",a_banned:"заблокирован",a_close:"Закрыть"});
+Object.assign(LT.en,{p_proof_pick:"Proof of payment (screenshot, photo or PDF)",p_proof_send:"I paid, send screenshot",p_proof_sent:"Screenshot sent. The manager will check your payment.",p_proof_bad:"Choose an image or PDF file (max 1 MB) first.",tl_sent:"Request sent",tl_ok:"Account checked, request approved",tl_link:"Video link sent",tl_acc:"Video accepted",tl_way:"Payment on the way",tl_paid:"Paid",tl_eta:"Expected",tl_proof:"View payment screenshot",tl_overdue:"The deadline has passed. Send the video link or the account will be banned.",tl_rej:"Request rejected",tl_ret:"Returned: fix the video and send the link again",d_banned:"Your account is banned for breaking the terms. Contact the manager.",a_ban:"Ban",a_eta:"Payment expected (date or note)",a_eta_save:"Save",a_overdue:"Overdue",a_proof_pick:"Payment screenshot (optional)",a_view_proof:"View screenshot",a_banned:"banned",a_close:"Close"});
+Object.assign(LT.ru,{p_proof_pick:"Подтверждение оплаты (скриншот, фото или PDF)",p_proof_send:"Я оплатил, отправить скриншот",p_proof_sent:"Скриншот отправлен. Менеджер проверит вашу оплату.",p_proof_bad:"Сначала выберите файл-картинку.",tl_sent:"Заявка отправлена",tl_ok:"Аккаунт проверен, заявка одобрена",tl_link:"Ссылка на видео отправлена",tl_acc:"Видео принято",tl_way:"Оплата в пути",tl_paid:"Оплачено",tl_eta:"Ожидается",tl_proof:"Посмотреть скриншот оплаты",tl_overdue:"Срок прошёл. Отправьте ссылку на видео, иначе аккаунт будет заблокирован.",tl_rej:"Заявка отклонена",tl_ret:"Возвращено: исправьте видео и отправьте ссылку снова",d_banned:"Ваш аккаунт заблокирован за нарушение условий. Свяжитесь с менеджером.",a_ban:"Заблокировать",a_eta:"Когда ожидается оплата (дата или заметка)",a_eta_save:"Сохранить",a_overdue:"Просрочено",a_proof_pick:"Скриншот оплаты (по желанию)",a_view_proof:"Показать скриншот",a_banned:"заблокирован",a_close:"Закрыть"});
 function tlHtml(q){
   if(q.status==="rejected"||q.status==="cancelled")return '<div class="note err">'+esc(L("tl_rej"))+'</div>';
   var cur=0;
@@ -1736,12 +1738,19 @@ function tlHtml(q){
   if(q.overdue)html+='<div class="note err">'+esc(L("tl_overdue"))+'</div>';
   return html;
 }
+function proofFile(file,cb){
+  if(file&&(file.type==="application/pdf"||/\.pdf$/i.test(file.name||""))){
+    if(file.size>1000000){cb(null);return}
+    var fr=new FileReader();fr.onload=function(){var s=String(fr.result||"");cb(s.indexOf("data:application/pdf")===0?s:null)};fr.onerror=function(){cb(null)};fr.readAsDataURL(file);return}
+  shrinkImage(file,cb)}
 function shrinkImage(file,cb){
   var fr=new FileReader();
   fr.onload=function(){var im=new Image();im.onload=function(){var m=900,w=im.width,h=im.height,k=Math.min(1,m/Math.max(w,h)),c=document.createElement("canvas");c.width=Math.round(w*k);c.height=Math.round(h*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",0.6))};im.onerror=function(){cb(null)};im.src=fr.result};
   fr.onerror=function(){cb(null)};fr.readAsDataURL(file);
 }
-function showImage(src){openModal('<img src="'+esc(src)+'" alt="" style="max-width:100%;border-radius:12px"><div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("a_close"))+'</button></div>')}
+function showImage(src){
+  if(String(src).indexOf("data:application/pdf")===0){try{var bin=atob(src.split(",")[1]),u=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);var url=URL.createObjectURL(new Blob([u],{type:"application/pdf"}));openModal('<p><a class="btn primary" href="'+url+'" target="_blank" rel="noopener">PDF ⬇</a></p><div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("a_close"))+'</button></div>')}catch(e){}return}
+  openModal('<img src="'+esc(src)+'" alt="" style="max-width:100%;border-radius:12px"><div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("a_close"))+'</button></div>')}
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
   if(a==="showProof"){e.preventDefault();api("/api/request/proof?id="+encodeURIComponent(id)).then(function(r){if(r.ok&&r.j.image)showImage(r.j.image)});return}
@@ -1770,7 +1779,7 @@ document.addEventListener("click",function(e){
   if(a==="proofSend"){
     var inp=$("ps_"+id),f=inp&&inp.files&&inp.files[0],er=$("pe_"+id);
     if(!f){er.textContent=L("p_proof_bad");er.hidden=false;return}
-    shrinkImage(f,function(img){if(!img){er.textContent=L("p_proof_bad");er.hidden=false;return}
+    proofFile(f,function(img){if(!img){er.textContent=L("p_proof_bad");er.hidden=false;return}
       api("/api/producer/proof",{id:id,image:img}).then(function(r){if(!r.ok){er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false;return}LV.prod=r.j;drawProd()})});return}
   if(a==="admProofT"){api("/api/admin/proof?id="+encodeURIComponent("t"+id)).then(function(r){if(r.ok&&r.j.image)showImage(r.j.image)});return}
 });
@@ -1804,12 +1813,13 @@ Object.assign(LT.ru,{p_msg:"Сообщение менеджеру (необяз�
 var CONTACTS=null;
 function loadContacts(){fetch("/api/contacts",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){CONTACTS=j;contactBtn()}).catch(function(){})}
 function contactBtn(){
+  var bl=$("navBell");if(bl)bl.hidden=!LIVE;
   if(!LIVE)return;var el=$("ctFloat");
   var off=/^#admin/.test(location.hash),c=CONTACTS||{};
   if(!el){el=document.createElement("div");el.id="ctFloat";el.className="ctfloat";document.body.appendChild(el)}
   var tgU=c.telegram?(/^https?:\/\//i.test(c.telegram)?c.telegram:'https://t.me/'+c.telegram.replace(/^@/,'')):'',tg=tgU?'<a class="btn sm ct-tg" href="'+esc(tgU)+'" target="_blank" rel="noopener noreferrer">Telegram</a>':"",dc=c.discord&&/^https?:\/\//.test(c.discord)?'<a class="btn sm ct-dc" href="'+esc(c.discord)+'" target="_blank" rel="noopener noreferrer">Discord</a>':(c.discord?'<span class="pill">Discord: '+esc(c.discord)+'</span>':"");
   var ig=c.instagram?'<a class="btn sm ct-ig" href="'+esc(c.instagram)+'" target="_blank" rel="noopener noreferrer">Instagram</a>':"",tk=c.tiktok?'<a class="btn sm ct-tk" href="'+esc(c.tiktok)+'" target="_blank" rel="noopener noreferrer">TikTok</a>':"";tg+=ig+tk;el.hidden=off||!(tg||dc||roleGet());
-  el.innerHTML='<div id="ctBox" hidden><b>'+esc(L("ct_title"))+'</b><div class="row">'+tg+dc+'</div></div><div class="row" style="justify-content:flex-end"><button class="btn" data-l="sndOpen" aria-label="'+esc(L("a_notif"))+'">🔔</button>'+((tg||dc)?'<button class="btn primary" data-l="ctToggle">💬 '+esc(L("ct_btn"))+'</button>':'')+'</div>';
+  el.innerHTML='<div id="ctBox" hidden><b>'+esc(L("ct_title"))+'</b><div class="row">'+tg+dc+'</div></div><div class="row" style="justify-content:flex-end">'+((tg||dc)?'<button class="btn primary" data-l="ctToggle">💬 '+esc(L("ct_btn"))+'</button>':'')+'</div>';
 }
 loadContacts();
 function wordCount(s){return (String(s||"").trim().match(/\S+/g)||[]).length}
@@ -1836,7 +1846,7 @@ function fillFlows(){
   });
 }
 /* ---- sounds ---- */
-var SNDS={ping:"Ping",chime:"Chime",bell:"Bell",drum:"Drum",pop:"Pop",none:"Silent"};
+var SNDS={ping:"Ping",chime:"Chime",bell:"Bell",marimba:"Marimba",harp:"Harp",glass:"Glass",coin:"Coin",dingdong:"Ding dong",sparkle:"Sparkle",soft:"Soft",musicbox:"Music box",piano:"Piano",windchime:"Wind chime",bubble:"Bubble",dream:"Dream",bloom:"Bloom",happy:"Happy",crystal:"Crystal",drum:"Drum",pop:"Pop",none:"Silent"};
 function sndGet(){try{return localStorage.getItem("psnd")||"ping"}catch(e){return "ping"}}
 function sndSet(k){try{localStorage.setItem("psnd",k)}catch(e){}}
 function playSound(k){
@@ -1848,6 +1858,21 @@ function playSound(k){
     if(k==="bell"){tone(523,0,1.1,"sine",.2);tone(1046,0,0.9,"sine",.12);tone(1568,0,0.6,"sine",.08)}
     if(k==="drum"){var o=c.createOscillator(),g=c.createGain();o.frequency.setValueAtTime(160,t0);o.frequency.exponentialRampToValueAtTime(50,t0+0.25);o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(0.6,t0);g.gain.exponentialRampToValueAtTime(0.0001,t0+0.3);o.start();o.stop(t0+0.35)}
     if(k==="pop"){tone(420,0,0.08,"square",.15);tone(640,0.07,0.1,"square",.15)}
+    if(k==="marimba"){[523,659,784].forEach(function(f,i){tone(f,i*0.12,0.35,"triangle",.3);tone(f*4,i*0.12,0.08,"sine",.06)})}
+    if(k==="harp"){[392,494,587,784,988].forEach(function(f,i){tone(f,i*0.09,0.9,"sine",.18);tone(f*2,i*0.09,0.4,"sine",.05)})}
+    if(k==="glass"){tone(1318,0,1.2,"sine",.14);tone(1976,0.02,0.9,"sine",.07);tone(2637,0.04,0.6,"sine",.04)}
+    if(k==="coin"){tone(988,0,0.08,"square",.1);tone(1319,0.08,0.45,"square",.1)}
+    if(k==="dingdong"){tone(784,0,0.7,"sine",.22);tone(587,0.38,0.9,"sine",.22)}
+    if(k==="sparkle"){[1568,1976,2349,2637,3136].forEach(function(f,i){tone(f,i*0.06,0.35,"sine",.08)})}
+    if(k==="musicbox"){[1047,1319,1568,2093,1568,1319].forEach(function(f,i){tone(f,i*0.16,0.5,"sine",.12);tone(f*2,i*0.16,0.15,"sine",.03)})}
+    if(k==="piano"){[[523,0],[659,0.14],[784,0.28],[1047,0.46]].forEach(function(n){tone(n[0],n[1],1.1,"triangle",.2);tone(n[0]*2,n[1],0.35,"sine",.05)})}
+    if(k==="windchime"){[2093,1760,2349,1976,2637,1568].forEach(function(f,i){tone(f,i*0.11,1.0,"sine",.07)})}
+    if(k==="bubble"){[500,700,950].forEach(function(f,i){tone(f,i*0.1,0.12,"sine",.2);tone(f*1.5,i*0.1+0.02,0.08,"sine",.06)})}
+    if(k==="dream"){[262,330,392,523].forEach(function(f,i){tone(f,i*0.2,1.6,"sine",.1)});tone(1047,0.6,1.2,"sine",.04)}
+    if(k==="bloom"){[392,523,659,784,1047].forEach(function(f,i){tone(f,i*0.07,1.2,"triangle",.1)})}
+    if(k==="happy"){[523,659,784,659,1047].forEach(function(f,i){tone(f,i*0.1,0.3,"triangle",.17)})}
+    if(k==="crystal"){[2093,2637,3136,3951].forEach(function(f,i){tone(f,i*0.09,1.0,"sine",.06);tone(f*0.5,i*0.09,0.5,"sine",.04)})}
+    if(k==="soft"){tone(440,0,0.8,"sine",.14);tone(554,0.15,0.9,"sine",.12);tone(659,0.3,1.1,"sine",.1)}
   }catch(e){}
 }
 function toast(msg){var el=$("toastBox");if(!el){el=document.createElement("div");el.id="toastBox";el.className="toast";document.body.appendChild(el)}
@@ -1903,7 +1928,7 @@ function drawLCamps(){
     if(t.hasMp3)links+='<a class="plink" style="--c:#6B5CFF" href="/api/track/mp3?id='+esc(t.id)+'">⬇ MP3</a>';
     if(!links&&t.link)links='<a class="plink" style="--c:#6B5CFF" href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer">▶ Link</a>';
     return '<article class="tcard" style="animation-delay:'+Math.min(i,8)*0.07+'s"><div class="tcover" style="'+coverStyle(t)+'"><span class="tnote">♪</span><span class="tinit">'+esc((t.title||"?").charAt(0).toUpperCase())+'</span></div><div class="tbody"><div class="tname">'+esc(t.title)+'</div><div class="tby">'+esc(t.artist)+(t.producerName?' · '+esc(L("t_by"))+' '+esc(t.producerName):'')+'</div><div class="tcats">'+catPills(t.categories,t.otherCategory)+'</div><div class="tlinks">'+links+'</div>'+
-      (t.descRule?'<div class="trule">📝 '+esc(L("t_desc_rule").replace("{t}",t.title))+'</div>':'')+
+      (t.deadline?'<div class="trule">⏰ '+esc(L("t_deadline"))+': <b>'+esc(t.deadline)+'</b></div>':'')+(t.descRule?'<div class="trule">📝 '+esc(L("t_desc_rule").replace("{t}",t.title))+'</div>':'')+
       '<button class="btn primary tgo" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></div></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
 }
@@ -1918,7 +1943,7 @@ Object.assign(LT.ru,{fl1:"Регистрация через TikTok",fl1h:"Под
 function clamp01(v){return Math.max(0,Math.min(1,v))}
 function breakdown(A,u){
   var vids=((u&&u.videos)||[]).filter(function(v){return v.created>=Date.now()-30*86400000}).sort(function(a,b){return a.created-b.created}).slice(-30);
-  var perWeek=A.month.videos/(30/7),avg=A.refAvg||0;
+  var perWeek=Math.floor(A.month.videos/(30/7)+1e-9),avg=A.refAvg||0;
   var above=vids.length?vids.filter(function(v){return v.views>=10000}).length/vids.length:0;
   var tv=0,tl=0,hasL=false;vids.forEach(function(v){tv+=v.views;if(v.likes!=null&&v.likes>0)hasL=true;tl+=v.likes||0});
   var likeP=hasL&&tv?tl/tv*100:null,price=u&&u.price,cpm=price&&avg?price/avg*1000:null;
@@ -1926,7 +1951,7 @@ function breakdown(A,u){
     {k:"cr_views",w:30,v:clamp01(Math.log(Math.max(avg,1)/1000)/Math.log(30)),txt:n(avg)},
     {k:"cr_stable",w:27,v:above,txt:Math.round(above*100)+"% ≥ 10K"},
     {k:"cr_price",w:21,v:cpm===null?0.5:clamp01((0.15-cpm)/0.11),txt:cpm===null?"—":"$"+cpm.toFixed(2)+" / 1K"},
-    {k:"cr_freq",w:12,v:clamp01(perWeek/7),txt:perWeek.toFixed(1)+" / "+L("an_week")},
+    {k:"cr_freq",w:12,v:clamp01(Math.max(perWeek,A.month.videos>0?0.5:0)/7),txt:(perWeek<1&&A.month.videos>0?"<1":perWeek)+" / "+L("an_week")},
     {k:"cr_fresh",w:10,v:A.lastDaysAgo===null?0:clamp01(1-A.lastDaysAgo/7),txt:A.lastDaysAgo===null?"—":(A.lastDaysAgo===0?L("an_today"):L("an_ago").replace("{n}",A.lastDaysAgo))}];
   var score=Math.round(parts.reduce(function(s,p){return s+p.w*p.v},0));
   return {vids:vids,perWeek:perWeek,avg:avg,likeP:likeP,parts:parts,score:score};
@@ -1938,7 +1963,7 @@ function winTable(A,u){
   var bars=B.vids.map(function(v,i){var h=Math.max(4,v.views/mx*100);return '<i class="'+(v.views>=10000?'':'lo')+'" style="--h:'+h+'%;animation-delay:'+(i*0.03)+'s" title="'+esc(fmtDate(v.created)+" · "+n(v.views))+'"></i>'}).join("");
   return '<div class="acard"><div class="achead"><b>'+esc(L("an_title"))+'</b><button type="button" class="algob" data-l="algoToggle">'+esc(L("an_algo"))+' ›</button></div>'+
    '<div class="acmain"><div class="ring" data-s="'+B.score+'" style="--c:'+col+'"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="rbg"/><circle cx="60" cy="60" r="52" class="rfg" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+C.toFixed(1)+'" data-c="'+C.toFixed(1)+'"/></svg><div class="rnum"><b>0</b><small>'+esc(L("an_of"))+'</small></div></div>'+
-   '<div class="acrows"><div><span>'+esc(L("an_freq"))+'</span><b>'+B.perWeek.toFixed(B.perWeek<10?1:0)+' '+esc(L("an_week"))+'</b></div><div><span>'+esc(L("an_views"))+'</span><b>'+n(B.avg)+'</b></div>'+(B.likeP!==null&&B.likeP>=0.1?'<div><span>'+esc(L("an_likes"))+'</span><b>'+B.likeP.toFixed(1)+'%</b></div>':'')+'<div><span>'+esc(L("an_last"))+'</span><b>'+esc(last)+'</b></div></div></div>'+
+   '<div class="acrows"><div><span>'+esc(L("an_freq"))+'</span><b>'+(B.perWeek<1&&A.month.videos>0?'&lt;1':B.perWeek)+' '+esc(L("an_week"))+'</b></div><div><span>'+esc(L("an_views"))+'</span><b>'+n(B.avg)+'</b></div>'+(B.likeP!==null&&B.likeP>=0.1?'<div><span>'+esc(L("an_likes"))+'</span><b>'+B.likeP.toFixed(1)+'%</b></div>':'')+'<div><span>'+esc(L("an_last"))+'</span><b>'+esc(last)+'</b></div></div></div>'+
    '<div class="abars">'+(bars||'<div class="hint">'+esc(t("v_none"))+'</div>')+(bars?'<span class="aline" style="bottom:'+lineY.toFixed(1)+'%"><em>10K</em></span>':'')+'</div>'+
    '<p class="hint">'+esc(L("an_checked"))+'</p>'+
    '<div class="algo" hidden><h4>'+esc(L("an_algo"))+'</h4><p class="hint">'+esc(L("an_algo_h"))+'</p>'+B.parts.map(function(p){return '<div class="cr"><div><span>'+esc(L(p.k))+' · '+p.w+'%</span><b>'+esc(p.txt)+'</b></div><div class="crbar"><i style="--w:'+Math.round(p.v*100)+'%"></i></div></div>'}).join("")+'</div></div>';
@@ -1965,8 +1990,14 @@ Object.assign(LT.en,{p_min100:"The minimum budget is $100.",p_where:"Where to se
 Object.assign(LT.ru,{p_min100:"Минимальный бюджет $100.",p_where:"Куда отправлять деньги",p_where_h:"Отправьте платёж на любой из этих реквизитов. Потом приложите скриншот под своим треком.",p_review_wait:"Ваш трек ждёт одобрения. Когда менеджер его одобрит, здесь появятся реквизиты для оплаты."});
 Object.assign(LT.en,{p_fee_short:"The 20% is payment for the promoter's work."});
 Object.assign(LT.ru,{p_fee_short:"20% это плата за работу промоутера."});
-Object.assign(LT.en,{p_recipient:"Recipient",p_cardno:"Card number",p_send_to:"Send the money here",p_attach:"Attach a screenshot of your payment",p_attach_h:"After you pay, attach the screenshot here. You can also add it later under your track.",p_too_small:"Too small. The minimum budget is $100."});
-Object.assign(LT.ru,{p_recipient:"Получатель",p_cardno:"Номер карты",p_send_to:"Отправьте деньги сюда",p_attach:"Прикрепите скриншот оплаты",p_attach_h:"После оплаты прикрепите скриншот здесь. Его можно добавить и позже, под своим треком.",p_too_small:"Слишком мало. Минимальный бюджет $100."});
+Object.assign(LT.en,{p_recipient:"Recipient",p_cardno:"Card number",p_send_to:"Send the money here",p_attach:"Attach proof of payment (screenshot, photo or PDF receipt)",p_attach_h:"After you pay, attach the file here. You can also add it later under your track.",p_too_small:"Too small. The minimum budget is $100."});
+Object.assign(LT.ru,{p_recipient:"Получатель",p_cardno:"Номер карты",p_send_to:"Отправьте деньги сюда",p_attach:"Прикрепите подтверждение оплаты (скриншот, фото или PDF-чек)",p_attach_h:"После оплаты прикрепите файл здесь. Его можно добавить и позже, под своим треком.",p_too_small:"Слишком мало. Минимальный бюджет $100."});
+Object.assign(LT.en,{p_deadline:"Deadline for the videos (optional)",p_deadline_ph:"for example: 2 weeks, 1 month",p_deadline_h:"Write it as you like, in words. We recommend at least 2 weeks so editors have time to make good videos.",t_deadline:"Deadline",p_review_note:"Fill in the track, send the payment and attach the screenshot. We check the payment and the track. After that the track goes live for editors."});
+Object.assign(LT.ru,{p_deadline:"Срок на видео (необязательно)",p_deadline_ph:"например: 2 недели, 1 месяц",p_deadline_h:"Пишите как удобно, словами. Мы советуем минимум 2 недели, чтобы редакторы успели сделать хорошие видео.",t_deadline:"Срок",p_review_note:"Заполните трек, отправьте оплату и приложите скриншот. Мы проверим платёж и трек. После этого трек станет виден редакторам."});
+Object.assign(LT.en,{snd_marimba:"Marimba",snd_harp:"Harp",snd_glass:"Glass",snd_coin:"Coin",snd_dingdong:"Ding dong",snd_sparkle:"Sparkle",snd_soft:"Soft"});
+Object.assign(LT.ru,{snd_marimba:"Маримба",snd_harp:"Арфа",snd_glass:"Стекло",snd_coin:"Монетка",snd_dingdong:"Динь-дон",snd_sparkle:"Искры",snd_soft:"Мягкий"});
+Object.assign(LT.en,{snd_musicbox:"Music box",snd_piano:"Piano",snd_windchime:"Wind chime",snd_bubble:"Bubble",snd_dream:"Dream",snd_bloom:"Bloom",snd_happy:"Happy",snd_crystal:"Crystal"});
+Object.assign(LT.ru,{snd_musicbox:"Музыкальная шкатулка",snd_piano:"Пианино",snd_windchime:"Музыка ветра",snd_bubble:"Пузырьки",snd_dream:"Мечта",snd_bloom:"Цветение",snd_happy:"Радость",snd_crystal:"Хрусталь"});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
