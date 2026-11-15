@@ -454,6 +454,7 @@ const server = http.createServer(async (req, res) => {
       const since = Number(new URL(req.url, "http://x").searchParams.get("since")) || 0;
       return send(res, 200, { now: Date.now(), items: (db.settings.inbox || []).filter(x => x.at > since).slice(-5).map(x => ({ id: x.id, at: x.at, audience: x.audience, title: x.title, text: x.text, url: x.url })) });
     }
+    if (P === "/api/price-ranges" && M === "GET") return send(res, 200, { ranges: db.settings.ranges || { visual: { min: 3, max: 5 } } });
     if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "" }); }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
@@ -624,6 +625,11 @@ const server = http.createServer(async (req, res) => {
         const plan = cands.filter(c => c.n > 0).sort((x, y) => y.n - x.n || y.score - x.score).map(c => ({ id: c.id, handle: c.handle, videos: c.n, price: c.price, discount: c.discount, unit: c.unit, cost: Math.round(c.n * c.unit * 100) / 100, expViews: Math.round(c.n * c.exp), stars: c.stars }));
         const spent = Math.round((budget - rem) * 100) / 100;
         return send(res, 200, { track: t.title, budget, spent, left: rem, videos: plan.reduce((x, p) => x + p.videos, 0), expViews: plan.reduce((x, p) => x + p.expViews, 0), plan, candidates: cands.length });
+      }
+      if (P === "/api/admin/price-ranges" && M === "POST") {
+        const out = {}, src = b.ranges && typeof b.ranges === "object" ? b.ranges : {};
+        for (const c of CATEGORIES) { const x = src[c] || {}, mn = Number(x.min), mx = Number(x.max); if (mn > 0 && mx >= mn && mx <= 200) out[c] = { min: Math.round(mn * 100) / 100, max: Math.round(mx * 100) / 100 }; }
+        db.settings.ranges = out; saveDb(); return send(res, 200, { ranges: out });
       }
       if (P === "/api/admin/contacts" && M === "POST") { const tg = String(b.telegram || "").trim().replace(/^https?:\/\/t\.me\//i, "").replace(/^@/, "").slice(0, 60), dc = String(b.discord || "").trim().slice(0, 200); db.settings.contacts = { telegram: tg, discord: dc }; saveDb(); return send(res, 200, db.settings.contacts); }
       if (P === "/api/admin/broadcast" && M === "POST") {

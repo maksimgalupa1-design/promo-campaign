@@ -823,7 +823,21 @@ function applyStatic(){
   }).join("");
 }
 
-function renderAnalysis(){
+var RA=null,PRANGES=null;
+function loadRanges(){fetch("/api/price-ranges").then(function(r){return r.json()}).then(function(j){PRANGES=j.ranges||{};updRange()}).catch(function(){})}
+function updRange(){
+  var box=$("rangeHint"),inp=$("priceIn");if(!box||!inp||!RA)return;
+  var sel=checked("anCats"),mn=null,mx=null,names=[];
+  sel.forEach(function(c){var r=PRANGES&&PRANGES[c];if(r){mn=mn===null?r.min:Math.min(mn,r.min);mx=mx===null?r.max:Math.max(mx,r.max);names.push(L("c_"+c))}});
+  var rec=PC.recommend(RA),sug=rec;
+  if(mn!==null){sug=Math.max(mn,Math.min(mx,rec));box.textContent=L("tp_range").replace("{t}",names.join(", ")).replace("{a}",mn).replace("{b}",mx)+" "+L("tp_sug").replace("{p}",sug);box.hidden=false}
+  else if(sel.length){box.textContent=L("tp_sug").replace("{p}",rec);box.hidden=false}
+  else box.hidden=true;
+  if(!inp.getAttribute("data-t"))inp.value=sug;
+}
+document.addEventListener("change",function(e){if(e.target&&e.target.closest&&e.target.closest("#anResult")&&e.target.type==="checkbox")updRange()});
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="priceIn")e.target.setAttribute("data-t","1")});
+function renderAnalysis(){loadRanges();
   var u=S.user;if(!u)return;
   var my=++runId,A=getA(),res=$("anResult");
   var steps=["an_s1","an_s2","an_s3","an_s4"];
@@ -842,12 +856,14 @@ function renderAnalysis(){
       h+='<div class="blk"><h3>'+esc(t("rp_bad"))+'</h3>'+reasonList([A.reject],"b")+'<p class="hint" style="margin-top:8px">'+esc(t("rej_hint"))+'</p></div>'+
         '<button class="btn primary" id="otherAcc">'+esc(t("rej_other"))+'</button>';
     }else{
-      h+='<div class="card" style="margin-top:18px"><h3>'+esc(t("price_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(t("price_hint"))+'</p>'+
+      h+='<div class="card" style="margin-top:18px"><h3>'+esc(L("tp_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(L("tp_h"))+'</p>'+catChecks("anCats",u.categories||[])+'<div class="note err" id="topicErr" hidden style="margin-top:12px">'+esc(L("tp_err"))+'</div></div>'+
+        '<div class="card" style="margin-top:18px"><h3>'+esc(t("price_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(t("price_hint"))+'</p><div class="note" id="rangeHint" hidden style="margin-bottom:12px"></div>'+
         '<div class="pricebox"><span style="font-family:var(--display);font-size:24px;font-weight:700">$</span><input type="number" id="priceIn" min="1" max="200" step="0.5" inputmode="decimal" aria-label="'+esc(t("price_title"))+'" value="'+(u.price||PC.recommend(A))+'"></div>'+
         '<div class="note err" id="priceErr" hidden style="margin-top:12px">'+esc(t("price_err"))+'</div></div>'+
         '<button class="btn primary wide" id="sendReview" style="margin-top:16px">'+esc(t("an_send"))+'</button>';
     }
     res.innerHTML=h;res.hidden=false;
+    if(A.accepted){RA=A;updRange()}
   }
   if(u.analyzed){show();return}
   res.hidden=true;$("anTitle").textContent=t("an_title");paint(0,0);
@@ -1096,7 +1112,8 @@ document.addEventListener("click",function(e){
     var pv=Number(String($("priceIn").value).replace(",","."));
     if(!(pv>=1&&pv<=200)){$("priceErr").hidden=false;return}
     var pr2=Math.round(pv*100)/100;
-    if(LIVE){fetch("/api/price",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:S.user.id,price:pr2})}).then(function(r){if(!r.ok)throw 0;S.user.price=pr2;S.user.reviewed=true;save();go("report")}).catch(function(){$("priceErr").textContent=t("live_err");$("priceErr").hidden=false});return}
+    if(LIVE&&!checked("anCats").length){$("topicErr").hidden=false;$("topicErr").scrollIntoView({behavior:"smooth",block:"center"});return}
+    if(LIVE){fetch("/api/account/update",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:S.user.id,categories:checked("anCats")})}).then(function(){return fetch("/api/price",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:S.user.id,price:pr2})})}).then(function(r){if(!r.ok)throw 0;S.user.price=pr2;S.user.reviewed=true;save();go("report")}).catch(function(){$("priceErr").textContent=t("live_err");$("priceErr").hidden=false});return}
     S.user.price=pr2;S.user.reviewed=true;save();go("report");return}
   if(id==="changePrice"||id==="changePrice2"){S.user.reviewed=false;save();go("analysis");return}
   if(id==="reanalyze"){
@@ -1369,7 +1386,7 @@ function renderOwner(){
   admNav();["adH1","adH2","adNote"].forEach(function(i){$(i).hidden=false});
   var D=ADM.data;
   if(!ADM.ok||!D)return false;checkNew(D);
-  var WAITN=D.accounts.filter(function(a){return a.adminStatus==="new"||!a.adminStatus}).length;var S2=D.stats,tabs=["overview","requests","waiting","accounts","producers","editorpay","payments","tracks","pay"].map(function(k){return '<button type="button" class="btn sm" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+(k==="waiting"&&WAITN?' ('+WAITN+')':'')+(k==="requests"&&S2.pendingRequests?' ('+S2.pendingRequests+')':'')+(k==="payments"&&S2.pendingTopups?' ('+S2.pendingTopups+')':'')+(k==="editorpay"&&S2.pendingPayouts?' ('+S2.pendingPayouts+')':'')+'</button>'}).join("");
+  var WAITN=D.accounts.filter(function(a){return a.adminStatus==="new"||!a.adminStatus}).length;var S2=D.stats,tabs=["overview","requests","waiting","accounts","prices","producers","editorpay","payments","tracks","pay"].map(function(k){return '<button type="button" class="btn sm" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+(k==="waiting"&&WAITN?' ('+WAITN+')':'')+(k==="requests"&&S2.pendingRequests?' ('+S2.pendingRequests+')':'')+(k==="payments"&&S2.pendingTopups?' ('+S2.pendingTopups+')':'')+(k==="editorpay"&&S2.pendingPayouts?' ('+S2.pendingPayouts+')':'')+'</button>'}).join("");
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -1414,6 +1431,9 @@ function renderOwner(){
       return '<div class="card ord"><div class="t"><div><span>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+'</span><b>'+money(q.cost)+'</b><span>'+esc(q.track)+' · '+esc(q.artist)+'</span></div><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></div>'+po+
         (q.paid?'':'<label class="f" for="sc_'+esc(q.id)+'"><span>'+esc(L("a_proof_pick"))+'</span><input id="sc_'+esc(q.id)+'" type="file" accept="image/*"></label>')+'<div class="row"><button class="btn sm '+(q.paid?'':'primary')+'" data-l="poAct2" data-id="'+esc(q.id)+'" data-p="'+(q.paid?0:1)+'">'+esc(L(q.paid?"a_unpaid":"a_mark_paid"))+'</button>'+(q.hasProof?'<button class="btn sm" data-l="admProof" data-id="'+esc(q.id)+'">'+esc(L("a_view_proof"))+'</button>':'')+'</div></div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
+  }else if(LV.adTab==="prices"){
+    var RG=LV.ranges||{};
+    body='<div class="card form"><p class="hint">'+esc(L("a_prices_h"))+'</p>'+CATS.map(function(c){var r=RG[c]||{};return '<div class="row" style="align-items:center"><span style="flex:1 1 200px">'+esc(L("c_"+c))+'</span><label>$ <input id="prmin_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.min||"")+'" placeholder="min"></label><label>– <input id="prmax_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.max||"")+'" placeholder="max"></label></div>'}).join("")+'<div class="row"><button class="btn primary" data-l="prSave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="prOk"></span></div></div>';
   }else if(LV.adTab==="waiting"){
     var wl=D.accounts.filter(function(a){return a.adminStatus==="new"||!a.adminStatus}).map(function(a){return accCardHtml(a)}).join("");
     body=wl?'<div class="list">'+wl+'</div>':'<div class="empty">'+esc(L("a_wait_none"))+'</div>';
@@ -1479,13 +1499,14 @@ document.addEventListener("click",function(e){
   if(a==="pDelYes"){closeModal();prodCall("/api/producer/track/delete",{id:id}).then(drawProd);return}
   if(a==="pTopOld"){LV.modal={type:"top",id:id};openModal('<h3>'+esc(L("p_addb"))+'</h3><label class="f" for="tAmt"><span>'+esc(L("p_amount"))+'</span><input id="tAmt" type="number" min="1" inputmode="decimal"></label><label class="f" for="tMeth"><span>'+esc(L("p_method"))+'</span><select id="tMeth">'+methodOpts("paypal")+'</select></label><div id="payBoxM">'+payBoxHtml("paypal",0)+'</div><div class="row"><button class="btn primary" data-l="pTopGo" data-id="'+esc(id)+'">'+esc(L("p_topup"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
   if(a==="pTopGo"){var amt=Number(val("tAmt"));if(!(amt>=1))return;closeModal();prodCall("/api/producer/topup",{trackId:id,amount:amt,method:val("tMeth"),coin:val("tCoin")}).then(drawProd);return}
-  if(a==="atab"){LV.adTab=el.getAttribute("data-k");if(LV.adTab==="pay"){api("/api/admin/pay").then(function(r){LV.payInfo=r.j||{};renderOwner()})}else renderOwner();return}
+  if(a==="atab"){LV.adTab=el.getAttribute("data-k");if(LV.adTab==="prices"){fetch("/api/price-ranges").then(function(r){return r.json()}).then(function(j){LV.ranges=j.ranges||{};renderOwner()});return}if(LV.adTab==="pay"){api("/api/admin/pay").then(function(r){LV.payInfo=r.j||{};renderOwner()})}else renderOwner();return}
   if(a==="planGo"){var ptr=val("planTrack");LV.planTrack=ptr;LV.planErr="";api("/api/admin/plan",{trackId:ptr}).then(function(r){if(r.ok){LV.plan=r.j}else{LV.plan=null;LV.planErr=(r.j&&r.j.error)||L("p_err")}renderOwner()});return}
   if(a==="chkProd"){var w=window.open("","_blank");api("/api/admin/demo",{}).then(function(r){if(r.ok&&w)w.location.href="/#producer";else if(w)w.close()});return}
   if(a==="sndOpen"){sndModal();return}
   if(a==="bcOpen"){bcModal();return}
   if(a==="bcSend"){var tx=val("bcText");if(!tx){return}api("/api/admin/broadcast",{text:tx,title:val("bcTitle")||"Promo Campaign",audience:val("bcAud")}).then(function(r){var o=$("bcRes");if(o)o.textContent=r.ok?L("bc_done").replace("{d}",r.j.delivered).replace("{n}",r.j.subscribers):((r.j&&r.j.error)||L("p_err"))});return}
   if(a==="bcTrack"){var tt=D0().tracks.filter(function(x){return x.id===id})[0];api("/api/admin/broadcast",{text:L("bc_track_text").replace("{t}",tt?tt.title:""),title:L("bc_track_title"),audience:"editors"}).then(function(r){LV.bcMsg=r.ok?L("bc_done").replace("{d}",r.j.delivered).replace("{n}",r.j.subscribers):((r.j&&r.j.error)||L("p_err"));renderOwner()});return}
+  if(a==="prSave"){var rg={};CATS.forEach(function(c){var mn=val("prmin_"+c),mx=val("prmax_"+c);if(mn&&mx)rg[c]={min:Number(mn),max:Number(mx)}});api("/api/admin/price-ranges",{ranges:rg}).then(function(r){if(r.ok)LV.ranges=r.j.ranges;var o=$("prOk");if(o)o.textContent=r.ok?L("a_pay_saved"):L("p_err")});return}
   if(a==="ctSave"){api("/api/admin/contacts",{telegram:val("ct_tg"),discord:val("ct_dc")}).then(function(r){if(r.ok){CONTACTS=r.j;var o=$("ctOk");if(o)o.textContent=L("a_pay_saved");contactBtn()}});return}
   if(a==="ctToggle"){var bx=$("ctBox");if(bx)bx.hidden=!bx.hidden;return}
   if(a==="paySave"){api("/api/admin/pay",{paypal:val("pay_paypal"),card:val("pay_card"),cardHolder:val("pay_cardHolder"),crypto:COINS.reduce(function(o,c){o[c]=val("pay_c_"+c);return o},{})}).then(function(r){LV.payInfo=r.j||{};var o=$("payOk");if(o)o.textContent=L("a_pay_saved")});return}
@@ -1748,7 +1769,7 @@ loadContacts();
 function wordCount(s){return (String(s||"").trim().match(/\S+/g)||[]).length}
 function stepsHtml(u){
   var wc=wordCount(u.about),topic=(u.categories&&u.categories.length>0)||wc>=8;
-  var st=[{k:"st1",ok:true,go:""},{k:"st2",ok:!!u.price,go:"changePrice2"},{k:"st3",ok:topic,go:"sName"},{k:"st4",ok:(u.discount||0)>0,go:"sDisc",opt:true}];
+  var st=[{k:"st1",ok:true,go:""},{k:"st2",ok:topic,go:"sName"},{k:"st3",ok:!!u.price,go:"changePrice2"},{k:"st4",ok:(u.discount||0)>0,go:"sDisc",opt:true}];
   var done=st.filter(function(s){return s.ok}).length,cur=st.findIndex(function(s){return !s.ok});
   return '<div class="stepsx card"><div class="stbar"><i style="width:'+Math.round(done/4*100)+'%"></i></div>'+st.map(function(s,i){
     return '<div class="st'+(s.ok?' done':(i===cur?' cur':''))+'" style="animation-delay:'+(i*0.12)+'s" data-l="stGo" data-g="'+s.go+'"><span class="stn">'+(s.ok?'✓':(i+1))+'</span><span class="stt"><b>'+esc(L(s.k))+(s.opt?' <em>'+esc(L("st_opt"))+'</em>':'')+'</b><small>'+esc(L(s.k+"h"))+'</small></span></div>'}).join("")+'</div>';
@@ -1887,6 +1908,11 @@ try{var _mo=new MutationObserver(function(){clearTimeout(animRings.t);animRings.
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="algoToggle"]');if(!el)return;var c=el.closest(".acard"),b=c&&c.querySelector(".algo");if(b){b.hidden=!b.hidden;if(!b.hidden)b.classList.add("pop")}});
 Object.assign(LT.en,{an_today:"today",an_ago:"{n} days ago",an_title:"Account breakdown",an_algo:"What we look at",an_of:"of 100",an_freq:"How often you post",an_week:"per week",an_views:"Views per video",an_likes:"Likes to views",an_last:"Last post",an_checked:"We analyse your public TikTok page once a day. Videos of the last 30 days count. One bar is one video, the dashed line is 10,000 views.",an_algo_h:"The score is our own calculation from your public numbers. This is how much each part counts.",cr_views:"Views per video",cr_stable:"Stable views",cr_price:"Price fit",cr_freq:"Posting often",cr_fresh:"Fresh posts"});
 Object.assign(LT.ru,{an_today:"сегодня",an_ago:"{n} дн. назад",an_title:"Разбор аккаунта",an_algo:"На что мы смотрим",an_of:"из 100",an_freq:"Как часто вы постите",an_week:"в неделю",an_views:"Просмотров на видео",an_likes:"Лайки к просмотрам",an_last:"Последний пост",an_checked:"Мы читаем вашу открытую страницу TikTok раз в сутки. Считаются видео за последние 30 дней. Один столбец это одно видео, пунктир это 10 000 просмотров.",an_algo_h:"Оценка наша собственная, из ваших открытых цифр. Вот сколько весит каждая часть.",cr_views:"Просмотров на видео",cr_stable:"Стабильные просмотры",cr_price:"Цена подходит",cr_freq:"Как часто вы постите",cr_fresh:"Свежие посты"});
+
+Object.assign(LT.en,{tp_title:"Your topic",tp_h:"Choose what your videos are about. The price we suggest depends on your topic.",tp_err:"Choose at least one topic first.",tp_range:"For {t}, editors usually get ${a} to ${b} per video.",tp_sug:"Suggested price for you: ${p}.",a_prices:"Prices by topic",a_prices_h:"Set the usual price range per video for each topic. Editors see the range for their topic and get a suggested price inside it. Leave empty to use only the views-based suggestion.",
+ st2:"Pick your topic and describe your account",st2h:"Choose a topic or write at least 8 words about your account.",st3:"Set your price",st3h:"We suggest a price for your topic and your views.",fl2h:"The bot looks at the views of your latest videos. Next: you pick your topic.",fl3:"Topic and price",fl3h:"Pick your topic. We suggest a price for it based on your views."});
+Object.assign(LT.ru,{tp_title:"Ваша тематика",tp_h:"Выберите, о чём ваши видео. Цена, которую мы предложим, зависит от тематики.",tp_err:"Сначала выберите хотя бы одну тематику.",tp_range:"Для «{t}» редакторам обычно платят от ${a} до ${b} за видео.",tp_sug:"Предлагаем вам цену ${p}.",a_prices:"Цены по тематикам",a_prices_h:"Укажите обычный диапазон цены за видео для каждой тематики. Редактор увидит диапазон своей тематики и получит предложенную цену внутри него. Если оставить пустым, цена считается только по просмотрам.",
+ st2:"Выберите тематику и опишите аккаунт",st2h:"Выберите тематику или напишите про аккаунт минимум 8 слов.",st3:"Укажите цену",st3h:"Мы предложим цену под вашу тематику и просмотры.",fl2h:"Бот смотрит просмотры ваших последних видео. Дальше: вы выбираете тематику.",fl3:"Тематика и цена",fl3h:"Выберите тематику. Мы предложим цену под неё по вашим просмотрам."});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
