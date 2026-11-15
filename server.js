@@ -125,12 +125,16 @@ function nickNorm(str) {
   return t.replace(/(.)\1+/g, "$1");
 }
 const NICK_STRONG_N = NICK_STRONG.map(nickNorm).filter(r => r.length >= 2);
+const LAT2CYR_T = { a: "а", b: "б", v: "в", g: "г", d: "д", e: "е", z: "з", i: "и", k: "к", l: "л", m: "м", n: "н", o: "о", p: "п", r: "р", s: "с", t: "т", u: "у", f: "ф", h: "х", x: "х", c: "к", y: "и", j: "и", w: "в", q: "к" };
+function translit(n) { return n.replace(/sh/g, "ш").replace(/ch/g, "ч").replace(/zh/g, "ж").replace(/ya/g, "я").replace(/yu/g, "ю").replace(/[a-z]/g, c => LAT2CYR_T[c] || c).replace(/(.)\1+/g, "$1"); }
 function badNick(nick) {
   const n = nickNorm(nick);
   const n2 = n.replace(/[a-z]/g, c => LAT2CYR[c] || c);
   for (const r of NICK_STRONG_N) { if (r.length < 3) continue; if (n.includes(r) || n2.includes(r)) return true; }
   const r2 = NICK_STRONG_N.map(r => r.replace(/[a-z]/g, c => LAT2CYR[c] || c));
   for (const r of r2) { if (r.length >= 3 && n2.includes(r)) return true; }
+  const n3 = translit(n);
+  for (const r of NICK_STRONG_N) { const rc = r.replace(/[a-z]/g, c => LAT2CYR_T[c] || c); if (rc.length >= 3 && n3.includes(translit(rc))) return true; }
   const toks = String(nick).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean).map(nickNorm);
   const weak = NICK_WEAK.map(nickNorm);
   return toks.some(tk => weak.includes(tk));
@@ -153,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 30;
+const SERVER_VER = 31;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -353,7 +357,7 @@ function accView(acc) {
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
 function accPayoutRaw(user, acc) { return (acc && acc.payout) || (user && user.payout) || null; }   // every TikTok account can have its own payout details; the user-level ones are the fallback
-function view(user) { return { accounts: (user.accounts || []).map(a => { const x = accView(a), p = accPayoutRaw(user, a); x.payout = p ? { set: true, method: p.method, coin: p.coin || "", label: p.label, own: !!a.payout } : { set: false }; return x; }), categories: CATEGORIES, payout: payoutLabel(user), coins: COINS }; }
+function view(user) { return { accounts: (user.accounts || []).map(a => { const x = accView(a), p = accPayoutRaw(user, a); x.payout = p ? { set: true, method: p.method, coin: p.coin || "", label: p.label, own: !!a.payout, value: p.method === "paypal" && p.enc ? String((decObj(p.enc) || {}).value || "") : "" } : { set: false }; return x; }), categories: CATEGORIES, payout: payoutLabel(user), coins: COINS }; }
 function accAdminView(acc) {
   const v = accView(acc), r = autoStars(acc);
   v.stars = { auto: r.stars, manual: acc.rating_manual == null ? null : acc.rating_manual, final: acc.rating_manual != null ? acc.rating_manual : r.stars };
@@ -559,7 +563,7 @@ const server = http.createServer(async (req, res) => {
       const rec = { method: m, coin: m === "crypto" ? coin : "", label: maskVal(m, val), enc: encObj({ method: m, coin: m === "crypto" ? coin : "", value: val, holder: m === "card" ? h : "" }) };
       const own = b.accountId ? findAcc(u, b.accountId) : null;
       if (b.accountId && !need(res, own, 404, "no such account")) return;
-      if (own) { own.payout = rec; saveDb(); return send(res, 200, { set: true, method: rec.method, coin: rec.coin, label: rec.label, own: true }); }
+      if (own) { own.payout = rec; saveDb(); return send(res, 200, { set: true, method: rec.method, coin: rec.coin, label: rec.label, own: true, value: rec.method === "paypal" ? val : "" }); }
       u.payout = rec;
       saveDb(); return send(res, 200, payoutLabel(u));
     }
@@ -663,8 +667,8 @@ const server = http.createServer(async (req, res) => {
 
       const linkRe = /(https?:\/\/|www\.|t\.me|@[a-z0-9_]{3,}|\b[a-z0-9-]+\.(com|ru|ua|net|org|io|me|gg|ly|cc|info)\b)/i;
       if (P === "/api/chat" && M === "GET") {
-        if (u.chatNick && badNick(u.chatNick)) { u.chatNick = ""; saveDb(); }
-        return send(res, 200, { me: { nick: u.chatNick || "", canWrite, banned: chBanned(C, u.id) }, msgs: C.msgs.slice(-100).map(m => ({ id: m.id, at: m.at, name: m.name, text: m.text, mine: m.uid === u.id, mgr: !!m.mgr, file: m.file ? { id: m.file.id, name: m.file.name, type: m.file.type, size: m.file.size, gone: !(C.files && C.files[m.file.id]) } : null })) });
+        if (u.chatNick && badNick(u.chatNick)) { u.chatNick = ""; u.chatNickAt = 0; saveDb(); }
+        return send(res, 200, { me: { nick: u.chatNick || "", nickWait: u.chatNick && u.chatNickAt ? Math.max(0, 3 * 86400000 - (Date.now() - u.chatNickAt)) : 0, canWrite, banned: chBanned(C, u.id) }, msgs: C.msgs.slice(-100).map(m => ({ id: m.id, at: m.at, name: m.name, text: m.text, mine: m.uid === u.id, mgr: !!m.mgr, file: m.file ? { id: m.file.id, name: m.file.name, type: m.file.type, size: m.file.size, gone: !(C.files && C.files[m.file.id]) } : null })) });
       }
       if (P === "/api/chat/file" && M === "GET") {
         const fid = new URL(req.url, "http://x").searchParams.get("id") || ""; const f = C.files && C.files[fid];
@@ -678,6 +682,8 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, /^[\p{L}\p{N} _.-]{2,10}$/u.test(nick) && !linkRe.test(nick), 400, "Nickname: 2-10 letters or digits, no links")) return;
         if (!need(res, !/(admin|manager|менеджер|админ|support|поддержк)/i.test(nick), 400, "This nickname is not allowed")) return;
         if (!need(res, !badNick(nick), 400, "This nickname is not allowed. Choose another one.")) return;
+        if (u.chatNick && u.chatNick !== nick && u.chatNickAt && Date.now() - u.chatNickAt < 3 * 86400000) { const h = Math.ceil((3 * 86400000 - (Date.now() - u.chatNickAt)) / 3600000); return send(res, 429, { error: "You can change your nickname once every 3 days. Try again in " + h + " h." }); }
+        if (u.chatNick !== nick) { u.chatNickAt = Date.now(); C.msgs.forEach(m => { if (m.uid === u.id) m.name = nick; }); }
         u.chatNick = nick; saveDb(); return send(res, 200, { ok: true, nick });
       }
       if (P === "/api/chat" && M === "POST") {
@@ -705,6 +711,10 @@ const server = http.createServer(async (req, res) => {
         if (C.files) { const keep = new Set(C.msgs.filter(m => m.file).slice(-40).map(m => m.file.id)); Object.keys(C.files).forEach(k => { if (!keep.has(k)) delete C.files[k]; }); }
         saveDb();
         return send(res, 200, { ok: true });
+      }
+      if (P === "/api/chat/delete" && M === "POST") {
+        const dm = C.msgs.find(x => x.id === b.id && x.uid === u.id); if (!need(res, dm, 404, "no such message")) return;
+        if (dm.file && C.files) delete C.files[dm.file.id]; C.msgs = C.msgs.filter(x => x.id !== dm.id); saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/chat/report" && M === "POST") {
         const m = C.msgs.find(x => x.id === b.id); if (!need(res, m, 404, "no such message")) return;

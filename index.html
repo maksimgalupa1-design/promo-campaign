@@ -893,6 +893,13 @@ button.wgt::after{opacity:.2;transition:opacity .2s}button.wgt:hover::after{opac
 .cmmi{flex:1;min-width:0;display:flex;flex-direction:column}.cmmi small{color:var(--muted);overflow-wrap:anywhere}.cmm{color:#E8445A!important}
 .cmlog{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;padding:10px;border:1px solid var(--line);border-radius:18px;background:var(--bg);margin-bottom:12px}
 .cmlog .chm{max-width:min(520px,86%)}.cmact{margin-top:6px}.cmsel{font-size:12px;padding:3px 6px;border-radius:8px;max-width:150px}
+/* v39 */
+.pycur{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--soft,rgba(255,255,255,.04))}
+.pycur small{display:block;color:var(--muted)}.pycur b{font-size:17px;overflow-wrap:anywhere}
+.pyedit{font-size:16px}
+.chnick{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chdel{margin-left:auto;opacity:.7}
+.chcard .btn+.btn{margin-top:8px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1071,7 +1078,7 @@ button.wgt::after{opacity:.2;transition:opacity .2s}button.wgt:hover::after{opac
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v38 · 15.11 23:55</span>
+  <span>© Promo Campaign · v39 · 16.11 00:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4375,6 +4382,78 @@ document.addEventListener("change",function(e){var t=e.target;if(t&&t.getAttribu
   api("/api/admin/chat/ban",{uid:t.getAttribute("data-uid"),on:1,hours:Number(t.value)}).then(function(r){if(r.ok){toast(L("cw_muted"));cmLoad()}})}});
 setInterval(function(){if(ownerMode()&&LV.adTab==="chatmod"&&!document.hidden){var a=document.activeElement;if(a&&(a.id==="cmIn"||a.classList.contains("cmsel")))return;cmLoad()}},7000);
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="chatmod"){var l=$("cmLog");if(l&&!CM._sc){l.scrollTop=l.scrollHeight;CM._sc=true}}else CM._sc=false}catch(e){}return r}})();
+
+/* ===== v39: delete own messages, nickname change, dock highlight, payout email pencil ===== */
+(function(){
+var N={
+en:{ch_del:"Delete message",ch_nick_edit:"Change nickname",ch_nick_note:"You can change your nickname once every 3 days.",ch_nick_wait:"You can change your nickname again in {t}.",py_edit:"Edit",py_email:"Email",},
+ru:{ch_del:"Удалить сообщение",ch_nick_edit:"Сменить ник",ch_nick_note:"Ник можно менять раз в 3 дня.",ch_nick_wait:"Сменить ник снова можно через {t}.",py_edit:"Изменить",py_email:"Email"},
+uk:{ch_del:"Видалити повідомлення",ch_nick_edit:"Змінити нік",ch_nick_note:"Нік можна змінювати раз на 3 дні.",ch_nick_wait:"Змінити нік знову можна через {t}.",py_edit:"Змінити",py_email:"Email"},
+de:{ch_del:"Nachricht löschen",ch_nick_edit:"Nickname ändern",ch_nick_note:"Du kannst deinen Nickname alle 3 Tage ändern.",ch_nick_wait:"Du kannst deinen Nickname wieder in {t} ändern.",py_edit:"Ändern",py_email:"E-Mail"},
+es:{ch_del:"Eliminar mensaje",ch_nick_edit:"Cambiar apodo",ch_nick_note:"Puedes cambiar tu apodo una vez cada 3 días.",ch_nick_wait:"Podrás cambiar tu apodo de nuevo en {t}.",py_edit:"Cambiar",py_email:"Email"},
+pt:{ch_del:"Excluir mensagem",ch_nick_edit:"Mudar apelido",ch_nick_note:"Você pode mudar o apelido a cada 3 dias.",ch_nick_wait:"Você poderá mudar o apelido de novo em {t}.",py_edit:"Alterar",py_email:"Email"},
+fr:{ch_del:"Supprimer le message",ch_nick_edit:"Changer de pseudo",ch_nick_note:"Vous pouvez changer de pseudo tous les 3 jours.",ch_nick_wait:"Vous pourrez rechanger de pseudo dans {t}.",py_edit:"Modifier",py_email:"E-mail"},
+tr:{ch_del:"Mesajı sil",ch_nick_edit:"Takma adı değiştir",ch_nick_note:"Takma adını 3 günde bir değiştirebilirsin.",ch_nick_wait:"Takma adını {t} sonra tekrar değiştirebilirsin.",py_edit:"Değiştir",py_email:"E-posta"}};
+Object.assign(LT.en,N.en);Object.assign(LT.ru,N.ru);
+for(var k in N){if(k==="en"||k==="ru")continue;Object.assign(XLL[k],N[k])}
+})();
+function chWaitTxt(ms){var h=Math.ceil(ms/3600e3);return h>=24?Math.floor(h/24)+" "+(lang==="ru"||lang==="uk"?"д.":"d")+" "+(h%24)+" "+(lang==="ru"||lang==="uk"?"ч.":"h"):h+" "+(lang==="ru"||lang==="uk"?"ч.":"h")}
+/* nickname card also opens from the chat header */
+chGate=function(me){
+  var box=document.querySelector("#chatOv .chatbox");if(!box)return;var g=$("chGate");
+  var edit=!!CHT.editNick&&me.canWrite&&!me.banned;
+  var need=edit||(me.canWrite&&!me.banned&&(!chOk()||!me.nick)),st=edit?"e":(!chOk()?"r":"n");
+  if(!need){if(g)g.remove();return}
+  if(g&&g.getAttribute("data-s")===st)return;
+  if(g)g.remove();
+  g=document.createElement("div");g.id="chGate";g.className="chgate";g.setAttribute("data-s",st);
+  var cb=esc(L("ch_cb")).replace("{p}",'<a href="#privacy" target="_blank" rel="noopener">'+esc(L("ch_pp"))+'</a>').replace("{t}",'<a href="#terms" target="_blank" rel="noopener">'+esc(L("ch_tt"))+'</a>');
+  var wait=me.nickWait>0&&me.nick;
+  if(st==="r")g.innerHTML='<div class="chcard"><div class="chic">💬</div><h3>'+esc(L("ch_rules_t"))+'</h3><p>'+esc(L("ch_rule"))+'</p><label class="chcb"><input type="checkbox" id="chCb"><span>'+cb+'</span></label><button type="button" class="btn primary" id="chAgreeBtn" data-l="chAgree" disabled>'+esc(L("ch_agree"))+'</button></div>';
+  else if(st==="e"&&wait)g.innerHTML='<div class="chcard"><div class="chic">⏳</div><h3>'+esc(L("ch_nick_edit"))+'</h3><p class="hint">'+esc(L("ch_nick_wait").replace("{t}",chWaitTxt(me.nickWait)))+'</p><button type="button" class="btn" data-l="chNickCancel">'+esc(L("p_cancel"))+'</button></div>';
+  else g.innerHTML='<div class="chcard"><div class="chic">✏️</div><h3>'+esc(L("ch_nick_t"))+'</h3><p class="hint">'+esc(L("ch_nick_h"))+' '+esc(L("ch_nick_note"))+'</p><input id="chNick" type="text" maxlength="10" placeholder="'+esc(L("ch_nick_ph"))+'" value="'+esc(st==="e"?me.nick:"")+'" autocomplete="off"><button class="btn primary" data-l="chNickOk">'+esc(L("ch_nick_ok"))+'</button>'+(st==="e"?'<button type="button" class="btn" data-l="chNickCancel">'+esc(L("p_cancel"))+'</button>':'')+'<div class="note err" id="chErr" hidden></div></div>';
+  box.appendChild(g);var i=$("chNick");if(i)setTimeout(function(){i.focus();i.select()},300)};
+(function(){var o=chRender;chRender=function(j){
+  if(CHT.me&&CHT.me.nick&&j.me.nick&&CHT.me.nick!==j.me.nick)CHT.sig="";
+  o.apply(this,arguments);
+  var f=document.querySelector("#chatOv .chath");if(f&&!f.querySelector(".chnick")&&j.me.canWrite&&j.me.nick){var b=document.createElement("button");b.type="button";b.className="btn sm chnick";b.setAttribute("data-l","chNickEdit");b.title=L("ch_nick_edit");b.textContent="✏️ "+j.me.nick;f.insertBefore(b,f.querySelector(".chbell"))}
+  else if(f){var nb=f.querySelector(".chnick");if(nb&&j.me.nick)nb.textContent="✏️ "+j.me.nick}
+}})();
+/* own messages: delete button */
+(function(){var o=chRender;chRender=function(j){
+  var res=o.apply(this,arguments);
+  document.querySelectorAll("#chatLog .chm.mine").forEach(function(m,i){
+    if(m.querySelector(".chdel"))return;var ids=j.msgs.filter(function(x){return x.mine});var x=ids[i];if(!x)return;
+    var n=m.querySelector(".chn");if(n){var b=document.createElement("button");b.type="button";b.className="chr chdel";b.setAttribute("data-l","chDel");b.setAttribute("data-id",x.id);b.title=L("ch_del");b.textContent="🗑";n.appendChild(b)}});
+  return res}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="chDel"){e.stopImmediatePropagation();api("/api/chat/delete",{id:el.getAttribute("data-id")}).then(function(){CHT.sig="";chPoll()});return}
+  if(a==="chNickEdit"){CHT.editNick=true;var g=$("chGate");if(g)g.remove();chGate(CHT.me||{canWrite:true,nick:""});return}
+  if(a==="chNickCancel"){CHT.editNick=false;var g2=$("chGate");if(g2)g2.remove();return}
+},true);
+(function(){var o=chRender;chRender=function(j){var r=o.apply(this,arguments);return r}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="chNickOk"]');if(!el)return;setTimeout(function(){CHT.editNick=false},900)},true);
+/* dock: highlight Chat while the chat is open */
+(function(){var o=dockRender;dockRender=function(){o.apply(this,arguments);
+  var d=$("dock");if(!d)return;
+  if($("chatOv")){d.querySelectorAll("[aria-current]").forEach(function(b){b.removeAttribute("aria-current")});var c=d.querySelector('[data-x="chat"]');if(c)c.setAttribute("aria-current","page")}}})();
+(function(){var oo=openChat,oc=closeChat;
+  openChat=function(){oo.apply(this,arguments);CHT.editNick=false;dockRender()};
+  closeChat=function(){var had=!!$("chatOv");oc.apply(this,arguments);if(had)dockRender()}})();
+
+/* payout: show the email with a pencil */
+(function(){var o=payoutBlock;payoutBlock=function(){
+  var ac=S.accounts[S.active],c=(ac&&ac.payout)||LV.payout||{set:false},h=o();
+  if(LV.pyEdit&&c.set&&LV._pyKey!==undefined&&LV._pyKey!==c.label+"|"+(c.value||"")){LV.pyEdit=false}
+  if(!c.set)return h;
+  if(LV.pyEdit)return h.replace('<span class="hint" id="pyOk">','<button type="button" class="btn" data-l="pyCancel">'+esc(L("p_cancel"))+'</button><span class="hint" id="pyOk">');
+  var shown=c.method==="paypal"&&c.value?c.value:((c.method==="crypto"?coinL(c.coin)+" ":"")+c.label);
+  return '<div class="blk"><h3>'+esc(L("py_title"))+(ac?' · '+esc(ac.handle):'')+'</h3><p class="hint">'+esc(L("py_h"))+' '+esc(L("py_per_acc"))+'</p><div class="pycur"><div><small>'+esc(L("py_current"))+(c.method==="paypal"?' · PayPal':'')+'</small><b>'+esc(shown)+'</b></div><button type="button" class="btn sm pyedit" data-l="pyEdit" title="'+esc(L("py_edit"))+'" aria-label="'+esc(L("py_edit"))+'">✏️</button></div></div>'}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="pyEdit"||a==="pyCancel"){e.stopImmediatePropagation();var ac=S.accounts[S.active],c=(ac&&ac.payout)||LV.payout||{set:false};
+    LV.pyEdit=(a==="pyEdit");LV._pyKey=c.label+"|"+(c.value||"");if(a==="pyEdit"&&c.method)LV.pyM=c.method==="crypto"?"crypto":c.method;
+    renderDashLive();if(a==="pyEdit")setTimeout(function(){var i=$("pyValue");if(i){if(c.method==="paypal"&&c.value)i.value=c.value;i.focus()}},50);return}
+},true);
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
