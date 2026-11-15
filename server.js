@@ -531,7 +531,7 @@ const server = http.createServer(async (req, res) => {
       Object.values(db.requests).forEach(r => { if (r.openId === acc.open_id && r.status === "pending") r.status = "cancelled"; });
       saveDb(); return send(res, 200, view(u));
     }
-    if (P === "/google418570ab9aa36d84.html" && M === "GET") { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); return res.end("google-site-verification: google418570ab9aa36d84.html"); }
+    if (/^\/google[0-9a-f]{8,32}\.html$/.test(P) && M === "GET") { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); return res.end("google-site-verification: " + P.slice(1)); }   // any Google Search Console verification file name
     if (P === "/robots.txt" && M === "GET") { res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: " + (PUBLIC_URL || "") + "/sitemap.xml\n"); }
     if (P === "/sitemap.xml" && M === "GET") { res.writeHead(200, { "Content-Type": "application/xml; charset=utf-8" }); return res.end('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>' + (PUBLIC_URL || "") + '/</loc></url></urlset>\n'); }
     if ((P === "/icon.png" || P === "/favicon.ico") && M === "GET") { res.writeHead(200, { "Content-Type": "image/png", "Cache-Control": "public, max-age=86400" }); return res.end(ICON_PNG); }
