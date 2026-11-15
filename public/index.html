@@ -247,6 +247,23 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
 .tlinks{display:flex;flex-wrap:wrap;gap:8px}.plink{font-size:13px;font-weight:700;color:#fff;background:var(--c);padding:6px 12px;border-radius:99px;text-decoration:none;transition:transform .15s,filter .15s}.plink:hover{transform:scale(1.06);filter:brightness(1.1)}
 .trule{font-size:13px;background:var(--soft);padding:10px 12px;border-radius:12px}
 .tgo{width:100%;margin-top:4px}
+.acard{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:14px;animation:cardIn .6s both}
+.achead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.achead>b{font-size:17px;color:var(--muted)}
+.algob{background:none;border:0;color:#2F8CFF;font-weight:700;font-size:15px;cursor:pointer;padding:4px 0}
+.acmain{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.ring{position:relative;width:132px;height:132px;flex:none}.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9;stroke-linecap:round}.ring .rbg{stroke:rgba(127,127,127,.2)}.ring .rfg{stroke:var(--c);filter:drop-shadow(0 0 6px var(--c))}
+.rnum{position:absolute;inset:0;display:grid;place-content:center;text-align:center}.rnum b{font-size:40px;line-height:1}.rnum small{color:var(--muted)}
+.acrows{flex:1 1 220px;display:grid;gap:8px}.acrows>div{display:flex;justify-content:space-between;gap:10px}.acrows span{color:var(--muted)}.acrows b{white-space:nowrap}
+.abars{position:relative;display:flex;align-items:flex-end;gap:3px;height:110px;margin:18px 0 8px;border-bottom:1px solid var(--line)}
+.abars i{flex:1;min-width:3px;height:var(--h);border-radius:4px 4px 0 0;background:linear-gradient(#3AA0FF,#2A7BE8);transform-origin:bottom;animation:barUp .7s cubic-bezier(.2,.8,.2,1) both;transition:filter .15s}.abars i:hover{filter:brightness(1.3)}
+.abars i.lo{background:rgba(58,160,255,.3)}
+.aline{position:absolute;left:0;right:0;border-top:1px dashed rgba(127,127,127,.55);pointer-events:none}.aline em{position:absolute;right:0;top:-18px;font-style:normal;font-size:12px;color:var(--muted)}
+@keyframes barUp{from{transform:scaleY(0)}}
+.algo{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}.algo.pop{animation:popIn .35s both}.algo h4{margin-bottom:4px}
+.cr{margin:12px 0}.cr>div:first-child{display:flex;justify-content:space-between;gap:10px}.crbar{height:7px;border-radius:99px;background:rgba(127,127,127,.2);overflow:hidden;margin-top:6px}
+.crbar i{display:block;height:100%;width:var(--w);border-radius:99px;background:linear-gradient(90deg,#3AA0FF,#1FA85A);animation:wGrow .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes wGrow{from{width:0}}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1258,7 +1275,7 @@ function renderDashLive(){
   var earn=0,prog=0,done=0;LV.reqs.forEach(function(q){if(q.status==="completed"){earn+=q.cost;done++}else if(q.status==="approved"||q.status==="submitted"||q.status==="returned")prog+=q.cost});
   $("dashTitle").textContent=u.handle+(u.internalName?" · "+u.internalName:"");
   $("tiles").innerHTML=[[money(earn),"dl_earn"],[money(prog),"dl_prog"],[done,"dl_done"],[u.price?money(u.price):"—","a_price"]].map(function(x){return '<div class="card tile"><b>'+esc(x[0])+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("");
-  $("profCard").innerHTML=stepsHtml(u)+accBar()+'<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A)+videoTable(u)+
+  $("profCard").innerHTML=stepsHtml(u)+accBar()+'<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A,u)+videoTable(u)+
     '<div class="row" style="margin-top:14px"><button class="btn sm" id="reanalyze">'+esc(t("d_reanalyze"))+'</button><button class="btn sm" id="changePrice2">'+esc(t("d_pricebtn"))+(u.price?' ($'+u.price+')':'')+'</button></div>'+
     '<div class="blk"><h3>'+esc(L("dl_acc"))+'</h3>'+
     '<label class="f" for="sName"><span>'+esc(L("dl_name"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"></label>'+
@@ -1410,7 +1427,7 @@ function renderOwner(){
           '<div style="margin-top:10px">'+catPills(a.categories,a.otherCategory)+'</div>'+
           '<div class="row" style="margin:12px 0"><label class="f" for="rt_'+esc(a.id)+'" style="flex:0 1 180px"><span>'+esc(L("a_manual"))+'</span><select id="rt_'+esc(a.id)+'" data-l="rate" data-id="'+esc(a.id)+'">'+sel+'</select></label>'+
           '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
-          winTable(a.analysis)+videoTable({videos:a.videos})+'</details>';
+          winTable(a.analysis,{videos:a.videos,price:a.price})+videoTable({videos:a.videos})+'</details>';
       }).join(""):'<div class="empty">'+esc(L("a_no_acc"))+'</div>')+'</div>';
   }else if(LV.adTab==="pay"){
     var X=LV.payInfo||{},C=X.crypto||{};
@@ -1828,6 +1845,47 @@ Object.assign(LT.en,{fl1:"Sign up with TikTok",fl1h:"Connect your account in one
 Object.assign(LT.ru,{fl1:"Регистрация через TikTok",fl1h:"Подключите аккаунт в одно касание. Мы читаем только открытые цифры. Дальше: бот всё проверит.",fl2:"Проверка аккаунта",fl2h:"Бот смотрит просмотры ваших последних видео. Дальше: вы увидите результат.",fl3:"Ваша цена",fl3h:"Укажите цену за видео. Мы сравним её с вашими реальными просмотрами.",fl4:"Начало заработка",fl4h:"Выберите тематику, добавьте скидку и дождитесь одобрения. Потом берите треки и получайте деньги.",
  snd_h:"Выберите звук для новых сообщений и включите уведомления.",snd_ping:"Пинг",snd_chime:"Колокольчик",snd_bell:"Звонок",snd_drum:"Барабан",snd_pop:"Поп",snd_none:"Без звука",snd_enable:"Включить уведомления",close:"Закрыть",
  bc_btn:"Написать всем",bc_to:"Кому",bc_ed:"Всем редакторам",bc_pr:"Всем продюсерам",bc_all:"Всем",bc_title:"Заголовок",bc_text:"Сообщение",bc_send:"Отправить",bc_done:"Отправлено. Дошло до {d} из {n} устройств с включёнными уведомлениями.",bc_track:"Сообщить редакторам об этом треке",bc_track_title:"Новый трек!",bc_track_text:"Вышел новый трек «{t}». Отправляйте заявки сейчас!"});
+
+/* ---- animated account breakdown (replaces the plain table) ---- */
+function clamp01(v){return Math.max(0,Math.min(1,v))}
+function breakdown(A,u){
+  var vids=((u&&u.videos)||[]).filter(function(v){return v.created>=Date.now()-30*86400000}).sort(function(a,b){return a.created-b.created}).slice(-30);
+  var perWeek=A.month.videos/(30/7),avg=A.refAvg||0;
+  var above=vids.length?vids.filter(function(v){return v.views>=10000}).length/vids.length:0;
+  var tv=0,tl=0,hasL=false;vids.forEach(function(v){tv+=v.views;if(v.likes!=null&&v.likes>0)hasL=true;tl+=v.likes||0});
+  var likeP=hasL&&tv?tl/tv*100:null,price=u&&u.price,cpm=price&&avg?price/avg*1000:null;
+  var parts=[
+    {k:"cr_views",w:30,v:clamp01(Math.log(Math.max(avg,1)/1000)/Math.log(30)),txt:n(avg)},
+    {k:"cr_stable",w:27,v:above,txt:Math.round(above*100)+"% ≥ 10K"},
+    {k:"cr_price",w:21,v:cpm===null?0.5:clamp01((0.15-cpm)/0.11),txt:cpm===null?"—":"$"+cpm.toFixed(2)+" / 1K"},
+    {k:"cr_freq",w:12,v:clamp01(perWeek/7),txt:perWeek.toFixed(1)+" / "+L("an_week")},
+    {k:"cr_fresh",w:10,v:A.lastDaysAgo===null?0:clamp01(1-A.lastDaysAgo/7),txt:A.lastDaysAgo===null?"—":(A.lastDaysAgo===0?L("an_today"):L("an_ago").replace("{n}",A.lastDaysAgo))}];
+  var score=Math.round(parts.reduce(function(s,p){return s+p.w*p.v},0));
+  return {vids:vids,perWeek:perWeek,avg:avg,likeP:likeP,parts:parts,score:score};
+}
+function winTable(A,u){
+  var B=breakdown(A,u),col=B.score>=70?"#1FA85A":(B.score>=40?"#E8A91E":"#D8445A"),C=2*Math.PI*52;
+  var last=A.lastDaysAgo===null?"—":(A.lastDaysAgo===0?L("an_today"):L("an_ago").replace("{n}",A.lastDaysAgo));
+  var mx=Math.max.apply(null,B.vids.map(function(v){return v.views}).concat([10000])),lineY=10000/mx*100;
+  var bars=B.vids.map(function(v,i){var h=Math.max(4,v.views/mx*100);return '<i class="'+(v.views>=10000?'':'lo')+'" style="--h:'+h+'%;animation-delay:'+(i*0.03)+'s" title="'+esc(fmtDate(v.created)+" · "+n(v.views))+'"></i>'}).join("");
+  return '<div class="acard"><div class="achead"><b>'+esc(L("an_title"))+'</b><button type="button" class="algob" data-l="algoToggle">'+esc(L("an_algo"))+' ›</button></div>'+
+   '<div class="acmain"><div class="ring" data-s="'+B.score+'" style="--c:'+col+'"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="rbg"/><circle cx="60" cy="60" r="52" class="rfg" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+C.toFixed(1)+'" data-c="'+C.toFixed(1)+'"/></svg><div class="rnum"><b>0</b><small>'+esc(L("an_of"))+'</small></div></div>'+
+   '<div class="acrows"><div><span>'+esc(L("an_freq"))+'</span><b>'+B.perWeek.toFixed(B.perWeek<10?1:0)+' '+esc(L("an_week"))+'</b></div><div><span>'+esc(L("an_views"))+'</span><b>'+n(B.avg)+'</b></div>'+(B.likeP!==null&&B.likeP>=0.1?'<div><span>'+esc(L("an_likes"))+'</span><b>'+B.likeP.toFixed(1)+'%</b></div>':'')+'<div><span>'+esc(L("an_last"))+'</span><b>'+esc(last)+'</b></div></div></div>'+
+   '<div class="abars">'+(bars||'<div class="hint">'+esc(t("v_none"))+'</div>')+(bars?'<span class="aline" style="bottom:'+lineY.toFixed(1)+'%"><em>10K</em></span>':'')+'</div>'+
+   '<p class="hint">'+esc(L("an_checked"))+'</p>'+
+   '<div class="algo" hidden><h4>'+esc(L("an_algo"))+'</h4><p class="hint">'+esc(L("an_algo_h"))+'</p>'+B.parts.map(function(p){return '<div class="cr"><div><span>'+esc(L(p.k))+' · '+p.w+'%</span><b>'+esc(p.txt)+'</b></div><div class="crbar"><i style="--w:'+Math.round(p.v*100)+'%"></i></div></div>'}).join("")+'</div></div>';
+}
+function animRings(){
+  document.querySelectorAll(".ring:not([data-d])").forEach(function(r){
+    r.setAttribute("data-d","1");var s=Number(r.getAttribute("data-s")),fg=r.querySelector(".rfg"),C=Number(fg.getAttribute("data-c")),num=r.querySelector(".rnum b"),t0=null;
+    function step(ts){if(t0===null)t0=ts;var p=Math.min(1,(ts-t0)/1100),e=1-Math.pow(1-p,3);num.textContent=Math.round(s*e);fg.style.strokeDashoffset=String(C*(1-s/100*e));if(p<1)requestAnimationFrame(step)}
+    requestAnimationFrame(step);
+  });
+}
+try{var _mo=new MutationObserver(function(){clearTimeout(animRings.t);animRings.t=setTimeout(animRings,30)});_mo.observe(document.body,{childList:true,subtree:true})}catch(e){}
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="algoToggle"]');if(!el)return;var c=el.closest(".acard"),b=c&&c.querySelector(".algo");if(b){b.hidden=!b.hidden;if(!b.hidden)b.classList.add("pop")}});
+Object.assign(LT.en,{an_today:"today",an_ago:"{n} days ago",an_title:"Account breakdown",an_algo:"What we look at",an_of:"of 100",an_freq:"How often you post",an_week:"per week",an_views:"Views per video",an_likes:"Likes to views",an_last:"Last post",an_checked:"We analyse your public TikTok page once a day. Videos of the last 30 days count. One bar is one video, the dashed line is 10,000 views.",an_algo_h:"The score is our own calculation from your public numbers. This is how much each part counts.",cr_views:"Views per video",cr_stable:"Stable views",cr_price:"Price fit",cr_freq:"Posting often",cr_fresh:"Fresh posts"});
+Object.assign(LT.ru,{an_today:"сегодня",an_ago:"{n} дн. назад",an_title:"Разбор аккаунта",an_algo:"На что мы смотрим",an_of:"из 100",an_freq:"Как часто вы постите",an_week:"в неделю",an_views:"Просмотров на видео",an_likes:"Лайки к просмотрам",an_last:"Последний пост",an_checked:"Мы читаем вашу открытую страницу TikTok раз в сутки. Считаются видео за последние 30 дней. Один столбец это одно видео, пунктир это 10 000 просмотров.",an_algo_h:"Оценка наша собственная, из ваших открытых цифр. Вот сколько весит каждая часть.",cr_views:"Просмотров на видео",cr_stable:"Стабильные просмотры",cr_price:"Цена подходит",cr_freq:"Как часто вы постите",cr_fresh:"Свежие посты"});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
