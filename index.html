@@ -763,6 +763,29 @@ body.isadmin .wrap{max-width:1320px}
 }
 #v-admin .mchips{flex:1 1 100%!important}#v-admin .rgbox{max-width:360px}
 
+/* ===== v29: owner on phones ===== */
+#dock .dkc{position:absolute;top:2px;right:calc(50% - 24px);min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:#F43F5E;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+#dock button{position:relative}
+@media (max-width:899px){
+ body.isadmin .ownside .agh,body.isadmin .ownside .autosc,body.isadmin .ownside label.autosc{display:none!important}
+ body.isadmin .ownside .agrp{display:none;background:none!important;border:0!important;padding:0!important;box-shadow:none}
+ body.isadmin .ownside[data-grp=ov] .g-ov,body.isadmin .ownside[data-grp=ed] .g-ed,body.isadmin .ownside[data-grp=pr] .g-pr,body.isadmin .ownside[data-grp=st] .g-st{display:block}
+ body.isadmin .ownside[data-grp=ov] .agrp{display:none}
+ body.isadmin .ownside .agb{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:2px 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+ body.isadmin .ownside .agb::-webkit-scrollbar{display:none}
+ body.isadmin .ownside .atb{flex:0 0 auto;white-space:nowrap;padding:10px 16px;font-size:15px}
+ body.isadmin .ownside .atb[aria-pressed="true"]{background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important;color:#fff!important;border-color:transparent!important}
+ body.isadmin .ownside #admLogout{width:auto;margin:0 0 10px}
+ body.isadmin .ownlay{display:block}
+ body.isadmin .ownmain{margin-top:4px}
+ body.isadmin main.wrap{padding-bottom:96px}
+ body.isadmin .msum,.msum{grid-template-columns:repeat(2,1fr)!important}
+ body.isadmin .tiles{grid-template-columns:repeat(2,1fr)!important}
+ #v-admin>h2{display:none}
+}
+@media (max-width:899px){body.isadmin #v-admin{padding-top:10px}body.isadmin .ownside .row{margin-bottom:0!important}}
+@media (max-width:899px){body.isadmin .ownlay,body.isadmin .ownside,body.isadmin .ownmain,body.isadmin .ownside .row,body.isadmin .ownside .row>div{min-width:0;max-width:100%}body.isadmin .ownlay{overflow-x:clip}}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -939,7 +962,7 @@ body.isadmin .wrap{max-width:1320px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v28 · 15.11 18:50</span>
+  <span>© Promo Campaign · v29 · 15.11 19:05</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -3766,6 +3789,34 @@ Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Ос
 (function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);try{
   var sc=document.querySelector("#profCard .setcard");if(sc&&!sc.getAttribute("data-ord")){sc.setAttribute("data-ord","1");var k=sc.children;if(k.length>3&&k[2].tagName==="LABEL"&&k[3].classList.contains("f"))sc.insertBefore(k[3],k[2])}
   var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
+
+/* ===== v29: phone owner cabinet with bottom menu ===== */
+var AGRP=[["ov","🏠","a_overview",["overview"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["pr","🎵","g_pr",["producers","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
+function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
+function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
+  if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
+  if(g==="pr")return S2.pendingTopups||0;return 0}
+function adDockRender(){
+  var d=$("dock");
+  var on=(location.hash||"").replace(/\?.*/,"")==="#admin"&&window.innerWidth<900&&ADM&&ADM.ok&&ADM.data;
+  if(!on)return;
+  if(!d){d=document.createElement("nav");d.id="dock";d.setAttribute("aria-label","Menu");document.body.appendChild(d)}
+  var cur=adGroupOf(LV.adTab||"overview");
+  d.hidden=false;document.body.classList.add("hasdock","isadmin");
+  var lo=$("admLogout"),mn=document.querySelector(".ownmain");if(lo&&mn&&lo.parentNode!==mn){var w=document.createElement("div");w.className="row";w.style.marginTop="20px";w.appendChild(lo);mn.appendChild(w)}
+  d.innerHTML=AGRP.map(function(g){var c=adCount(g[0]);return '<button type="button" data-ag="'+g[0]+'"'+(g[0]===cur?' aria-current="page"':'')+'><i>'+g[1]+'</i><span>'+esc(L(g[2]))+'</span>'+(c?'<b class="dkc">'+c+'</b>':'')+'</button>'}).join("");
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("#dock [data-ag]");if(!b)return;e.stopImmediatePropagation();
+  var g=b.getAttribute("data-ag"),def=AGRP.filter(function(x){return x[0]===g})[0];
+  if(adGroupOf(LV.adTab||"overview")!==g)LV.adTab=def[3][0];
+  renderAdminLive();window.scrollTo({top:0,behavior:"smooth"});
+},true);
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{
+  var side=document.querySelector(".ownside");if(side)side.setAttribute("data-grp",adGroupOf(LV.adTab||"overview"));
+  adDockRender()}catch(e){}return r}})();
+(function(){var o=dockRender;dockRender=function(){o.apply(this,arguments);try{adDockRender()}catch(e){}}})();
+window.addEventListener("resize",function(){try{renderAdminLive()}catch(e){}});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
