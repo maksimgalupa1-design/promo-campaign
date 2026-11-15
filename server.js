@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 35;
+const SERVER_VER = 36;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -486,7 +486,7 @@ function overview() {
       pendingRequests: reqs.filter(r => r.status === "pending" || r.status === "submitted").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
-    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
+    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", enrollUntil: t.enrollUntil || 0, message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
     topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", deadline: (db.tracks[p.trackId] || {}).deadline || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, cur: p.cur || "", orig: p.orig || 0, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
@@ -818,11 +818,13 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("psid", "", 0) });
     }
     if (P.startsWith("/api/dm")) {     // private messages between a user (editor or producer) and the manager
-      const pr0 = producerOf(req), eu0 = sessionUser(req);
+      const asR = url.searchParams.get("as") || "", pr1 = producerOf(req), eu1 = sessionUser(req);
+      const pr0 = asR === "editor" && eu1 ? null : (asR === "producer" && !pr1 ? null : pr1), eu0 = pr0 ? null : eu1;   // the page says which role it is acting as
       if (!pr0 && !eu0) return send(res, 401, { error: "not signed in" });
       const key = pr0 ? "p:" + pr0.id : "e:" + eu0.id;
       const D = db.settings.dm = db.settings.dm || { threads: {} };
       const th = D.threads[key] = D.threads[key] || { key, kind: pr0 ? "producer" : "editor", name: pr0 ? (pr0.name || pr0.email) : ((((eu0.accounts || [])[0] || {}).profile || {}).username ? "@" + eu0.accounts[0].profile.username : (eu0.chatNick || eu0.id)), sub: "", msgs: [], updated: 0, userSeen: 0, adminSeen: 0 };
+      th.avatar = pr0 ? "" : ((((eu0.accounts || [])[0] || {}).profile || {}).avatar_url || "");
       th.sub = pr0 ? [pr0.email, pr0.instagram && "IG " + pr0.instagram, pr0.tiktok && "TikTok " + pr0.tiktok, pr0.discord && "Discord " + pr0.discord].filter(Boolean).join(" · ") : (eu0.chatNick ? "chat: " + eu0.chatNick : "");
       const mine = () => th.msgs.filter(m => !m.hideU).slice(-200).map(m => ({ id: m.id, at: m.at, mgr: !!m.mgr, text: m.text }));
       if (P === "/api/dm/unread" && M === "GET") return send(res, 200, { n: th.msgs.filter(m => m.mgr && !m.hideU && m.at > (th.userSeen || 0)).length });
@@ -866,8 +868,8 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, title && budget >= 100 && budget <= 1000000, 400, "minimum budget is $100")) return;
         const L = {}, src = b.links && typeof b.links === "object" ? b.links : {};
         for (const k of ["spotify", "soundcloud", "tiktok", "mp3"]) { const v = String(src[k] || "").trim().slice(0, 400); if (v) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(v), 400, "link must start with https://")) return; const kk = classifyLink(v); if (!L[kk]) L[kk] = v; } }
-        if (!need(res, Object.keys(L).length > 0 || b.willUpload, 400, "add at least one link or an mp3 file")) return;
         const plats = (Array.isArray(b.platforms) ? b.platforms : []).filter(x => PLATFORMS.includes(x));
+        if (!need(res, !(plats.length ? plats : ["tiktok"]).includes("tiktok") || L.tiktok, 400, "add the TikTok sound link")) return;
         if (!need(res, deadlineOk(b.deadline), 400, "The deadline must be at least 1 week (for example: 2 weeks, 1 month)")) return;
         if (!need(res, !b.descRule || String(b.descText || "").trim(), 400, "write what editors must put in the description")) return;
         const ig = String(b.instagram || "").trim().slice(0, 100); if (!need(res, ig, 400, "write your Instagram")) return;
@@ -1077,7 +1079,7 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/dm" && M === "GET") {
         const D = db.settings.dm = db.settings.dm || { threads: {} };
-        return send(res, 200, { threads: Object.values(D.threads).filter(t => t.msgs.length).sort((a, c) => c.updated - a.updated).map(t => { const last = t.msgs[t.msgs.length - 1]; return { key: t.key, kind: t.kind, name: t.name, sub: t.sub || "", last: last.text.slice(0, 80), lastMgr: !!last.mgr, updated: t.updated, unread: t.msgs.filter(m => !m.mgr && m.at > (t.adminSeen || 0)).length }; }) });
+        return send(res, 200, { threads: Object.values(D.threads).filter(t => t.msgs.length).sort((a, c) => (c.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || c.updated - a.updated).map(t => { const last = t.msgs[t.msgs.length - 1]; return { key: t.key, kind: t.kind, name: t.name, sub: t.sub || "", avatar: t.avatar || "", last: last.text.slice(0, 80), lastMgr: !!last.mgr, updated: t.updated, pinned: !!t.pinned, archived: !!t.archived, muted: !!t.muted, unread: t.muted ? 0 : t.msgs.filter(m => !m.mgr && m.at > (t.adminSeen || 0)).length }; }) });
       }
       if (P === "/api/admin/dm/thread" && M === "GET") {
         const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[url.searchParams.get("key") || ""]; if (!need(res, t, 404, "no such chat")) return;
@@ -1087,6 +1089,17 @@ const server = http.createServer(async (req, res) => {
         const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;
         const text = String(b.text || "").trim().slice(0, 1000); if (!need(res, text, 400, "write a message")) return;
         t.msgs.push({ id: uid8(), at: Date.now(), mgr: true, text }); t.updated = Date.now(); t.adminSeen = Date.now(); saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/dm/flag" && M === "POST") {
+        const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;
+        if (b.pinned !== undefined) { if (b.pinned && !t.pinned) { if (!need(res, Object.values(D.threads).filter(x => x.pinned).length < 10, 400, "You can pin up to 10 chats")) return; } t.pinned = !!b.pinned; }
+        if (b.archived !== undefined) { t.archived = !!b.archived; if (t.archived) t.pinned = false; }
+        if (b.muted !== undefined) t.muted = !!b.muted;
+        saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/track-enroll" && M === "POST") {
+        const t = db.tracks[b.id]; if (!need(res, t, 404, "no such track")) return;
+        const v = Number(b.until) || 0; t.enrollUntil = v > 0 ? v : 0; saveDb(); return send(res, 200, { ok: true, until: t.enrollUntil });
       }
       if (P === "/api/admin/dm/delete" && M === "POST") {
         const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;
