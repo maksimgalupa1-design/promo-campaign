@@ -298,6 +298,7 @@ function accAdminView(acc) {
   const v = accView(acc), r = autoStars(acc);
   v.stars = { auto: r.stars, manual: acc.rating_manual == null ? null : acc.rating_manual, final: acc.rating_manual != null ? acc.rating_manual : r.stars };
   v.cpm = r.cpm;
+  { const ou = Object.values(db.users).find(x => (x.accounts || []).some(z => z.open_id === acc.open_id)); v.payout = ou && ou.payout ? decObj(ou.payout.enc) : null; }
   v.videos = v.videos.slice(0, 40);
   return v;
 }

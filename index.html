@@ -427,6 +427,7 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 textarea{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
 .accfull{max-height:80vh;overflow:auto}.accfull .tbl{font-size:13px}
 .tieropt{padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin:6px 0;display:flex;gap:10px;align-items:center}.tieropt input{width:20px;height:20px}
+.tieropt.cust{display:block}.payto{border-left:4px solid #6B5CFF}.payto2{font-weight:600}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -2555,12 +2556,14 @@ Object.assign(LT.ru,{
  nt_ord_reminder:"Напоминание: «{t}»: осталось {d}, чтобы отправить ссылки на видео.",nt_price_ok:"Новая цена для {h} принята: {p}.",nt_price_no:"Менеджер оставил цену {p} для {h}."});
 function isWait(a){return a.adminStatus==="new"||!a.adminStatus||!!a.priceReq}
 function tiersTxt(ts){return (ts&&ts.length)?ts.map(function(x){return x.min+"+: −"+x.pct+"%"}).join(" · "):L("wt_none")}
-var TIER_OPTS=[[3,5],[6,10],[12,15],[20,20]];
+var TIER_OPTS=[[3,5],[6,10],[12,15]];
 function tiersHtml(u){
-  var cur=u.tiers||[];
-  return '<div class="f tiers"><span>'+esc(L("tr_h"))+'</span><span class="hint">'+esc(L("tr_h3"))+'</span>'+TIER_OPTS.map(function(o,i){var on=cur.some(function(x){return x.min===o[0]&&x.pct===o[1]});return '<label class="chk tieropt" for="tOpt'+i+'"><input type="checkbox" id="tOpt'+i+'" data-min="'+o[0]+'" data-pct="'+o[1]+'"'+(on?' checked':'')+'><span><b>'+o[0]+'+ '+esc(L("tr_vid"))+'</b> → −'+o[1]+'%</span></label>'}).join("")+'</div>';
+  var cur=u.tiers||[],pre=function(x){return TIER_OPTS.some(function(o){return o[0]===x.min&&o[1]===x.pct})},cust=cur.filter(function(x){return !pre(x)})[0]||{min:"",pct:""};
+  return '<div class="f tiers"><span>'+esc(L("tr_h"))+'</span><span class="hint">'+esc(L("tr_h3"))+'</span>'+TIER_OPTS.map(function(o,i){var on=cur.some(function(x){return x.min===o[0]&&x.pct===o[1]});return '<label class="chk tieropt" for="tOpt'+i+'"><input type="checkbox" id="tOpt'+i+'" data-min="'+o[0]+'" data-pct="'+o[1]+'"'+(on?' checked':'')+'><span><b>'+o[0]+' '+esc(L("tr_vid"))+'</b> → −'+o[1]+'%</span></label>'}).join("")+
+   '<div class="tieropt cust"><b>'+esc(L("tr_own"))+'</b><div class="tierrow"><span>'+esc(L("tr_from"))+'</span><input id="tcMin" type="number" min="2" max="500" inputmode="numeric" value="'+cust.min+'" placeholder="8"><span>'+esc(L("tr_vid"))+'</span><b>−</b><input id="tcPct" type="number" min="1" max="99" inputmode="numeric" value="'+cust.pct+'" placeholder="12"><span>%</span></div></div>'+
+   '<div class="row"><button type="button" class="btn primary" data-l="saveTiers">'+esc(L("tr_save"))+'</button></div></div>';
 }
-function readTiers(){var o=[];document.querySelectorAll(".tieropt input:checked").forEach(function(c){o.push({min:Number(c.getAttribute("data-min")),pct:Number(c.getAttribute("data-pct"))})});return o}
+function readTiers(){var o=[];document.querySelectorAll(".tieropt input[data-min]:checked").forEach(function(c){o.push({min:Number(c.getAttribute("data-min")),pct:Number(c.getAttribute("data-pct"))})});var m=Number(val("tcMin")),p=Number(val("tcPct"));if(m>=2&&m<=500&&p>=1&&p<=99)o.push({min:m,pct:p});return o}
 (function(){var o=renderDashLive;renderDashLive=function(){
   o.apply(this,arguments);var u=S.user;
   var d=$("sDisc");if(d&&u){var lab=d.closest("label");if(lab)lab.outerHTML=tiersHtml(u)}
@@ -2697,6 +2700,20 @@ document.addEventListener("click",function(e){
 
 Object.assign(LT.en,{tr_h3:"Tick the deals you want to offer. Nothing is offered until you tick it and send for review.",ad_about:"About this account (at least 3 words)",ad_sent:"✓ Sent for review. The manager will decide soon."});
 Object.assign(LT.ru,{tr_h3:"Отметьте скидки, которые хотите предложить. Пока вы не отметите и не отправите на проверку, скидок нет.",ad_about:"Об аккаунте (минимум 3 слова)",ad_sent:"✓ Отправлено на проверку. Менеджер скоро решит."});
+
+Object.assign(LT.en,{tr_h:"Bulk deals",tr_h3:"Pick a ready deal, or make your own below, then press Save deals. Nothing is offered until you save.",tr_own:"Your own deal",tr_save:"Save deals",tr_saved:"✓ Deals sent to the manager.",pay_mine:"Where we send your money",pay_mine_h:"These are your payout details. You can change them at any time.",pay_none:"You have not added payout details yet. Add them so the manager can pay you.",ov_pay:"Pay this editor to",ov_nopay:"No payout details yet"});
+Object.assign(LT.ru,{tr_h:"Скидки за количество",tr_h3:"Выберите готовую скидку или сделайте свою ниже, потом нажмите «Сохранить скидки». Пока не сохранили, скидок нет.",tr_own:"Своя скидка",tr_save:"Сохранить скидки",tr_saved:"✓ Скидки отправлены менеджеру.",pay_mine:"Куда мы отправляем ваши деньги",pay_mine_h:"Это ваши реквизиты для выплат. Их можно изменить в любой момент.",pay_none:"Вы ещё не добавили реквизиты. Добавьте их, чтобы менеджер мог вам заплатить.",ov_pay:"Куда платить эдитору",ov_nopay:"Реквизитов пока нет"});
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="saveTiers"]');if(!el||!S.user)return;e.stopImmediatePropagation();
+  var ts=readTiers(),id=S.user.id;el.disabled=true;
+  api("/api/account/update",{id:id,tiers:ts,review:true,discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){el.disabled=false;if(!r.ok){toast((r.j&&r.j.error)||L("p_err"));return}applyLive(r.j);renderDashLive();toast(L("tr_saved"))})},true);
+/* editor: payout details always visible on the account page */
+(function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);
+  if(LV.acc&&S.user){var h=$("payH1");if(h){h.hidden=false;h.textContent=L("pay_mine")}$("payBox").innerHTML='<p class="hint">'+esc(L(S.user&&LV.payout&&LV.payout.set?"pay_mine_h":"pay_none"))+'</p>'+payoutBlock();try{refreshPayBox()}catch(e){}}
+}})();
+/* owner: where to pay */
+function payTxt(p){return p?esc((p.method==="crypto"?coinL(p.coin)+" ":p.method+" ")+p.value+(p.holder?" · "+p.holder:"")):""}
+(function(){var o=accFullHtml;accFullHtml=function(a){var h=o(a);return h.replace('<p class="hint"><b>'+esc(L("wt_tiers")),'<div class="note payto"><b>💳 '+esc(L("ov_pay"))+':</b> '+(a.payout?payTxt(a.payout):esc(L("ov_nopay")))+'</div><p class="hint"><b>'+esc(L("wt_tiers")))}})();
+(function(){var o=accCardHtml;accCardHtml=function(a){var h=o(a);return h.replace('<div class="wtier">','<div class="wtier payto2">💳 '+(a.payout?payTxt(a.payout):esc(L("ov_nopay")))+'</div><div class="wtier">')}})();
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
