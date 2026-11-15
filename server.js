@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 38;
+const SERVER_VER = 39;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -836,6 +836,7 @@ const server = http.createServer(async (req, res) => {
       const D = db.settings.dm = db.settings.dm || { threads: {} };
       const th = D.threads[key] = D.threads[key] || { key, kind: pr0 ? "producer" : "editor", name: pr0 ? (pr0.name || pr0.email) : ((((eu0.accounts || [])[0] || {}).profile || {}).username ? "@" + eu0.accounts[0].profile.username : (eu0.chatNick || eu0.id)), sub: "", msgs: [], updated: 0, userSeen: 0, adminSeen: 0 };
       th.avatar = pr0 ? "" : ((((eu0.accounts || [])[0] || {}).profile || {}).avatar_url || "");
+      th.tt = pr0 ? (pr0.tiktok ? [String(pr0.tiktok).slice(0, 120)] : []) : (eu0.accounts || []).map(x => x && x.profile && x.profile.username).filter(Boolean).slice(0, 5);
       th.sub = pr0 ? [pr0.email, pr0.instagram && "IG " + pr0.instagram, pr0.tiktok && "TikTok " + pr0.tiktok, pr0.discord && "Discord " + pr0.discord].filter(Boolean).join(" · ") : (eu0.chatNick ? "chat: " + eu0.chatNick : "");
       const mine = () => th.msgs.filter(m => !m.hideU).slice(-200).map(m => ({ id: m.id, at: m.at, mgr: !!m.mgr, text: m.text }));
       if (P === "/api/dm/unread" && M === "GET") return send(res, 200, { n: th.msgs.filter(m => m.mgr && !m.hideU && m.at > (th.userSeen || 0)).length });
@@ -1090,11 +1091,11 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/dm" && M === "GET") {
         const D = db.settings.dm = db.settings.dm || { threads: {} };
-        return send(res, 200, { threads: Object.values(D.threads).filter(t => t.msgs.length).sort((a, c) => (c.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || c.updated - a.updated).map(t => { const last = t.msgs[t.msgs.length - 1]; return { key: t.key, kind: t.kind, name: t.name, sub: t.sub || "", avatar: t.avatar || "", last: last.text.slice(0, 80), lastMgr: !!last.mgr, updated: t.updated, pinned: !!t.pinned, archived: !!t.archived, muted: !!t.muted, unread: t.muted ? 0 : t.msgs.filter(m => !m.mgr && m.at > (t.adminSeen || 0)).length }; }) });
+        return send(res, 200, { threads: Object.values(D.threads).filter(t => t.msgs.length).sort((a, c) => (c.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || c.updated - a.updated).map(t => { const last = t.msgs[t.msgs.length - 1]; return { key: t.key, kind: t.kind, name: t.name, sub: t.sub || "", tt: t.tt || [], avatar: t.avatar || "", last: last.text.slice(0, 80), lastMgr: !!last.mgr, updated: t.updated, pinned: !!t.pinned, archived: !!t.archived, muted: !!t.muted, unread: t.muted ? 0 : t.msgs.filter(m => !m.mgr && m.at > (t.adminSeen || 0)).length }; }) });
       }
       if (P === "/api/admin/dm/thread" && M === "GET") {
         const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[url.searchParams.get("key") || ""]; if (!need(res, t, 404, "no such chat")) return;
-        t.adminSeen = Date.now(); saveDb(); return send(res, 200, { key: t.key, kind: t.kind, name: t.name, sub: t.sub || "", msgs: t.msgs.slice(-300).map(m => ({ id: m.id, at: m.at, mgr: !!m.mgr, text: m.text, hideU: !!m.hideU })) });
+        t.adminSeen = Date.now(); saveDb(); return send(res, 200, { key: t.key, kind: t.kind, name: t.name, sub: t.sub || "", tt: t.tt || [], msgs: t.msgs.slice(-300).map(m => ({ id: m.id, at: m.at, mgr: !!m.mgr, text: m.text, hideU: !!m.hideU })) });
       }
       if (P === "/api/admin/dm/say" && M === "POST") {
         const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;

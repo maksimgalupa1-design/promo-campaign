@@ -1058,6 +1058,20 @@ body.tab-promos .ownmain .f{margin-right:8px}
 .mkbox{max-width:620px;margin:0 auto}.mkt{background:rgba(45,212,191,.15);color:#2DD4BF}
 .mkrow{display:flex;flex-direction:column;gap:6px}.mkh{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.mkh small{margin-left:auto;color:var(--muted)}
 .mk-new{background:rgba(229,51,74,.18);color:#FF7A88}.mk-talking{background:rgba(224,168,0,.18);color:#E0A800}.mk-done{background:rgba(31,168,90,.18);color:#4CD08F}
+/* v51 */
+.tklinks{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0}
+.tkl{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;background:rgba(139,108,255,.16);color:#B7A4FF;font-weight:600;font-size:13px;text-decoration:none}
+.tkl:hover{background:rgba(139,108,255,.3)}
+#tkToasts{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none}
+body.hasdock #tkToasts{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.tktoast{pointer-events:auto;display:flex;gap:10px;align-items:flex-start;max-width:min(340px,calc(100vw - 28px));text-align:left;padding:12px 14px;border-radius:14px;border:1px solid rgba(139,108,255,.5);background:#1c1830;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 18px rgba(139,108,255,.35);cursor:pointer;font:inherit;animation:tkin .3s ease}
+.tktoast i{font-style:normal;font-size:20px}.tktoast small{display:block;opacity:.7;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
+.tktoast.out{opacity:0;transform:translateX(30px);transition:.4s}
+@keyframes tkin{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+.chath{position:relative}
+.dmwr{position:absolute;right:10px;top:100%;margin-top:6px;z-index:5;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--card,#1c1830);border:1px solid rgba(139,108,255,.4);box-shadow:0 10px 30px rgba(0,0,0,.5);min-width:210px}
+.dmwr .supb{justify-content:flex-start}
+.dmwrb{white-space:nowrap}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1237,7 +1251,7 @@ body.tab-promos .ownmain .f{margin-right:8px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v50 · 15.11 23:10</span>
+  <span>© Promo Campaign · v51 · 15.11 23:35</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2210,7 +2224,7 @@ function renderOwner(){
   admNav();["adH1","adH2","adNote"].forEach(function(i){$(i).hidden=false});
   var D=ADM.data;
   if(!ADM.ok||!D)return false;checkNew(D);
-  var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
+  var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')+(k==="tickets"&&window.__TK&&window.__TK.unread?' <i class="cnt">'+(window.__TK.unread>99?"99+":window.__TK.unread)+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
   tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks","maker"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
@@ -4098,6 +4112,7 @@ var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"
 function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
 function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
   if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
+  if(g==="tk")return (window.__TK&&window.__TK.unread)||0;
   if(g==="pr")return S2.pendingTopups||0;return 0}
 function adDockRender(){
   var d=$("dock");
@@ -4107,7 +4122,7 @@ function adDockRender(){
   var cur=adGroupOf(LV.adTab||"overview");
   d.hidden=false;document.body.classList.add("hasdock","isadmin");
   var lo=$("admLogout"),mn=document.querySelector(".ownmain");if(lo&&mn&&lo.parentNode!==mn){var w=document.createElement("div");w.className="row";w.style.marginTop="20px";w.appendChild(lo);mn.appendChild(w)}
-  d.innerHTML=AGRP.map(function(g){var c=adCount(g[0]);return '<button type="button" data-ag="'+g[0]+'"'+(g[0]===cur?' aria-current="page"':'')+'><i>'+g[1]+'</i><span>'+esc(L(g[2]))+'</span>'+(c?'<b class="dkc">'+c+'</b>':'')+'</button>'}).join("");
+  d.innerHTML=AGRP.map(function(g){var c=adCount(g[0]);return '<button type="button" data-ag="'+g[0]+'"'+(g[0]===cur?' aria-current="page"':'')+'><i>'+g[1]+'</i><span>'+esc(L(g[2]))+'</span>'+(c?'<b class="dkc">'+(c>99?"99+":c)+'</b>':'')+'</button>'}).join("");
 }
 document.addEventListener("click",function(e){
   var b=e.target.closest&&e.target.closest("#dock [data-ag]");if(!b)return;e.stopImmediatePropagation();
@@ -4860,13 +4875,13 @@ function dmSend(){var i=$("dmIn");if(!i)return;var t=i.value.trim();if(!t)return
 /* ---- owner: tickets tab ---- */
 window.__TK=null;var TK={kind:"editor",list:null,open:null,th:null,sig:"",unread:0};
 window.__TK=TK;
-function tkLoad(){api("/api/admin/dm").then(function(r){if(!r.ok)return;var sg=JSON.stringify(r.j.threads.map(function(t){return [t.key,t.updated,t.unread]}));TK.unread=r.j.threads.reduce(function(s,t){return s+t.unread},0);if(sg===TK.lsig&&TK.list)return;TK.lsig=sg;TK.list=r.j.threads;try{nBadge()}catch(e){}if(LV.adTab==="tickets"&&!TK.open)renderOwner()})}
+function tkLoad(){api("/api/admin/dm").then(function(r){if(!r.ok)return;try{tkNotify(r.j.threads)}catch(e){}var sg=JSON.stringify(r.j.threads.map(function(t){return [t.key,t.updated,t.unread]}));TK.unread=r.j.threads.reduce(function(s,t){return s+t.unread},0);if(sg===TK.lsig&&TK.list)return;TK.lsig=sg;TK.list=r.j.threads;try{nBadge()}catch(e){}if(LV.adTab==="tickets"&&!TK.open)renderOwner();else if(LV.adTab!=="tickets"){var fa=document.activeElement;if(!(fa&&/INPUT|TEXTAREA/.test(fa.tagName)))try{renderOwner()}catch(e){}}})}
 function tkThread(){if(!TK.open)return;api("/api/admin/dm/thread?key="+encodeURIComponent(TK.open)).then(function(r){if(!r.ok)return;var sg=r.j.msgs.map(function(m){return m.id}).join(",");if(sg===TK.tsig&&TK.th)return;TK.tsig=sg;TK.th=r.j;TK.stick=true;if(LV.adTab==="tickets")renderOwner()})}
 function tkHtml(){
   if(!TK.list){tkLoad();return '<div class="empty">…</div>'}
   if(TK.open){
     var t=TK.th;if(!t||t.key!==TK.open){tkThread();return '<div class="empty">…</div>'}
-    return '<div class="tkhead"><button type="button" class="btn sm" data-l="tkBack">← '+esc(L("tk_back"))+'</button><div class="tkwho"><b>'+esc(t.name)+'</b><small>'+esc(t.sub||"")+'</small></div><button type="button" class="btn sm danger" data-l="tkDelChat">'+esc(L("tk_del_chat"))+'</button></div>'+
+    return '<div class="tkhead"><button type="button" class="btn sm" data-l="tkBack">← '+esc(L("tk_back"))+'</button><div class="tkwho"><b>'+esc(t.name)+'</b>'+((t.tt||[]).length?'<span class="tklinks">'+t.tt.map(function(n){var u=/^https?:\/\//i.test(n)?n:"https://www.tiktok.com/@"+String(n).replace(/^@/,"");return '<a class="tkl" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">🎵 '+esc(/^https?:\/\//i.test(n)?"TikTok":"@"+String(n).replace(/^@/,""))+'</a>'}).join("")+'</span>':'')+'<small>'+esc(t.sub||"")+'</small></div><button type="button" class="btn sm danger" data-l="tkDelChat">'+esc(L("tk_del_chat"))+'</button></div>'+
       '<div id="tkLog" class="dmlog tk">'+(t.msgs.length?t.msgs.map(function(m){return '<div class="dmm '+(m.mgr?'me':'mgr')+'" data-id="'+esc(m.id)+'"><div class="dmb">'+chLinkify(m.text)+'</div><div class="dmt">'+(m.mgr?esc(L("dm_mgr"))+' · ':'')+dmTime(m.at)+(m.hideU?' · <i>'+esc(L("tk_gone"))+'</i>':'')+'<button type="button" class="chdel" data-l="tkDel" data-id="'+esc(m.id)+'" aria-label="delete">'+TRASH+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("dm_none"))+'</div>')+'</div>'+
       '<div class="row dmin"><input id="tkIn" type="text" maxlength="1000" placeholder="'+esc(L("tk_ph"))+'" autocomplete="off"><button type="button" class="btn primary" data-l="tkSend">'+esc(L("dm_send"))+'</button></div>'}
   var vis=TK.list.filter(function(x){return !x.archived}),arc=TK.list.filter(function(x){return x.archived});
@@ -5092,6 +5107,48 @@ setInterval(function(){if(ownerMode()&&!document.hidden)mkLoad()},20000);
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="mkSt"],[data-l="mkDel"]');if(!el)return;e.stopImmediatePropagation();
   var b=el.getAttribute("data-l")==="mkDel"?{id:el.getAttribute("data-id"),del:true}:{id:el.getAttribute("data-id"),status:el.getAttribute("data-s")};
   api("/api/admin/maker",b).then(function(){MK.sig="";mkLoad()})},true);
+})();
+
+/* ===== v51: owner toast for new tickets, dock highlight, "write to manager" ===== */
+(function(){
+Object.assign(LT.en,{dm_wr:"Write to manager",dm_wr_h:"Choose where to write:",dm_wr_none:"No contacts are set yet.",tk_new:"New message",tk_toast:"wrote to you"});
+Object.assign(LT.ru,{dm_wr:"Написать менеджеру",dm_wr_h:"Выберите, куда написать:",dm_wr_none:"Контакты пока не заданы.",tk_new:"Новое сообщение",tk_toast:"вам написал(а)"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};["dm_wr","dm_wr_h","dm_wr_none","tk_new","tk_toast"].forEach(function(x){if(!XLL[k][x])XLL[k][x]=LT.en[x]})});
+var PREV=null;function TKo(){return window.__TK}
+window.tkNotify=function(list){var cur={};list.forEach(function(t){cur[t.key]=t.unread||0});
+  if(PREV){list.forEach(function(t){if(t.muted||t.archived)return;if((t.unread||0)>(PREV[t.key]||0)&&!(TKo().open===t.key&&LV.adTab==="tickets"))tkToast(t)})}
+  PREV=cur};
+window.tkToast=function(t){var b=$("tkToasts");if(!b){b=document.createElement("div");b.id="tkToasts";document.body.appendChild(b)}
+  var e=document.createElement("button");e.type="button";e.className="tktoast";e.setAttribute("data-key",t.key);
+  e.innerHTML='<i>💬</i><span><b>'+esc(t.name)+'</b> '+esc(L("tk_toast"))+'<small>'+esc(t.last||"")+'</small></span>';
+  b.appendChild(e);while(b.children.length>3)b.firstChild.remove();
+  setTimeout(function(){e.classList.add("out");setTimeout(function(){e.remove()},400)},9000)};
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest(".tktoast");if(!el)return;e.stopImmediatePropagation();
+  if(el.getAttribute("data-dm")){el.remove();window.__dmOpen();return}
+  var T=TKo();T.open=el.getAttribute("data-key");T.th=null;T.tsig="";LV.adTab="tickets";el.remove();try{renderAdminLive()}catch(x){renderOwner()}window.scrollTo({top:0,behavior:"smooth"})},true);
+var LASTN=null;
+function dmPoll(){if(document.hidden||ownerMode())return;var r0=roleGet();if(!r0||r0==="home")return;api(window.__dmQ("/api/dm/unread")).then(function(r){if(!r.ok)return;var n=r.j.n||0;
+  if(LASTN!==null&&n>LASTN&&!$("dmOv")){var b=$("tkToasts");if(!b){b=document.createElement("div");b.id="tkToasts";document.body.appendChild(b)}
+   var e=document.createElement("button");e.type="button";e.className="tktoast";e.setAttribute("data-dm","1");e.innerHTML='<i>💬</i><span><b>'+esc(L("dm_mgr"))+'</b><small>'+esc(L("dm_t"))+'</small></span>';b.appendChild(e);
+   setTimeout(function(){e.classList.add("out");setTimeout(function(){e.remove()},400)},9000)}
+  LASTN=$("dmOv")?0:n})}
+setInterval(dmPoll,8000);setTimeout(dmPoll,3000);
+/* dock: highlight Ticket while the ticket window is open */
+function dmDock(){var d=$("dock");if(!d||!$("dmOv"))return;d.querySelectorAll("[aria-current]").forEach(function(b){b.removeAttribute("aria-current")});var c=d.querySelector('[data-x="tix"]');if(c)c.setAttribute("aria-current","page")}
+(function(){var o=dockRender;dockRender=function(){o.apply(this,arguments);try{dmDock()}catch(e){}}})();
+var oOpen=window.__dmOpen,oClose=window.__dmClose;
+window.__dmOpen=function(){var r=oOpen.apply(this,arguments);try{dockRender()}catch(e){}return r};
+window.__dmClose=function(){var r=oClose.apply(this,arguments);try{dockRender()}catch(e){}return r};
+/* header button: write to manager */
+function dmHead(){var h=document.querySelector("#dmOv .chath");if(!h||h.querySelector(".dmwrb"))return;var cl=h.querySelector('[data-l="dmClose"]');if(!cl)return;
+  var b=document.createElement("button");b.type="button";b.className="btn sm dmwrb";b.setAttribute("data-l","dmWr");b.textContent="✈ "+L("dm_wr");cl.insertAdjacentElement("beforebegin",b)}
+setInterval(dmHead,400);
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="dmWr"]');
+  var old=$("dmWr");if(!el){if(old&&!e.target.closest("#dmWr"))old.remove();return}
+  e.stopImmediatePropagation();if(old){old.remove();return}
+  var rows=[];try{rows=supLinks()}catch(x){}
+  var p=document.createElement("div");p.id="dmWr";p.className="dmwr";p.innerHTML='<div class="hint">'+esc(L("dm_wr_h"))+'</div>'+(rows.length?rows.join(""):'<div class="hint">'+esc(L("dm_wr_none"))+'</div>');
+  el.closest(".chath").appendChild(p)},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
