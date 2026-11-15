@@ -722,6 +722,46 @@ body.isadmin .wrap{max-width:1320px}
 .cvt .cvr.sel{background:color-mix(in srgb,var(--ok) 18%,var(--surface));border-color:var(--ok);box-shadow:0 0 0 1px var(--ok) inset}
 .cvt .cvr.sel b{color:var(--ok)}
 .osrch{width:100%;margin:0 0 12px;padding:13px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card,var(--bg));color:var(--fg);font:inherit}
+.rbdg{display:inline-flex;align-items:center;margin-left:8px;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em;background:linear-gradient(135deg,#6D5CFF,#A56BFF);color:#fff;white-space:nowrap}
+.rbdg.rb-producer{background:linear-gradient(135deg,#F59E0B,#F97316)}
+.rbdg.rb-owner{background:linear-gradient(135deg,#10B981,#059669)}
+@media (max-width:899px){body:has(#roleBdg) .logo{font-size:0;gap:0}body:has(#roleBdg) .logo .mark{font-size:14px}.rbdg{margin-left:4px;font-size:13px;padding:5px 12px}}
+
+/* ===== v28: layout, headings, animations ===== */
+.agtitle{font-size:15px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin:18px 6px 8px;pointer-events:none;user-select:none;cursor:default}
+.ownside .agtitle:first-child{margin-top:2px}
+#changePrice2{display:none!important}
+.setcard>.f,.setcard>.sect,.setcard>b{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.setcard>.f>b:first-child,.setcard>.f>span:first-child,.setcard>b{display:block;font-weight:800;font-size:17px;margin-bottom:8px;color:var(--fg)}
+.setcard>.f.chk,.setcard>.row{margin-top:14px}
+.botlog{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto;margin:10px 0;padding:4px}
+.bmsg{max-width:88%;padding:10px 14px;border-radius:16px;line-height:1.4;font-size:14.5px;animation:pop .25s ease}
+.bmsg.bot{background:var(--card-2,rgba(255,255,255,.07));align-self:flex-start}
+.bmsg.me{background:linear-gradient(135deg,#6D5CFF,#A56BFF);color:#fff;align-self:flex-end}
+.botq{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}.botin{display:flex;gap:8px}.botin input{flex:1;min-width:0}
+.botmgr{margin:12px 0}.botmgr summary{cursor:pointer;font-weight:700}
+.pmcard[data-l=accOpenH]{cursor:pointer}
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.view,#adApp>*,#v-admin .card{animation:fadeUp .35s ease both}
+.card,.btn,.chip,.pill,.atb,.mchip,.acitem,.tile,.ms,.mbrow,.efb,#dock a,#dock button,.logo,.rbdg,.supb,.plink,.fdcard,.tgo{transition:transform .18s cubic-bezier(.2,.8,.3,1),box-shadow .18s ease,background-color .18s ease,border-color .18s ease,filter .18s ease}
+@media (hover:hover){
+ .card:hover,.pmcard:hover,.tile:hover,.ms:hover,.acitem:hover,.mbrow:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(109,92,255,.22)}
+ .btn:hover,.chip:hover,.mchip:hover,.efb:hover,.supb:hover,.plink:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 8px 20px rgba(109,92,255,.3)}
+ .atb:hover{transform:translateX(4px)}
+ #dock a:hover,#dock button:hover{transform:translateX(4px) scale(1.03)}
+ .logo:hover{transform:scale(1.04)}.rbdg:hover{transform:scale(1.07)}
+ .btn:active,.chip:active,.atb:active{transform:scale(.96)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (min-width:900px){
+ .rbdg{position:fixed;left:24px;top:13px;margin:0;z-index:70;font-size:14px;padding:8px 18px}
+ body.isadmin .wrap{max-width:none;margin-left:0;margin-right:0}
+ body.isadmin header.bar .wrap{margin-left:294px}
+ body.isadmin footer .wrap{margin-left:294px}
+ body.isadmin .ownside{top:72px}
+}
+#v-admin .mchips{flex:1 1 100%!important}#v-admin .rgbox{max-width:360px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -899,7 +939,7 @@ body.isadmin .wrap{max-width:1320px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v26 · 15.11 18:30</span>
+  <span>© Promo Campaign · v28 · 15.11 18:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2943,12 +2983,20 @@ function moneySum(D){
 
 Object.assign(LT.en,{a_promos:"Active promos",pm_h:"Accounts with a promo right now. The closest deadline comes first.",pm_topic:"Topic",pm_all:"All topics",pm_left:"left",pm_days:"d",pm_hours:"h",pm_vids:"videos left",pm_sub:"waiting for your check",pm_none:"No active promos right now.",pm_done:"sent",pm_over:"time is over"});
 Object.assign(LT.ru,{a_promos:"Активные промо",pm_h:"Аккаунты, у которых сейчас идёт промо. Сначала те, у кого дедлайн ближе.",pm_topic:"Тема",pm_all:"Все темы",pm_left:"осталось",pm_days:"дн",pm_hours:"ч",pm_vids:"видео осталось",pm_sub:"ждут вашей проверки",pm_none:"Сейчас нет активных промо.",pm_done:"отправлено",pm_over:"время вышло"});
+function dlRange(a,b,on){
+  return '<div class="f rgbox" style="flex:1 1 260px"><span>⏰ '+esc(L("pm_dl"))+': <b id="pdTxt">'+(on?a+' – '+b+' '+esc(L("pm_days_s")):esc(L("pm_any")))+'</b>'+(on?' · <a href="#" id="pdReset">'+esc(L("rg_reset"))+'</a>':'')+'</span><div class="dual"><div class="dtrack"></div><div class="dfill" id="pdFill" style="left:'+(a/16*100)+'%;right:'+((16-b)/16*100)+'%"></div><input type="range" id="pdMin" min="0" max="16" step="1" value="'+a+'"><input type="range" id="pdMax" min="0" max="16" step="1" value="'+b+'"></div></div>';
+}
+document.addEventListener("input",function(e){var t=e.target;if(!t||(t.id!=="pdMin"&&t.id!=="pdMax"))return;var lo=$("pdMin"),hi=$("pdMax"),a=parseInt(lo.value,10),b=parseInt(hi.value,10);
+  if(t.id==="pdMin"&&a>b){a=b;lo.value=a}if(t.id==="pdMax"&&b<a){b=a;hi.value=b}
+  LV.pdMin=a;LV.pdMax=b;$("pdTxt").textContent=a+" – "+b+" "+L("pm_days_s");var f=$("pdFill");if(f){f.style.left=(a/16*100)+"%";f.style.right=((16-b)/16*100)+"%"}});
+document.addEventListener("change",function(e){var t=e.target;if(t&&(t.id==="pdMin"||t.id==="pdMax"))renderOwner()});
+document.addEventListener("click",function(e){if(e.target&&e.target.id==="pdReset"){e.preventDefault();LV.pdMin=null;LV.pdMax=null;renderOwner()}});
 function promosHtml(D){
   var now=Date.now(),list=D.requests.filter(function(q){return ["approved","returned","submitted"].indexOf(q.status)>=0&&q.approvedAt}).map(function(q){q._end=q.approvedAt+16*86400000;q._left=q._end-now;return q}).sort(function(a,b){return a._end-b._end});
   var topics={};list.forEach(function(q){(q.categories||[]).forEach(function(c){topics[c]=1})});
-  var f=LV.pTopic||"all",rm=Number(LV.pRate||0),dy=LV.pDisc==="yes",shown=list.filter(function(q){var st=typeof q.stars==="object"&&q.stars?q.stars.final:q.stars;return (f==="all"||(q.categories||[]).indexOf(f)>=0)&&(!rm||(st!=null&&st>=rm-0.001))&&(!dy||(q.discount||0)>0)});if(LV.pSort==="stars")shown.sort(function(a,b){var x=typeof a.stars==="object"&&a.stars?a.stars.final:a.stars,y=typeof b.stars==="object"&&b.stars?b.stars.final:b.stars;return (y||0)-(x||0)});
-  var sel='<label class="f" for="pTopic" style="max-width:260px"><span>'+esc(L("pm_topic"))+'</span><select id="pTopic"><option value="all">'+esc(L("pm_all"))+'</option>'+CATS.map(function(c){return '<option value="'+c+'"'+(f===c?' selected':'')+'>'+esc(L("c_"+c))+'</option>'}).join("")+'</select></label>'+
-    '<label class="f" for="pRate" style="max-width:200px"><span>★ '+esc(L("pm_rate"))+'</span><select id="pRate"><option value="0">'+esc(L("rg_all"))+'</option>'+[2.5,3,3.5,4,4.5].map(function(x){return '<option value="'+x+'"'+(rm===x?' selected':'')+'>'+x+'+ ★</option>'}).join("")+'</select></label>'+
+  var fc=LV.pCats||[],f="all",dmn=LV.pdMin==null?0:LV.pdMin,dmx=LV.pdMax==null?16:LV.pdMax,dOn=LV.pdMin!=null,rm=Number(LV.pRate||0),dy=LV.pDisc==="yes",shown=list.filter(function(q){var st=typeof q.stars==="object"&&q.stars?q.stars.final:q.stars;var dl=Math.max(0,q._left/86400000);return (!fc.length||(q.categories||[]).some(function(c){return fc.indexOf(c)>=0}))&&(!dOn||(dl>=dmn-0.001&&dl<=dmx+0.999))&&(!rm||(st!=null&&st>=rm-0.001))&&(!dy||(q.discount||0)>0)});if(LV.pSort==="stars")shown.sort(function(a,b){var x=typeof a.stars==="object"&&a.stars?a.stars.final:a.stars,y=typeof b.stars==="object"&&b.stars?b.stars.final:b.stars;return (y||0)-(x||0)});
+  var sel=multiChips("pCats",CATS,fc,"pm_topic")+dlRange(dmn,dmx,dOn)+
+    '<label class="f" for="pRate" style="max-width:200px"><span>★ '+esc(L("pm_rate"))+'</span><select id="pRate"><option value="0">'+esc(L("pm_any"))+'</option>'+[2.5,3,3.5,4,4.5].map(function(x){return '<option value="'+x+'"'+(rm===x?' selected':'')+'>'+x+'+ ★</option>'}).join("")+'</select></label>'+
     '<label class="f" for="pDisc" style="max-width:200px"><span>'+esc(L("a_bulk"))+'</span><select id="pDisc"><option value="all">'+esc(L("a_disc_all"))+'</option><option value="yes"'+(dy?' selected':'')+'>'+esc(L("a_disc_yes"))+'</option></select></label>'+
     '<label class="f" for="pSort" style="max-width:220px"><span>'+esc(L("pm_sort"))+'</span><select id="pSort"><option value="dl">'+esc(L("pm_s_dl"))+'</option><option value="stars"'+(LV.pSort==="stars"?' selected':'')+'>'+esc(L("pm_s_st"))+'</option></select></label>';
   sel='<div class="row" style="align-items:flex-end">'+sel+'</div>';
@@ -2956,7 +3004,7 @@ function promosHtml(D){
     var ms=q._left,d=Math.floor(ms/86400000),h=Math.floor((ms%86400000)/3600000),cls=ms<=0?"bad":(d<2?"bad":(d<5?"warn":"ok"));
     var txt=ms<=0?L("pm_over"):(d>0?d+L("pm_days")+" "+h+L("pm_hours"):h+L("pm_hours"))+" "+L("pm_left");
     var sent=(q.links||[]).length,rem=Math.max(0,q.videos-sent),sub=q.status==="submitted";
-    return '<div class="card pmcard pm-'+cls+'"><div class="pmtop">'+accAv({handle:q.handle,avatar:q.avatar},"acav")+'<div class="pmwho"><b>'+esc(q.handle)+'</b>'+(q.internalName?'<small>'+esc(q.internalName)+'</small>':'')+'<div>'+catPills(q.categories,"")+'</div></div><div class="pmvid"><b>'+(sub?'✓':rem)+'</b><span>'+esc(sub?L("pm_sub"):L("pm_vids"))+'</span></div></div>'+
+    return '<div class="card pmcard pm-'+cls+'" data-l="accOpenH" data-oid="'+esc(q.openId)+'" role="button" tabindex="0"><div class="pmtop">'+accAv({handle:q.handle,avatar:q.avatar},"acav")+'<div class="pmwho"><b>'+esc(q.handle)+'</b>'+(q.internalName?'<small>'+esc(q.internalName)+'</small>':'')+'<div>'+catPills(q.categories,"")+'</div></div><div class="pmvid"><b>'+(sub?'✓':rem)+'</b><span>'+esc(sub?L("pm_sub"):L("pm_vids"))+'</span></div></div>'+
       '<div class="pmbot"><span class="pmtr">🎵 '+esc(q.track)+'</span><span class="pill '+cls+'">⏰ '+esc(txt)+'</span><span class="hint">'+sent+'/'+q.videos+' '+esc(L("pm_done"))+'</span></div></div>';
   }).join("");
   return '<p class="hint">'+esc(L("pm_h"))+'</p>'+sel+'<div class="list" style="margin-top:12px">'+(cards||'<div class="empty">'+esc(L("pm_none"))+'</div>')+'</div>';
@@ -3582,15 +3630,63 @@ document.addEventListener("click",function(e){
 })();
 
 /* ---------- support window: the owner's contacts ---------- */
-function supOpen(){
+function supLinks(){
   var c=CONTACTS||{},ln=function(u,l,i){return '<a class="btn supb" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer"><i>'+i+'</i>'+esc(l)+'</a>'},rows=[];
   var url=function(v,base){return /^https?:\/\//i.test(v)?v:base+String(v).replace(/^@/,"")};
   if(c.telegram)rows.push(ln(url(c.telegram,"https://t.me/"),"Telegram","✈️"));
   if(c.instagram)rows.push(ln(url(c.instagram,"https://instagram.com/"),"Instagram","📸"));
   if(c.tiktok)rows.push(ln(url(c.tiktok,"https://tiktok.com/@"),"TikTok","🎵"));
   if(c.discord)rows.push(/^https?:\/\//i.test(c.discord)?ln(c.discord,"Discord","🎮"):'<div class="btn supb"><i>🎮</i>Discord: '+esc(c.discord)+'</div>');
-  openModal('<h3>🛟 '+esc(L("sup_t"))+'</h3><p class="hint">'+esc(L("sup_h"))+'</p>'+(rows.length?'<div class="supl">'+rows.join("")+'</div>':'<div class="note">'+esc(L("sup_none"))+'</div>')+'<div class="row"><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');
+  return rows;
 }
+var FAQ={
+ ru:[
+  ["pay|paid|деньг|выплат|оплат|получ|заплат|когда плат","Как я получу деньги? Когда вы опубликовали видео и менеджер их принял, заказ становится «Завершён». После этого менеджер платит на реквизиты, которые вы сохранили: Аккаунты → ваш аккаунт → «Куда мы переводим деньги». Проверьте, что реквизиты сохранены."],
+  ["цен|price|стоим|сколько брать","Цена за видео: Аккаунты → откройте аккаунт → «Цена за видео» → «Изменить цену». Новая цена уходит менеджеру на проверку, пока действует старая."],
+  ["провер|verif|одобр|модерац|review|approve|статус","Новые аккаунты проверяет менеджер, обычно в течение дня. Пока аккаунт на проверке, можно смотреть кампании, но брать заказы нельзя. Статус виден в карточке аккаунта."],
+  ["дедлайн|срок|deadline|16|дн|опоздал|успеть","На видео даётся 16 дней с момента одобрения. Мы напоминаем по дням, а в последний день предупреждаем. Если не сдать видео вовремя, мы перестаём работать с аккаунтом."],
+  ["тем|topic|ниш|категор","Темы: Аккаунты → откройте аккаунт → «Тематики контента» → отметьте нужные → «Сохранить»."],
+  ["скидк|bulk|пакет|discount","Скидки: Аккаунты → откройте аккаунт → «Скидки» → выберите готовую или свою → «Сохранить скидки». Пока вы не сохранили, ничего не предлагается."],
+  ["заяв|заказ|трек|взять|track|order|request","Как взять трек: Заказы → «Найти» → выберите трек → «Отправить заявку». Когда менеджер одобрит, заказ появится в «Одобренные»."],
+  ["звук|громк|описан|как делать|видео|sound|description","После одобрения: добавьте звук трека, громкость трека 10 %, оригинал 100 %, и напишите в описании то, что требует продюсер (оно написано в заказе). Потом пришлите ссылки на видео."],
+  ["удал|delete|убрать акк","Аккаунт можно удалить, только если нет открытых заказов: Аккаунты → откройте аккаунт → внизу «Удалить аккаунт»."],
+  ["о себе|about|слов|описание акк","«Об аккаунте» — 3–8 слов о том, что вы снимаете. Менеджеры читают это при проверке."],
+  ["tiktok|тикток|подключ|connect|ошибк|error|sandbox","Если TikTok показывает ошибку при подключении, напишите менеджеру: возможно, ваш аккаунт ещё нужно добавить в список доступа."],
+  ["карт|крипт|paypal|метод|реквизит|usdt","Способы выплаты: PayPal, крипта или карта (UA). Выберите и сохраните: Аккаунты → ваш аккаунт → «Куда мы переводим деньги». У каждого аккаунта свои реквизиты."]
+ ],
+ en:[
+  ["pay|paid|money|payout|when.*pay|get paid","How do I get paid? After you publish the videos and the manager accepts them, the order becomes Completed. Then the manager pays the details you saved: Accounts → your account → “Where we send your money”. Make sure they are saved."],
+  ["price|cost|how much","Price per video: Accounts → open the account → “Price per video” → “Change price”. A new price goes to the manager for review; the old one stays until then."],
+  ["verif|review|approv|status|moderat","The manager reviews new accounts, usually within a day. While it is under review you can browse campaigns but not take orders. The status is on the account card."],
+  ["deadline|days|late|16|time","You have 16 days from approval to publish. We send reminders, and a warning on the last day. If the videos are not sent in time, we stop working with the account."],
+  ["topic|niche|categor","Topics: Accounts → open the account → “Content topics” → tick them → Save."],
+  ["discount|bulk|deal","Bulk deals: Accounts → open the account → “Bulk deals” → pick a ready deal or make your own → Save deals. Nothing is offered until you save."],
+  ["request|order|track|take","How to take a track: Orders → Find → pick a track → Send request. When the manager approves it, the order appears in Approved."],
+  ["sound|volume|description|how to make|video","After approval: add the track sound, track volume 10%, original 100%, and write in the description what the producer asked for (it is shown in the order). Then send the video links."],
+  ["delete|remove account","You can delete an account only if it has no open orders: Accounts → open the account → “Delete this account” at the bottom."],
+  ["about|words","“About this account” is 3–8 words about what you film. Managers read it during review."],
+  ["tiktok|connect|error|sandbox","If TikTok shows an error while connecting, write to the manager: your account may still need to be added to the access list."],
+  ["card|crypto|paypal|method|usdt|details","Payout methods: PayPal, crypto or card (UA). Choose and save: Accounts → your account → “Where we send your money”. Each account has its own details."]
+ ]};
+function botAnswer(q){
+  var L2=FAQ[lang==="ru"?"ru":"en"],low=q.toLowerCase(),best=null,bs=0;
+  L2.forEach(function(f){var n=0;f[0].split("|").forEach(function(k){if(k&&low.indexOf(k.replace(/\.\*.*/,""))>=0)n++});if(n>bs){bs=n;best=f}});
+  return best?best[1]:L("bot_none");
+}
+function botAdd(who,txt){var b=$("botLog");if(!b)return;var d=document.createElement("div");d.className="bmsg "+who;d.textContent=txt;b.appendChild(d);b.scrollTop=b.scrollHeight}
+function supOpen(){
+  var rows=supLinks(),prod=roleGet()==="producer";
+  if(prod){
+    openModal('<h3>💬 '+esc(L("sup_prod_t"))+'</h3><p class="hint">'+esc(L("sup_prod_h"))+'</p>'+(rows.length?'<div class="supl">'+rows.join("")+'</div>':'<div class="note">'+esc(L("sup_none"))+'</div>')+'<div class="row"><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
+  var chips=lang==="ru"?["Как получить деньги?","Как изменить цену?","Сколько дней на видео?","Как взять трек?"]:["How do I get paid?","How to change my price?","How many days for videos?","How to take a track?"];
+  openModal('<h3>🤖 '+esc(L("bot_t"))+'</h3><p class="hint">'+esc(L("bot_h"))+'</p><div id="botLog" class="botlog"></div><div class="botq">'+chips.map(function(c){return '<button type="button" class="chip" data-l="botQ" data-q="'+esc(c)+'">'+esc(c)+'</button>'}).join("")+'</div><div class="row botin"><input id="botIn" type="text" maxlength="200" placeholder="'+esc(L("bot_ph"))+'" autocomplete="off"><button class="btn primary" data-l="botSend">'+esc(L("bot_send"))+'</button></div><details class="botmgr"><summary>'+esc(L("bot_mgr"))+'</summary>'+(rows.length?'<div class="supl">'+rows.join("")+'</div>':'')+'</details><div class="row"><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');
+  botAdd("bot",L("bot_hi"));
+}
+function botSend(q){q=(q||"").trim();if(!q)return;botAdd("me",q);setTimeout(function(){botAdd("bot",botAnswer(q))},350);var i=$("botIn");if(i)i.value=""}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="botQ"){e.stopImmediatePropagation();botSend(el.getAttribute("data-q"));return}
+  if(a==="botSend"){e.stopImmediatePropagation();botSend(val("botIn"))}},true);
+document.addEventListener("keydown",function(e){if(e.target&&e.target.id==="botIn"&&e.key==="Enter"){e.preventDefault();botSend(e.target.value)}});
 
 /* ---------- owner cabinet: menu on the left, the opened section on the right ---------- */
 function ownLayout(){
@@ -3600,6 +3696,7 @@ function ownLayout(){
   var side=document.createElement("aside");side.className="ownside";side.appendChild(head);
   var main=document.createElement("section");main.className="ownmain";kids.slice(1).forEach(function(k){main.appendChild(k)});
   lay.appendChild(side);lay.appendChild(main);app.appendChild(lay);
+  if(window.innerWidth>=900)Array.prototype.forEach.call(side.querySelectorAll(".agrp"),function(g){var h=g.querySelector(".agh");if(!h)return;var t=document.createElement("div");t.className="agtitle";t.textContent=h.textContent;g.parentNode.insertBefore(t,g);h.remove()});
 }
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{ownLayout()}catch(e){}return r}})();
 (function(){var o=autoScOn;autoScOn=function(){return window.innerWidth>=900?false:o()}})();
@@ -3646,6 +3743,29 @@ document.addEventListener("click",function(e){
   if(a==="prDel"){e.stopImmediatePropagation();openModal('<h3>'+esc(L("pr_del_q"))+'</h3><p><b>'+esc(el.getAttribute("data-n")||"")+'</b></p><p class="hint">'+esc(L("pr_del_note"))+'</p><div class="note err" id="prDelErr" hidden></div><div class="row"><button class="btn danger" data-l="prDelYes" data-id="'+esc(id)+'">'+esc(L("pr_del_yes"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
   if(a==="prDelYes"){e.stopImmediatePropagation();el.disabled=true;api("/api/admin/producer/delete",{id:id}).then(function(r){if(!r.ok){el.disabled=false;var er=$("prDelErr");if(er){er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false}return}closeModal();ownerReload()});return}
 },true);
+
+/* role badge next to the logo */
+Object.assign(LT.en,{rb_editor:"Editor",rb_producer:"Producer",rb_owner:"Owner"});
+Object.assign(LT.ru,{rb_editor:"Эдитор",rb_producer:"Продюсер",rb_owner:"Владелец"});
+function roleBadge(){
+  var lg=document.querySelector(".logo");if(!lg)return;
+  var h=(location.hash||"#home").replace(/\?.*/,""),r=roleGet(),k="";
+  if(h==="#admin")k="owner";else if(document.body.classList.contains("hasdock")&&(r==="editor"||r==="producer"))k=r;
+  var b=$("roleBdg");
+  if(!k){if(b)b.remove();return}
+  if(!b){b=document.createElement("span");b.id="roleBdg";b.className="rbdg";lg.insertAdjacentElement("afterend",b)}
+  b.className="rbdg rb-"+k;b.textContent=L("rb_"+k);
+}
+(function(){var o=dockRender;dockRender=function(){o.apply(this,arguments);roleBadge()}})();
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="langSel")setTimeout(roleBadge,60)});
+roleBadge();
+
+/* ===== v28 ===== */
+Object.assign(LT.en,{rb_owner:"Admin",a_overview:"Summary",pm_dl:"Days left",pm_any:"Any",pm_days_s:"days",sup_prod_t:"Write to the manager",sup_prod_h:"Send a message straight to the manager. Pick any app.",bot_t:"Assistant",bot_h:"Ask a question. The assistant answers right away. If it cannot help, write to the manager below.",bot_hi:"Hi! I answer questions about orders, prices, payouts and your account. What do you want to know?",bot_ph:"Type your question",bot_send:"Send",bot_none:"I am not sure about that one. Please write to the manager (open “Write to the manager” below).",bot_mgr:"Write to the manager"});
+Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Осталось дней",pm_any:"Любой",pm_days_s:"дн.",sup_prod_t:"Напишите менеджеру",sup_prod_h:"Пишите сразу менеджеру в личные сообщения. Выберите любое приложение.",bot_t:"Помощник",bot_h:"Задайте вопрос, помощник ответит сразу. Если не поможет, напишите менеджеру ниже.",bot_hi:"Привет! Я отвечаю на вопросы про заказы, цены, выплаты и ваш аккаунт. Что хотите узнать?",bot_ph:"Напишите вопрос",bot_send:"Отправить",bot_none:"Не уверен, что понял. Напишите менеджеру (раздел «Написать менеджеру» ниже).",bot_mgr:"Написать менеджеру"});
+(function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);try{
+  var sc=document.querySelector("#profCard .setcard");if(sc&&!sc.getAttribute("data-ord")){sc.setAttribute("data-ord","1");var k=sc.children;if(k.length>3&&k[2].tagName==="LABEL"&&k[3].classList.contains("f"))sc.insertBefore(k[3],k[2])}
+  var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
