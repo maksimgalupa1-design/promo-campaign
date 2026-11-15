@@ -207,7 +207,7 @@ function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
-    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created };
+    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidAt: r.paidAt || 0 };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)); if (ou && ou.payout) o.payout = decObj(ou.payout.enc); }
   if (withAdmin && acc) { const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
   return o;
@@ -223,11 +223,20 @@ async function refreshStale(max) {
 function overview() {
   const accs = allAccounts(), reqs = Object.values(db.requests);
   const live = reqs.filter(r => ["approved", "submitted", "completed"].includes(r.status));
-  let views30 = 0; accs.forEach(a => { views30 += PC.analyze(a.videos || [], Date.now()).month.views; });
-  let purchasedViews = 0, matched = 0;
-  live.forEach(r => reqView(r).links.forEach(l => { if (l.views != null) { purchasedViews += l.views; matched++; } }));
+  const now = Date.now(), D30 = 30 * 86400000;
+  let views30 = 0; accs.forEach(a => { views30 += PC.analyze(a.videos || [], now).month.views; });
+  const byTrack = {}; let purchasedViews = 0, boughtVideos = 0, matched = 0;
+  live.forEach(r => {
+    const acc = findAccAny(r.openId), bt = byTrack[r.trackId] || (byTrack[r.trackId] = { views: 0, videos: 0 });
+    if (now - r.created <= D30) { boughtVideos += r.videos; bt.videos += r.videos; }
+    (r.links || []).forEach(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); if (v && now - v.created <= D30) { purchasedViews += v.views; bt.views += v.views; matched++; } });
+  });
+  const paidReqs = reqs.filter(r => r.paid), paidSum = list => Math.round(list.reduce((x, r) => x + reqCost(r), 0) * 100) / 100;
+  const okTopups = Object.values(db.topups).filter(t => t.status === "confirmed"), topSum = list => Math.round(list.reduce((x, t) => x + t.amount, 0) * 100) / 100;
   return {
-    stats: { accounts: accs.length, boughtVideos: live.reduce((x, r) => x + r.videos, 0), purchasedViews, purchasedLinksCounted: matched, views30,
+    stats: { accounts: accs.length, boughtVideos, purchasedViews, purchasedLinksCounted: matched, views30, byTrack,
+      editorsPaidTotal: paidSum(paidReqs), editorsPaid30: paidSum(paidReqs.filter(r => now - (r.paidAt || 0) <= D30)), producersPaidTotal: topSum(okTopups), producersPaid30: topSum(okTopups.filter(t => now - (t.confirmedAt || t.created) <= D30)),
+      pendingPayouts: reqs.filter(r => r.status === "completed" && !r.paid).length,
       pendingRequests: reqs.filter(r => r.status === "pending").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
@@ -481,12 +490,16 @@ const server = http.createServer(async (req, res) => {
           if (!need(res, t && t.status === "active" && trackLeft(t) >= cost, 409, "not enough budget on the track")) return;
           t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100;
         }
-        r.status = st; r.updated = Date.now(); saveDb(); return send(res, 200, { ok: true });
+        r.status = st; r.updated = Date.now(); if (st === "completed") r.completedAt = Date.now(); saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/payout" && M === "POST") {     // mark that the editor has been paid for a completed request
+        const r = db.requests[b.id]; if (!need(res, r && r.status === "completed", 404, "no completed request")) return;
+        r.paid = !!b.paid; r.paidAt = r.paid ? Date.now() : 0; saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
         const tp = db.topups[b.id]; if (!need(res, tp && tp.status === "pending", 404, "no pending payment")) return;
         if (b.status === "confirmed" && !need(res, (db.tracks[tp.trackId] || {}).status === "active", 409, "approve the track first")) return;
-        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; }
+        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; tp.confirmedAt = Date.now(); }
         else if (b.status === "rejected") tp.status = "rejected";
         else return send(res, 400, { error: "bad status" });
         saveDb(); return send(res, 200, { ok: true });
