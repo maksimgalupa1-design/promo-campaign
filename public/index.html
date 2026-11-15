@@ -2,7 +2,6 @@
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="google-site-verification" content="LJBe9KbxYxb9IpKaacSZ-Qfjy9q5E6-DKxMdeHOds7k" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>html{color-scheme:light;-webkit-text-size-adjust:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Promo Campaign: earn from TikTok videos with artists' tracks</title>
@@ -483,23 +482,6 @@ button.mbrow{cursor:pointer}button.mbrow:hover{border-color:#E8445A}.mbrow b{fon
 .accsum .rsh b{font-size:20px}.rsp span{font-size:15px}.rsp .rstar{background:#F5C518!important;color:#3a2c00;font-size:17px;padding:2px 10px}
 .ord[class*="rq-"] .kv b{font-size:22px}.tkopen{margin-left:8px}
 
-/* v14 */
-.paycalc{margin:10px 0;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(31,168,90,.18),rgba(47,107,255,.16));border:1px solid rgba(31,168,90,.55)}
-.paycalc .pcl{font:700 12px inherit;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
-.paycalc .pcsum{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:6px 0 10px}
-.paycalc .pcbig{font-size:30px;line-height:1;color:#1FD16F}
-.paycalc .pcsum span{font-size:14px;opacity:.9}
-.paycalc .pcto{display:grid;gap:6px}
-.paycalc .pcto>b{font-size:14px}
-.mkt.find.on{background:#6B5CFF}
-.fdcard{border-left:4px solid #6B5CFF}
-.fdcard .t b{font-size:17px}
-.fdcard .fdlink{margin:6px 0}.fdcard .fdlink a{font-weight:600}
-.fdcard .fdfor{margin:8px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px}
-.fdchip{padding:3px 10px;border-radius:999px;font:600 12px inherit}
-.fdchip.ok{background:rgba(31,168,90,.2);color:#1FD16F}
-.fdchip.sent{background:rgba(232,169,30,.2);color:#E8A91E}
-
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -676,7 +658,7 @@ button.mbrow{cursor:pointer}button.mbrow:hover{border-color:#E8445A}.mbrow b{fon
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v14 · 15.11 14:55</span>
+  <span>© Promo Campaign · v12 · 15.11 13:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2926,54 +2908,6 @@ document.addEventListener("click",function(e){var el=e.target.closest("[data-l]"
   return h.replace(/(<div class="rsh"><b>)(@[^<]*)(<\/b>)/g,function(m,a1,hd,a3){return a1+hd+a3+'<a class="btn sm tkopen" href="https://www.tiktok.com/'+hd+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("tk_open"))+'</a>'});
 }})();
 document.addEventListener("change",function(e){if(e.target&&e.target.id==="rNiche"){LV.rNiche=e.target.value;renderOwner()}});
-
-/* ===== v14: live payment calculator for the manager + inline Find ===== */
-Object.assign(LT.en,{pc_title:"You will pay the editor",pc_calc:"videos",pc_disc:"bulk discount",pc_to:"Pay to",pc_nopay:"The editor has not added payout details yet",mk_find_ph:"Find a track by name or artist",mk_tracks:"tracks",fd_for:"Fits your accounts",fd_sent:"request sent",fd_none_acc:"No account of yours matches this topic",fd_open:"Open track",fd_budget:"Videos wanted"});
-Object.assign(LT.ru,{pc_title:"Вы заплатите редактору",pc_calc:"видео",pc_disc:"скидка за количество",pc_to:"Куда платить",pc_nopay:"Редактор ещё не указал реквизиты",mk_find_ph:"Найти трек по названию или артисту",mk_tracks:"треков",fd_for:"Подходит вашим аккаунтам",fd_sent:"заявка отправлена",fd_none_acc:"Ни один ваш аккаунт не подходит по теме",fd_open:"Открыть трек",fd_budget:"Нужно видео"});
-function pcDisc(tiers,n){var d=0;(tiers||[]).forEach(function(x){if(n>=x.min&&x.pct>d)d=x.pct});return d}
-function pcBox(q,nv){
-  var n=Math.max(1,Math.min(500,Math.round(Number(nv))||1)),d=pcDisc(q.tiers,n),unit=q.price||0,gross=Math.round(unit*n*100)/100,total=Math.round(unit*n*(1-d/100)*100)/100,p=q.payout;
-  var rows=p?[[p.method==="crypto"?coinL(p.coin):p.method,p.value]].concat(p.holder?[["Name",p.holder]]:[]):[];
-  return '<div class="paycalc"><div class="pcl">'+esc(L("pc_title"))+'</div><div class="pcsum"><b class="pcbig">'+money(total)+'</b><span>'+n+' '+esc(L("pc_calc"))+' × '+money(unit)+(d?' − '+d+'% '+esc(L("pc_disc")):'')+(d?' <s>'+money(gross)+'</s>':'')+'</span></div>'+
-    '<div class="pcto"><b>💳 '+esc(L("pc_to"))+'</b>'+(rows.length?rows.map(function(r){return '<div class="payrow"><span class="payl">'+esc(r[0])+'</span><b class="payv">'+esc(r[1])+'</b><button type="button" class="copybtn" data-l="cpy" data-v="'+esc(r[1])+'">⧉ '+esc(L("cp_copy"))+'</button></div>'}).join(""):'<div class="hint">'+esc(L("pc_nopay"))+'</div>')+'</div></div>';
-}
-function vidRow(q){
-  if(q.status!=="pending")return "";
-  return '<div class="row vidrow"><label class="f" for="vd_'+esc(q.id)+'" style="flex:0 1 160px"><span>'+esc(L("vd_lbl"))+'</span><input id="vd_'+esc(q.id)+'" type="number" min="1" max="500" value="'+q.videos+'"></label><button class="btn sm" data-l="vdSave" data-id="'+esc(q.id)+'">'+esc(L("vd_save"))+'</button><span class="hint">'+esc(L("vd_note"))+'</span></div>'+
-    '<div id="pc_'+esc(q.id)+'" data-id="'+esc(q.id)+'">'+pcBox(q,q.videos)+'</div>';
-}
-document.addEventListener("input",function(e){
-  var t=e.target;if(!t||!t.id||t.id.indexOf("vd_")!==0)return;var id=t.id.slice(3),box=$("pc_"+id);if(!box)return;
-  var D=(typeof ADM!=="undefined"&&ADM.data)?ADM.data:null,q=D&&(D.requests||[]).filter(function(x){return x.id===id})[0];if(!q)return;
-  box.innerHTML=pcBox(q,t.value);
-});
-
-/* inline Find inside Marketplace */
-function fdLoad(){if(LV.fdBusy)return;LV.fdBusy=true;api("/api/tracks").then(function(r){LV.fdBusy=false;LV.tracks=(r.j&&r.j.tracks)||[];LV.fdLoaded=true;if(LV.mk==="find")ordList()})}
-function fdCard(t){
-  var accs=(S.accounts||[]).filter(function(a){return accMatch(a,t)}),ok=accs.filter(function(a){return accReady(a)&&!reqSent(t.id,a)}),sent=accs.filter(function(a){return reqSent(t.id,a)});
-  var chips=ok.map(function(a){return '<span class="fdchip ok">✓ '+esc(a.handle)+'</span>'}).concat(sent.map(function(a){return '<span class="fdchip sent">⏱ '+esc(a.handle)+' · '+esc(L("fd_sent"))+'</span>'})).join("");
-  var can=ok.length>0;
-  return '<div class="card ord fdcard"><div class="t"><div><b>'+esc(t.title)+'</b><span>'+esc(t.artist||"")+'</span></div></div><div>'+trCats(t)+'</div>'+
-    (t.link?'<div class="fdlink"><a href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer">🎵 '+esc(L("fd_open"))+'</a></div>':'')+
-    '<div class="fdfor"><b>'+esc(L("fd_for"))+':</b> '+(chips||'<span class="hint">'+esc(S.accounts.length?L("fd_none_acc"):L("t_signin"))+'</span>')+'</div>'+
-    '<div class="row"><button class="btn primary" data-l="req" data-id="'+esc(t.id)+'"'+(can||!S.accounts.length?'':' disabled')+'>'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></div></div>';
-}
-function drawFind(){
-  var el=$("ordList");if(!el)return;
-  if(!LV.fdLoaded){el.innerHTML='<div class="empty">…</div>';fdLoad();return}
-  var qq=(LV.oq||"").toLowerCase().trim(),list=(LV.tracks||[]).filter(function(t){return !qq||((t.title||"")+" "+(t.artist||"")).toLowerCase().indexOf(qq)>=0});
-  el.innerHTML=list.length?list.map(fdCard).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
-}
-(function(){var o=ordList;ordList=function(){if(LV.mk==="find"){drawFind();return}o.apply(this,arguments)}})();
-(function(){var o=renderOrders;renderOrders=function(){
-  o.apply(this,arguments);
-  var b=document.querySelector("#ordersBody .mkt.find");if(!b)return;
-  b.removeAttribute("data-go");b.setAttribute("data-l","mkF");b.setAttribute("data-f","find");if(LV.mk==="find")b.classList.add("on");
-  b.insertAdjacentHTML("beforeend","<b>"+((LV.tracks||[]).length||"")+"</b>");
-  var q=$("ordQ");if(q)q.placeholder=L(LV.mk==="find"?"mk_find_ph":"od_search");
-  if(!LV.fdLoaded)fdLoad();
-}})();
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
