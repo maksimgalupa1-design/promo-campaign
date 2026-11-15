@@ -57,6 +57,24 @@ async function getProof(id) {
   if (SB_URL && SB_KEY) { const r = await fetch(SB_URL + "/rest/v1/kv?key=eq.proof:" + encodeURIComponent(id) + "&select=value", { headers: sbHeaders() }); if (!r.ok) return null; const rows = await r.json(); return rows.length ? rows[0].value.img : null; }
   try { return JSON.parse(fs.readFileSync(path.join(__dirname, "proofs", id + ".json"), "utf8")).img; } catch (e) { return null; }
 }
+/* mp3 files: split into chunks of 600 KB so every database request stays small */
+const CH = 600000;
+async function putBlob(id, b64) {
+  if (SB_URL && SB_KEY) {
+    for (let i = 0, k = 0; i < b64.length; i += CH, k++) {
+      const r = await fetch(SB_URL + "/rest/v1/kv?on_conflict=key", { method: "POST", headers: sbHeaders({ Prefer: "resolution=merge-duplicates,return=minimal" }), body: JSON.stringify({ key: "blob:" + id + ":" + String(k).padStart(4, "0"), value: { d: b64.slice(i, i + CH) }, updated_at: new Date().toISOString() }) });
+      if (!r.ok) throw new Error("blob save " + r.status);
+    }
+  } else { fs.mkdirSync(path.join(__dirname, "blobs"), { recursive: true }); fs.writeFileSync(path.join(__dirname, "blobs", id + ".b64"), b64, { mode: 0o600 }); }
+}
+async function getBlob(id) {
+  if (SB_URL && SB_KEY) {
+    const r = await fetch(SB_URL + "/rest/v1/kv?key=like.blob:" + encodeURIComponent(id) + ":*&select=key,value&order=key.asc", { headers: sbHeaders() });
+    if (!r.ok) return null; const rows = await r.json(); return rows.length ? rows.map(x => x.value.d).join("") : null;
+  }
+  try { return fs.readFileSync(path.join(__dirname, "blobs", id + ".b64"), "utf8"); } catch (e) { return null; }
+}
+function readRaw(req, max) { return new Promise((ok, fail) => { const ch = []; let n = 0; req.on("data", c => { n += c.length; if (n > max) { req.destroy(); return; } ch.push(c); }); req.on("end", () => ok(Buffer.concat(ch))); req.on("error", fail); }); }
 let saveTimer = null, saving = false, dirty = false;
 function saveDb() { dirty = true; if (!saveTimer) saveTimer = setTimeout(flushDb, 400); }
 async function flushDb() {
@@ -250,7 +268,7 @@ function overview() {
       pendingRequests: reqs.filter(r => r.status === "pending").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
-    tracks: Object.values(db.tracks).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
+    tracks: Object.values(db.tracks).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
     topups: Object.values(db.topups).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
@@ -302,6 +320,14 @@ const server = http.createServer(async (req, res) => {
 
     /* ----- editor (creator) ----- */
     if (P === "/health" && M === "GET") return send(res, 200, { ok: true, storage: SB_URL && SB_KEY ? "supabase" : "local file (data is lost on restart)", tiktokKey: KEY ? "set" : "missing", adminPassword: ADMIN_TOKEN ? "set" : "missing", time: new Date().toISOString() });
+    if (P === "/api/track/mp3" && M === "GET") {
+      const t = db.tracks[url.searchParams.get("id") || ""], prod = producerOf(req);
+      const allowed = t && t.mp3 && (adminOk(req) || (prod && prod.id === t.producerId) || (sessionUser(req) && t.status === "active"));
+      if (!need(res, allowed, 404, "no file")) return;
+      const b64 = await getBlob("m" + t.id); if (!need(res, b64, 404, "no file")) return;
+      const buf = Buffer.from(b64, "base64"), name = String(t.title || "track").replace(/[^\w\- ]+/g, "").trim().slice(0, 60) || "track";
+      res.writeHead(200, { "Content-Type": "audio/mpeg", "Content-Length": buf.length, "Content-Disposition": 'attachment; filename="' + name + '.mp3"', "Cache-Control": "private, no-store" }); return res.end(buf);
+    }
     if (P === "/api/me" && M === "GET") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       return send(res, 200, view(u));
@@ -353,7 +379,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
-      const list = Object.values(db.tracks).filter(t => t.status === "active" && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
+      const list = Object.values(db.tracks).filter(t => t.status === "active" && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
       return send(res, 200, { tracks: list, signedIn: !!u });
     }
     if (P === "/api/requests" && M === "GET") {          // editor's own requests
@@ -430,10 +456,18 @@ const server = http.createServer(async (req, res) => {
     if (P.startsWith("/api/producer/")) {
       const p = producerOf(req); if (!p) return send(res, 401, { error: "not signed in" });
       const mine = () => Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
-      const pview = () => ({ email: p.email, name: p.name || "", fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule,
+      const pview = () => ({ email: p.email, name: p.name || "", fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, hasMp3: !!t.mp3, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule,
         topups: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").map(x => ({ id: x.id, amount: x.amount, method: x.method, coin: x.coin || "", proof: !!x.proof })),
         pendingTopup: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").reduce((s, x) => s + x.amount, 0) })) });
       if (P === "/api/producer/me" && M === "GET") return send(res, 200, pview());
+      if (P === "/api/producer/mp3" && M === "POST") {        // producer uploads the mp3 itself (max 8 MB)
+        const t = db.tracks[url.searchParams.get("id") || ""];
+        if (!need(res, t && t.producerId === p.id && t.status !== "deleted", 404, "no such track")) return;
+        const buf = await readRaw(req, 8 * 1024 * 1024);
+        const okMp3 = buf.length > 1000 && buf.length <= 8 * 1024 * 1024 && ((buf[0] === 0x49 && buf[1] === 0x44 && buf[2] === 0x33) || (buf[0] === 0xFF && (buf[1] & 0xE0) === 0xE0));
+        if (!need(res, okMp3, 400, "this is not an mp3 file (max 8 MB)")) return;
+        await putBlob("m" + t.id, buf.toString("base64")); t.mp3 = { size: buf.length, at: Date.now() }; saveDb(); return send(res, 200, pview());
+      }
       if (P === "/api/producer/proof" && M === "POST") {      // producer attaches a screenshot of the payment he sent
         const b = await readBody(req, 8e5), tp = db.topups[b.id];
         if (!need(res, tp && tp.producerId === p.id && tp.status === "pending", 404, "no pending payment")) return;
@@ -445,10 +479,10 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, title && budget >= 1 && budget <= 1000000, 400, "title and budget (1..1000000) required")) return;
         const L = {}, src = b.links && typeof b.links === "object" ? b.links : {};
         for (const k of ["spotify", "soundcloud", "tiktok", "mp3"]) { const v = String(src[k] || "").trim().slice(0, 400); if (v) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(v), 400, "link must start with https://")) return; L[k] = v; } }
-        if (!need(res, Object.keys(L).length > 0, 400, "add at least one link to the track")) return;
+        if (!need(res, Object.keys(L).length > 0 || b.willUpload, 400, "add at least one link or an mp3 file")) return;
         const plats = (Array.isArray(b.platforms) ? b.platforms : []).filter(x => PLATFORMS.includes(x));
         const cats = cleanCats(b.categories);
-        const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0], links: L, budget: 0, spent: 0,
+        const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0] || "", links: L, budget: 0, spent: 0,
           platforms: plats.length ? plats : ["tiktok"], descRule: !!b.descRule,
           categories: cats, otherCategory: cats.includes("other") ? String(b.otherCategory || "").slice(0, 60) : "", status: "review", created: Date.now() };
         db.tracks[t.id] = t;
