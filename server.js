@@ -15,16 +15,79 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 const REDIRECT = PUBLIC_URL + "/auth/tiktok/callback";
 const SCOPES = "user.info.basic,user.info.profile,user.info.stats,video.list";
 const DB_FILE = path.join(__dirname, "data.json");
+const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
+const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
 const HISTORY_DAYS = 200;           // how far back we load videos
 const MAX_PAGES = 15;               // 20 videos per page
+const REFRESH_EVERY = 30 * 60000;   // background refresh of views
+const CATEGORIES = ["movies", "sports", "anime", "gym", "cars", "lyrics", "visual", "gaming", "cartoons", "celeb", "memes", "dancing", "kpop", "kdrama", "motivation", "irl", "beauty", "nature", "other"];
 
 if (!KEY || !SECRET || !ADMIN_TOKEN) { console.error("Set TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET and ADMIN_TOKEN"); process.exit(1); }
 
-/* tiny JSON file store: { users: { uid: { id, accounts: [ {open_id, tokens, profile, videos, price, ...} ] } }, sessions: { sid: uid }, byOpen: { open_id: uid } } */
-let db = { users: {}, sessions: {}, byOpen: {} };
-try { db = Object.assign(db, JSON.parse(fs.readFileSync(DB_FILE, "utf8"))); } catch (e) {}
-function saveDb() { fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), { mode: 0o600 }); }
-const pending = new Map();          // oauth state -> {exp, handle, uid}
+/* All data lives in one object. With SUPABASE_URL + SUPABASE_SERVICE_KEY it is saved to the Supabase table `kv` (row key "db"),
+   otherwise to data.json (lost on free hosting restarts). */
+let db = {};
+function normDb() {
+  for (const k of ["users", "sessions", "byOpen", "producers", "psessions", "tracks", "requests", "topups", "admin", "snapshots"]) if (!db[k]) db[k] = {};
+}
+function sbHeaders(extra) {
+  const h = Object.assign({ apikey: SB_KEY, "Content-Type": "application/json" }, extra || {});
+  if (SB_KEY.startsWith("eyJ")) h.Authorization = "Bearer " + SB_KEY;      // legacy JWT keys need it, new secret keys do not
+  return h;
+}
+async function loadDb() {
+  if (SB_URL && SB_KEY) {
+    const r = await fetch(SB_URL + "/rest/v1/kv?key=eq.db&select=value", { headers: sbHeaders() });
+    if (!r.ok) throw new Error("supabase load " + r.status + " " + (await r.text()));
+    const rows = await r.json();
+    if (rows.length) db = rows[0].value;
+    console.log("Storage: Supabase" + (rows.length ? " (loaded)" : " (empty, new)"));
+  } else {
+    try { db = JSON.parse(fs.readFileSync(DB_FILE, "utf8")); } catch (e) {}
+    console.log("Storage: local file data.json (set SUPABASE_URL and SUPABASE_SERVICE_KEY for permanent storage)");
+  }
+  normDb();
+}
+let saveTimer = null, saving = false, dirty = false;
+function saveDb() { dirty = true; if (!saveTimer) saveTimer = setTimeout(flushDb, 400); }
+async function flushDb() {
+  saveTimer = null;
+  if (saving) { saveTimer = setTimeout(flushDb, 400); return; }
+  if (!dirty) return;
+  dirty = false; saving = true;
+  try {
+    if (SB_URL && SB_KEY) {
+      const r = await fetch(SB_URL + "/rest/v1/kv?on_conflict=key", { method: "POST", headers: sbHeaders({ Prefer: "resolution=merge-duplicates,return=minimal" }),
+        body: JSON.stringify({ key: "db", value: db, updated_at: new Date().toISOString() }) });
+      if (!r.ok) throw new Error("supabase save " + r.status + " " + (await r.text()));
+    } else fs.writeFileSync(DB_FILE, JSON.stringify(db), { mode: 0o600 });
+  } catch (e) { console.error(e); dirty = true; }
+  saving = false;
+}
+process.on("SIGTERM", async () => { try { dirty = true; await flushDb(); } finally { process.exit(0); } });
+
+const pending = new Map();           // oauth state -> {exp, handle, uid}
+const loginTries = new Map();        // ip -> [timestamps], simple brute-force limit
+const sha = x => crypto.createHash("sha256").update(String(x)).digest();
+function clientIp(req) { return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim(); }
+function tooMany(ip) { const now = Date.now(), a = (loginTries.get(ip) || []).filter(t => now - t < 10 * 60000); loginTries.set(ip, a); return a.length >= 8; }
+function failTry(ip) { (loginTries.get(ip) || []).push(Date.now()); }
+function newSid() { return crypto.randomBytes(24).toString("hex"); }
+function setCookie(name, val, maxAge, strict) { return name + "=" + val + "; HttpOnly; Secure; SameSite=" + (strict ? "Strict" : "Lax") + "; Path=/; Max-Age=" + maxAge; }
+function adminOk(req) {
+  if (req.headers.authorization === "Bearer " + ADMIN_TOKEN) return true;
+  const c = cookie(req, "adm"), exp = c && db.admin[c];
+  if (exp && exp > Date.now()) return true;
+  if (c && db.admin[c]) { delete db.admin[c]; saveDb(); }
+  return false;
+}
+function hashPw(pw, salt) { return crypto.scryptSync(String(pw), salt, 32).toString("hex"); }
+function producerOf(req) {
+  const c = cookie(req, "psid"), s = c && db.psessions[c];
+  if (!s || s.exp < Date.now()) return null;
+  return db.producers[s.pid] || null;
+}
+const uid8 = () => crypto.randomBytes(6).toString("hex");
 
 function send(res, code, body, headers) {
   res.writeHead(code, Object.assign({ "Content-Type": "application/json; charset=utf-8" }, headers || {}));
@@ -84,87 +147,314 @@ async function fetchVideos(token) {
   }
   return out;
 }
-async function refreshAnalysis(user) {
-  const token = await freshToken(user);
-  user.profile = await fetchProfile(token);
-  user.videos = await fetchVideos(token);
-  user.analysisAt = Date.now();
+async function refreshAnalysis(acc) {
+  const token = await freshToken(acc);
+  acc.profile = await fetchProfile(token);
+  acc.videos = await fetchVideos(token);
+  acc.analysisAt = Date.now();
+  const A = PC.analyze(acc.videos, Date.now());
+  const snaps = db.snapshots[acc.open_id] || (db.snapshots[acc.open_id] = []);
+  snaps.push({ t: Date.now(), total: A.total.views, v30: A.month.views, n30: A.month.videos });
+  if (snaps.length > 500) snaps.splice(0, snaps.length - 500);
   saveDb();
+}
+const allAccounts = () => Object.values(db.users).flatMap(u => (u.accounts || []).map(a => { a._uid = u.id; return a; }));
+function findAccAny(openId) { return allAccounts().find(a => a.open_id === openId) || null; }
+
+/* ---- rating: stars 1..5 shown only to the owner. Manual stars override the automatic ones ---- */
+function autoStars(acc) {
+  const A = PC.analyze(acc.videos || [], Date.now());
+  if (!A.accepted) return { stars: null, cpm: null };
+  const cpm = acc.price && A.refAvg ? acc.price / A.refAvg * 1000 : null;
+  let st = cpm === null ? 3 : Math.max(1, Math.min(5, 5 - (cpm - 0.02) / 0.03));
+  if (A.status === "dormant") st -= 1;
+  if (A.status === "active" && A.week.videos === 0) st -= 0.5;
+  const mine = Object.values(db.requests).filter(r => r.openId === acc.open_id);
+  const done = mine.filter(r => r.status === "completed").length, bad = mine.filter(r => r.status === "returned").length;
+  if (done + bad > 0) { const q = done / (done + bad); st += q >= 0.9 ? 0.5 : (q < 0.5 ? -1 : 0); }
+  return { stars: Math.round(Math.max(1, Math.min(5, st)) * 2) / 2, cpm };
 }
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
+    internalName: acc.internal_name || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
     analysis: A, price: acc.price || null, evaluation: PC.evaluate(A, acc.price), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, url: v.url })) };
 }
-function view(user) { return { accounts: (user.accounts || []).map(accView) }; }
+function view(user) { return { accounts: (user.accounts || []).map(accView), categories: CATEGORIES }; }
+function accAdminView(acc) {
+  const v = accView(acc), r = autoStars(acc);
+  v.stars = { auto: r.stars, manual: acc.rating_manual == null ? null : acc.rating_manual, final: acc.rating_manual != null ? acc.rating_manual : r.stars };
+  v.cpm = r.cpm;
+  v.videos = v.videos.slice(0, 40);
+  return v;
+}
+const trackLeft = t => Math.max(0, Math.round(((t.budget || 0) - (t.spent || 0)) * 100) / 100);
+function cleanCats(list) { return Array.isArray(list) ? CATEGORIES.filter(c => list.includes(c)) : []; }
+function reqCost(r) { return Math.round(r.price * r.videos * (1 - (r.discount || 0) / 100) * 100) / 100; }
+function videoIdOf(link) { const m = String(link || "").match(/tiktok\.com\/@([A-Za-z0-9._]{2,24})\/video\/(\d{8,25})/i); return m ? { user: m[1].toLowerCase(), id: m[2] } : null; }
+function reqView(r, withAdmin) {
+  const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
+  const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
+  const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
+    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created };
+  if (withAdmin && acc) { const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
+  return o;
+}
+async function refreshStale(max) {
+  let n = 0;
+  for (const a of allAccounts()) {
+    if (n >= max) break;
+    if (!a.refresh_token || (a.analysisAt && Date.now() - a.analysisAt < REFRESH_EVERY - 60000)) continue;
+    n++; try { await refreshAnalysis(a); } catch (e) { console.error("refresh", a.open_id, String(e.message).slice(0, 200)); a.analysisAt = Date.now(); }
+  }
+}
+function overview() {
+  const accs = allAccounts(), reqs = Object.values(db.requests);
+  const live = reqs.filter(r => ["approved", "submitted", "completed"].includes(r.status));
+  let views30 = 0; accs.forEach(a => { views30 += PC.analyze(a.videos || [], Date.now()).month.views; });
+  let purchasedViews = 0, matched = 0;
+  live.forEach(r => reqView(r).links.forEach(l => { if (l.views != null) { purchasedViews += l.views; matched++; } }));
+  return {
+    stats: { accounts: accs.length, boughtVideos: live.reduce((x, r) => x + r.videos, 0), purchasedViews, purchasedLinksCounted: matched, views30,
+      pendingRequests: reqs.filter(r => r.status === "pending").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
+      refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
+    requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
+    tracks: Object.values(db.tracks).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, status: t.status })),
+    topups: Object.values(db.topups).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, track: (db.tracks[p.trackId] || {}).title, amount: p.amount, method: p.method, status: p.status, created: p.created })),
+    accounts: accs.map(accAdminView), categories: CATEGORIES
+  };
+}
 
 /* ---- routes ---- */
+const need = (res, cond, code, msg) => { if (!cond) { send(res, code, { error: msg }); return false; } return true; };
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, PUBLIC_URL);
+  const P = url.pathname, M = req.method;
   try {
-    if (url.pathname === "/auth/tiktok") {                       // "Open in TikTok" button points here
+    if (P === "/auth/tiktok") {                       // "Open in TikTok" button points here
       const state = crypto.randomBytes(16).toString("hex");
       const cu = sessionUser(req);
       pending.set(state, { exp: Date.now() + 10 * 60000, handle: (url.searchParams.get("u") || "").toLowerCase().replace(/^@/, ""), uid: cu ? cu.id : null });
       const q = new URLSearchParams({ client_key: KEY, scope: SCOPES, response_type: "code", redirect_uri: REDIRECT, state });
       res.writeHead(302, { Location: "https://www.tiktok.com/v2/auth/authorize/?" + q }); return res.end();
     }
-    if (url.pathname === "/auth/tiktok/callback") {
+    if (P === "/auth/tiktok/callback") {
       const state = url.searchParams.get("state"), code = url.searchParams.get("code");
-      if (url.searchParams.get("error")) { res.writeHead(302, { Location: "/#signup?denied=1" }); return res.end(); }   // user pressed Cancel in TikTok
+      if (url.searchParams.get("error")) { res.writeHead(302, { Location: "/#signup?denied=1" }); return res.end(); }
       if (!code || !pending.has(state) || pending.get(state).exp < Date.now()) return send(res, 400, { error: "bad state" });
-      const want = pending.get(state).handle;     // account link the creator pasted
-      const uid0 = pending.get(state).uid;        // signed-in profile that is adding an account (if any)
+      const want = pending.get(state).handle, uid0 = pending.get(state).uid;
       pending.delete(state);
       const tok = await tokenRequest({ code, grant_type: "authorization_code", redirect_uri: REDIRECT });
       const owner = db.byOpen[tok.open_id];
-      if (owner && uid0 && owner !== uid0) { res.writeHead(302, { Location: "/#signup?taken=1" }); return res.end(); }   // already linked to another profile
+      if (owner && uid0 && owner !== uid0) { res.writeHead(302, { Location: "/#signup?taken=1" }); return res.end(); }
       const uid = uid0 || owner || crypto.randomBytes(12).toString("hex");
       const user = db.users[uid] || (db.users[uid] = { id: uid, createdAt: Date.now(), accounts: [] });
       let acc = findAcc(user, tok.open_id);
-      if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now() }; user.accounts.push(acc); }
+      const isNew = !acc;
+      if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now(), categories: [], discount: 0 }; user.accounts.push(acc); }
       Object.assign(acc, { access_token: tok.access_token, refresh_token: tok.refresh_token, expires_at: Date.now() + tok.expires_in * 1000 });
       await refreshAnalysis(acc);
-      if (want && (acc.profile.username || "").toLowerCase() !== want) {   // confirmed a different account than the pasted link
+      if (want && (acc.profile.username || "").toLowerCase() !== want) {
         user.accounts = user.accounts.filter(x => x !== acc); saveDb();
         res.writeHead(302, { Location: "/#signup?mismatch=1" }); return res.end();
       }
       db.byOpen[tok.open_id] = uid;
-      const headers = { Location: "/#analysis" };
-      if (!uid0) { const sid = crypto.randomBytes(24).toString("hex"); db.sessions[sid] = uid; headers["Set-Cookie"] = "sid=" + sid + "; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000"; }
+      const headers = { Location: isNew ? "/#analysis" : "/#dashboard" };
+      if (!uid0) { const sid = newSid(); db.sessions[sid] = uid; headers["Set-Cookie"] = setCookie("sid", sid, 2592000); }
       saveDb();
       res.writeHead(302, headers);
       return res.end();
     }
-    if (url.pathname === "/api/me" && req.method === "GET") {
+
+    /* ----- editor (creator) ----- */
+    if (P === "/api/me" && M === "GET") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       return send(res, 200, view(u));
     }
-    if (url.pathname === "/api/reanalyze" && req.method === "POST") {
+    if (P === "/api/reanalyze" && M === "POST") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
       await refreshAnalysis(acc); return send(res, 200, view(u));
     }
-    if (url.pathname === "/api/price" && req.method === "POST") {  // creator confirms/edits price, we answer with chance + good/bad list
+    if (P === "/api/price" && M === "POST") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), price = Number(b.price), acc = findAcc(u, b.id);
       if (!acc) return send(res, 404, { error: "no such account" });
       if (!(price >= 1 && price <= 200)) return send(res, 400, { error: "price 1..200" });
       acc.price = Math.round(price * 100) / 100; saveDb(); return send(res, 200, view(u));
     }
-    if (url.pathname === "/api/account/delete" && req.method === "POST") {   // remove one TikTok account and its stored data
+    if (P === "/api/account/update" && M === "POST") {   // internal name, categories, bulk discount (one account or all)
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
-      u.accounts = u.accounts.filter(x => x !== acc); delete db.byOpen[acc.open_id]; saveDb();
-      return send(res, 200, view(u));
+      if (b.internalName !== undefined) acc.internal_name = String(b.internalName).slice(0, 60);
+      if (b.categories !== undefined) acc.categories = cleanCats(b.categories);
+      if (b.otherCategory !== undefined) acc.other_category = String(b.otherCategory).slice(0, 60);
+      if (b.discount !== undefined) {
+        const d = Math.round(Number(b.discount) || 0);
+        if (d < 0 || d > 99) return send(res, 400, { error: "discount 0..99" });
+        (b.discountAll ? u.accounts : [acc]).forEach(a => { a.discount = d; });
+      }
+      saveDb(); return send(res, 200, view(u));
     }
-    if (url.pathname === "/api/admin/applicants" && req.method === "GET") {   // owner screen: take or don't take
-      if (req.headers.authorization !== "Bearer " + ADMIN_TOKEN) return send(res, 401, { error: "unauthorized" });
-      return send(res, 200, Object.values(db.users).flatMap(u => u.accounts || []).map(accView));
+    if (P === "/api/account/delete" && M === "POST") {
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
+      u.accounts = u.accounts.filter(x => x !== acc); delete db.byOpen[acc.open_id];
+      Object.values(db.requests).forEach(r => { if (r.openId === acc.open_id && r.status === "pending") r.status = "cancelled"; });
+      saveDb(); return send(res, 200, view(u));
     }
+    if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
+      const u = sessionUser(req);
+      const list = Object.values(db.tracks).filter(t => t.status === "active" && trackLeft(t) > 0).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, categories: t.categories || [], otherCategory: t.otherCategory || "" }));
+      return send(res, 200, { tracks: list, signedIn: !!u });
+    }
+    if (P === "/api/requests" && M === "GET") {          // editor's own requests
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const mine = new Set((u.accounts || []).map(a => a.open_id));
+      return send(res, 200, { requests: Object.values(db.requests).filter(r => mine.has(r.openId)).sort((x, y) => y.created - x.created).map(r => reqView(r, false)) });
+    }
+    if (P === "/api/request" && M === "POST") {          // Send Request: choose accounts, only matching categories allowed
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req), t = db.tracks[b.trackId];
+      if (!need(res, t && t.status === "active" && trackLeft(t) > 0, 404, "track not available")) return;
+      const ids = Array.isArray(b.accountIds) ? b.accountIds : [];
+      if (!need(res, ids.length > 0 && ids.length <= 50, 400, "choose accounts")) return;
+      const videos = Math.max(1, Math.min(100, Math.round(Number(b.videos) || 1)));
+      const out = [];
+      for (const id of ids) {
+        const acc = findAcc(u, id); if (!need(res, acc, 404, "no such account")) return;
+        const A = PC.analyze(acc.videos || [], Date.now());
+        if (!need(res, A.accepted && acc.price > 0, 400, "account is not ready: " + (acc.profile && acc.profile.username))) return;
+        const okCat = !(t.categories || []).length || (t.categories || []).some(c => (acc.categories || []).includes(c));
+        if (!need(res, okCat, 400, "category does not match: " + (acc.profile && acc.profile.username))) return;
+        if (Object.values(db.requests).some(r => r.trackId === t.id && r.openId === acc.open_id && ["pending", "approved", "submitted"].includes(r.status))) continue;
+        const disc = b.discount !== undefined && b.discount !== "" ? Math.round(Number(b.discount)) : (acc.discount || 0);
+        if (!need(res, disc >= 0 && disc <= 99, 400, "discount 0..99")) return;
+        const r = { id: uid8(), trackId: t.id, openId: acc.open_id, price: acc.price, videos, discount: disc, priority: disc > 0 ? 5 : 0, status: "pending", links: [], created: Date.now(), updated: Date.now() };
+        db.requests[r.id] = r; out.push(reqView(r, false));
+      }
+      saveDb(); return send(res, 200, { requests: out });
+    }
+    if (P === "/api/request/links" && M === "POST") {    // editor sends the video link(s); we check they belong to the connected account
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req), r = db.requests[b.id];
+      if (!need(res, r && findAcc(u, r.openId), 404, "no such request")) return;
+      if (!need(res, r.status === "approved" || r.status === "returned", 409, "request is not waiting for a link")) return;
+      const acc = findAcc(u, r.openId), me = (acc.profile && acc.profile.username || "").toLowerCase();
+      const links = (Array.isArray(b.links) ? b.links : String(b.links || "").split(/\s+/)).map(x => String(x).trim()).filter(Boolean);
+      if (!need(res, links.length >= 1 && links.length <= r.videos, 400, "send 1.." + r.videos + " links")) return;
+      for (const l of links) { const p = videoIdOf(l); if (!need(res, p && p.user === me, 400, "link must be a tiktok.com/@" + me + "/video/... link")) return; }
+      r.links = links; r.status = "submitted"; r.updated = Date.now(); saveDb();
+      return send(res, 200, { request: reqView(r, false) });
+    }
+
+    /* ----- producer ----- */
+    if (P === "/api/producer/register" && M === "POST") {
+      const ip = clientIp(req); if (tooMany(ip)) return send(res, 429, { error: "too many attempts" });
+      const b = await readBody(req), email = String(b.email || "").trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || String(b.password || "").length < 8) { failTry(ip); return send(res, 400, { error: "valid email and password of 8+ characters required" }); }
+      if (Object.values(db.producers).some(p => p.email === email)) { failTry(ip); return send(res, 409, { error: "email already registered" }); }
+      const salt = crypto.randomBytes(16).toString("hex"), p = { id: uid8(), email, salt, hash: hashPw(b.password, salt), created: Date.now() };
+      db.producers[p.id] = p;
+      const sid = newSid(); db.psessions[sid] = { pid: p.id, exp: Date.now() + 30 * 86400000 }; saveDb();
+      return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("psid", sid, 2592000) });
+    }
+    if (P === "/api/producer/login" && M === "POST") {
+      const ip = clientIp(req); if (tooMany(ip)) return send(res, 429, { error: "too many attempts" });
+      const b = await readBody(req), email = String(b.email || "").trim().toLowerCase(), p = Object.values(db.producers).find(x => x.email === email);
+      const ok = p && crypto.timingSafeEqual(Buffer.from(hashPw(b.password || "", p.salt), "hex"), Buffer.from(p.hash, "hex"));
+      if (!ok) { failTry(ip); return send(res, 401, { error: "wrong email or password" }); }
+      const sid = newSid(); db.psessions[sid] = { pid: p.id, exp: Date.now() + 30 * 86400000 }; saveDb();
+      return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("psid", sid, 2592000) });
+    }
+    if (P === "/api/producer/logout" && M === "POST") {
+      const c = cookie(req, "psid"); if (c) { delete db.psessions[c]; saveDb(); }
+      return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("psid", "", 0) });
+    }
+    if (P.startsWith("/api/producer/")) {
+      const p = producerOf(req); if (!p) return send(res, 401, { error: "not signed in" });
+      const mine = () => Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
+      const pview = () => ({ email: p.email, categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created,
+        pendingTopup: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").reduce((s, x) => s + x.amount, 0) })) });
+      if (P === "/api/producer/me" && M === "GET") return send(res, 200, pview());
+      if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
+        const b = await readBody(req), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
+        if (!need(res, title && budget >= 1 && budget <= 1000000, 400, "title and budget (1..1000000) required")) return;
+        const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: String(b.link || "").slice(0, 300), budget: 0, spent: 0,
+          categories: cleanCats(b.categories), otherCategory: String(b.otherCategory || "").slice(0, 60), status: "active", created: Date.now() };
+        db.tracks[t.id] = t;
+        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(budget * 100) / 100, method: ["paypal", "crypto", "card"].includes(b.method) ? b.method : "paypal", status: "pending", created: Date.now() };
+        db.topups[tp.id] = tp; saveDb(); return send(res, 200, pview());
+      }
+      if (P === "/api/producer/track/delete" && M === "POST") {  // track stays hidden but its data stays in the database
+        const b = await readBody(req), t = db.tracks[b.id];
+        if (!need(res, t && t.producerId === p.id, 404, "no such track")) return;
+        t.status = "deleted"; Object.values(db.requests).forEach(r => { if (r.trackId === t.id && r.status === "pending") r.status = "cancelled"; });
+        saveDb(); return send(res, 200, pview());
+      }
+      if (P === "/api/producer/topup" && M === "POST") {     // "Add budget": owner confirms the payment by hand
+        const b = await readBody(req), t = db.tracks[b.trackId], amount = Number(b.amount);
+        if (!need(res, t && t.producerId === p.id && t.status !== "deleted" && amount >= 1 && amount <= 1000000, 400, "track and amount (1..1000000) required")) return;
+        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(amount * 100) / 100, method: ["paypal", "crypto", "card"].includes(b.method) ? b.method : "paypal", status: "pending", created: Date.now() };
+        db.topups[tp.id] = tp; saveDb(); return send(res, 200, pview());
+      }
+      return send(res, 404, { error: "not found" });
+    }
+
+    /* ----- owner ----- */
+    if (P === "/api/admin/login" && M === "POST") {
+      const ip = clientIp(req);
+      if (tooMany(ip)) return send(res, 429, { error: "too many attempts" });
+      const b = await readBody(req);
+      if (!crypto.timingSafeEqual(sha(b.password || ""), sha(ADMIN_TOKEN))) { failTry(ip); return send(res, 401, { error: "wrong password" }); }
+      const sid = newSid(); db.admin[sid] = Date.now() + 12 * 3600000; saveDb();
+      return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("adm", sid, 43200, true) });
+    }
+    if (P === "/api/admin/logout" && M === "POST") {
+      const c = cookie(req, "adm"); if (c) { delete db.admin[c]; saveDb(); }
+      return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("adm", "", 0, true) });
+    }
+    if (P.startsWith("/api/admin/")) {
+      if (!adminOk(req)) return send(res, 401, { error: "unauthorized" });
+      if (P === "/api/admin/overview" && M === "GET") { refreshStale(20).catch(() => {}); return send(res, 200, overview()); }
+      if (P === "/api/admin/applicants" && M === "GET") return send(res, 200, allAccounts().map(accAdminView));
+      const b = M === "POST" ? await readBody(req) : {};
+      if (P === "/api/admin/decision" && M === "POST") {
+        if (!need(res, ["approved", "rejected", "new"].includes(b.status), 400, "bad status")) return;
+        const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
+        a.adminStatus = b.status; saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/rating" && M === "POST") {       // manual stars 1..5 (null = back to automatic)
+        const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
+        if (b.stars === null) delete a.rating_manual;
+        else { const s = Number(b.stars); if (!need(res, s >= 1 && s <= 5, 400, "stars 1..5")) return; a.rating_manual = Math.round(s * 2) / 2; }
+        saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/request" && M === "POST") {      // pending -> approved/rejected, submitted -> completed/returned
+        const r = db.requests[b.id]; if (!need(res, r, 404, "no such request")) return;
+        const st = b.status, from = r.status;
+        const allowed = { pending: ["approved", "rejected"], submitted: ["completed", "returned"] };
+        if (!need(res, (allowed[from] || []).includes(st), 409, "cannot change " + from + " to " + st)) return;
+        if (st === "approved") {
+          const t = db.tracks[r.trackId], cost = reqCost(r);
+          if (!need(res, t && t.status === "active" && trackLeft(t) >= cost, 409, "not enough budget on the track")) return;
+          t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100;
+        }
+        r.status = st; r.updated = Date.now(); saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
+        const tp = db.topups[b.id]; if (!need(res, tp && tp.status === "pending", 404, "no pending payment")) return;
+        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t) t.budget = Math.round(((t.budget || 0) + tp.amount) * 100) / 100; tp.status = "confirmed"; }
+        else if (b.status === "rejected") tp.status = "rejected";
+        else return send(res, 400, { error: "bad status" });
+        saveDb(); return send(res, 200, { ok: true });
+      }
+      return send(res, 404, { error: "not found" });
+    }
+
     /* static site */
-    const file = path.join(__dirname, "public", url.pathname === "/" ? "index.html" : url.pathname);
+    const file = path.join(__dirname, "public", P === "/" ? "index.html" : P);
     if (file.startsWith(path.join(__dirname, "public")) && fs.existsSync(file) && fs.statSync(file).isFile()) {
       const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".txt": "text/plain; charset=utf-8" };
       res.writeHead(200, { "Content-Type": types[path.extname(file)] || "application/octet-stream" });
@@ -173,4 +463,7 @@ const server = http.createServer(async (req, res) => {
     send(res, 404, { error: "not found" });
   } catch (e) { console.error(e); send(res, 500, { error: "server error" }); }
 });
-server.listen(PORT, () => console.log("Promo Campaign on " + PUBLIC_URL));
+loadDb().then(() => {
+  server.listen(PORT, () => console.log("Promo Campaign on " + PUBLIC_URL));
+  setInterval(() => refreshStale(30).catch(e => console.error(e)), REFRESH_EVERY);
+}).catch(e => { console.error("Could not load the database:", e); process.exit(1); });
