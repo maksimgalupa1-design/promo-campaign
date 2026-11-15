@@ -717,6 +717,11 @@ body.isadmin .wrap{max-width:1320px}
 }
 #v-admin>h2{margin-bottom:16px}
 
+.cvt .cvr.pick{cursor:pointer;transition:background .15s,border-color .15s}
+.cvt .cvr.pick:hover{border-color:var(--ok)}
+.cvt .cvr.sel{background:color-mix(in srgb,var(--ok) 18%,var(--surface));border-color:var(--ok);box-shadow:0 0 0 1px var(--ok) inset}
+.cvt .cvr.sel b{color:var(--ok)}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -893,7 +898,7 @@ body.isadmin .wrap{max-width:1320px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v23 · 15.11 18:10</span>
+  <span>© Promo Campaign · v25 · 15.11 21:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -1929,7 +1934,7 @@ function renderOwner(){
       var act=t.status==="review"?'<div class="row"><button class="btn sm primary" data-l="trAct" data-id="'+esc(t.id)+'" data-s="approved">'+esc(L("a_approve_t"))+'</button><button class="btn sm danger" data-l="trAct" data-id="'+esc(t.id)+'" data-s="rejected">'+esc(L("a_reject_t"))+'</button></div>':(t.status==="active"?'<div class="row"><button class="btn sm primary" data-l="bcTrack" data-id="'+esc(t.id)+'">📣 '+esc(L("bc_track"))+'</button></div>':'');
       act+=(t.status==="active"&&(t.left||0)<=0?'<div class="row"><button class="btn sm primary" data-l="arcMove" data-id="'+esc(t.id)+'">🗄 '+esc(L("ar_move"))+'</button></div>':'');
       act+='<div class="row"><button class="btn sm danger" data-l="trDel" data-id="'+esc(t.id)+'">🗑 '+esc(L("tr_del"))+'</button></div>';
-      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+trCats(t)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · Song: '+esc(t.title):'')+'</div>'+act+'</div>';
+      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+trCats(t)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · '+esc(t.descText||('Song: '+t.title)):'')+'</div>'+act+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_tr"))+'</div>')+'</div>';
   }
   if(LV.adTab==="tracks"){if(LV.trArch)body=archHtml(D);else body=arcBtn(D)+body}
@@ -2039,10 +2044,11 @@ function payBoxHtml(method,amount,coin,compact){
 function refreshPayBox(){
   var c=$("nCoinRow");if(c)c.hidden=val("nMethod")!=="crypto";
   var m=$("tCoinRow");if(m)m.hidden=val("tMeth")!=="crypto";
+  var dr=$("nDescRow");if(dr)dr.hidden=!($("nDesc")&&$("nDesc").checked);
   var o=$("nOtherRow");if(o){var on=checked("nCats").indexOf("other")>=0;o.hidden=!on}
   var b=$("payBoxM");if(b)b.innerHTML=payBoxHtml(val("tMeth"),val("tAmt"),val("tCoin"));
   var np=$("nPayBox");if(np)np.innerHTML=payBoxHtml(val("nMethod"),0,val("nCoin"),true);
-  var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;if(a>0&&a<100){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=a>0?L("p_you_get")+": "+money(a*0.8)+" ("+money(a)+" − 20%). "+L("p_fee_short"):L("p_fee");q.className=a>0?"hotnote":"hint"}}
+  var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;if(a>0&&a<100){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=a>0?L("p_fee_line").replace("{f}",money(a*0.2)).replace("{n}",money(a*0.8)):L("p_fee");q.className=a>0?"hotnote":"hint"}}
   var so=$("sOtherRow");if(so&&$("sCats"))so.hidden=checked("sCats").indexOf("other")<0;
   var pc=$("pyCoinRow");if(pc)pc.hidden=val("pyMethod")!=="crypto";var ph=$("pyHolderRow");if(ph)ph.hidden=val("pyMethod")!=="card";
   var pv=$("pyValueL");if(pv)pv.textContent=L("py_value_"+val("pyMethod"));
@@ -2073,16 +2079,20 @@ function drawProd(){
     '<label class="f" for="nTitle"><span>'+esc(L("p_title"))+'</span><input id="nTitle" type="text" maxlength="120"></label>'+
     '<label class="f" for="nArtist"><span>'+esc(L("p_artist"))+'</span><input id="nArtist" type="text" maxlength="120"></label>'+
     '<label class="chk" for="nDesc"><input type="checkbox" id="nDesc"><span>'+esc(L("p_desc_rule"))+'</span></label>'+
+    '<label class="f" id="nDescRow" for="nDescText" hidden><span>'+esc(L("desc_txt_l"))+'</span><input id="nDescText" type="text" maxlength="120" placeholder="'+esc(L("desc_txt_ph"))+'"></label>'+
     '<b>'+esc(L("p_platforms"))+'</b><div class="cats" id="nPlat">'+["tiktok","instagram","youtube"].map(function(k){return '<label'+(k==="tiktok"?'':' class="soon"')+'><input type="checkbox" value="'+k+'"'+(k==="tiktok"?' checked':' disabled')+'><span>'+esc(L("pl_"+k))+'</span></label>'}).join("")+'</div>'+
     '<b>'+esc(L("p_cats"))+'</b>'+catChecks("nCats",[])+
     '<label class="f" id="nOtherRow" for="nOther" hidden><span>'+esc(L("p_other_h"))+'</span><input id="nOther" type="text" maxlength="60"></label>'+
-    '<label class="f" for="nBudget"><span>'+esc(L("p_budget"))+'</span><input id="nBudget" type="number" min="100" inputmode="decimal" placeholder="100"></label><p class="hint" id="nBudgetInfo">'+esc(L("p_fee"))+'</p>'+
+    '</div><h3 class="sub">'+esc(L("sec_pay"))+'</h3><div class="card form">'+
     '<label class="f" for="nMethod"><span>'+esc(L("p_method"))+'</span><select id="nMethod">'+methodOpts("paypal")+'</select></label>'+
     '<label class="f" id="nCoinRow" for="nCoin" hidden><span>'+esc(L("p_coin"))+'</span><select id="nCoin">'+coinOpts("solana")+'</select></label>'+
+    '<label class="f" for="nBudget"><span>'+esc(L("p_budget"))+'</span><input id="nBudget" type="number" min="100" inputmode="decimal" placeholder="100"></label><p class="hint" id="nBudgetInfo">'+esc(L("p_fee"))+'</p>'+
     '<div id="nPayBox">'+payBoxHtml("paypal",0,"solana",true)+'</div>'+
     '<label class="f" for="nProof"><span>'+esc(L("p_attach"))+'</span><input id="nProof" type="file" accept="image/*,application/pdf,.pdf"></label><p class="hint">'+esc(L("p_attach_h"))+'</p>'+
-    '<details class="card" open><summary><b>'+esc(L("p_links"))+'</b></summary><p class="hint">'+esc(L("p_links_h"))+'</p><label class="f" for="nMp3"><span>'+esc(L("p_mp3_file"))+'</span><input id="nMp3" type="file" accept=".mp3,audio/mpeg"></label>'+
-    ["spotify","soundcloud","tiktok","mp3"].map(function(k){return '<label class="f" for="nl_'+k+'"><span>'+esc(L("l_"+k))+'</span><input id="nl_'+k+'" type="text" inputmode="url" placeholder="https://"></label>'}).join("")+'</details>'+
+    '</div><h3 class="sub">'+esc(L("sec_links"))+'</h3><div class="card form">'+
+    '<p class="hint">'+esc(L("p_links_h"))+'</p><label class="f" for="nMp3"><span>'+esc(L("p_mp3_file"))+'</span><input id="nMp3" type="file" accept=".mp3,audio/mpeg"></label>'+
+    ["spotify","soundcloud","tiktok","mp3"].map(function(k){return '<label class="f" for="nl_'+k+'"><span>'+esc(L("l_"+k))+'</span><input id="nl_'+k+'" type="text" inputmode="url" placeholder="https://"></label>'}).join("")+
+    '</div><h3 class="sub">'+esc(L("sec_more"))+'</h3><div class="card form">'+
     '<label class="f" for="nDeadline"><span>'+esc(L("p_deadline"))+'</span><input id="nDeadline" type="text" maxlength="60" placeholder="'+esc(L("p_deadline_ph"))+'"></label><p class="hint">'+esc(L("p_deadline_h"))+'</p><label class="f" for="nMsg"><span>'+esc(L("p_msg"))+'</span><textarea id="nMsg" rows="3" maxlength="600" placeholder="'+esc(L("p_msg_ph"))+'"></textarea></label>'+
     '<p class="hint">'+esc(L("p_review_note"))+'</p>'+
     '<div class="note err" id="nErr" hidden></div>'+
@@ -2097,7 +2107,7 @@ function drawLCamps(){
     if(t.hasMp3)links+=' <a class="pill" href="/api/track/mp3?id='+esc(t.id)+'">MP3 ⬇</a>';
     if(!links&&t.link)links='<a class="pill" href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer">link</a>';
     return '<article class="card camp"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+(t.producerName?' · '+esc(L("t_by"))+' '+esc(t.producerName):'')+'</div></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div>'+
-      '<div class="row">'+links+'</div>'+(t.descRule?'<div class="note">'+esc(L("t_desc_rule").replace("{t}",t.title))+'</div>':'')+
+      '<div class="row">'+links+'</div>'+(t.descRule?'<div class="note">'+esc(descTxt(t))+'</div>':'')+
       '<button class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
 }
@@ -2117,9 +2127,10 @@ document.addEventListener("click",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
   if(a==="pAdd"){
     var links={};["spotify","soundcloud","tiktok","mp3"].forEach(function(k){var v=val("nl_"+k);if(v)links[k]=v});
-    var b={title:val("nTitle"),artist:val("nArtist"),links:links,budget:Number(val("nBudget")),method:val("nMethod"),coin:val("nCoin"),categories:checked("nCats"),otherCategory:val("nOther"),platforms:checked("nPlat"),descRule:!!($("nDesc")&&$("nDesc").checked),message:val("nMsg"),deadline:val("nDeadline")};
+    var b={title:val("nTitle"),artist:val("nArtist"),links:links,budget:Number(val("nBudget")),method:val("nMethod"),coin:val("nCoin"),categories:checked("nCats"),otherCategory:val("nOther"),platforms:checked("nPlat"),descRule:!!($("nDesc")&&$("nDesc").checked),descText:val("nDescText"),message:val("nMsg"),deadline:val("nDeadline")};
     var ne=$("nErr");function bad(m){ne.textContent=m;ne.hidden=false}
     if(!b.title){bad(L("p_bad"));return}
+    if(b.descRule&&!b.descText.trim()){bad(L("desc_txt_need"));return}
     if(!deadlineOk(b.deadline)){bad(L("p_dl_min"));return}
     if(!(b.budget>=100)){bad(L("p_min100"));return}
     var badL=Object.keys(links).some(function(k){return !/^https?:\/\/\S+\.\S+/i.test(links[k])});
@@ -2377,7 +2388,7 @@ function drawLCamps(){
     if(t.hasMp3)links+='<a class="plink" style="--c:#6B5CFF" href="/api/track/mp3?id='+esc(t.id)+'">⬇ MP3</a>';
     if(!links&&t.link)links='<a class="plink" style="--c:#6B5CFF" href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer">▶ Link</a>';
     return '<article class="tcard" style="animation-delay:'+Math.min(i,8)*0.07+'s"><div class="tcover" style="'+coverStyle(t)+'"><span class="tnote">♪</span><span class="tinit">'+esc((t.title||"?").charAt(0).toUpperCase())+'</span></div><div class="tbody"><div class="tname">'+esc(t.title)+'</div><div class="tby">'+esc(t.artist)+(t.producerName?' · '+esc(L("t_by"))+' '+esc(t.producerName):'')+'</div><div class="tcats">'+catPills(t.categories,t.otherCategory)+'</div><div class="tlinks">'+links+'</div>'+
-      (t.deadline?'<div class="trule">⏰ '+esc(L("t_deadline"))+': <b>'+esc(t.deadline)+'</b></div>':'')+(t.descRule?'<div class="trule">📝 '+esc(L("t_desc_rule").replace("{t}",t.title))+'</div>':'')+
+      (t.deadline?'<div class="trule">⏰ '+esc(L("t_deadline"))+': <b>'+esc(t.deadline)+'</b></div>':'')+(t.descRule?'<div class="trule">📝 '+esc(descTxt(t))+'</div>':'')+
       '<button class="btn primary tgo" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></div></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
 }
@@ -3420,16 +3431,17 @@ function trackModalHtml(q){
 }
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="trOpen"]');if(!el)return;var q=(LV.reqs||[]).filter(function(x){return x.id===el.getAttribute("data-q")})[0];if(q)openModal(trackModalHtml(q))});
 /* ===== v21: dock navigation, stat widgets, budget converter ===== */
-Object.assign(LT.en,{rj_chance:"Approval chance: 2–3%.",rj_note:"You can still send the account for review. The manager looks at it by hand, but the chance is very low.",dk_sup:"Support",sup_t:"Support",sup_h:"Write to the manager if something is wrong.",sup_none:"Contacts are not added yet.",dk_orders:"Orders",dk_pay:"Payments",dk_acc:"Accounts",dk_tracks:"My tracks",dk_add:"Add track",dk_role:"Change role",
+Object.assign(LT.en,{p_attach_req:"Attach proof of payment (required)",p_attach_need:"Attach the payment screenshot first. It is required.",rj_chance:"Approval chance: 2–3%.",rj_note:"You can still send the account for review. The manager looks at it by hand, but the chance is very low.",dk_sup:"Support",sup_t:"Support",sup_h:"Write to the manager if something is wrong.",sup_none:"Contacts are not added yet.",dk_orders:"Orders",dk_pay:"Payments",dk_acc:"Accounts",dk_tracks:"My tracks",dk_add:"Add track",dk_role:"Change role",
  w_active:"In progress",w_wait:"Waiting",w_earned:"Earned",w_prog:"Money in progress",w_orders:"orders",
- cv_UAH:"Budget, UAH (₴)",cv_USDT:"Budget, USDT",cv_USD:"Budget, USD",cv_card_h:"You pay in hryvnia. We convert it to dollars for the budget.",cv_crypto_h:"Type the amount in USDT. Below is the same amount in other coins. Tap Copy to copy a number.",
+ cv_UAH:"Budget, UAH (₴)",cv_USDT:"Budget, USDT",cv_USD:"Budget, USD",cv_card_h:"Type the budget in dollars. Below is how much to pay in hryvnia.",cv_crypto_h:"Type the amount in USDT. Below is the same amount in other coins. Tap Copy to copy a number.",
  cv_usd:"Budget in dollars",cv_pay:"To pay",cv_rate:"Rate",cv_min:"Minimum",cv_copy:"Copy",cv_copied:"Copied",cv_approx:"Approximate rate (live rate is not available now)",cv_conv:"Same amount in other coins",cv_sel:"selected"});
-Object.assign(LT.ru,{rj_chance:"Шанс одобрения: 2–3%.",rj_note:"Вы всё равно можете отправить аккаунт на проверку. Менеджер посмотрит его вручную, но шанс очень низкий.",dk_sup:"Поддержка",sup_t:"Поддержка",sup_h:"Напишите менеджеру, если что-то не так.",sup_none:"Контакты пока не добавлены.",dk_orders:"Заказы",dk_pay:"Платежи",dk_acc:"Аккаунты",dk_tracks:"Мои треки",dk_add:"Добавить",dk_role:"Сменить роль",
+Object.assign(LT.ru,{p_attach_req:"Прикрепите подтверждение оплаты (обязательно)",p_attach_need:"Сначала прикрепите скриншот оплаты. Это обязательно.",rj_chance:"Шанс одобрения: 2–3%.",rj_note:"Вы всё равно можете отправить аккаунт на проверку. Менеджер посмотрит его вручную, но шанс очень низкий.",dk_sup:"Поддержка",sup_t:"Поддержка",sup_h:"Напишите менеджеру, если что-то не так.",sup_none:"Контакты пока не добавлены.",dk_orders:"Заказы",dk_pay:"Платежи",dk_acc:"Аккаунты",dk_tracks:"Мои треки",dk_add:"Добавить",dk_role:"Сменить роль",
  w_active:"В работе",w_wait:"Ждут",w_earned:"Заработано",w_prog:"Деньги в работе",w_orders:"заказов",
- cv_UAH:"Бюджет, грн (₴)",cv_USDT:"Бюджет, USDT",cv_USD:"Бюджет, USD",cv_card_h:"Вы платите в гривнах. Мы пересчитаем в доллары для бюджета.",cv_crypto_h:"Впишите сумму в USDT. Ниже та же сумма в других монетах. Нажмите «Копировать», чтобы скопировать число.",
+ cv_UAH:"Бюджет, грн (₴)",cv_USDT:"Бюджет, USDT",cv_USD:"Бюджет, USD",cv_card_h:"Впишите бюджет в долларах. Ниже сумма к оплате в гривнах.",cv_crypto_h:"Впишите сумму в USDT. Ниже та же сумма в других монетах. Нажмите «Копировать», чтобы скопировать число.",
  cv_usd:"Бюджет в долларах",cv_pay:"К оплате",cv_rate:"Курс",cv_min:"Минимум",cv_copy:"Копировать",cv_copied:"Скопировано",cv_approx:"Примерный курс (живой сейчас недоступен)",cv_conv:"Эта же сумма в других монетах",cv_sel:"выбрано"});
 
 /* ---------- dock ---------- */
+function descTxt(t){return t&&t.descText?L("t_desc_say").replace("{x}",t.descText):L("t_desc_rule").replace("{t}",t.title)}
 function dockItems(){
   var h=(location.hash||"#home").replace(/\?.*/,""),r=roleGet();
   if(!LIVE||h==="#admin"||h==="#home"||h===""||!r)return null;
@@ -3503,31 +3515,29 @@ function cvCtx(){
   return null;
 }
 function cvMode(c){var m=c.sel?c.sel.value:"paypal";return m==="card"?"UAH":(m==="crypto"||m==="usdt")?"USDT":"USD"}
-function cvToUsd(amount,mode){var R=CV.rates||CV.fall;return mode==="UAH"?amount/R.UAH:amount}
 function cvUpdate(force){
   var c=cvCtx();if(!c)return;if(!CV.rates){cvLoad();}
   var R=CV.rates||CV.fall,mode=cvMode(c),lab=c.inp.closest("label"),sp=lab&&lab.querySelector("span");
-  if(sp)sp.textContent=L("cv_"+mode);
-  c.inp.min=mode==="UAH"?String(Math.ceil(100*R.UAH)):"100";c.inp.placeholder=mode==="UAH"?String(Math.ceil(100*R.UAH)):"100";
+  if(sp)sp.textContent=L(mode==="USDT"?"cv_USDT":"cv_USD");
+  c.inp.min="100";c.inp.placeholder="100";
+  var pl=document.querySelector('label[for=nProof] span');if(pl)pl.textContent=L("p_attach_req");
   var box=$("cvBox");
   if(!box){box=document.createElement("div");box.id="cvBox";box.className="cvt";
     var anchor=$("nBudgetInfo")||lab;if(anchor&&anchor.insertAdjacentElement)anchor.insertAdjacentElement("afterend",box)}
-  var a=Number(c.inp.value)||0,usd=cvToUsd(a,mode),html="";
-  var rate=mode==="UAH"?'1 $ = '+cvFmt("UAH",R.UAH)+' ₴':'';
+  var usd=Number(c.inp.value)||0,html="";
   var approx=(!CV.live&&CV.rates)?'<div class="cvb">⚠ '+esc(L("cv_approx"))+'</div>':'';
-  var q=$("nBudgetInfo");if(q&&mode!=="USD"&&a>0){if(usd<100){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=L("p_you_get")+": "+money(usd*0.8)+" ("+money(usd)+" − 20%). "+L("p_fee_short");q.className="hotnote"}}
   if(mode==="USD"){box.hidden=true;return}
   box.hidden=false;
   if(mode==="UAH"){
+    var uah=usd*R.UAH;
     html='<h4>₴ '+esc(L("cv_card_h"))+'</h4>'+
-     '<div class="cvr"><b>₴</b><span>'+(a>0?cvFmt("UAH",a)+' ₴':'—')+'</span>'+(a>0?'<button type="button" data-cv="'+(Math.round(a*100)/100)+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'+
-     '<div class="cvmain"><span>'+esc(L("cv_usd"))+'</span><b>'+(a>0?'$'+cvFmt("USD",usd):'—')+'</b></div>'+
-     '<div class="cvb">'+esc(L("cv_rate"))+': '+rate+' · '+esc(L("cv_min"))+': '+cvFmt("UAH",100*R.UAH)+' ₴ ($100)</div>'+approx;
+     '<div class="cvr sel"><b>₴ UAH</b><span>'+(usd>0?cvFmt("UAH",uah)+' ₴':'—')+'</span>'+(usd>0?'<button type="button" data-cv="'+(Math.round(uah*100)/100)+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'+
+     '<div class="cvb">'+esc(L("cv_rate"))+': 1 $ = '+cvFmt("UAH",R.UAH)+' ₴ · '+esc(L("cv_min"))+': $100</div>'+approx;
   }else{
-    var sel=c.coin?(CV.coinMap[c.coin.value]||"USDT"):"USDT",order=["USDT","SOL","TRX","ETH","LTC","TON","BTC"];
+    var sel=c.coin?(CV.coinMap[c.coin.value]||""):"",order=["USDT","SOL","TRX","ETH","LTC","TON"];
     html='<h4>◎ '+esc(L("cv_crypto_h"))+'</h4>'+
-     order.map(function(k){var v=k==="USDT"?a:a*(R[k]||0),show=a>0?cvFmt(k,v):"—";
-       return '<div class="cvr"><b>'+k+(k===sel?' ✓':'')+'</b><span>'+show+'</span>'+(a>0?'<button type="button" data-cv="'+show+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'}).join("")+
+     order.map(function(k){var v=k==="USDT"?usd:usd*(R[k]||0),show=usd>0?cvFmt(k,v):"—",pick=k!=="USDT";
+       return '<div class="cvr'+(k===sel?' sel':'')+(pick?' pick':'')+'"'+(pick?' data-net="'+k+'"':'')+'><b>'+k+'</b><span>'+show+'</span>'+(usd>0?'<button type="button" data-cv="'+show+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'}).join("")+
      '<div class="cvb">'+esc(L("cv_min"))+': 100 USDT</div>'+approx;
   }
   if(box.getAttribute("data-k")!==html){box.setAttribute("data-k",html);box.innerHTML=html}
@@ -3535,20 +3545,23 @@ function cvUpdate(force){
 document.addEventListener("input",function(e){if(e.target&&(e.target.id==="nBudget"||e.target.id==="tAmt"))cvUpdate()});
 document.addEventListener("change",function(e){if(e.target&&/^(nMethod|tMeth|nCoin|tCoin)$/.test(e.target.id)){var b=$("cvBox");if(b)b.removeAttribute("data-k");setTimeout(cvUpdate,0)}});
 document.addEventListener("click",function(e){
-  var b=e.target.closest("[data-cv]");if(!b)return;var v=b.getAttribute("data-cv");
-  var ok=function(){var o=b.textContent;b.textContent=L("cv_copied");b.classList.add("done");setTimeout(function(){b.textContent=L("cv_copy");b.classList.remove("done")},1400)};
+  var b=e.target.closest("[data-cv]");
+  if(!b){var row=e.target.closest(".cvr[data-net]");if(row){var c=cvCtx(),k=row.getAttribute("data-net"),name=Object.keys(CV.coinMap).filter(function(x){return CV.coinMap[x]===k})[0];
+    if(c&&c.coin&&name){c.coin.value=name;c.coin.dispatchEvent(new Event("change",{bubbles:true}))}}return}
+  var v=b.getAttribute("data-cv");
+  var ok=function(){b.textContent=L("cv_copied");b.classList.add("done");setTimeout(function(){b.textContent=L("cv_copy");b.classList.remove("done")},1400)};
   try{navigator.clipboard.writeText(v).then(ok,function(){fallback()})}catch(er){fallback()}
   function fallback(){var t=document.createElement("textarea");t.value=v;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(x){}t.remove();ok()}
 });
-/* before the old handlers read the amount: turn hryvnia into dollars and remember the original */
+/* payment screenshot is required for a new track; remember what was paid for the owner */
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
   if(a!=="pAdd"&&a!=="pTopGo")return;
-  var c=cvCtx();if(!c)return;var mode=cvMode(c),v=Number(c.inp.value)||0;window.__cv=null;
-  if(mode==="USD"||!(v>0))return;
-  window.__cv={cur:mode,orig:Math.round(v*100)/100};
-  var usd=Math.round(cvToUsd(v,mode)*100)/100,old=c.inp.value;c.inp.value=String(usd);
-  setTimeout(function(){var i=$(c.id);if(i)i.value=old},0);
+  var c=cvCtx();window.__cv=null;if(!c)return;
+  if(a==="pAdd"){var f=$("nProof"),ne=$("nErr");if(!(f&&f.files&&f.files[0])){e.stopImmediatePropagation();e.preventDefault();if(ne){ne.textContent=L("p_attach_need");ne.hidden=false;ne.scrollIntoView({behavior:"smooth",block:"center"})}return}}
+  var mode=cvMode(c),usd=Number(c.inp.value)||0,R=CV.rates||CV.fall;
+  if(mode==="USD"||!(usd>0))return;
+  window.__cv={cur:mode,orig:Math.round((mode==="UAH"?usd*R.UAH:usd)*100)/100};
 },true);
 (function(){var o=prodCall;prodCall=function(p,b){
   if(window.__cv&&b&&(b.budget!=null||b.amount!=null)){b.cur=window.__cv.cur;b.orig=window.__cv.orig}window.__cv=null;return o.apply(this,arguments)}})();
@@ -3583,6 +3596,21 @@ function ownLayout(){
 }
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{ownLayout()}catch(e){}return r}})();
 (function(){var o=autoScOn;autoScOn=function(){return window.innerWidth>=900?false:o()}})();
+
+Object.assign(LT.en,{sec_pay:"Payment",sec_links:"Track links",sec_more:"Other",desc_txt_l:"Write exactly what editors must put in the description",desc_txt_ph:"e.g. Song: Title - Artist",desc_txt_need:"Write what editors must put in the video description.",t_desc_say:"Important: write in the description of every video: {x}",p_fee_line:"Fee: {f} — 20%. This 20% is payment for the promoter's work. Promoters get {n}.",cf_t:"Is everything correct?",cf_h:"Check the track, payment and links before sending.",cf_yes:"Yes, everything is correct",cf_no:"Check again"});
+Object.assign(LT.ru,{sec_pay:"Оплата",sec_links:"Ссылки на трек",sec_more:"Остальное",desc_txt_l:"Напишите, что именно редакторы должны указать в описании",desc_txt_ph:"например: Song: Название - Артист",desc_txt_need:"Напишите, что редакторы должны указать в описании видео.",t_desc_say:"Важно: в описании каждого видео напишите: {x}",p_fee_line:"Комиссия: {f} — 20%. Эти 20% — оплата работы промоутера. Промоутерам пойдёт {n}.",cf_t:"Всё правильно написано?",cf_h:"Проверьте трек, оплату и ссылки перед отправкой.",cf_yes:"Да, всё правильно",cf_no:"Проверить ещё раз"});
+document.addEventListener("click",function(e){
+  var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="cfNo"){closeModal();e.stopImmediatePropagation();return}
+  if(a==="cfYes"){closeModal();window.__cfm=true;var b=document.querySelector('[data-l="pAdd"]');if(b)b.click();window.__cfm=false;e.stopImmediatePropagation();return}
+  if(a==="pAdd"&&!window.__cfm&&$("nTitle")){
+    var bud=Number(val("nBudget"))||0,dOk=!($("nDesc")&&$("nDesc").checked)||val("nDescText").trim();
+    var pf=$("nProof")&&$("nProof").files&&$("nProof").files[0];
+    if(!val("nTitle")||bud<100||!dOk||!pf)return;
+    e.stopImmediatePropagation();e.preventDefault();
+    openModal('<h3>'+esc(L("cf_t"))+'</h3><p class="hint">'+esc(L("cf_h"))+'</p><div class="row"><button class="btn primary" data-l="cfYes">'+esc(L("cf_yes"))+'</button><button class="btn" data-l="cfNo">'+esc(L("cf_no"))+'</button></div>');
+  }
+},true);
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
