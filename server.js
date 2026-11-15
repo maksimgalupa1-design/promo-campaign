@@ -551,9 +551,9 @@ const server = http.createServer(async (req, res) => {
         await putBlob("m" + t.id, buf.toString("base64")); t.mp3 = { size: buf.length, at: Date.now() }; saveDb(); return send(res, 200, pview());
       }
       if (P === "/api/producer/proof" && M === "POST") {      // producer attaches a screenshot of the payment he sent
-        const b = await readBody(req, 8e5), tp = db.topups[b.id];
+        const b = await readBody(req, 2e6), tp = db.topups[b.id];
         if (!need(res, tp && tp.producerId === p.id && tp.status === "pending", 404, "no pending payment")) return;
-        if (!need(res, /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.image || "") && b.image.length < 700000, 400, "bad image")) return;
+        if (!need(res, /^data:(image\/(jpeg|png|webp)|application\/pdf);base64,[A-Za-z0-9+\/=]+$/.test(b.image || "") && b.image.length < 1500000, 400, "bad file (image or PDF, max 1 MB)")) return;
         await putProof("t" + tp.id, b.image); tp.proof = true; saveDb(); notify("producer sent a payment screenshot, please check Payments"); return send(res, 200, pview());
       }
       if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
