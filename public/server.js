@@ -59,10 +59,14 @@ async function sendMail(to, subject, text) {   // optional: works when RESEND_AP
   try { const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" }, body: JSON.stringify({ from, to: [to], subject, text }) }); return r.ok; } catch (e) { return false; }
 }
 function mailList(audience, type) {
-  const out = [], ok = o => o && o.notif && o.notif.email && (o.notif.types || {})[type] !== false;
-  if (audience !== "producers") Object.values(db.users).forEach(u => { if (ok(u) && !(u.accounts || []).every(a => a.demo)) out.push(u.notif.email); });
-  if (audience !== "editors") Object.values(db.producers).forEach(p => { if (ok(p)) out.push(p.notif.email); });
+  const out = [], okT = o => (((o || {}).notif || {}).types || {})[type] !== false, addr = o => ((o || {}).notif || {}).email || "";
+  if (audience !== "producers") Object.values(db.users).forEach(u => { if (addr(u) && okT(u) && !(u.accounts || []).every(a => a.demo)) out.push(addr(u)); });
+  if (audience !== "editors") Object.values(db.producers).forEach(p => { const e = addr(p) || p.email; if (e && okT(p)) out.push(e); });   // producers signed up with an email: it is used by default
   return [...new Set(out)];
+}
+function inboxCounts(audience) {
+  const ed = Object.values(db.users).filter(u => !(u.accounts || []).every(a => a.demo)).length, pr = Object.keys(db.producers).length;
+  return { editors: audience === "producers" ? 0 : ed, producers: audience === "editors" ? 0 : pr };
 }
 async function broadcast(audience, title, text, url, type, withMail) {
   type = NTYPES.includes(type) ? type : "support";
@@ -293,12 +297,13 @@ function accView(acc) {
     analysis: A, price: acc.price || null, evaluation: PC.evaluate(A, acc.price), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
-function view(user) { return { accounts: (user.accounts || []).map(accView), categories: CATEGORIES, payout: payoutLabel(user), coins: COINS }; }
+function accPayoutRaw(user, acc) { return (acc && acc.payout) || (user && user.payout) || null; }   // every TikTok account can have its own payout details; the user-level ones are the fallback
+function view(user) { return { accounts: (user.accounts || []).map(a => { const x = accView(a), p = accPayoutRaw(user, a); x.payout = p ? { set: true, method: p.method, coin: p.coin || "", label: p.label, own: !!a.payout } : { set: false }; return x; }), categories: CATEGORIES, payout: payoutLabel(user), coins: COINS }; }
 function accAdminView(acc) {
   const v = accView(acc), r = autoStars(acc);
   v.stars = { auto: r.stars, manual: acc.rating_manual == null ? null : acc.rating_manual, final: acc.rating_manual != null ? acc.rating_manual : r.stars };
   v.cpm = r.cpm;
-  { const ou = Object.values(db.users).find(x => (x.accounts || []).some(z => z.open_id === acc.open_id)); v.payout = ou && ou.payout ? decObj(ou.payout.enc) : null; }
+  { const ou = Object.values(db.users).find(x => (x.accounts || []).some(z => z.open_id === acc.open_id)), pp = accPayoutRaw(ou, acc); v.payout = pp ? decObj(pp.enc) : null; }
   v.videos = v.videos.slice(0, 40);
   return v;
 }
@@ -356,15 +361,33 @@ const HEX_AV = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEB
 const PIN_AV = "data:image/svg+xml;base64," + Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6a6c1"/><stop offset="1" stop-color="#7c5cff"/></linearGradient></defs><rect width="128" height="128" fill="url(#g)"/><circle cx="64" cy="64" r="34" fill="none" stroke="#fff" stroke-width="7" opacity=".9"/><circle cx="64" cy="64" r="12" fill="#fff" opacity=".9"/></svg>').toString("base64");
 const trackLeft = t => Math.max(0, Math.round(((t.budget || 0) - (t.spent || 0)) * 100) / 100);
 function cleanCats(list) { return Array.isArray(list) ? CATEGORIES.filter(c => list.includes(c)) : []; }
+/* track cover: taken from the public oEmbed of the first link we know (Spotify, SoundCloud, TikTok); tried once, never blocks a request */
+const COVER_BUSY = new Set();
+function ensureCover(t) {
+  if (t.cover || t.coverTried || COVER_BUSY.has(t.id)) return;
+  const L = Object.assign({}, t.links || {}); if (t.link && !L.spotify && !L.soundcloud && !L.tiktok) L.other = t.link;
+  const tries = []; if (L.spotify) tries.push("https://open.spotify.com/oembed?url=" + encodeURIComponent(L.spotify));
+  if (L.soundcloud) tries.push("https://soundcloud.com/oembed?format=json&url=" + encodeURIComponent(L.soundcloud));
+  if (L.tiktok) tries.push("https://www.tiktok.com/oembed?url=" + encodeURIComponent(L.tiktok));
+  if (L.other) { if (/spotify\.com/.test(L.other)) tries.push("https://open.spotify.com/oembed?url=" + encodeURIComponent(L.other)); else if (/soundcloud\.com/.test(L.other)) tries.push("https://soundcloud.com/oembed?format=json&url=" + encodeURIComponent(L.other)); }
+  if (!tries.length) { t.coverTried = Date.now(); return; }
+  COVER_BUSY.add(t.id);
+  (async () => {
+    for (const u of tries) {
+      try { const r = await fetch(u, { signal: AbortSignal.timeout(6000) }); if (!r.ok) continue; const j = await r.json(); if (j && /^https:\/\//.test(j.thumbnail_url || "")) { t.cover = String(j.thumbnail_url).slice(0, 500); break; } } catch (e) { }
+    }
+    t.coverTried = Date.now(); COVER_BUSY.delete(t.id); saveDb();
+  })();
+}
 function reqCost(r) { return Math.round(r.price * r.videos * (1 - (r.discount || 0) / 100) * 100) / 100; }
 function videoIdOf(link) { const m = String(link || "").match(/tiktok\.com\/@([A-Za-z0-9._]{2,24})\/video\/(\d{8,25})/i); return m ? { user: m[1].toLowerCase(), id: m[2] } : null; }
 function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
-    internalName: acc ? acc.internal_name || "" : "", price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
+    internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, descRule: !!t.descRule, message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
-  if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)); if (ou && ou.payout) o.payout = decObj(ou.payout.enc); }
+  if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)), pp = accPayoutRaw(ou, acc); if (pp) o.payout = decObj(pp.enc); }
   if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.tiers = acc.tiers || []; o.bulk = maxTier(acc); o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
   return o;
 }
@@ -458,7 +481,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (P === "/api/me" && M === "GET") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
-      return send(res, 200, view(u));
+      return send(res, 200, view(u), { "Set-Cookie": setCookie("sid", cookie(req, "sid"), 2592000) });   // signed in for 30 days after the last visit
     }
     if (P === "/api/payout" && M === "GET") { const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" }); return send(res, 200, payoutLabel(u)); }
     if (P === "/api/payout" && M === "POST") {
@@ -470,7 +493,11 @@ const server = http.createServer(async (req, res) => {
       else if (m === "card") ok = /^\d{12,19}$/.test(v.replace(/\s/g, "")) && h.length >= 2;
       if (!need(res, ok, 400, "check the payment details")) return;
       const val = m === "card" ? v.replace(/\s/g, "") : v;
-      u.payout = { method: m, coin: m === "crypto" ? coin : "", label: maskVal(m, val), enc: encObj({ method: m, coin: m === "crypto" ? coin : "", value: val, holder: m === "card" ? h : "" }) };
+      const rec = { method: m, coin: m === "crypto" ? coin : "", label: maskVal(m, val), enc: encObj({ method: m, coin: m === "crypto" ? coin : "", value: val, holder: m === "card" ? h : "" }) };
+      const own = b.accountId ? findAcc(u, b.accountId) : null;
+      if (b.accountId && !need(res, own, 404, "no such account")) return;
+      if (own) { own.payout = rec; saveDb(); return send(res, 200, { set: true, method: rec.method, coin: rec.coin, label: rec.label, own: true }); }
+      u.payout = rec;
       saveDb(); return send(res, 200, payoutLabel(u));
     }
     if (P === "/api/reanalyze" && M === "POST") {
@@ -558,7 +585,7 @@ const server = http.createServer(async (req, res) => {
     if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "", instagram: c.instagram || "", tiktok: c.tiktok || "" }); }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
-      const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, hasMp3: !!t.mp3, deadline: t.deadline || "", producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
+      const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ cover: (ensureCover(t), t.cover || ""), id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, hasMp3: !!t.mp3, deadline: t.deadline || "", producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
       return send(res, 200, { tracks: list, signedIn: !!u });
     }
     if (P === "/api/requests" && M === "GET") {          // editor's own requests
@@ -572,7 +599,6 @@ const server = http.createServer(async (req, res) => {
       if (!need(res, t && t.status === "active" && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok"), 404, "track not available")) return;
       const ids = Array.isArray(b.accountIds) ? b.accountIds : [];
       if (!need(res, ids.length > 0 && ids.length <= 1000, 400, "choose accounts")) return;
-      if (!need(res, u.payout, 403, "add your payment details first (Dashboard → Payment)")) return;
       const videos = Math.max(1, Math.min(100, Math.round(Number(b.videos) || 1))); // the manager decides the real number of videos
       const dmap = b.discounts && typeof b.discounts === "object" ? b.discounts : {};
       const out = [];
@@ -581,6 +607,7 @@ const server = http.createServer(async (req, res) => {
         const A = PC.analyze(acc.videos || [], Date.now());
         if (!need(res, A.accepted && acc.price > 0, 400, "account is not ready: " + (acc.profile && acc.profile.username))) return;
         if (!need(res, acc.adminStatus === "approved", 403, "account is waiting for the manager's approval: " + (acc.profile && acc.profile.username))) return;
+        if (!need(res, accPayoutRaw(u, acc), 403, "add payout details for @" + (acc.profile && acc.profile.username))) return;
         const okCat = !(t.categories || []).length || (t.categories || []).some(c => (acc.categories || []).includes(c));
         if (!need(res, okCat, 400, "category does not match: " + (acc.profile && acc.profile.username))) return;
         if (Object.values(db.requests).some(r => r.trackId === t.id && r.openId === acc.open_id && ["pending", "approved", "submitted"].includes(r.status))) continue;
@@ -613,6 +640,8 @@ const server = http.createServer(async (req, res) => {
       const links = (Array.isArray(b.links) ? b.links : String(b.links || "").split(/\s+/)).map(x => String(x).trim()).filter(Boolean);
       if (!need(res, links.length >= 1 && links.length <= r.videos, 400, "send 1.." + r.videos + " links")) return;
       for (const l of links) { const p = videoIdOf(l); if (!need(res, p && p.user === me, 400, "link must be a tiktok.com/@" + me + "/video/... link")) return; }
+      if (!need(res, b.ack === true, 400, "Confirm the sound and description steps first")) return;
+      r.ack = true; r.ackAt = Date.now();
       r.links = links; r.status = "submitted"; r.updated = Date.now(); saveDb(); notify("an editor sent video links to check");
       return send(res, 200, { request: reqView(r, false) });
     }
@@ -646,7 +675,7 @@ const server = http.createServer(async (req, res) => {
       const pview = () => ({ email: p.email, name: p.name || "", fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, hasMp3: !!t.mp3, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule,
         topups: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").map(x => ({ id: x.id, amount: x.amount, method: x.method, coin: x.coin || "", proof: !!x.proof })),
         pendingTopup: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").reduce((s, x) => s + x.amount, 0) })) });
-      if (P === "/api/producer/me" && M === "GET") return send(res, 200, pview());
+      if (P === "/api/producer/me" && M === "GET") { const c = cookie(req, "psid"); if (db.psessions[c]) db.psessions[c].exp = Date.now() + 30 * 86400000; return send(res, 200, pview(), { "Set-Cookie": setCookie("psid", c, 2592000) }); }
       if (P === "/api/producer/mp3" && M === "POST") {        // producer uploads the mp3 itself (max 8 MB)
         const t = db.tracks[url.searchParams.get("id") || ""];
         if (!need(res, t && t.producerId === p.id && t.status !== "deleted", 404, "no such track")) return;
@@ -711,7 +740,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/applicants" && M === "GET") return send(res, 200, allAccounts().map(accAdminView));
       const b = M === "POST" ? await readBody(req, P === "/api/admin/payout" ? 8e5 : 1e5) : {};
       if (P === "/api/admin/plan" && M === "POST") {   // suggests how many videos to buy from which accounts for one track
-        const t = db.tracks[b.trackId]; if (!need(res, t && t.status === "active", 404, "track not active")) return;
+        const t = db.tracks[b.trackId]; if (!need(res, t && ["active", "archived"].includes(t.status), 404, "track not active")) return;
         let rem = Math.round((Number(b.budget) > 0 ? Number(b.budget) : trackLeft(t)) * 100) / 100; const budget = rem;
         if (!need(res, rem > 0, 400, "no budget left on this track")) return;
         const busy = new Set(Object.values(db.requests).filter(r => r.trackId === t.id && ["pending", "approved", "submitted"].includes(r.status)).map(r => r.openId));
@@ -747,7 +776,7 @@ const server = http.createServer(async (req, res) => {
         const text = String(b.text || "").trim().slice(0, 300), title = String(b.title || "Promo Campaign").trim().slice(0, 80), aud = ["editors", "producers", "all"].includes(b.audience) ? b.audience : "editors";
         if (!need(res, text, 400, "write a message")) return;
         const n = Object.values(db.settings.push || {}).filter(x => aud === "all" || x.role === aud).length, r0 = await broadcast(aud, title, text, "/", b.type, !!b.email);
-        return send(res, 200, { ok: true, subscribers: n, delivered: r0.sent, emails: r0.mails, mailReady: !!(process.env.RESEND_API_KEY && process.env.MAIL_FROM) });
+        return send(res, 200, { ok: true, inbox: inboxCounts(aud), subscribers: n, delivered: r0.sent, emails: r0.mails, mailTo: mailList(aud, NTYPES.includes(b.type) ? b.type : "support").length, mailReady: !!(process.env.RESEND_API_KEY && process.env.MAIL_FROM) });
       }
       if (P === "/api/admin/demo-editor" && M === "POST") {    // test editor with fake videos, only for the owner's own checks
         const uid = "demo-editor"; let u = db.users[uid];
@@ -768,6 +797,8 @@ const server = http.createServer(async (req, res) => {
         if (!dp) { dp = { id: uid8(), email: "demo-producer@promo.test", name: "TEST producer", created: now }; db.producers[dp.id] = dp; }
         let dt = Object.values(db.tracks).find(x => x.demoEd && x.status !== "deleted");
         if (!dt) { dt = { id: uid8(), producerId: dp.id, title: "TEST track for editors", artist: "Demo artist", link: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", links: { spotify: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT" }, budget: 80, spent: 0, platforms: ["tiktok"], categories: [], otherCategory: "", status: "active", created: now, demo: true, demoEd: true }; db.tracks[dt.id] = dt; }
+        dt.categories = (dt.categories || []).length ? dt.categories : ["gaming", "anime"]; dt.descRule = true; dt.message = dt.message || "Add #promo and the artist's name to the description.";
+        dt.links = Object.assign({ spotify: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", soundcloud: "https://soundcloud.com/", tiktok: "https://www.tiktok.com/music/" }, dt.links || {});
         Object.values(db.requests).forEach(r => { if (r.demo && r.openId === acc.open_id) delete db.requests[r.id]; });
         const D = 86400000, mk = (st, videos, extra) => { const r = Object.assign({ id: uid8(), trackId: dt.id, openId: acc.open_id, price: 3, videos, discount: 10, priority: 5, status: st, links: [], created: now - 3 * D, updated: now, demo: true }, extra || {}); db.requests[r.id] = r; return r; };
         mk("pending", 2, { created: now - 3600e3 }); mk("submitted", 2, { created: now - 4 * D, approvedAt: now - 3 * D });
@@ -829,6 +860,14 @@ const server = http.createServer(async (req, res) => {
         const t = { id: uid8(), producerId: "owner", title, artist: String(b.artist || "").trim().slice(0, 120), link, links: link ? { [classifyLink(link)]: link } : {}, budget, spent: 0, platforms: ["tiktok"], categories: cleanCats(b.categories), otherCategory: "", status: "active", created: Date.now() };
         db.tracks[t.id] = t; saveDb(); return send(res, 200, { ok: true, id: t.id });
       }
+      if (P === "/api/admin/track/archive" && M === "POST") {    // finished tracks go to the archive; the owner can bring them back
+        const t = db.tracks[b.id];
+        if (b.archived === false) { if (!need(res, t && t.status === "archived", 404, "not in the archive")) return; t.status = "active"; t.archivedAt = 0; saveDb(); return send(res, 200, { ok: true }); }
+        if (!need(res, t && t.status === "active", 404, "only an active track can be archived")) return;
+        const open = Object.values(db.requests).filter(r => r.trackId === t.id && ["pending", "approved", "submitted", "returned"].includes(r.status)).length;
+        if (!need(res, open === 0, 409, "This track has " + open + " open order(s). Finish or cancel them first.")) return;
+        t.status = "archived"; t.archivedAt = Date.now(); saveDb(); return send(res, 200, { ok: true });
+      }
       if (P === "/api/admin/track/delete" && M === "POST") {    // the owner can delete any track; its data stays in the database
         const t = db.tracks[b.id]; if (!need(res, t && t.status !== "deleted", 404, "no such track")) return;
         const open = Object.values(db.requests).filter(r => r.trackId === t.id && ["approved", "submitted", "returned"].includes(r.status)).length;
@@ -869,14 +908,14 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/proof" && M === "GET") { const img = await getProof(url.searchParams.get("id") || ""); return send(res, 200, { image: img }); }
       if (P === "/api/admin/payout" && M === "POST") {     // mark that the editor has been paid for a completed request
-        const r = db.requests[b.id]; if (!need(res, r && r.status === "completed", 404, "no completed request")) return;
+        const r = db.requests[b.id]; if (!need(res, r && ["approved","returned","submitted","completed"].includes(r.status), 404, "no such request")) return;
         r.paid = !!b.paid; r.paidAt = r.paid ? Date.now() : 0; if (r.paid && b.paidBy !== undefined) r.paidBy = String(b.paidBy).trim().slice(0, 60); if (r.paid) notifyUser("editors", edUserOfOpen(r.openId), "money", "money_paid", { a: "$" + reqCost(r), t: (db.tracks[r.trackId] || {}).title || "" });
         if (b.image) { if (!need(res, /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.image) && b.image.length < 700000, 400, "bad image")) return; await putProof(r.id, b.image); r.proof = true; } saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
         const tp = db.topups[b.id]; if (!need(res, tp && tp.status === "pending", 404, "no pending payment")) return;
-        if (b.status === "confirmed" && !need(res, (db.tracks[tp.trackId] || {}).status === "active", 409, "approve the track first")) return;
-        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; tp.confirmedAt = Date.now(); }
+        if (b.status === "confirmed" && !need(res, ["active", "archived"].includes((db.tracks[tp.trackId] || {}).status), 409, "approve the track first")) return;
+        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t && t.status === "archived") { t.status = "active"; t.archivedAt = 0; } if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; tp.confirmedAt = Date.now(); }
         else if (b.status === "rejected") tp.status = "rejected";
         else return send(res, 400, { error: "bad status" });
         saveDb(); return send(res, 200, { ok: true });
