@@ -945,7 +945,7 @@ function admLoad(){
     return r.json().then(function(d){ADM.ok=true;ADM.data=d});
   }).catch(function(){});
 }
-function admNav(){var b=document.querySelector('nav [data-go="admin"]');if(b)b.hidden=LIVE&&!ADM.ok}
+function admNav(){var b=document.querySelector('nav [data-go="admin"]');if(b)b.hidden=LIVE}
 function renderAdminLive(){
   admNav();
   if(!ADM.ok){
@@ -985,6 +985,7 @@ function route(){
   if(parts[1]&&parts[1].indexOf("taken")>=0){$("linkErr").textContent=t("taken_err");$("linkErr").hidden=false}
   if(parts[1]&&parts[1].indexOf("mismatch")>=0){$("linkErr").textContent=t("mm_err");$("linkErr").hidden=false}
   if(VIEWS.indexOf(v)<0)v="home";
+  if(LIVE){if(v==="producer")roleSet("producer");else if(["signup","dashboard","campaigns","analysis","report","tiktok"].indexOf(v)>=0)roleSet("editor")}
   var g=gate();
   if((v==="dashboard"||v==="report")&&g)v=g;
   if(v==="tiktok"&&!termsOk())v="signup";
@@ -994,6 +995,7 @@ function route(){
   document.querySelectorAll("nav .lnk").forEach(function(b){b.removeAttribute("aria-current");if(b.getAttribute("data-go")===v)b.setAttribute("aria-current","page")});
   if(location.hash!=="#"+v&&(location.hash||v!=="home")){try{history.replaceState(null,"","#"+v)}catch(err){}}
   if(v==="signup"){var add=S.accounts.length>0;$("fTerms").closest("label").hidden=add;$("openTT").disabled=!termsOk();$("suTitle").textContent=add?t("acc_add_title"):t("su_title")}
+  navRole();
   runId++;
   if(v==="analysis")renderAnalysis();
   if(v==="report")renderReport();
@@ -1108,7 +1110,7 @@ a_overview:"Обзор",a_requests:"Заявки",a_payments:"Платежи",a_
 a_approve:"Одобрить",a_reject:"Отклонить",a_complete:"Завершить",a_return:"Вернуть на доработку",a_confirm:"Подтвердить платёж",a_no_req:"Заявок пока нет.",a_no_pay:"Платежей пока нет.",a_no_acc:"Нет подходящих аккаунтов.",a_no_tr:"Треков пока нет.",
 a_f_cat:"Тематика",a_f_stars:"Рейтинг",a_f_all:"Все тематики",a_min2:"от 2 звёзд",a_min3:"от 3 звёзд",a_min4:"от 4 звёзд",a_manual:"Ваша оценка",a_auto:"Авто",a_bulk:"Bulk",a_left:"осталось",a_price:"Цена",a_per1k:"за 1000 просмотров",a_dec:"Решение",a_taken:"Брать",a_skip:"Не брать",a_refresh_note:"Просмотры обновляются сами примерно раз в 30 минут, пока сайт не спит.",a_acc_note:"Аккаунты ниже 2 звёзд скрыты. Рейтинг: цена за 1000 просмотров, стабильность и сдача в срок; ваши звёзды главнее автоматических."}};
 function L(k){if(XL[lang]&&XL[lang][k])return XL[lang][k];return (LT[lang]&&LT[lang][k])||LT.en[k]||k}
-var LV={ovTrack:"",fDisc:"all",tracks:[],reqs:[],prod:null,prodMode:"login",prodErr:"",tCat:"all",modal:null,ok:"",fCat:"all",fStars:"2+",adTab:"overview"};
+var LV={ovTrack:"",fDisc:"all",tracks:[],reqs:[],prod:null,prodMode:"login",prodErr:"",tCat:"all",modal:null,ok:"",fCat:"all",fStars:"all",adTab:"overview"};
 function api(path,body){
   return fetch(path,{method:body===undefined?"GET":"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:body===undefined?undefined:JSON.stringify(body)})
     .then(function(r){return r.json().catch(function(){return {}}).then(function(j){return {ok:r.ok,status:r.status,j:j}})});
@@ -1293,7 +1295,7 @@ function renderOwner(){
   admNav();["adH1","adH2","adNote"].forEach(function(i){$(i).hidden=false});
   var D=ADM.data;
   if(!ADM.ok||!D)return false;
-  var S2=D.stats,tabs=["overview","requests","accounts","editorpay","payments","tracks","pay"].map(function(k){return '<button type="button" class="btn sm" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+(k==="requests"&&S2.pendingRequests?' ('+S2.pendingRequests+')':'')+(k==="payments"&&S2.pendingTopups?' ('+S2.pendingTopups+')':'')+(k==="editorpay"&&S2.pendingPayouts?' ('+S2.pendingPayouts+')':'')+'</button>'}).join("");
+  var S2=D.stats,tabs=["overview","requests","accounts","producers","editorpay","payments","tracks","pay"].map(function(k){return '<button type="button" class="btn sm" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+(k==="requests"&&S2.pendingRequests?' ('+S2.pendingRequests+')':'')+(k==="payments"&&S2.pendingTopups?' ('+S2.pendingTopups+')':'')+(k==="editorpay"&&S2.pendingPayouts?' ('+S2.pendingPayouts+')':'')+'</button>'}).join("");
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -1302,7 +1304,7 @@ function renderOwner(){
       '<div class="card tile hot"><b>'+n(bt?bt.videos:S2.boughtVideos)+'</b><span>'+esc(L("a_bought30"))+'</span></div>',
       '<div class="card tile hot"><b>'+n(bt?bt.views:S2.purchasedViews)+'</b><span>'+esc(L("a_pviews30"))+'</span></div>',
       '<div class="card tile"><b>'+(bt?n(bt.views):n(S2.views30))+'</b><span>'+esc(L(bt?"a_v30_track":"a_v30"))+'</span>'+trSel+'</div>',
-      '<div class="card tile"><b>'+S2.accounts+'</b><span>'+esc(L("a_accs"))+'</span></div>',
+      '<div class="card tile" data-l="atab" data-k="accounts" style="cursor:pointer"><b>'+S2.accounts+'</b><span>'+esc(L("a_accs"))+' →</span></div>',
       '<div class="card tile'+(S2.pendingRequests?' hot':'')+'"><b>'+S2.pendingRequests+'</b><span>'+esc(L("a_preq"))+'</span></div>',
       '<div class="card tile'+(S2.pendingTopups?' hot':'')+'"><b>'+S2.pendingTopups+'</b><span>'+esc(L("a_ppay"))+'</span></div>',
       '<div class="card tile'+(S2.pendingPayouts?' hot':'')+'"><b>'+S2.pendingPayouts+'</b><span>'+esc(L("a_pedit"))+'</span></div>'].join("");
@@ -1326,6 +1328,8 @@ function renderOwner(){
       return '<div class="card ord"><div class="t"><div><span>'+esc(p.producer||"")+'</span><b>'+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' 20%: '+money(Math.round(p.amount*20)/100)+'</span><span>'+esc(p.track||"")+'</span></div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
         (p.status==="pending"?'<div class="row"><button class="btn sm primary" data-l="tAct" data-id="'+esc(p.id)+'" data-s="confirmed">'+esc(L("a_confirm"))+'</button><button class="btn sm danger" data-l="tAct" data-id="'+esc(p.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>':'')+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
+  }else if(LV.adTab==="producers"){
+    body='<div class="list">'+((D.producers||[]).length?D.producers.map(function(p){return '<div class="card ord"><div class="t"><div><b>'+esc(p.name||"—")+'</b><span>'+esc(p.email)+'</span><span>'+esc(L("a_pr_joined"))+' '+fmtDate(p.created)+'</span></div><div class="kv" style="grid-template-columns:1fr 1fr"><div><b>'+p.tracks.length+'</b><span>'+esc(L("a_pr_tracks"))+'</span></div><div><b>'+money(p.paid)+'</b><span>'+esc(L("a_pr_paid"))+'</span></div></div></div>'+p.tracks.map(function(t){return '<div class="hint">'+esc(t.title)+' · '+esc(t.status)+' · '+money(t.left)+' '+esc(L("a_left"))+'</div>'}).join("")+'</div>'}).join(""):'<div class="empty">'+esc(L("a_pr_none"))+'</div>')+'</div>';
   }else if(LV.adTab==="editorpay"){
     var dl=D.requests.filter(function(q){return q.status==="completed"}).sort(function(x,y){return (x.paid?1:0)-(y.paid?1:0)||(y.completedAt||0)-(x.completedAt||0)});
     body='<div class="list">'+(dl.length?dl.map(function(q){
@@ -1335,10 +1339,10 @@ function renderOwner(){
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="accounts"){
     var fs=LV.fStars;
-    var list=D.accounts.filter(function(a){var s=a.stars.final;if(s==null||s<2)return false;var okS=fs==="2+"?true:(fs==="5"?s>=5:(s>=Number(fs)&&s<Number(fs)+1));return okS&&(LV.fDisc!=="yes"||(a.discount||0)>0)&&(LV.fCat==="all"||(a.categories||[]).indexOf(LV.fCat)>=0)}).sort(function(x,y){return y.stars.final-x.stars.final||(y.discount||0)-(x.discount||0)||(x.cpm||9)-(y.cpm||9)});
+    var list=D.accounts.filter(function(a){var s=a.stars.final;if(fs!=="all"&&(s==null||s<2))return false;var okS=fs==="all"||fs==="2+"?true:(fs==="5"?s>=5:(s>=Number(fs)&&s<Number(fs)+1));return okS&&(LV.fDisc!=="yes"||(a.discount||0)>0)&&(LV.fCat==="all"||(a.categories||[]).indexOf(LV.fCat)>=0)}).sort(function(x,y){return (y.stars.final||0)-(x.stars.final||0)||(y.discount||0)-(x.discount||0)||(x.cpm||9)-(y.cpm||9)});
     var wait=D.accounts.filter(function(a){return a.adminStatus==='new'||!a.adminStatus}).map(function(a){return '<div class="card arow"><div class="row" style="justify-content:space-between"><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'<br><span class="hint">'+(a.price?money(a.price):'—')+' · '+n(a.analysis.refAvg||0)+'</span></span><span class="row"><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button></span></div></div>'}).join('');
     body=(wait?'<h3 class="sub">'+esc(L("a_wait_acc"))+'</h3><div class="list" style="margin-bottom:18px">'+wait+'</div>':'')+'<div class="row" style="margin-bottom:12px"><label class="f" for="fCat" style="flex:1 1 200px"><span>'+esc(L("a_f_cat"))+'</span><select id="fCat" data-l="fCat"><option value="all">'+esc(L("a_f_all"))+'</option>'+CATS.map(function(c){return '<option value="'+c+'"'+(LV.fCat===c?' selected':'')+'>'+esc(L("c_"+c))+'</option>'}).join("")+'</select></label>'+
-      '<label class="f" for="fStars" style="flex:1 1 160px"><span>'+esc(L("a_f_stars"))+'</span><select id="fStars" data-l="fStars">'+[["2+","a_min2"],["2","a_r2"],["3","a_r3"],["4","a_r4"],["5","a_r5"]].map(function(o){return '<option value="'+o[0]+'"'+(LV.fStars===o[0]?' selected':'')+'>'+esc(L(o[1]))+'</option>'}).join("")+'</select></label><label class="f" for="fDisc" style="flex:1 1 160px"><span>'+esc(L("a_bulk"))+'</span><select id="fDisc" data-l="fDisc"><option value="all">'+esc(L("a_disc_all"))+'</option><option value="yes"'+(LV.fDisc==="yes"?' selected':'')+'>'+esc(L("a_disc_yes"))+'</option></select></label></div><p class="hint" style="margin-bottom:10px">'+esc(L("a_acc_note"))+'</p>'+
+      '<label class="f" for="fStars" style="flex:1 1 160px"><span>'+esc(L("a_f_stars"))+'</span><select id="fStars" data-l="fStars">'+[["all","a_f_all_rated"],["2+","a_min2"],["2","a_r2"],["3","a_r3"],["4","a_r4"],["5","a_r5"]].map(function(o){return '<option value="'+o[0]+'"'+(LV.fStars===o[0]?' selected':'')+'>'+esc(L(o[1]))+'</option>'}).join("")+'</select></label><label class="f" for="fDisc" style="flex:1 1 160px"><span>'+esc(L("a_bulk"))+'</span><select id="fDisc" data-l="fDisc"><option value="all">'+esc(L("a_disc_all"))+'</option><option value="yes"'+(LV.fDisc==="yes"?' selected':'')+'>'+esc(L("a_disc_yes"))+'</option></select></label></div><p class="hint" style="margin-bottom:10px">'+esc(L("a_acc_note"))+'</p>'+
       '<div class="list">'+(list.length?list.map(function(a){
         var sel=['<option value="auto">'+esc(L("a_auto"))+(a.stars.auto!=null?' ('+a.stars.auto+')':'')+'</option>'].concat([1,1.5,2,2.5,3,3.5,4,4.5,5].map(function(s){return '<option value="'+s+'"'+(a.stars.manual===s?' selected':'')+'>'+s+' ★</option>'})).join("");
         return '<details class="card arow"><summary><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'</span><span class="hint">'+(a.price?money(a.price):"—")+(a.cpm?' · '+money(a.cpm)+' '+esc(L("a_per1k")):'')+' · '+n(a.analysis.refAvg||0)+'</span></summary>'+
@@ -1581,6 +1585,16 @@ document.addEventListener("click",function(e){
     function go(img){var body={id:id,paid:paid};if(img)body.image=img;api("/api/admin/payout",body).then(function(){ownerReload()})}
     if(paid&&f){shrinkImage(f,function(img){go(img)})}else go(null);return}
 });
+
+function roleGet(){try{return localStorage.getItem("pc_role")||""}catch(e){return ""}}
+function roleSet(r){try{localStorage.setItem("pc_role",r)}catch(e){}}
+function navRole(){
+  if(!LIVE)return;var r=roleGet(),show={campaigns:r==="editor",dashboard:r==="editor",producer:r==="producer",admin:false};
+  document.querySelectorAll("nav .lnk").forEach(function(b){b.hidden=!show[b.getAttribute("data-go")]});
+  var nb=$("navSignup");if(nb)nb.hidden=r!=="editor";
+}
+Object.assign(LT.en,{a_producers:"Producers",a_pr_none:"No producers yet.",a_pr_tracks:"tracks",a_pr_paid:"paid in total",a_pr_joined:"joined",a_f_all_rated:"All accounts (including below 2 stars and unrated)",a_open_acc:"Open accounts"});
+Object.assign(LT.ru,{a_producers:"Продюсеры",a_pr_none:"Продюсеров пока нет.",a_pr_tracks:"треков",a_pr_paid:"оплачено всего",a_pr_joined:"зарегистрирован",a_f_all_rated:"Все аккаунты (в том числе ниже 2 звёзд и без оценки)",a_open_acc:"Открыть аккаунты"});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
