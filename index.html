@@ -1278,7 +1278,7 @@ body.hasdock #tkToasts{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v53 · 16.11 00:10</span>
+  <span>© Promo Campaign · v54 · 16.11 00:40</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2250,9 +2250,9 @@ function renderOwner(){
   admNav();["adH1","adH2","adNote"].forEach(function(i){$(i).hidden=false});
   var D=ADM.data;
   if(!ADM.ok||!D)return false;checkNew(D);
-  var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')+(k==="tickets"&&window.__TK&&window.__TK.unread?' <i class="cnt">'+(window.__TK.unread>99?"99+":window.__TK.unread)+'</i>':'')},
+  var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')+(k==="newtracks"&&window.__NTn&&window.__NTn()?' <i class="cnt">'+window.__NTn()+'</i>':'')+(k==="tickets"&&window.__TK&&window.__TK.unread?' <i class="cnt">'+(window.__TK.unread>99?"99+":window.__TK.unread)+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -4134,12 +4134,12 @@ Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Ос
   var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
 
 /* ===== v29: phone owner cabinet with bottom menu ===== */
-var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["pr","🎵","g_pr",["producers","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
+var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
 function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
 function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
   if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
   if(g==="tk")return (window.__TK&&window.__TK.unread)||0;
-  if(g==="pr")return S2.pendingTopups||0;return 0}
+  if(g==="pr")return (S2.pendingTopups||0)+((window.__NTn&&window.__NTn())||0);return 0}
 function adDockRender(){
   var d=$("dock");
   var on=(location.hash||"").replace(/\?.*/,"")==="#admin"&&window.innerWidth<900&&ADM&&ADM.ok&&ADM.data;
@@ -5097,6 +5097,30 @@ window.addEventListener("click",function(e){var el=e.target.closest&&e.target.cl
 document.addEventListener("input",function(e){var l=e.target&&e.target.closest&&e.target.closest(".badf");if(l)l.classList.remove("badf")});
 })();
 
+/* ===== v54: owner tab "New tracks" ===== */
+(function(){
+Object.assign(LT.en,{a_newtracks:"New tracks",nt_h:"New tracks from producers",nt_none:"No new tracks waiting.",nt_ok:"Approve and notify editors",nt_no:"Reject",nt_by:"Producer",nt_bud:"Budget",nt_links:"Links",nt_msg:"Message",nt_done:"Approved. Editors were notified.",ow_i_nt:"New track from a producer: {t}"});
+Object.assign(LT.ru,{a_newtracks:"Новые треки",nt_h:"Новые треки от продюсеров",nt_none:"Новых треков нет.",nt_ok:"Принять и оповестить эдиторов",nt_no:"Отклонить",nt_by:"Продюсер",nt_bud:"Бюджет",nt_links:"Ссылки",nt_msg:"Сообщение",nt_done:"Принято. Эдиторы оповещены.",ow_i_nt:"Новый трек от продюсера: {t}"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(/^(a_newtracks|nt_|ow_i_nt)/.test(x)&&!XLL[k][x])XLL[k][x]=LT.en[x]});
+function rev(){var D=ADM&&ADM.data;return D?(D.tracks||[]).filter(function(t){return t.status==="review"}):[]}
+window.__NTn=function(){return rev().length};
+function amt(t){var D=ADM.data,s=0;(D.topups||[]).forEach(function(x){if(x.track===t.title&&x.status==="pending")s+=x.amount});return s}
+function ntHtml(){var a=rev();
+  return '<h3 style="margin:0 0 12px">🆕 '+esc(L("nt_h"))+'</h3>'+(NT.msg?'<div class="note payok">'+esc(NT.msg)+'</div>':'')+'<div class="tklist">'+(a.length?a.map(function(t){
+   var ln=Object.keys(t.links||{}).map(function(k){var u=t.links[k];return '<a class="tkl" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join("");
+   return '<div class="card mkrow"><div class="mkh"><b>'+esc(t.title)+'</b><span>'+esc(t.artist||"")+'</span></div><div>'+esc(L("nt_by"))+': '+esc(t.producerName||"")+' · '+esc(t.producer||"")+'</div><div>'+esc(L("nt_bud"))+': <b>'+money(amt(t)||t.budget||0)+'</b> · '+esc((t.platforms||[]).join(", "))+'</div><div>'+catPills(t.categories,t.otherCategory)+'</div>'+(ln?'<div class="tklinks">'+ln+'</div>':'')+(t.message?'<div class="hint">'+esc(L("nt_msg"))+': '+esc(t.message)+'</div>':'')+(t.deadline?'<div class="hint">'+esc(t.deadline)+'</div>':'')+
+   '<div class="row"><button type="button" class="btn primary sm" data-l="ntOk" data-id="'+esc(t.id)+'">'+esc(L("nt_ok"))+'</button><button type="button" class="btn sm danger" data-l="ntNo" data-id="'+esc(t.id)+'">'+esc(L("nt_no"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("nt_none"))+'</div>')+'</div>'}
+var NT={msg:""};
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="newtracks"){var mn=document.querySelector(".ownmain")||$("adApp");if(mn)mn.innerHTML=ntHtml()}}catch(e){}return r}})();
+(function(){var o=ownItems;ownItems=function(){var it=o();rev().forEach(function(t){it.push({id:"nt"+t.id,t:"tracks",tab:"newtracks",txt:L("ow_i_nt").replace("{t}",t.title+(t.artist?" — "+t.artist:""))})});return it}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="ntOk"],[data-l="ntNo"]');if(!el)return;e.stopImmediatePropagation();
+  var id=el.getAttribute("data-id"),ok=el.getAttribute("data-l")==="ntOk";el.disabled=true;
+  api("/api/admin/track",{id:id,status:ok?"approved":"rejected"}).then(function(r){
+   if(!r.ok){NT.msg=(r.j&&r.j.error)||L("p_err");renderOwner();return}
+   var tt=ADM.data.tracks.filter(function(x){return x.id===id})[0];
+   if(!ok){NT.msg="";return ownerReload()}
+   return api("/api/admin/broadcast",{text:L("bc_track_text").replace("{t}",tt?(tt.title+(tt.artist?" — "+tt.artist:"")):""),title:L("bc_track_title"),audience:"editors",type:"campaigns",trackId:id}).then(function(){NT.msg=L("nt_done");return ownerReload()})})},true);
+})();
 /* ===== v51: owner toast for new tickets, dock highlight, "write to manager" ===== */
 (function(){
 Object.assign(LT.en,{dm_wr:"Write to manager",dm_wr_h:"Choose where to write:",dm_wr_none:"No contacts are set yet.",tk_new:"New message",tk_toast:"wrote to you"});
