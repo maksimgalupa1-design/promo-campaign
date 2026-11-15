@@ -176,7 +176,7 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 /* ---- live screens: roles, producer, tracks, owner cabinet ---- */
 .roles{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:6px}
-.role{text-align:left;cursor:pointer;display:grid;gap:8px;font:inherit;color:inherit;padding:22px}
+.role{text-align:left;cursor:pointer;display:grid;gap:8px;font:inherit;color:inherit;padding:22px;transition:transform .18s ease,box-shadow .18s ease}.roles>.card{animation-fill-mode:backwards!important}.role:hover,.role:focus-visible{transform:translateY(-7px);box-shadow:0 14px 30px rgba(107,92,255,.28)}.role:active{transform:translateY(-3px)}
 .role b{font-family:var(--display);font-size:24px}
 .role span:not(.pill){color:var(--muted);font-size:14px}
 .role:hover{border-color:var(--accent)}
@@ -428,6 +428,16 @@ textarea{background:var(--bg);color:var(--fg);border:1px solid var(--line);borde
 .accfull{max-height:80vh;overflow:auto}.accfull .tbl{font-size:13px}
 .tieropt{padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin:6px 0;display:flex;gap:10px;align-items:center}.tieropt input{width:20px;height:20px}
 .tieropt.cust{display:block}.payto{border-left:4px solid #6B5CFF}.payto2{font-weight:600}
+
+.payok{background:rgba(47,181,116,.14);border:1px solid #2FB574;border-radius:14px}
+.payrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0;padding:10px 12px;border-radius:12px;background:rgba(47,181,116,.18)}
+.payl{font-weight:700;color:#2FB574;min-width:70px}.payv{flex:1;min-width:0;overflow-wrap:anywhere;font-size:15px}
+.copybtn{border:0;border-radius:999px;padding:8px 14px;background:#2FB574;color:#fff;font:700 13px inherit;cursor:pointer}.copybtn.copied{background:#177a45}
+.ratebox{margin:12px 0}.rtrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.rtw,.rtd,.rtauto{border:1px solid var(--line);background:transparent;color:inherit;border-radius:999px;padding:8px 14px;font:700 14px inherit;cursor:pointer}
+.rtw.on,.rtd.on{background:#6B5CFF;border-color:#6B5CFF;color:#fff}
+.rtauto{background:#F5C518;border-color:#F5C518;color:#3a2c00}.rtauto.on{box-shadow:0 0 0 3px rgba(245,197,24,.45)}
+.rtdec{margin-top:10px;padding:10px;border-radius:14px;border:1px dashed var(--line)}.rtdec>div{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1413,7 +1423,7 @@ function drawLCamps(){
   $("lchips").innerHTML=chips;
   var list=LV.tracks.filter(function(t){return LV.tCat==="all"||(t.categories||[]).indexOf(LV.tCat)>=0||!(t.categories||[]).length});
   $("lgrid").innerHTML=list.length?list.map(function(t){
-    return '<article class="card camp"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+'</div></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div>'+
+    return '<article class="card camp"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+'</div></div></div><div>'+trCats(t)+'</div>'+
       (t.link?'<a class="hint" href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer" style="overflow-wrap:anywhere">'+esc(t.link)+'</a>':'')+
       '<button class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
@@ -1425,12 +1435,12 @@ function openReq(tid){
   var t=LV.tracks.filter(function(x){return x.id===tid})[0];if(!t)return;
   LV.modal={type:"req",tid:tid};
   var okN=S.accounts.filter(function(a){return accReady(a)&&accMatch(a,t)}).length;
-  openModal('<h3>'+esc(t.title)+' · '+esc(t.artist)+'</h3><div>'+catPills(t.categories,t.otherCategory)+'</div><b>'+esc(L("rq_acc"))+'</b>'+
+  openModal('<h3>'+esc(t.title)+' · '+esc(t.artist)+'</h3><div>'+trCats(t)+'</div><b>'+esc(L("rq_acc"))+'</b>'+
     (okN>1?'<label class="accopt all"><input type="checkbox" id="rqAll"><span><b>'+esc(L("rq_all"))+' ('+okN+')</b></span></label>':'')+
-    '<div class="accscroll">'+S.accounts.map(function(a,i){
+    '<div class="accscroll">'+S.accounts.filter(function(a){return accMatch(a,t)}).map(function(a,i){
       var ready=accReady(a),match=accMatch(a,t),ok=ready&&match;
       return '<div class="accrow"><label class="accopt'+(ok?'':' dis')+'"><input type="checkbox" data-acc="'+esc(a.id)+'"'+(ok?'':' disabled')+'><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+'<br><span class="hint">'+(a.price?money(a.price)+' · ':'')+catPills(a.categories,a.otherCategory)+'</span>'+
-        (!ok?'<br><span class="hint" style="color:var(--bad)">'+esc(!ready?L("rq_no_price"):L("rq_cat_no"))+'</span>':'')+'</span></label>'+
+        (!ok?'<br><span class="hint" style="color:var(--bad)">'+esc(!ready?accWhy(a):L("rq_cat_no"))+'</span>':'')+'</span></label>'+
         (ok?'<div class="accdisc hint">★ '+esc(L("rq_disc_acc"))+': '+esc(tiersTxt(a.tiers))+'</div>':'')+'</div>';
     }).join("")+'</div><p class="hint">'+esc(L("rq_disc_h2"))+'</p>'+
     '<div class="note err" id="rqErr" hidden></div><div class="row"><button class="btn primary" data-l="rqSend">'+esc(L("rq_send"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');
@@ -1521,7 +1531,7 @@ function drawProd(){
     '<div class="list" style="margin-top:14px">'+(P.tracks.length?P.tracks.map(function(t){
       return '<div class="card ord"><div class="t"><div><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span></div><div class="row"><button class="btn sm" data-l="pTop" data-id="'+esc(t.id)+'">'+esc(L("p_addb"))+'</button><button class="btn sm danger" data-l="pDel" data-id="'+esc(t.id)+'">'+esc(L("p_del"))+'</button></div></div>'+
         '<div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div>'+
-        '<div>'+catPills(t.categories,t.otherCategory)+'</div>'+(t.pendingTopup?'<div class="note">'+esc(L("p_pending"))+': '+money(t.pendingTopup)+'</div>':'')+'</div>';
+        '<div>'+trCats(t)+'</div>'+(t.pendingTopup?'<div class="note">'+esc(L("p_pending"))+': '+money(t.pendingTopup)+'</div>':'')+'</div>';
     }).join(""):'<div class="empty">'+esc(L("p_none"))+'</div>')+'</div>'+
     '<h3 class="sub">'+esc(L("p_add"))+'</h3><div class="card form">'+
     '<label class="f" for="nTitle"><span>'+esc(L("p_title"))+'</span><input id="nTitle" type="text" maxlength="120"></label>'+
@@ -1621,7 +1631,7 @@ function renderOwner(){
         var sel=['<option value="auto">'+esc(L("a_auto"))+(a.stars.auto!=null?' ('+a.stars.auto+')':'')+'</option>'].concat([1,1.5,2,2.5,3,3.5,4,4.5,5].map(function(s){return '<option value="'+s+'"'+(a.stars.manual===s?' selected':'')+'>'+s+' ★</option>'})).join("");
         return '<details class="card arow v-'+verdictOf(a).k+'"><summary><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'</span><span class="hint">'+(a.price?money(a.price):"—")+(a.cpm?' · '+money(a.cpm)+' '+esc(L("a_per1k")):'')+' · '+n(a.analysis.refAvg||0)+'</span></summary>'+
           '<div style="margin-top:10px">'+catPills(a.categories,a.otherCategory)+'</div>'+
-          '<div class="row" style="margin:12px 0"><label class="f" for="rt_'+esc(a.id)+'" style="flex:0 1 180px"><span>'+esc(L("a_manual"))+'</span><select id="rt_'+esc(a.id)+'" data-l="rate" data-id="'+esc(a.id)+'">'+sel+'</select></label>'+
+          '<div class="row" style="margin:12px 0">'+ratingHtml(a)+
           '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
           winTable(a.analysis,{videos:a.videos,price:a.price})+videoTable({videos:a.videos})+'</details>';
       }).join(""):'<div class="empty">'+esc(L("a_no_acc"))+'</div>')+'</div>';
@@ -1639,7 +1649,7 @@ function renderOwner(){
       var lk=["spotify","soundcloud","tiktok","mp3"].filter(function(k){return t.links&&t.links[k]}).map(function(k){return '<a class="pill" href="'+esc(t.links[k])+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join(" ");
       var act=t.status==="review"?'<div class="row"><button class="btn sm primary" data-l="trAct" data-id="'+esc(t.id)+'" data-s="approved">'+esc(L("a_approve_t"))+'</button><button class="btn sm danger" data-l="trAct" data-id="'+esc(t.id)+'" data-s="rejected">'+esc(L("a_reject_t"))+'</button></div>':(t.status==="active"?'<div class="row"><button class="btn sm primary" data-l="bcTrack" data-id="'+esc(t.id)+'">📣 '+esc(L("bc_track"))+'</button></div>':'');
       act+='<div class="row"><button class="btn sm danger" data-l="trDel" data-id="'+esc(t.id)+'">🗑 '+esc(L("tr_del"))+'</button></div>';
-      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · Song: '+esc(t.title):'')+'</div>'+act+'</div>';
+      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+trCats(t)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · Song: '+esc(t.title):'')+'</div>'+act+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_tr"))+'</div>')+'</div>';
   }
   $("adApp").innerHTML='<div class="row" style="justify-content:space-between;margin-bottom:6px"><div style="flex:1 1 100%;min-width:0">'+tabs+'</div><button class="btn sm" id="admLogout">'+esc(t("ad_logout"))+'</button></div>'+body;
@@ -1742,7 +1752,7 @@ function payBoxHtml(method,amount,coin,compact){
   if(method==="crypto"){var ad=(x.crypto||{})[coin||"solana"];if(ad){rows.push([coinL(coin||"solana"),ad])}}
   if(method==="card"&&x.card){if(x.cardHolder)rows.push([L("p_recipient"),x.cardHolder]);rows.push([L("p_cardno"),x.card])}
   var a=Number(amount)||0,fee=Math.round(a*0.2*100)/100;
-  return '<div class="note"><b>'+esc(L("p_send_to"))+'</b>'+(rows.length?rows.map(function(r){return '<div style="overflow-wrap:anywhere">'+esc(r[0])+': <b>'+esc(r[1])+'</b></div>'}).join(""):'<div>'+esc(L("p_no_pay"))+'</div>')+
+  return '<div class="note payok"><b>'+esc(L("p_send_to"))+'</b>'+(rows.length?rows.map(function(r){return '<div class="payrow"><span class="payl">'+esc(r[0])+'</span><b class="payv">'+esc(r[1])+'</b><button type="button" class="copybtn" data-l="cpy" data-v="'+esc(r[1])+'">⧉ '+esc(L("cp_copy"))+'</button></div>'}).join(""):'<div>'+esc(L("p_no_pay"))+'</div>')+
     (compact?'':(a>0?'<div class="hotnote" style="margin-top:8px">'+esc(L("p_you_get"))+': <b>'+money(a-fee)+'</b> ('+money(a)+' − 20% = '+money(fee)+')<br><small>'+esc(L("p_fee_short"))+'</small></div>':'')+'<div class="hint" style="margin-top:6px">'+esc(L("p_fee"))+'</div>')+'</div>';
 }
 function refreshPayBox(){
@@ -1810,7 +1820,7 @@ function drawLCamps(){
       '<button class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
 }
-function accReady(a){return PC.analyze(a.videos||[],Date.now()).accepted&&a.price>0&&a.adminStatus==="approved"&&!!(LV.payout&&LV.payout.set)}
+function accReady(a){return a.price>0&&a.adminStatus==="approved"&&!!(LV.payout&&LV.payout.set)}
 function payoutBlock(){
   var c=LV.payout||{set:false},m=LV.pyM||"paypal";
   return '<div class="blk"><h3>'+esc(L("py_title"))+'</h3><p class="hint">'+esc(L("py_h"))+'</p>'+
@@ -1982,7 +1992,8 @@ loadContacts();
 function wordCount(s){return (String(s||"").trim().match(/\S+/g)||[]).length}
 function stepsHtml(u){
   var wc=wordCount(u.about),topic=(u.categories&&u.categories.length>0)||wc>=3;
-  var st=[{k:"st1",ok:true,go:""},{k:"st2",ok:topic,go:"sName"},{k:"st3",ok:!!u.price,go:"changePrice2"},{k:"st4",ok:(u.discount||0)>0,go:"sDisc",opt:true}];
+  var st=[{k:"st1",ok:true,go:""},{k:"st2",ok:topic,go:"sAbout"},{k:"st3",ok:!!u.price,go:"price"},{k:"st4",ok:(u.tiers||[]).length>0,go:"tOpt0",opt:true}];
+  if(st[1].ok&&st[2].ok)return "";   // everything required is done: no need to show the list
   var done=st.filter(function(s){return s.ok}).length,cur=st.findIndex(function(s){return !s.ok});
   return '<div class="stepsx card"><div class="stbar"><i style="width:'+Math.round(done/4*100)+'%"></i></div>'+st.map(function(s,i){
     return '<div class="st'+(s.ok?' done':(i===cur?' cur':''))+'" style="animation-delay:'+(i*0.12)+'s" data-l="stGo" data-g="'+s.go+'"><span class="stn">'+(s.ok?'✓':(i+1))+'</span><span class="stt"><b>'+esc(L(s.k))+(s.opt?' <em>'+esc(L("st_opt"))+'</em>':'')+'</b><small>'+esc(L(s.k+"h"))+'</small></span></div>'}).join("")+'</div>';
@@ -2165,7 +2176,7 @@ function ordGroup(q){return (q.status==="pending"||q.status==="submitted")?"wait
 function ordEnd(q){return (q.approvedAt||q.created)+16*86400000}
 function cdHtml(q){
   var end=ordEnd(q);
-  return '<div class="cdbox" data-end="'+end+'"><div class="cdt">'+esc(L("od_left"))+'</div><div class="cdn"><div><b data-p="d">0</b><span>'+esc(L("od_d"))+'</span></div><div><b data-p="h">00</b><span>'+esc(L("od_h"))+'</span></div><div><b data-p="m">00</b><span>'+esc(L("od_m"))+'</span></div><div><b data-p="s">00</b><span>'+esc(L("od_s"))+'</span></div></div><div class="cdover" hidden>'+esc(L("od_over"))+'</div></div>';
+  return '<div class="cdbox" data-end="'+end+'"><div class="cdt">⏱ '+esc(L("od_left"))+'</div><div class="cdn"><div><b data-p="d">0</b><span>'+esc(L("od_d"))+'</span></div><div><b data-p="h">00</b><span>'+esc(L("od_h"))+'</span></div><div><b data-p="m">00</b><span>'+esc(L("od_m"))+'</span></div><div><b data-p="s">00</b><span>'+esc(L("od_s"))+'</span></div></div><div class="cdover" hidden>'+esc(L("od_over"))+'</div></div>';
 }
 function tickCd(){
   document.querySelectorAll(".cdbox").forEach(function(b){
@@ -2370,7 +2381,7 @@ function renderDashLive(){
     stepsHtml(u)+priceBig(u)+
     statsHtml(u)+sugBanner(u)+actRow(u)+(LV.edit?'<div class="blk"><h3>'+esc(L("ad_set"))+'</h3>'+
     '<label class="f" for="sName"><span>'+esc(L("ad_label"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"><span class="hint">'+esc(L("ad_label_h"))+'</span></label>'+
-    '<div class="f"><span>'+esc(L("ad_tt"))+'</span><a class="ttlink" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">https://www.tiktok.com/'+esc(u.handle)+'</a></div>'+
+    '<div class="f"><span>'+esc(L("ad_tt"))+': </span> <a class="ttlink" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">https://www.tiktok.com/'+esc(u.handle)+'</a></div>'+
     '<div class="f"><span>'+esc(L("ad_price"))+'</span><div class="row" style="align-items:center"><b style="font-size:20px">'+(u.price?'$'+u.price:'—')+'</b><button type="button" class="btn sm primary" id="changePrice">'+esc(L("pr_btn"))+'</button></div></div>'+
     '<label class="f" for="sDisc"><span>'+esc(L("ad_disc"))+'</span><input id="sDisc" type="number" min="0" max="99" inputmode="numeric" value="'+(u.discount||"")+'" placeholder="0"><span class="hint">'+esc(L("ad_disc_h"))+'</span></label>'+
     (S.accounts.length>1?'<label class="chk" for="sAll"><input type="checkbox" id="sAll"><span>'+esc(L("dl_disc_all"))+'</span></label>':'')+
@@ -2714,6 +2725,36 @@ document.addEventListener("click",function(e){var el=e.target.closest('[data-l="
 function payTxt(p){return p?esc((p.method==="crypto"?coinL(p.coin)+" ":p.method+" ")+p.value+(p.holder?" · "+p.holder:"")):""}
 (function(){var o=accFullHtml;accFullHtml=function(a){var h=o(a);return h.replace('<p class="hint"><b>'+esc(L("wt_tiers")),'<div class="note payto"><b>💳 '+esc(L("ov_pay"))+':</b> '+(a.payout?payTxt(a.payout):esc(L("ov_nopay")))+'</div><p class="hint"><b>'+esc(L("wt_tiers")))}})();
 (function(){var o=accCardHtml;accCardHtml=function(a){var h=o(a);return h.replace('<div class="wtier">','<div class="wtier payto2">💳 '+(a.payout?payTxt(a.payout):esc(L("ov_nopay")))+'</div><div class="wtier">')}})();
+
+/* ===== v11 ===== */
+Object.assign(LT.en,{cp_copy:"Copy",cp_done:"Copied",ad_about:"About this account * (at least 3 words)",ad_tt:"Link to your TikTok account",rq_nopay:"Add payout details first (Dashboard)",rq_wait:"Waiting for the manager's approval",rt_pick:"Pick the decimals",tr_alltopics:"All topics",od_timer:"⏱"});
+Object.assign(LT.ru,{cp_copy:"Копировать",cp_done:"Скопировано",ad_about:"Об аккаунте * (минимум 3 слова)",ad_tt:"Ссылка на ваш аккаунт",rq_nopay:"Сначала добавьте реквизиты для выплат (Кабинет)",rq_wait:"Ждёт одобрения менеджера",rt_pick:"Выберите десятые",tr_alltopics:"Все темы",od_timer:"⏱"});
+function accWhy(a){return !a.price?L("rq_no_price"):(a.adminStatus!=="approved"?L("rq_wait"):L("rq_nopay"))}
+function trCats(t){var c=t.categories||[];return c.length>=8?'<span class="pill">'+esc(L("tr_alltopics"))+'</span>':catPills(c,t.otherCategory)}
+/* one-click copy */
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="cpy"]');if(!el)return;var v=el.getAttribute("data-v")||"",old=el.textContent;
+  function ok(){el.classList.add("copied");el.textContent="✓ "+L("cp_done");setTimeout(function(){el.classList.remove("copied");el.textContent=old},1800)}
+  function fb(){var t=document.createElement("textarea");t.value=v;t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(x){}t.remove();ok()}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(ok,fb);else fb()});
+/* steps: jump to the right place */
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="stGo"]');if(!el)return;e.stopImmediatePropagation();var g=el.getAttribute("data-g");if(!g)return;
+  if(g==="price"){prOpen();return}
+  LV.edit=true;renderDashLive();var t=$(g);if(t){t.scrollIntoView({behavior:"smooth",block:"center"});if(t.focus)setTimeout(function(){try{t.focus({preventScroll:true})}catch(x){}},350)}},true);
+/* owner rating: pick the whole star, then the decimals (2.0 - 5.0). Auto is yellow */
+function ratingHtml(a){
+  var m=a.stars.manual,au=a.stars.auto,cur=m!=null?Math.floor(m):null;
+  var whole=[2,3,4,5].map(function(w){return '<button type="button" class="rtw'+(cur===w?' on':'')+'" data-l="rtWhole" data-w="'+w+'" data-id="'+esc(a.id)+'">'+w+' ★</button>'}).join("");
+  var dec=[2,3,4].map(function(w){var b="";for(var d=0;d<10;d++){var v=(w+d/10).toFixed(1);b+='<button type="button" class="rtd'+(m!=null&&m.toFixed(1)===v?' on':'')+'" data-l="rate2" data-v="'+v+'" data-id="'+esc(a.id)+'">'+v+'</button>'}return '<div class="rtdec" data-w="'+w+'" hidden><small>'+esc(L("rt_pick"))+'</small><div>'+b+'</div></div>'}).join("")+'<div class="rtdec" data-w="5" hidden><div><button type="button" class="rtd'+(m===5?' on':'')+'" data-l="rate2" data-v="5" data-id="'+esc(a.id)+'">5.0</button></div></div>';
+  return '<div class="ratebox"><span class="hint"><b>'+esc(L("a_manual"))+'</b></span><div class="rtrow"><button type="button" class="rtauto'+(m==null?' on':'')+'" data-l="rate2" data-v="auto" data-id="'+esc(a.id)+'">⚡ '+esc(L("a_auto"))+(au!=null?' ('+au+')':'')+'</button>'+whole+'</div>'+dec+'</div>';
+}
+document.addEventListener("click",function(e){var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="rtWhole"){var box=el.closest(".ratebox"),w=el.getAttribute("data-w");box.querySelectorAll(".rtdec").forEach(function(d){d.hidden=d.getAttribute("data-w")!==w});return}
+  if(a==="rate2"){var v=el.getAttribute("data-v");api("/api/admin/rating",{id:el.getAttribute("data-id"),stars:v==="auto"?null:Number(v)}).then(function(){ownerReload()});return}
+});
+/* owner tabs: keep the scroll position */
+document.addEventListener("click",function(e){if(!e.target.closest('[data-l="atab"]'))return;var y=window.scrollY;[0,40,120,300].forEach(function(ms){setTimeout(function(){window.scrollTo(0,y)},ms)})},true);
+/* the pink "My dashboard" button duplicated the Dashboard tab */
+(function(){var nb=$("navSignup");if(nb)new MutationObserver(function(){if(S.user&&S.user.consent)nb.hidden=true;else nb.hidden=false}).observe(nb,{childList:true,attributes:true,attributeFilter:["data-go"]});if(nb&&S&&S.user&&S.user.consent)nb.hidden=true})();
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);

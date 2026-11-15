@@ -274,17 +274,17 @@ const allAccounts = () => Object.values(db.users).flatMap(u => (u.accounts || []
 function findAccAny(openId) { return allAccounts().find(a => a.open_id === openId) || null; }
 
 /* ---- rating: stars 1..5 shown only to the owner. Manual stars override the automatic ones ---- */
-function autoStars(acc) {
+function autoStars(acc) {   // automatic rating: 2.0 .. 5.0 in steps of 0.1
   const A = PC.analyze(acc.videos || [], Date.now());
-  if (!A.accepted) return { stars: null, cpm: null };
   const cpm = acc.price && A.refAvg ? acc.price / A.refAvg * 1000 : null;
-  let st = cpm === null ? 3 : Math.max(1, Math.min(5, 5 - (cpm - 0.02) / 0.03));
-  if (A.status === "dormant") st -= 1;
-  if (A.status === "active" && A.week.videos === 0) st -= 0.5;
+  let st = !A.accepted ? 2.5 : (cpm === null ? 3.2 : 5 - (cpm - 0.02) / 0.03);
+  if (A.status === "dormant") st -= 0.8;
+  if (A.status === "active" && A.week && A.week.videos === 0) st -= 0.4;
+  if (A.refAvg) st += Math.min(0.4, A.refAvg / 250000);
   const mine = Object.values(db.requests).filter(r => r.openId === acc.open_id);
   const done = mine.filter(r => r.status === "completed").length, bad = mine.filter(r => r.status === "returned").length;
-  if (done + bad > 0) { const q = done / (done + bad); st += q >= 0.9 ? 0.5 : (q < 0.5 ? -1 : 0); }
-  return { stars: Math.round(Math.max(1, Math.min(5, st)) * 2) / 2, cpm };
+  if (done + bad > 0) { const q = done / (done + bad); st += q >= 0.9 ? 0.4 : (q < 0.5 ? -0.6 : 0); }
+  return { stars: Math.round(Math.max(2, Math.min(5, st)) * 10) / 10, cpm };
 }
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
@@ -839,7 +839,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/rating" && M === "POST") {       // manual stars 1..5 (null = back to automatic)
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
         if (b.stars === null) delete a.rating_manual;
-        else { const s = Number(b.stars); if (!need(res, s >= 1 && s <= 5, 400, "stars 1..5")) return; a.rating_manual = Math.round(s * 2) / 2; }
+        else { const s = Number(b.stars); if (!need(res, s >= 2 && s <= 5, 400, "stars 2.0..5.0")) return; a.rating_manual = Math.round(s * 10) / 10; }
         saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/request" && M === "POST") {      // pending -> approved/rejected, submitted -> completed/returned
