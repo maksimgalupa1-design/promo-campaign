@@ -1044,6 +1044,12 @@ details.rqd{animation:chgIn .3s ease backwards}
 body.tab-promos .ownmain .row,body.tab-promos .ownmain .rbar{gap:20px 28px}
 body.tab-promos .ownmain .f{margin-right:8px}
 #lprodBody .card,#lprodBody .list>*{animation:none!important}
+/* v49 */
+.badf{outline:2px solid #E5334A;outline-offset:3px;border-radius:12px;animation:shakeX .35s}
+@keyframes shakeX{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.chk:has(#nDesc:checked){border-color:#8B6CFF;background:rgba(139,108,255,.16);box-shadow:0 0 14px -4px #8B6CFF}
+.camp.flash{animation:campFlash 2.4s ease}
+@keyframes campFlash{0%,100%{box-shadow:none}20%,60%{box-shadow:0 0 0 3px #8B6CFF,0 0 30px rgba(139,108,255,.6)}}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1222,7 +1228,7 @@ body.tab-promos .ownmain .f{margin-right:8px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v48 · 15.11 22:10</span>
+  <span>© Promo Campaign · v49 · 15.11 22:40</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2044,7 +2050,7 @@ function drawLCamps(){
   $("lchips").innerHTML=chips;
   var list=LV.tracks.filter(function(t){return LV.tCat==="all"||(t.categories||[]).indexOf(LV.tCat)>=0||!(t.categories||[]).length});
   $("lgrid").innerHTML=list.length?list.map(function(t){
-    return '<article class="card camp"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+'</div></div></div><div>'+trCats(t)+'</div>'+
+    return '<article class="card camp" data-tid="'+esc(t.id)+'"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+'</div></div></div><div>'+trCats(t)+'</div>'+
       (t.link?'<a class="hint" href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer" style="overflow-wrap:anywhere">'+esc(t.link)+'</a>':'')+
       '<button class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
@@ -2450,7 +2456,7 @@ function drawLCamps(){
     var links=["spotify","soundcloud","tiktok","mp3"].filter(function(k){return t.links&&t.links[k]}).map(function(k){return '<a class="pill" href="'+esc(t.links[k])+'" target="_blank" rel="noopener noreferrer">'+esc(L("l_"+k).split(" ")[0])+'</a>'}).join(" ");
     if(t.hasMp3)links+=' <a class="pill" href="/api/track/mp3?id='+esc(t.id)+'">MP3 ⬇</a>';
     if(!links&&t.link)links='<a class="pill" href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer">link</a>';
-    return '<article class="card camp"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+(t.producerName?' · '+esc(L("t_by"))+' '+esc(t.producerName):'')+'</div></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div>'+
+    return '<article class="card camp" data-tid="'+esc(t.id)+'"><div class="top"><div><div class="name">'+esc(t.title)+'</div><div class="by">'+esc(t.artist)+(t.producerName?' · '+esc(L("t_by"))+' '+esc(t.producerName):'')+'</div></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div>'+
       '<div class="row">'+links+'</div>'+(t.descRule?'<div class="note">'+esc(descTxt(t))+'</div>':'')+
       '<button class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
@@ -3158,7 +3164,7 @@ function inboxPoll(){
 function nTime(at){return new Date(at).toLocaleString(lang,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
 function sndModal(){
   var cur=sndGet(),r=lsGet("pc_read"),ar=lsGet("pc_arch");LV.modal={type:"snd"};
-  var list=LV.inbox.filter(function(m){return nOn(m.type)}).filter(function(m){var isA=ar.indexOf(m.id)>=0,isR=r.indexOf(m.id)>=0;return LV.nFil==="arch"?isA:(!isA&&(LV.nFil==="all"||!isR))});
+  var list=LV.inbox.filter(function(m){return nOn(m.type)}).filter(function(m){var isA=ar.indexOf(m.id)>=0,isR=r.indexOf(m.id)>=0;return LV.nFil==="arch"?isA:(LV.nFil==="all"||(!isA&&!isR))});
   var un=nUnread(),inbox='<div class="chips" role="group">'+["all","unread","arch"].map(function(f){return '<button type="button" class="chip" data-l="nFil" data-f="'+f+'" aria-pressed="'+(LV.nFil===f)+'">'+esc(L(f==="all"?"nt_all":(f==="unread"?"nt_unread":"nt_arch")))+'</button>'}).join("")+'</div>'+
     (un?'<div class="row" style="margin:8px 0"><button class="btn sm" data-l="nReadAll">'+esc(L("nt_readall"))+'</button></div>':'')+
     '<div class="nlist">'+(list.length?list.map(function(m){var isR=r.indexOf(m.id)>=0,isA=ar.indexOf(m.id)>=0;return '<div class="nitem'+(isR?'':' unr')+'" data-l="nRead" data-id="'+esc(m.id)+'"><span class="ndot"></span><div class="nb"><div class="nt">'+esc(nText(m))+'</div><small>'+esc(L("nt_t_"+m.type))+' · '+esc(nTime(m.at))+'</small></div><button type="button" class="btn sm" data-l="nArch" data-id="'+esc(m.id)+'">'+esc(L(isA?"nt_restore":"nt_archive"))+'</button></div>'}).join(""):'<div class="empty">'+esc(L("nt_none"))+'</div>')+'</div>';
@@ -3169,7 +3175,7 @@ function sndModal(){
 }
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
-  if(a==="sndOpen"){e.stopImmediatePropagation();LV.nTab="in";sndModal();loadInbox(function(){if(LV.modal&&LV.modal.type==="snd")sndModal()});return}
+  if(a==="sndOpen"){e.stopImmediatePropagation();LV.nTab="in";LV.nFil="all";sndModal();loadInbox(function(){if(LV.modal&&LV.modal.type==="snd")sndModal()});return}
   if(a==="nTab"){LV.nTab=el.getAttribute("data-t");sndModal();return}
   if(a==="nFil"){LV.nFil=el.getAttribute("data-f");sndModal();return}
   if(a==="nRead"){if(e.target.closest('[data-l="nArch"]'))return;var r=lsGet("pc_read");if(r.indexOf(id)<0){r.push(id);lsSet("pc_read",r)}nBadge();sndModal();return}
@@ -5008,6 +5014,36 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
 (function(){var o=cmHtml;cmHtml=function(){return o.apply(this,arguments).replace(/<button type="button" class="chr" data-l="cmDel" data-id="([^"]*)" title="([^"]*)">🗑<\/button>/g,'<button type="button" class="chdel" data-l="cmDel" data-id="$1" title="$2" aria-label="$2">'+TRASH+'</button>')}})();
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="cmDel"]');if(!el)return;e.stopImmediatePropagation();
   var b=el.closest(".chm");if(b)b.classList.add("chbye");el.disabled=true;setTimeout(function(){api("/api/admin/chat/delete",{id:el.getAttribute("data-id")}).then(function(){cmLoad()})},380)},true);
+})();
+
+/* ===== v49: track notification opens the track, one clear validation for a new track ===== */
+window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="bcTrack"]');if(!el)return;e.stopImmediatePropagation();
+  var id=el.getAttribute("data-id"),tt=ADM.data.tracks.filter(function(x){return x.id===id})[0];
+  api("/api/admin/broadcast",{text:L("bc_track_text").replace("{t}",tt?(tt.title+(tt.artist?" — "+tt.artist:"")):""),title:L("bc_track_title"),audience:"editors",type:"campaigns",trackId:id}).then(function(r){LV.bcMsg=r.ok?L("bc_done").replace("{d}",r.j.delivered).replace("{n}",r.j.subscribers):((r.j&&r.j.error)||L("p_err"));renderOwner()})},true);
+function campGo(tid){
+  go("campaigns");var tries=0,t=setInterval(function(){tries++;var c=tid&&document.querySelector('article.camp[data-tid="'+tid+'"]');
+    if(c){clearInterval(t);c.scrollIntoView({behavior:"smooth",block:"center"});c.classList.add("flash");setTimeout(function(){c.classList.remove("flash")},2600)}
+    else if(tries>20)clearInterval(t)},200)}
+window.addEventListener("click",function(e){var it=e.target.closest&&e.target.closest('.nitem[data-l="nRead"]');if(!it||e.target.closest('[data-l="nArch"]'))return;
+  var id=it.getAttribute("data-id"),m=LV.inbox.filter(function(x){return x.id===id})[0];if(!m||!m.trackId)return;
+  e.stopImmediatePropagation();var r=lsGet("pc_read");if(r.indexOf(id)<0){r.push(id);lsSet("pc_read",r)}nBadge();closeModal();campGo(m.trackId)},true);
+/* new track form: everything required is checked first, the missing field is marked */
+(function(){
+function mark(id,msg){var f=$(id),ne=$("nErr");document.querySelectorAll(".badf").forEach(function(x){x.classList.remove("badf")});
+  if(f){var l=f.closest("label")||f.closest(".dz")||f;l.classList.add("badf");try{f.scrollIntoView({behavior:"smooth",block:"center"});if(f.focus&&f.type!=="file")f.focus({preventScroll:true})}catch(e){}}
+  if(ne){ne.textContent=msg;ne.hidden=false}}
+window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="pAdd"]');if(!el||!$("nTitle"))return;
+  var pl=checked("nPlat"),pt=pl.length?pl:["tiktok"],stop=function(id,msg){e.stopImmediatePropagation();e.preventDefault();mark(id,msg)};
+  if(!val("nTitle"))return stop("nTitle",L("p_bad"));
+  if(!val("nInsta"))return stop("nInsta",L("ig_need"));
+  if($("nDesc")&&$("nDesc").checked&&!val("nDescText"))return stop("nDescText",L("desc_txt_need"));
+  if(pt.indexOf("tiktok")>=0&&!val("nl_tiktok"))return stop("nl_tiktok",L("p_tt_need"));
+  if(pt.indexOf("instagram")>=0&&!val("nl_instagram"))return stop("nl_instagram",L("p_ig_need"));
+  if(pt.indexOf("youtube")>=0&&!val("nl_youtube"))return stop("nl_youtube",L("p_yt_need"));
+  if(!(Number(val("nBudget"))>=100))return stop("nBudget",L("p_min100"));
+  var f=$("nProof");if(!(f&&f.files&&f.files[0]))return stop("nProof",L("p_attach_need"));
+  var ne=$("nErr");if(ne)ne.hidden=true;document.querySelectorAll(".badf").forEach(function(x){x.classList.remove("badf")})},true);
+document.addEventListener("input",function(e){var l=e.target&&e.target.closest&&e.target.closest(".badf");if(l)l.classList.remove("badf")});
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();

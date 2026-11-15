@@ -68,9 +68,9 @@ function inboxCounts(audience) {
   const ed = Object.values(db.users).filter(u => !(u.accounts || []).every(a => a.demo)).length, pr = Object.keys(db.producers).length;
   return { editors: audience === "producers" ? 0 : ed, producers: audience === "editors" ? 0 : pr };
 }
-async function broadcast(audience, title, text, url, type, withMail) {
+async function broadcast(audience, title, text, url, type, withMail, extra) {
   type = NTYPES.includes(type) ? type : "support";
-  inboxAdd({ audience, title, text, url: url || "/", type });
+  inboxAdd(Object.assign({ audience, title, text, url: url || "/", type }, extra || {}));
   const subs = db.settings.push || {}; let sent = 0;
   for (const [k, s] of Object.entries(subs)) {
     if (audience !== "all" && s.role !== audience) continue;
@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 36;
+const SERVER_VER = 37;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -638,7 +638,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (P === "/api/inbox" && M === "GET") {     // broadcasts + private messages for the signed-in editor or producer
       const wantP = new URL(req.url, "http://x").searchParams.get("role") === "producers", me = wantP ? producerOf(req) : sessionUser(req), aud = wantP ? "producers" : "editors";
-      const items = (db.settings.inbox || []).filter(x => (x.audience === "all" || x.audience === aud) && (!x.to || (me && x.to === me.id))).slice(-80).map(x => ({ id: x.id, at: x.at, type: x.type || "support", title: x.title, text: x.text, key: x.key || "", vars: x.vars || {}, url: x.url }));
+      const items = (db.settings.inbox || []).filter(x => (x.audience === "all" || x.audience === aud) && (!x.to || (me && x.to === me.id))).slice(-80).map(x => ({ id: x.id, at: x.at, type: x.type || "support", title: x.title, text: x.text, key: x.key || "", vars: x.vars || {}, url: x.url, trackId: x.trackId || "" }));
       return send(res, 200, { now: Date.now(), items, prefs: me ? { types: (me.notif || {}).types || {}, email: (me.notif || {}).email || "" } : null });
     }
     if (P === "/api/notif/prefs" && M === "POST") {
@@ -953,7 +953,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/broadcast" && M === "POST") {
         const text = String(b.text || "").trim().slice(0, 300), title = String(b.title || "Promo Campaign").trim().slice(0, 80), aud = ["editors", "producers", "all"].includes(b.audience) ? b.audience : "editors";
         if (!need(res, text, 400, "write a message")) return;
-        const n = Object.values(db.settings.push || {}).filter(x => aud === "all" || x.role === aud).length, r0 = await broadcast(aud, title, text, "/", b.type, !!b.email);
+        const n = Object.values(db.settings.push || {}).filter(x => aud === "all" || x.role === aud).length, r0 = await broadcast(aud, title, text, b.trackId ? "/#campaigns" : "/", b.type, !!b.email, b.trackId ? { trackId: String(b.trackId).slice(0, 40) } : null);
         return send(res, 200, { ok: true, inbox: inboxCounts(aud), subscribers: n, delivered: r0.sent, emails: r0.mails, mailTo: mailList(aud, NTYPES.includes(b.type) ? b.type : "support").length, mailReady: !!(process.env.RESEND_API_KEY && process.env.MAIL_FROM) });
       }
       if (P === "/api/admin/demo-editor" && M === "POST") {    // test editor with fake videos, only for the owner's own checks
