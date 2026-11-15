@@ -28,7 +28,7 @@ if (!KEY || !SECRET || !ADMIN_TOKEN) { console.error("Set TIKTOK_CLIENT_KEY, TIK
    otherwise to data.json (lost on free hosting restarts). */
 let db = {};
 function normDb() {
-  for (const k of ["users", "sessions", "byOpen", "producers", "psessions", "tracks", "requests", "topups", "admin", "snapshots"]) if (!db[k]) db[k] = {};
+  for (const k of ["users", "sessions", "byOpen", "producers", "psessions", "tracks", "requests", "topups", "admin", "snapshots", "settings"]) if (!db[k]) db[k] = {};
 }
 function sbHeaders(extra) {
   const h = Object.assign({ apikey: SB_KEY, "Content-Type": "application/json" }, extra || {});
@@ -189,6 +189,9 @@ function accAdminView(acc) {
   v.videos = v.videos.slice(0, 40);
   return v;
 }
+const FEE = 0.2;   // site commission, taken from every confirmed payment
+const METHODS = ["paypal", "usdt", "card", "crypto"];
+function payInfo() { const x = db.settings.pay || {}; return { paypal: x.paypal || "", usdt: x.usdt || "", usdtNet: x.usdtNet || "", card: x.card || "", cardHolder: x.cardHolder || "" }; }
 const trackLeft = t => Math.max(0, Math.round(((t.budget || 0) - (t.spent || 0)) * 100) / 100);
 function cleanCats(list) { return Array.isArray(list) ? CATEGORIES.filter(c => list.includes(c)) : []; }
 function reqCost(r) { return Math.round(r.price * r.videos * (1 - (r.discount || 0) / 100) * 100) / 100; }
@@ -221,7 +224,7 @@ function overview() {
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
     tracks: Object.values(db.tracks).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, status: t.status })),
-    topups: Object.values(db.topups).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, track: (db.tracks[p.trackId] || {}).title, amount: p.amount, method: p.method, status: p.status, created: p.created })),
+    topups: Object.values(db.topups).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, method: p.method, status: p.status, created: p.created })),
     accounts: accs.map(accAdminView), categories: CATEGORIES
   };
 }
@@ -375,16 +378,17 @@ const server = http.createServer(async (req, res) => {
     if (P.startsWith("/api/producer/")) {
       const p = producerOf(req); if (!p) return send(res, 401, { error: "not signed in" });
       const mine = () => Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
-      const pview = () => ({ email: p.email, categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created,
+      const pview = () => ({ email: p.email, fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created,
         pendingTopup: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").reduce((s, x) => s + x.amount, 0) })) });
       if (P === "/api/producer/me" && M === "GET") return send(res, 200, pview());
       if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
         const b = await readBody(req), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
         if (!need(res, title && budget >= 1 && budget <= 1000000, 400, "title and budget (1..1000000) required")) return;
+        if (!need(res, !b.link || /^https?:\/\/\S+\.\S+/i.test(String(b.link).trim()), 400, "link must start with https://")) return;
         const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: String(b.link || "").slice(0, 300), budget: 0, spent: 0,
           categories: cleanCats(b.categories), otherCategory: String(b.otherCategory || "").slice(0, 60), status: "active", created: Date.now() };
         db.tracks[t.id] = t;
-        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(budget * 100) / 100, method: ["paypal", "crypto", "card"].includes(b.method) ? b.method : "paypal", status: "pending", created: Date.now() };
+        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(budget * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", status: "pending", created: Date.now() };
         db.topups[tp.id] = tp; saveDb(); return send(res, 200, pview());
       }
       if (P === "/api/producer/track/delete" && M === "POST") {  // track stays hidden but its data stays in the database
@@ -396,7 +400,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/producer/topup" && M === "POST") {     // "Add budget": owner confirms the payment by hand
         const b = await readBody(req), t = db.tracks[b.trackId], amount = Number(b.amount);
         if (!need(res, t && t.producerId === p.id && t.status !== "deleted" && amount >= 1 && amount <= 1000000, 400, "track and amount (1..1000000) required")) return;
-        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(amount * 100) / 100, method: ["paypal", "crypto", "card"].includes(b.method) ? b.method : "paypal", status: "pending", created: Date.now() };
+        const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(amount * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", status: "pending", created: Date.now() };
         db.topups[tp.id] = tp; saveDb(); return send(res, 200, pview());
       }
       return send(res, 404, { error: "not found" });
@@ -420,6 +424,8 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/overview" && M === "GET") { refreshStale(20).catch(() => {}); return send(res, 200, overview()); }
       if (P === "/api/admin/applicants" && M === "GET") return send(res, 200, allAccounts().map(accAdminView));
       const b = M === "POST" ? await readBody(req) : {};
+      if (P === "/api/admin/pay" && M === "GET") return send(res, 200, payInfo());
+      if (P === "/api/admin/pay" && M === "POST") { const c = k => String(b[k] || "").trim().slice(0, 120); db.settings.pay = { paypal: c("paypal"), usdt: c("usdt"), usdtNet: c("usdtNet"), card: c("card"), cardHolder: c("cardHolder") }; saveDb(); return send(res, 200, payInfo()); }
       if (P === "/api/admin/decision" && M === "POST") {
         if (!need(res, ["approved", "rejected", "new"].includes(b.status), 400, "bad status")) return;
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
@@ -445,7 +451,7 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
         const tp = db.topups[b.id]; if (!need(res, tp && tp.status === "pending", 404, "no pending payment")) return;
-        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t) t.budget = Math.round(((t.budget || 0) + tp.amount) * 100) / 100; tp.status = "confirmed"; }
+        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; }
         else if (b.status === "rejected") tp.status = "rejected";
         else return send(res, 400, { error: "bad status" });
         saveDb(); return send(res, 200, { ok: true });
