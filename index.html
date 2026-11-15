@@ -1326,7 +1326,7 @@ header.bar .logo{flex:0 0 auto}header.bar .logo .mark{flex:none;min-width:28px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v57 · 16.11 02:40</span>
+  <span>© Promo Campaign · v58 · 16.11 03:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4700,20 +4700,13 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   openChat=function(){oo.apply(this,arguments);CHT.editNick=false;setTimeout(dockRender,0)};
   closeChat=function(){var had=!!$("chatOv");oc.apply(this,arguments);if(had)setTimeout(dockRender,0)}})();
 
-/* payout: show the email with a pencil */
+/* payout: the form is always open: pick where the money goes, type it, press Save */
 (function(){var o=payoutBlock;payoutBlock=function(){
-  var ac=S.accounts[S.active],c=(ac&&ac.payout)||LV.payout||{set:false},h=o();
-  if(LV.pyEdit&&c.set&&LV._pyKey!==undefined&&LV._pyKey!==c.label+"|"+(c.value||"")){LV.pyEdit=false}
-  if(!c.set)return h;
-  if(LV.pyEdit)return h.replace('<span class="hint" id="pyOk">','<button type="button" class="btn" data-l="pyCancel">'+esc(L("p_cancel"))+'</button><span class="hint" id="pyOk">');
-  var shown=c.method==="paypal"&&c.value?c.value:((c.method==="crypto"?coinL(c.coin)+" ":"")+c.label);
-  return '<div class="blk"><h3>'+esc(L("py_title"))+(ac?' · '+esc(ac.handle):'')+'</h3><p class="hint">'+esc(L("py_h"))+' '+esc(L("py_per_acc"))+'</p><div class="pycur"><div><small>'+esc(L("py_current"))+(c.method==="paypal"?' · PayPal':'')+'</small><b>'+esc(shown)+'</b></div><button type="button" class="btn sm pyedit" data-l="pyEdit" title="'+esc(L("py_edit"))+'" aria-label="'+esc(L("py_edit"))+'">✏️</button></div></div>'}})();
-document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
-  if(a==="pyEdit"||a==="pyCancel"){e.stopImmediatePropagation();var ac=S.accounts[S.active],c=(ac&&ac.payout)||LV.payout||{set:false};
-    LV.pyEdit=(a==="pyEdit");LV._pyKey=c.label+"|"+(c.value||"");if(a==="pyEdit"&&c.method)LV.pyM=c.method==="crypto"?"crypto":c.method;
-    renderDashLive();if(a==="pyEdit")setTimeout(function(){var i=$("pyValue");if(i){if(c.method==="paypal"&&c.value)i.value=c.value;i.focus()}},50);return}
-},true);
-
+  var ac=S.accounts[S.active],c=(ac&&ac.payout)||LV.payout||{set:false};
+  if(c.set&&!LV._pyInit){LV._pyInit=true;if(c.method)LV.pyM=c.method==="crypto"?"crypto":c.method}
+  var h=o();
+  if(c.set&&c.method==="paypal"&&c.value&&(LV.pyM||"paypal")==="paypal"&&h.indexOf('id="pyValue" type="text" autocomplete="off">')>=0)h=h.replace('id="pyValue" type="text" autocomplete="off">','id="pyValue" type="text" autocomplete="off" value="'+esc(c.value)+'">');
+  return h}})();
 /* ===== v40: owner request cards: compact, video count ===== */
 Object.assign(LT.en,{rq_pick_h:"Usually up to 7 videos per order, up to 10 for a really strong account.",rq_open_tt:"Open TikTok",rq_vid_saved:"Saved",rq_avg:"avg views"});
 Object.assign(LT.ru,{rq_pick_h:"Обычно до 7 видео за заказ, до 10 для очень сильного аккаунта.",rq_open_tt:"Открыть TikTok",rq_vid_saved:"Сохранено",rq_avg:"средний просмотр"});
@@ -5289,6 +5282,27 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
 })();
 
 try{if(window.__pcReady)window.__pcReady()}catch(e){}
+
+/* ===== v58: owner always sees the editor's CURRENT payout details ===== */
+(function(){
+  function pv(p){return p?(p.method==="crypto"?coinL(p.coin)+" ":String(p.method||"")+" ")+p.value+(p.holder?" · "+p.holder:""):""}
+  function fresh(id){
+    return admLoad().then(function(){
+      var q=(D0().requests||[]).filter(function(x){return x.id===id})[0],el=$("poVal");
+      if(q&&q.payout&&el){var t=pv(q.payout);if(el.textContent!==t){el.textContent=t;var b=el.parentNode.querySelector('[data-l="poCopy"]');if(b)b.setAttribute("data-v",q.payout.value)}}
+    }).catch(function(){})
+  }
+  var o=poModal;
+  poModal=function(id){
+    o(id);fresh(id);
+    clearInterval(window.__poT);
+    window.__poT=setInterval(function(){if(!$("poVal")){clearInterval(window.__poT);return}fresh(id)},5000)
+  };
+  /* owner lists refresh faster, so a changed payout shows up by itself */
+  setInterval(function(){
+    if(LIVE&&ADM.ok&&/#admin/.test(location.hash)&&!document.hidden&&!$("poVal")&&!(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))&&!document.querySelector(".mbg"))ownerReload()
+  },10000);
+})();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
