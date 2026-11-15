@@ -1143,6 +1143,11 @@ header.bar .logo{flex:0 0 auto}header.bar .logo .mark{flex:none;min-width:28px}
 .btn.chk-ed{background:var(--surface)!important;color:inherit!important;border:1px solid rgba(139,108,255,.45)!important;box-shadow:none!important}
 .agrp.g-ed,.agrp.g-pr,.agrp.g-st,.agrp.g-ov{background:var(--surface)!important;border-color:var(--line)!important;box-shadow:none!important}
 :root[data-theme="dark"] .agrp.g-ed,:root[data-theme="dark"] .agrp.g-pr,:root[data-theme="dark"] .agrp.g-st,:root[data-theme="dark"] .agrp.g-ov{background:rgba(255,255,255,.03)!important;border-color:rgba(255,255,255,.08)!important}
+/* v57 */
+#toastBox.clk{cursor:pointer}
+.odinfo{margin-top:6px}
+.odmore{margin:6px 0}
+@media(max-width:899px){.odc,.astat,.tcard,.st{opacity:1!important}}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1321,7 +1326,7 @@ header.bar .logo{flex:0 0 auto}header.bar .logo .mark{flex:none;min-width:28px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v56 · 16.11 02:10</span>
+  <span>© Promo Campaign · v57 · 16.11 02:40</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2796,7 +2801,7 @@ function inboxPoll(){
   fetch("/api/inbox?since="+since,{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){
     try{localStorage.setItem("pinbox",String(j.now))}catch(e){}
     if(!since)return;var me=roleGet()==="producer"?"producers":"editors";
-    (j.items||[]).forEach(function(m){if(m.audience==="all"||m.audience===me)gotMessage(m.title,m.text)});
+    (j.items||[]).forEach(function(m){if(m.audience==="all"||m.audience===me)gotMessage(m.title,m.text,m)});
   }).catch(function(){});
 }
 setInterval(inboxPoll,45000);setTimeout(inboxPoll,3000);
@@ -3253,7 +3258,7 @@ function inboxPoll(){
   var since=0;try{since=Number(localStorage.getItem("pinbox"))||0}catch(e){}
   loadInbox(function(j){
     try{localStorage.setItem("pinbox",String(j.now))}catch(e){}
-    if(!since)return;LV.inbox.filter(function(m){return m.at>since&&nOn(m.type)}).slice(0,3).forEach(function(m){gotMessage("",nText(m))});
+    if(!since)return;LV.inbox.filter(function(m){return m.at>since&&nOn(m.type)}).slice(0,3).forEach(function(m){gotMessage("",nText(m),m)});
     if(LV.modal&&LV.modal.type==="snd")sndModal();
   });
 }
@@ -5213,6 +5218,33 @@ function hit(){try{var sel=[];if(LV.adTab==="promos")sel=LV.pCats||[];else if(LV
   var set={};sel.forEach(function(c){set[L("c_"+c)]=1});var m=document.querySelector(".ownmain");if(!m)return;
   m.querySelectorAll(".pill").forEach(function(p){if(set[p.textContent.trim()])p.classList.add("hit");else p.classList.remove("hit")})}catch(e){}}
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);hit();return r}})();
+})();
+/* ===== v57: tapping a notification opens its place; compact order card ===== */
+(function(){
+Object.assign(LT.en,{od_more:"More details",od_less:"Hide details"});
+Object.assign(LT.ru,{od_more:"Узнать подробнее",od_less:"Скрыть подробности"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};XLL[k].od_more=LT.en.od_more;XLL[k].od_less=LT.en.od_less});
+function navItem(m){if(!m)return;var t=m.type||"",key=m.key||"";
+  if(m.trackId){campGo(m.trackId);return}
+  if(t==="campaigns"){campGo("");return}
+  if(roleGet()==="producer"){go("producer");return}
+  if(t==="money"){LV.mk="completed";go("orders");return}
+  if(t==="orders"){LV.mk=key==="ord_rejected"?"declined":(key==="ord_completed"?"completed":"approved");go("orders");return}
+  if(t==="accounts"){go("dashboard");return}
+  if(t==="support"){window.__dmOpen();return}}
+var og=gotMessage;gotMessage=function(t,b,m){og.apply(this,arguments);window.__toastItem=m||null;var el=$("toastBox");if(el)el.classList.toggle("clk",!!m)};
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("#toastBox");if(!el||!window.__toastItem)return;var m=window.__toastItem;window.__toastItem=null;el.hidden=true;e.stopImmediatePropagation();navItem(m)},true);
+document.addEventListener("click",function(e){var it=e.target.closest&&e.target.closest('.nitem[data-l="nRead"]');if(!it||e.target.closest('[data-l="nArch"]'))return;
+  var id=it.getAttribute("data-id"),m=LV.inbox.filter(function(x){return x.id===id})[0];if(!m||m.trackId)return;
+  var r=lsGet("pc_read"),seen=r.indexOf(id)>=0;if(seen)return;e.stopImmediatePropagation();r.push(id);lsSet("pc_read",r);nBadge();closeModal();navItem(m)},true);
+/* order card: a short card, the countdown and the sound rules sit behind "More details" */
+(function(){var o=ordCard;ordCard=function(q,u,i){if(ordGroup(q)!=="work")return o.apply(this,arguments);
+  var cd0=cdHtml,sr0=soundRules,h;cdHtml=function(){return ""};soundRules=function(){return ""};
+  try{h=o.apply(this,arguments)}finally{cdHtml=cd0;soundRules=sr0}
+  var info='<div><button type="button" class="btn sm ghost odmore" data-l="odMore" data-id="'+esc(q.id)+'" aria-expanded="false">ℹ '+esc(L("od_more"))+'</button></div><div class="odinfo" id="odi_'+esc(q.id)+'" hidden>'+cd0(q)+sr0(q)+'</div>';
+  var mk='<div><button type="button" class="btn primary lkopen"';return h.indexOf(mk)>=0?h.replace(mk,info+mk):h+info}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="odMore"]');if(!el)return;e.stopImmediatePropagation();
+  var p=$("odi_"+el.getAttribute("data-id"));if(!p)return;p.hidden=!p.hidden;el.setAttribute("aria-expanded",String(!p.hidden));el.textContent="ℹ "+L(p.hidden?"od_more":"od_less");if(!p.hidden){try{tickCd()}catch(x){}}},true);
 })();
 /* ===== v51: owner toast for new tickets, dock highlight, "write to manager" ===== */
 (function(){
