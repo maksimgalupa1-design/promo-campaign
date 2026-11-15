@@ -105,7 +105,28 @@ const PUBLIC_URL = (process.env.PUBLIC_URL || "http://localhost:" + PORT).replac
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 const REDIRECT = PUBLIC_URL + "/auth/tiktok/callback";
 const SCOPES = "user.info.basic,user.info.profile,user.info.stats,video.list";
-const SERVER_VER = 26;
+/* ---- forbidden words in nicknames (ru, uk, en, es, pt, fr, de, tr) ---- */
+const NICK_STRONG = ["хуй","хуе","хуи","хуя","хуё","пизд","пезд","піздa","пізд","ебан","ебат","ебал","ебл","ебну","ебуч","ёбан","ёб","їб","заеб","уеб","наеб","выеб","пидор","пидар","пидр","підор","підар","педик","гомик","мудак","мудил","мразь","сука","сучка","сучар","блят","бляд","блядь","шлюх","шлюш","шалав","залуп","жоп","говн","дроч","минет","сосат","хуесос","еблан","гандон","пенис","член","вагин","сиськ","титьк","порн","секс","эрот","сперм","оргазм","нахуй","похуй","курва","сракa","дрист","ссыкл","fuck","fuk","shit","bitch","cunt","dick","pussy","penis","vagina","porn","sex","nude","nigg","fagg","whore","slut","asshole","bastard","wank","jizz","blowjob","horny","milf","xxx","hentai","dildo","sperm","orgasm","erotic","retard","rapist","huy","xuy","xyu","hyu","khuy","pizd","pisd","ebat","eban","eblan","blyad","blyat","bliad","mudak","pidor","pidar","pidr","zalup","gandon","dolboeb","shlyuh","shlyux","shalav","nahuy","pohuy","zhopa","mierda","follar","joder","cabron","pendejo","chinga","sexo","porno","maricon","hijueputa","hdp","caralho","buceta","foder","viado","merda","siririca","punheta","xoxota","bosta","arrombad","filhodaputa","putain","salope","connard","encul","nique","couille","branle","scheiss","scheiß","ficken","fotze","hurensohn","wichser","pimmel","nutte","schlampe","orospu","siktir","yarrak","amcik","pezevenk","ibne","kahpe","sikis","porna"];
+const NICK_WEAK = ["хер","хрен","трах","анал","лох","жопа","суч","срак","сс","puta","puto","pene","pija","polla","teta","coño","cono","culo","culero","concha","zorra","verga","cock","cum","tit","tits","ass","anal","boob","boobs","rape","pau","pica","porra","cuzao","bite","pute","chatte","cul","bordel","arsch","schwanz","muschi","geil","sik","got","göt","amk","pic","piç","taşak","tasak","nazi","hitler","gay"];
+const LAT2CYR = {a:"а",e:"е",o:"о",p:"р",c:"с",x:"х",y:"у",k:"к",m:"м",t:"т",h:"н",b:"в",i:"и",z:"з",d:"д",u:"у",s:"с",n:"н",l:"л",r:"р",g:"г",v:"в",f:"ф"};
+function nickNorm(str) {
+  let t = String(str).toLowerCase().replace(/[0@]/g, "o").replace(/1|!/g, "i").replace(/3/g, "e").replace(/4/g, "a").replace(/5|\$/g, "s").replace(/7/g, "t").replace(/ё/g, "е").replace(/й/g, "и");
+  t = t.replace(/[^\p{L}]/gu, "");
+  return t.replace(/(.)\1+/g, "$1");
+}
+const NICK_STRONG_N = NICK_STRONG.map(nickNorm).filter(r => r.length >= 2);
+function badNick(nick) {
+  const n = nickNorm(nick);
+  const n2 = n.replace(/[a-z]/g, c => LAT2CYR[c] || c);
+  for (const r of NICK_STRONG_N) { if (n.includes(r) || n2.includes(r)) return true; }
+  const r2 = NICK_STRONG_N.map(r => r.replace(/[a-z]/g, c => LAT2CYR[c] || c));
+  for (const r of r2) { if (n2.includes(r)) return true; }
+  const toks = String(nick).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean).map(nickNorm);
+  const weak = NICK_WEAK.map(nickNorm);
+  return toks.some(tk => weak.includes(tk));
+}
+
+const SERVER_VER = 28;
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
@@ -606,6 +627,43 @@ const server = http.createServer(async (req, res) => {
       const mine = new Set((u.accounts || []).map(a => a.open_id));
       return send(res, 200, { requests: Object.values(db.requests).filter(r => mine.has(r.openId)).sort((x, y) => y.created - x.created).map(r => reqView(r, false)) });
     }
+    /* ---- editors' chat ---- */
+    if (P.startsWith("/api/chat") ) {
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} };
+      const canWrite = (u.accounts || []).some(x => x.adminStatus === "approved") && !C.bans[u.id];
+
+      const linkRe = /(https?:\/\/|www\.|t\.me|@[a-z0-9_]{3,}|\b[a-z0-9-]+\.(com|ru|ua|net|org|io|me|gg|ly|cc|info)\b)/i;
+      if (P === "/api/chat" && M === "GET") {
+        return send(res, 200, { me: { nick: u.chatNick || "", canWrite, banned: !!C.bans[u.id] }, msgs: C.msgs.slice(-100).map(m => ({ id: m.id, at: m.at, name: m.name, text: m.text, mine: m.uid === u.id, mgr: !!m.mgr })) });
+      }
+      const b = await readBody(req);
+      if (P === "/api/chat/nick" && M === "POST") {
+        const nick = String(b.nick || "").trim().replace(/\s+/g, " ");
+        if (!need(res, /^[\p{L}\p{N} _.-]{2,10}$/u.test(nick) && !linkRe.test(nick), 400, "Nickname: 2-10 letters or digits, no links")) return;
+        if (!need(res, !/(admin|manager|менеджер|админ|support|поддержк)/i.test(nick), 400, "This nickname is not allowed")) return;
+        if (!need(res, !badNick(nick), 400, "This nickname is not allowed. Choose another one.")) return;
+        u.chatNick = nick; saveDb(); return send(res, 200, { ok: true, nick });
+      }
+      if (P === "/api/chat" && M === "POST") {
+        if (!need(res, !C.bans[u.id], 403, "You cannot write in the chat")) return;
+        if (!need(res, canWrite, 403, "The chat opens after the manager approves your account")) return;
+        if (!need(res, u.chatNick, 400, "Choose a nickname first")) return;
+        const text = String(b.text || "").trim().replace(/\s+/g, " ").slice(0, 300);
+        if (!need(res, text, 400, "Write a message")) return;
+        if (!need(res, !linkRe.test(text), 400, "Links and contacts are not allowed in the chat")) return;
+        global.__chatLast = global.__chatLast || {}; const now = Date.now();
+        if (!need(res, now - (global.__chatLast[u.id] || 0) >= 3000, 429, "Too fast. Wait a few seconds")) return;
+        global.__chatLast[u.id] = now;
+        C.msgs.push({ id: uid8(), at: now, uid: u.id, name: u.chatNick, text }); C.msgs = C.msgs.slice(-500); saveDb();
+        return send(res, 200, { ok: true });
+      }
+      if (P === "/api/chat/report" && M === "POST") {
+        const m = C.msgs.find(x => x.id === b.id); if (!need(res, m, 404, "no such message")) return;
+        m.reps = m.reps || []; if (!m.reps.includes(u.id)) { m.reps.push(u.id); if (m.reps.length === 1) notify("A chat message was reported: " + m.name); saveDb(); }
+        return send(res, 200, { ok: true });
+      }
+    }
     if (P === "/api/request" && M === "POST") {          // Send Request: choose accounts, only matching categories allowed
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), t = db.tracks[b.trackId];
@@ -905,6 +963,21 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, open === 0, 409, "This track has " + open + " open order(s). Finish or cancel them first.")) return;
         t.status = "deleted"; Object.values(db.requests).forEach(r => { if (r.trackId === t.id && r.status === "pending") r.status = "cancelled"; });
         saveDb(); return send(res, 200, { ok: true, left: trackLeft(t) });
+      }
+      if (P === "/api/admin/chat" && M === "GET") {
+        const C = db.settings.chat || { msgs: [], bans: {} };
+        return send(res, 200, { msgs: C.msgs.slice(-200).map(m => ({ id: m.id, at: m.at, uid: m.uid, name: m.name, text: m.text, mgr: !!m.mgr, reps: (m.reps || []).length, banned: !!C.bans[m.uid] })) });
+      }
+      if (P === "/api/admin/chat/delete" && M === "POST") {
+        const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; C.msgs = C.msgs.filter(m => m.id !== b.id); saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/chat/ban" && M === "POST") {
+        const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; if (!need(res, b.uid && db.users[b.uid], 404, "no such user")) return;
+        if (b.on) C.bans[b.uid] = true; else delete C.bans[b.uid]; saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/chat/say" && M === "POST") {
+        const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; const text = String(b.text || "").trim().slice(0, 300); if (!need(res, text, 400, "write a message")) return;
+        C.msgs.push({ id: uid8(), at: Date.now(), uid: "manager", name: "Manager", text, mgr: true }); C.msgs = C.msgs.slice(-500); saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/producer/delete" && M === "POST") {    // the owner removes a producer (test accounts); money records stay
         const pr = db.producers[b.id]; if (!need(res, pr, 404, "no such producer")) return;
