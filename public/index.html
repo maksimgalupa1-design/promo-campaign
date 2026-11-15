@@ -568,6 +568,14 @@ button.mbrow{cursor:pointer}button.mbrow:hover{border-color:#E8445A}.mbrow b{fon
 .tilinks{gap:8px}
 .srmini{font-weight:700;font-size:13px;color:#F5B731}
 .moneyacc{margin:14px 0}.moneyacc h4{margin:0 0 8px}
+.mcn{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#E8445A;color:#fff;font:800 11px inherit}
+.mchip.on:has(.mcn) i{display:none}
+.mcall{font-weight:600;color:#6B5CFF}
+.wrh{margin:16px 0 8px}
+.acav.ph{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#6B5CFF,#E8445A);color:#fff;font-weight:800}
+.trlink{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}.trlink:hover{color:#6B5CFF}
+.trmod h4{margin:14px 0 8px}
+.plink.big{padding:10px 16px;font-size:15px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -745,7 +753,7 @@ button.mbrow{cursor:pointer}button.mbrow:hover{border-color:#E8445A}.mbrow b{fon
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v18 · 15.11 16:40</span>
+  <span>© Promo Campaign · v20 · 15.11 17:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -989,7 +997,8 @@ privacy:'<p class="eyebrow">Черновик</p><h2>Политика конфи�
 '<h3>3. Зачем нам эти данные</h3><p>Чтобы оценить аккаунт, показать шанс одобрения, проверять выполнение условий кампании, начислять оплату и защищаться от накруток.</p>'+
 '<h3>4. Кому мы передаём данные</h3><p>Платёжным провайдерам для выплат и артистам или лейблам в виде итоговой статистики кампании. Мы не продаём персональные данные.</p>'+
 '<h3>5. Сроки хранения и удаление</h3><p>Данные хранятся, пока аккаунт активен и пока этого требует закон. Если автор не отправляет видео в срок, аккаунт блокируется, мы больше не заказываем у него, а запись о блокировке сохраняется. Реквизиты для выплат хранятся в зашифрованном виде. Удалить аккаунт можно по запросу в поддержку.</p>'+
-'<h3>6. Контакты</h3><p>[адрес поддержки будет указан здесь]</p>',
+'<h3>6. Реквизиты для выплат и ответственность</h3><p>Реквизиты (PayPal, кошелёк или карту) вы вводите сами и перед сохранением подтверждаете, что они верные. Если вы указали неверный адрес или ошиблись, деньги нельзя вернуть, и это не наша ответственность. Вы всё равно обязаны выполнить заказ. Если заказ не выполнен, мы прекращаем сотрудничество навсегда.</p>'+
+'<h3>7. Контакты</h3><p>[адрес поддержки будет указан здесь]</p>',
 terms:'<p class="eyebrow">Черновик</p><h2>Условия использования</h2><p>Проект текста для прототипа. Перед запуском его должен проверить юрист.</p>'+
 '<h3>1. Кто может участвовать</h3><p>Совершеннолетние авторы с собственным аккаунтом, который регулярно публикует видео. Пустые и давно неактивные аккаунты мы не принимаем.</p>'+
 '<h3>2. Как устроены кампании</h3><p>Автор отправляет заявку на трек, менеджер проверяет аккаунт и одобряет заявку, затем автор публикует ролик со звуком кампании. На отправку ссылки отводится 16 дней. После проверки ссылки менеджером кампания считается завершённой, и выплата отправляется автору: в кабинете виден статус «оплата в пути», а после оплаты автор получает скриншот перевода.</p>'+
@@ -1006,7 +1015,8 @@ privacy:'<p class="eyebrow">Draft</p><h2>Privacy policy</h2><p>Sample text for t
 '<h3>3. Why we use this data</h3><p>To evaluate the account, show your approval chance, check campaign terms, calculate payments and prevent fake views.</p>'+
 '<h3>4. Who receives data</h3><p>Payment providers for payouts, and artists or labels as aggregate campaign statistics. We do not sell personal data.</p>'+
 '<h3>5. Retention and deletion</h3><p>Data is kept while the account is active and as long as the law requires. If a creator does not send videos on time, the account is banned, we no longer order from it, and a record of the ban is kept. Payout details are stored encrypted. You can ask support to delete your account.</p>'+
-'<h3>6. Contact</h3><p>[support address goes here]</p>',
+'<h3>6. Payout details and responsibility</h3><p>You enter your payout details (PayPal, crypto wallet or card) yourself and confirm that they are correct before saving. If you give a wrong address or make a mistake, the money cannot be recovered and this is not our responsibility. You must still complete the order. If an order is not completed, we stop working with you permanently.</p>'+
+'<h3>7. Contact</h3><p>[support address goes here]</p>',
 terms:'<p class="eyebrow">Draft</p><h2>Terms of use</h2><p>Sample text for the prototype. A lawyer must review it before launch.</p>'+
 '<h3>1. Who can take part</h3><p>Adult creators with their own account that posts regularly. Empty and long-inactive accounts are not accepted.</p>'+
 '<h3>2. How campaigns work</h3><p>The creator requests a track, a manager checks the account and approves the request, then the creator posts a video with the campaign sound. The link is due within 16 days. After a manager checks the link, the campaign is complete and the payout is sent: the dashboard shows “payment on the way”, and once it is paid the creator receives a screenshot of the transfer.</p>'+
@@ -1703,7 +1713,7 @@ function renderOwner(){
   admNav();["adH1","adH2","adNote"].forEach(function(i){$(i).hidden=false});
   var D=ADM.data;
   if(!ADM.ok||!D)return false;checkNew(D);
-  var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
+  var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&(WAITN+(S2.pendingRequests||0))?' <i class="cnt">'+(WAITN+(S2.pendingRequests||0))+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
   tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
@@ -1751,7 +1761,8 @@ function renderOwner(){
   }else if(LV.adTab==="waiting"){
     var wl=D.accounts.filter(function(a){return isWait(a)}).map(function(a){return accCardHtml(a)}).join("");
     var wn=D.accounts.filter(function(a){return isWait(a)}).length;
-    body=wl?'<div class="waitbig">'+esc(L("a_wait_cnt").replace("{n}",wn))+'</div><div class="list">'+wl+'</div>':'<div class="empty">'+esc(L("a_wait_none"))+'</div>';
+    var wr=waitReqHtml(D);
+    body=(wl?'<div class="waitbig">'+esc(L("a_wait_cnt").replace("{n}",wn))+'</div><div class="list">'+wl+'</div>':'')+(wr?'<h3 class="wrh">'+esc(L("wr_title"))+'</h3>'+wr:'')+((wl||wr)?'':'<div class="empty">'+esc(L("a_wait_none"))+'</div>');
   }else if(LV.adTab==="accounts"){
     var fcs=LV.fCats||[];
     var list=D.accounts.filter(function(a){if(a.adminStatus==='new'||!a.adminStatus)return false;var s=a.stars.final;var okS=LV.rgMin==null||(s!=null&&s>=LV.rgMin-0.001&&s<=LV.rgMax+0.001);return okS&&(LV.fDisc!=="yes"||(a.discount||0)>0)&&(!fcs.length||(a.categories||[]).some(function(c){return fcs.indexOf(c)>=0}))}).sort(function(x,y){return (y.stars.final||0)-(x.stars.final||0)||(y.discount||0)-(x.discount||0)||(x.cpm||9)-(y.cpm||9)});
@@ -2444,22 +2455,17 @@ Object.assign(LT.ru,{p_deadline_ph:"например: 2 недели, 1 меся
 /* ---- owner: incoming requests with account description, filters and sorting ---- */
 Object.assign(LT.en,{rs_sort:"Sort",rs_smart:"Best first: discounts, then rating",rs_stars:"Highest rating",rs_disc:"Biggest discount",rs_price:"Cheapest price",rs_new:"Newest",rf_act:"Needs a decision",rf_work:"In progress",rf_done:"Completed",rf_all:"All",rs_avg:"avg views",rs_about:"About the account",rs_cancel:"Video not made: money back to budget",rs_cancel_h:"The order is cancelled and the money returns to the track budget.",rs_none_f:"Nothing here for this filter.",rs_cnt:"requests"});
 Object.assign(LT.ru,{rs_sort:"Сортировка",rs_smart:"Сначала лучшие: скидки, потом рейтинг",rs_stars:"Высокий рейтинг",rs_disc:"Большая скидка",rs_price:"Дешёвые сначала",rs_new:"Новые сначала",rf_act:"Ждут решения",rf_work:"В работе",rf_done:"Завершены",rf_all:"Все",rs_avg:"средние просмотры",rs_about:"Об аккаунте",rs_cancel:"Видео не сделано: деньги в бюджет",rs_cancel_h:"Заказ отменяется, деньги возвращаются в бюджет трека.",rs_none_f:"По этому фильтру ничего нет.",rs_cnt:"заявок"});
-LV.rSort=LV.rSort||"smart";LV.rFilter=LV.rFilter||"act";
+LV.rSort=LV.rSort||"smart";LV.rSorts=LV.rSorts||[];LV.rFilter=(LV.rFilter&&LV.rFilter!=="act")?LV.rFilter:"work";
 function rGroup(q){return (q.status==="pending"||q.status==="submitted")?"act":((q.status==="approved"||q.status==="returned")?"work":(q.status==="completed"?"done":"other"))}
 function reqTabHtml(D){
   var all=D.requests.slice(),sorts=["smart","stars","disc","price","new"];
-  var list=all.filter(function(q){return LV.rFilter==="all"||rGroup(q)===LV.rFilter});
+  var list=all.filter(function(q){return LV._onlyAct?rGroup(q)==="act":(LV.rFilter==="all"||rGroup(q)===LV.rFilter)});
   var st=function(q){return q.stars==null?0:q.stars};
-  list.sort(function(a,b){
-    if(LV.rSort==="stars")return st(b)-st(a)||(b.bulk||0)-(a.bulk||0)||b.created-a.created;
-    if(LV.rSort==="disc")return (b.bulk||0)-(a.bulk||0)||st(b)-st(a)||b.created-a.created;
-    if(LV.rSort==="price")return (a.price||0)-(b.price||0)||b.created-a.created;
-    if(LV.rSort==="new")return b.created-a.created;
-    return (b.bulk||0)-(a.bulk||0)||st(b)-st(a)||(a.price||0)-(b.price||0)||b.created-a.created;
-  });
+  var CMP={stars:function(a,b){return st(b)-st(a)},disc:function(a,b){return (b.bulk||0)-(a.bulk||0)},price:function(a,b){return (a.price||0)-(b.price||0)},"new":function(a,b){return b.created-a.created},smart:function(a,b){return (b.bulk||0)-(a.bulk||0)||st(b)-st(a)||(a.price||0)-(b.price||0)}},ks=(LV.rSorts&&LV.rSorts.length?LV.rSorts:["smart"]);
+  list.sort(function(a,b){for(var i=0;i<ks.length;i++){var r=CMP[ks[i]](a,b);if(r)return r}return b.created-a.created});
   var cnt={act:0,work:0,done:0};all.forEach(function(q){var g=rGroup(q);if(cnt[g]!==undefined)cnt[g]++});
-  var chips=["act","work","done","all"].map(function(f){return '<button type="button" class="chip" data-l="rFil" data-f="'+f+'" aria-pressed="'+(LV.rFilter===f)+'">'+esc(L("rf_"+f))+(f==="all"?' ('+all.length+')':(cnt[f]?' ('+cnt[f]+')':''))+'</button>'}).join("");
-  var sel='<label class="f rsort" for="rSort"><span>'+esc(L("rs_sort"))+'</span><select id="rSort" data-l="rSort">'+sorts.map(function(k){return '<option value="'+k+'"'+(LV.rSort===k?' selected':'')+'>'+esc(L("rs_"+k))+'</option>'}).join("")+'</select></label>';
+  var chips=(LV._onlyAct?[]:["work","done","all"]).map(function(f){return '<button type="button" class="chip" data-l="rFil" data-f="'+f+'" aria-pressed="'+(LV.rFilter===f)+'">'+esc(L("rf_"+f))+(f==="all"?' ('+all.length+')':(cnt[f]?' ('+cnt[f]+')':''))+'</button>'}).join("");
+  var sel='<div class="f mchips rsort" style="flex:1 1 300px"><span>'+esc(L("rs_sort"))+'</span><div class="mcrow">'+sorts.map(function(k){var ix=(LV.rSorts||[]).indexOf(k),on=ix>=0;return '<label class="mchip'+(on?' on':'')+'"><input type="checkbox" data-mck="rSorts" value="'+k+'"'+(on?' checked':'')+'><i></i>'+(on&&(LV.rSorts||[]).length>1?'<b class="mcn">'+(ix+1)+'</b>':'')+esc(L("rs_"+k))+'</label>'}).join("")+'</div></div>';
   var cards=list.map(function(q){
     var act="";
     if(q.status==="pending")act='<div class="row"><button class="btn sm primary" data-l="rAct" data-id="'+esc(q.id)+'" data-s="approved">'+esc(L("a_approve"))+'</button><button class="btn sm danger" data-l="rAct" data-id="'+esc(q.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>';
@@ -2848,7 +2854,7 @@ Object.assign(LT.en,{tr_h:"Bulk deals",tr_h3:"Pick a ready deal, or make your ow
 Object.assign(LT.ru,{tr_h:"Скидки за количество",tr_h3:"Выберите готовую скидку или сделайте свою ниже, потом нажмите «Сохранить скидки». Пока не сохранили, скидок нет.",tr_own:"Своя скидка",tr_save:"Сохранить скидки",tr_saved:"✓ Скидки отправлены менеджеру.",pay_mine:"Куда мы отправляем ваши деньги",pay_mine_h:"Это ваши реквизиты для выплат. Их можно изменить в любой момент.",pay_none:"Вы ещё не добавили реквизиты. Добавьте их, чтобы менеджер мог вам заплатить.",ov_pay:"Куда платить эдитору",ov_nopay:"Реквизитов пока нет"});
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="saveTiers"]');if(!el||!S.user)return;e.stopImmediatePropagation();
   var ts=readTiers(),id=S.user.id;el.disabled=true;
-  api("/api/account/update",{id:id,tiers:ts,review:true,discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){el.disabled=false;if(!r.ok){toast((r.j&&r.j.error)||L("p_err"));return}applyLive(r.j);renderDashLive();toast(L("tr_saved"))})},true);
+  api("/api/account/update",{id:id,tiers:ts,review:!(S.user&&S.user.adminStatus==="approved"),discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){el.disabled=false;if(!r.ok){toast((r.j&&r.j.error)||L("p_err"));return}applyLive(r.j);renderDashLive();toast(L(S.user&&S.user.adminStatus==="approved"?"saved_ok":"tr_saved"))})},true);
 /* editor: payout details live inside the account settings card */
 (function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);
   if(LV.acc&&S.user){var h=$("payH1");if(h)h.hidden=true;$("payBox").innerHTML="";
@@ -2991,7 +2997,7 @@ document.addEventListener("click",function(e){var el=e.target.closest("[data-l]"
   var f=LV.rNiches||[],save=D.requests;
   if(f.length)D=Object.assign({},D,{requests:D.requests.filter(function(q){return (q.categories||[]).some(function(c){return f.indexOf(c)>=0})})});
   var h=o(D),cats={};save.forEach(function(q){(q.categories||[]).forEach(function(c){cats[c]=1})});
-  var sel=multiChips("rNiches",Object.keys(cats),f,"niche");
+  var sel=multiChips("rNiches",CATS,f,"niche");
   h=h.replace('<div class="rbar">','<div class="rbar">'+sel);
   return h.replace(/(<div class="rsh">)(<button[^>]*>[^<]*<\/button>)/g,function(m,a1,btn){var hd=(btn.match(/>(@[^ <]*)/)||[])[1]||"";return a1+btn+'<a class="btn sm tkopen" href="https://www.tiktok.com/'+hd+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("tk_open"))+'</a>'});
 }})();
@@ -3063,19 +3069,19 @@ document.addEventListener("click",function(e){
 /* the owner's view of an editor account = what the editor sees: stats, no per-video price tile, decision buttons only while waiting */
 (function(){var o=accFullHtml;accFullHtml=function(a){
   var h=o(a);
-  h=h.replace(/<div class="ms g"><b>[^<]*<\/b><span>[^<]*<\/span><\/div>/,'<div class="ms g"><b>'+esc(a.stars&&a.stars.final!=null?starsTxt(a.stars.final):"—")+'</b><span>'+esc(L("ac_stars"))+'</span></div>');
+  h=h.replace(/(<div class="ms g"><b>[^<]*<\/b><span>[^<]*<\/span><\/div>)/,'$1<div class="ms"><b>'+esc(a.stars&&a.stars.final!=null?starsTxt(a.stars.final):"—")+'</b><span>'+esc(L("ac_stars"))+'</span></div>');
   if(a.adminStatus==="approved"&&!a.priceReq)h=h.replace(/<div class="row" style="margin-top:12px">.*<\/div><\/div>$/,'<div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("rv_close"))+'</button></div></div>');
   return h}})();
 
 
 /* ===== v15: multi-topic chips, rating range, track cards for everyone, remembered role ===== */
-Object.assign(LT.en,{rg_title:"Rating",rg_all:"All accounts (incl. below 2 and unrated)",rg_reset:"Reset",mc_clear:"Clear",fd_links:"Listen"});
-Object.assign(LT.ru,{rg_title:"Рейтинг",rg_all:"Все аккаунты (в т.ч. ниже 2 и без оценки)",rg_reset:"Сбросить",mc_clear:"Очистить",fd_links:"Слушать"});
+Object.assign(LT.en,{mc_all:"All",wr_title:"Requests waiting for your decision",rg_title:"Rating",rg_all:"All accounts (incl. below 2 and unrated)",rg_reset:"Reset",mc_clear:"Clear",fd_links:"Listen"});
+Object.assign(LT.ru,{mc_all:"Все",wr_title:"Заявки, ждущие вашего решения",rg_title:"Рейтинг",rg_all:"Все аккаунты (в т.ч. ниже 2 и без оценки)",rg_reset:"Сбросить",mc_clear:"Очистить",fd_links:"Слушать"});
 function multiChips(key,list,sel,lbl){
-  return '<div class="f mchips" style="flex:1 1 300px"><span>'+esc(L(lbl))+(sel.length?' · <a href="#" class="mcclear" data-mck="'+key+'">'+esc(L("mc_clear"))+'</a>':'')+'</span><div class="mcrow">'+list.map(function(c){var on=sel.indexOf(c)>=0;return '<label class="mchip'+(on?' on':'')+'"><input type="checkbox" data-mck="'+key+'" value="'+esc(c)+'"'+(on?' checked':'')+'><i></i>'+esc(L("c_"+c))+'</label>'}).join("")+'</div></div>';
+  return '<div class="f mchips" style="flex:1 1 300px"><span>'+esc(L(lbl))+' · <a href="#" class="mcall" data-mck="'+key+'">'+esc(L("mc_all"))+'</a>'+(sel.length?' · <a href="#" class="mcclear" data-mck="'+key+'">'+esc(L("mc_clear"))+'</a>':'')+'</span><div class="mcrow">'+list.map(function(c){var on=sel.indexOf(c)>=0;return '<label class="mchip'+(on?' on':'')+'"><input type="checkbox" data-mck="'+key+'" value="'+esc(c)+'"'+(on?' checked':'')+'><i></i>'+esc(L("c_"+c))+'</label>'}).join("")+'</div></div>';
 }
 document.addEventListener("change",function(e){var t=e.target;if(!t||!t.getAttribute||!t.getAttribute("data-mck")||t.type!=="checkbox")return;var k=t.getAttribute("data-mck"),a=(LV[k]||[]).slice(),i=a.indexOf(t.value);if(t.checked&&i<0)a.push(t.value);if(!t.checked&&i>=0)a.splice(i,1);LV[k]=a;renderOwner()});
-document.addEventListener("click",function(e){var c=e.target.closest(".mcclear");if(!c)return;e.preventDefault();LV[c.getAttribute("data-mck")]=[];renderOwner()});
+document.addEventListener("click",function(e){var c=e.target.closest(".mcclear");if(c){e.preventDefault();LV[c.getAttribute("data-mck")]=[];renderOwner();return}var al=e.target.closest(".mcall");if(al){e.preventDefault();var k=al.getAttribute("data-mck");LV[k]=(k==="rSorts")?[]:CATS.slice();renderOwner()}});
 function rgFmt(x){return Number(x).toFixed(1)}
 function rangeHtml(){
   var a=LV.rgMin==null?2:LV.rgMin,b=LV.rgMax==null?5:LV.rgMax,on=LV.rgMin!=null;
@@ -3178,7 +3184,7 @@ function trackInfoHtml(q){
   o.apply(this,arguments);
   if(LV.mk==="find")return;var el=$("ordList");if(!el)return;
   var all={};(LV.reqs||[]).forEach(function(q){all[q.id]=q});
-  el.querySelectorAll(".mkfor").forEach(function(m){var card=m.closest(".card");if(!card||card.querySelector(".tinfo"))return;var q=all[m.getAttribute("data-q")];if(q)m.insertAdjacentHTML("afterend",trackInfoHtml(q))})
+  el.querySelectorAll(".mkfor").forEach(function(m){var card=m.closest(".card");if(!card||card.querySelector(".tinfo"))return;var q=all[m.getAttribute("data-q")];if(q){m.insertAdjacentHTML("afterend",trackInfoHtml(q));var tb=card.querySelector(".t b");if(tb){tb.classList.add("trlink");tb.setAttribute("data-l","trOpen");tb.setAttribute("data-q",q.id)}}})
 }})();
 /* open orders of an account: shortcut to the orders list */
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="goOpenOrders"]');if(!el)return;LV.oq=el.getAttribute("data-h")||"";var hasA=(LV.reqs||[]).some(function(q){return q.handle===LV.oq&&(q.status==="approved"||q.status==="returned"||q.status==="submitted")});LV.mk=hasA?"approved":"pending";go("orders")});
@@ -3196,6 +3202,84 @@ document.addEventListener("click",function(e){var el=e.target.closest('[data-l="
 (function(){var o=reqTabHtml;reqTabHtml=function(D){
   if(LV.rgMin!=null)D=Object.assign({},D,{requests:D.requests.filter(function(q){var s=typeof q.stars==="object"&&q.stars?q.stars.final:q.stars;return s!=null&&s>=LV.rgMin-0.001&&s<=LV.rgMax+0.001})});
   var h=o(D);return h.replace('<div class="rbar">','<div class="rbar">'+rangeHtml())}})();
+
+
+/* ===== v19: waiting requests, account card from any row, reminders text ===== */
+Object.assign(LT.en,{nt_ord_remind:'Reminder: "{t}": {d} days passed since approval, {l} days left. Publish your videos and send the links.',nt_ord_last:'LAST DAY for "{t}". If the videos are not sent today, we stop working with you and your account will be blocked.'});
+Object.assign(LT.ru,{nt_ord_remind:"Напоминание: «{t}»: с одобрения прошло {d} дн., осталось {l} дн. Опубликуйте видео и отправьте ссылки.",nt_ord_last:"ПОСЛЕДНИЙ ДЕНЬ по «{t}». Если сегодня не отправите видео, мы перестаём с вами работать и аккаунт будет заблокирован."});
+function waitReqHtml(D){
+  var has=(D.requests||[]).some(function(q){return rGroup(q)==="act"});if(!has)return "";
+  LV._onlyAct=true;try{return reqTabHtml(D)}finally{LV._onlyAct=false}
+}
+function moneyAccHtml(openId){
+  var R=(D0().requests||[]).filter(function(q){return q.openId===openId&&["approved","submitted","returned","completed"].indexOf(q.status)>=0}),tot=0,paid=0;
+  R.forEach(function(q){tot+=q.cost||0;if(q.paid)paid+=q.cost||0});
+  return '<div class="moneyacc"><h4>💸 '+esc(L("mn_title"))+'</h4>'+(R.length?'<div class="msum"><div class="ms"><b>'+money(tot)+'</b><span>'+esc(L("mn_total"))+' · '+R.length+' '+esc(L("mn_orders"))+'</span></div><div class="ms g"><b>'+money(paid)+'</b><span>'+esc(L("mn_paid"))+'</span></div><div class="ms r"><b>'+money(tot-paid)+'</b><span>'+esc(L("mn_unpaid"))+'</span></div></div><div class="mbl">'+R.map(function(q){return '<div class="mbrow"><b>'+esc(q.track)+'</b><span>'+q.videos+' × '+money(q.price)+(q.discount?' −'+q.discount+'%':'')+' = <b>'+money(q.cost)+'</b> · '+stL(q.status)+(q.paid?' ✓':'')+'</span></div>'}).join("")+'</div>':'<div class="empty">'+esc(L("mn_none"))+'</div>')+'</div>';
+}
+/* short card built from a request, for accounts the overview does not list (demo or deleted) */
+function accLiteHtml(q){
+  var av=q.avatar?'<img class="acav big" src="'+esc(q.avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="acav big ph">'+esc((q.handle||"@?").charAt(1).toUpperCase())+'</span>',p=q.payout;
+  return '<div class="accfull"><div class="pmtop">'+av+'<div class="pmwho"><b style="font-size:20px">'+esc(q.handle)+'</b>'+(q.internalName?'<small>'+esc(q.internalName)+'</small>':'')+'<div>'+catPills(q.categories||[],"")+'</div></div></div>'+
+    (q.about?'<p class="wabout">“'+esc(q.about)+'”</p>':'')+
+    '<div class="msum"><div class="ms"><b>'+n(q.avgViews||0)+'</b><span>'+esc(L("rv_avg"))+'</span></div><div class="ms g"><b>'+(q.accPrice?money(q.accPrice):"—")+'</b><span>'+esc(L("rv_price"))+'</span></div><div class="ms"><b>'+esc(q.stars!=null?starsTxt(typeof q.stars==="object"?q.stars.final:q.stars):"—")+'</b><span>'+esc(L("ac_stars"))+'</span></div></div>'+
+    '<div class="note payto"><b>💳 '+esc(L("ov_pay"))+':</b> '+(p?payTxt(p):esc(L("ov_nopay")))+'</div>'+
+    '<p class="hint"><b>'+esc(L("wt_tiers"))+':</b> '+esc(tiersTxt(q.tiers))+'</p>'+moneyAccHtml(q.openId)+
+    '<div class="row" style="margin-top:12px"><a class="btn sm" href="https://www.tiktok.com/'+esc(q.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("tk_open"))+'</a><button class="btn" data-l="mclose2">'+esc(L("rv_close"))+'</button></div></div>';
+}
+document.addEventListener("click",function(e){
+  var h=e.target.closest('[data-l="accOpenH"]');if(!h)return;e.stopImmediatePropagation();
+  var oid=h.getAttribute("data-oid"),D=D0(),ac=(D.accounts||[]).filter(function(x){return x.id===oid})[0];
+  LV.modal={type:"accfull",id:oid};
+  if(ac){openModal(accFullHtml(ac));return}
+  var q=(D.requests||[]).filter(function(x){return x.openId===oid})[0];
+  if(q)openModal(accLiteHtml(q));
+},true);
+
+
+/* ===== v20: editor can change everything after approval, payout confirmation, track window ===== */
+Object.assign(LT.en,{ad_about:"About this account * (3 to 8 words)",an_about:"Describe your account (3 to 8 words)",an_about_err:"Write 3 to 8 words about your account.",ad_about_max:"Write no more than 8 words.",sv_mini:"Save",saved_ok:"✓ Saved",py_confirm_t:"Check your payout details",py_confirm_q:"Are you sure you wrote them correctly? If the details are wrong, the money will be lost and it is not our responsibility.",py_yes:"Yes, they are correct",py_edit:"No, let me edit",py_name:"Name",tm_close:"Close",tm_todo:"What to do",tm_links:"Listen and download",tm_deadline:"Deadline",tm_open:"Open track info ›"});
+Object.assign(LT.ru,{ad_about:"Об аккаунте * (от 3 до 8 слов)",an_about:"Опишите аккаунт (от 3 до 8 слов)",an_about_err:"Напишите об аккаунте от 3 до 8 слов.",ad_about_max:"Напишите не больше 8 слов.",sv_mini:"Сохранить",saved_ok:"✓ Сохранено",py_confirm_t:"Проверьте реквизиты",py_confirm_q:"Вы уверены, что написали правильно? Если реквизиты неверные, деньги потеряются, и это не наша ответственность.",py_yes:"Да, всё верно",py_edit:"Нет, исправлю",py_name:"Имя",tm_close:"Закрыть",tm_todo:"Что нужно сделать",tm_links:"Слушать и скачать",tm_deadline:"Срок",tm_open:"Открыть информацию о треке ›"});
+(function(){var o=saveAcc;saveAcc=function(){var v=$("sAbout");if(v&&wordCount(v.value)>8){toast(L("ad_about_max"));return}o.apply(this,arguments)}})();
+/* approved account: no "send for review", small Save buttons next to each field */
+(function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);
+  var u=S.user;if(!u||u.adminStatus!=="approved")return;
+  var save=document.querySelector('#profCard [data-l="saveAcc"]');if(!save)return;var row=save.closest(".row");if(row)row.hidden=true;
+  var ab=$("sAbout");if(ab&&!$("miniAbout")){var lb=ab.closest("label");if(lb)lb.insertAdjacentHTML("afterend",'<div class="row"><button type="button" class="btn sm primary" id="miniAbout" data-l="miniSave" data-k="about">'+esc(L("sv_mini"))+'</button></div>')}
+  var cats=$("sCats");if(cats&&!$("miniCats")){var anchor=$("sOtherRow")||cats;anchor.insertAdjacentHTML("afterend",'<div class="row"><button type="button" class="btn sm primary" id="miniCats" data-l="miniSave" data-k="cats">'+esc(L("sv_mini"))+'</button></div>')}
+}})();
+document.addEventListener("click",function(e){
+  var el=e.target.closest('[data-l="miniSave"]');if(!el||!S.user)return;var k=el.getAttribute("data-k"),body={id:S.user.id};
+  if(k==="about"){var tx=val("sAbout").trim(),n=wordCount(tx);if(n<3||n>8){toast(n>8?L("ad_about_max"):L("an_about_err"));return}body.about=tx}
+  else{var cs=checked("sCats");if(!cs.length){toast(L("ad_cats_err")||L("p_err"));return}body.categories=cs;body.otherCategory=val("sOther")}
+  el.disabled=true;api("/api/account/update",body).then(function(r){el.disabled=false;if(!r.ok){toast((r.j&&r.j.error)||L("p_err"));return}applyLive(r.j);renderDashLive();toast(L("saved_ok"))});
+});
+/* payout: show what was typed and ask for confirmation */
+document.addEventListener("click",function(e){
+  var el=e.target.closest('[data-l="pySave"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();
+  var m=val("pyMethod"),v=val("pyValue").trim(),er=$("pyErr");
+  if(!v){if(er){er.textContent=L("py_bad");er.hidden=false}return}
+  var coin=val("pyCoin"),h=val("pyHolder"),acx=S.accounts[S.active];
+  LV.pyPend={method:m,coin:coin,value:v,holder:h,accountId:acx?acx.id:undefined};
+  openModal('<h3>💳 '+esc(L("py_confirm_t"))+'</h3><div class="note payok"><div class="payrow"><span class="payl">'+esc(m==="crypto"?coinL(coin):m.toUpperCase())+'</span><b class="payv">'+esc(v)+'</b></div>'+(h?'<div class="payrow"><span class="payl">'+esc(L("py_name"))+'</span><b class="payv">'+esc(h)+'</b></div>':'')+'</div><p><b>'+esc(L("py_confirm_q"))+'</b></p><div class="row"><button type="button" class="btn primary" data-l="pyYes">'+esc(L("py_yes"))+'</button><button type="button" class="btn" data-l="mclose2">'+esc(L("py_edit"))+'</button></div>');
+},true);
+document.addEventListener("click",function(e){
+  var el=e.target.closest('[data-l="pyYes"]');if(!el||!LV.pyPend)return;var body=LV.pyPend;el.disabled=true;
+  api("/api/payout",body).then(function(r){closeModal();var er=$("pyErr");if(!r.ok){if(er){er.textContent=L("py_bad");er.hidden=false}return}var acx=S.accounts[S.active];if(body.accountId&&acx)acx.payout=r.j;else LV.payout=r.j;LV.pyPend=null;try{save()}catch(x){}renderDashLive();toast(L("saved_ok"))});
+});
+/* track window for the editor: links, topics and what to do */
+function trackModalHtml(q){
+  var lk=Object.assign({},q.tlinks||{});if(!lk.spotify&&!lk.soundcloud&&!lk.tiktok&&q.tlink)lk.other=q.tlink;
+  var rows=["spotify","soundcloud","tiktok"].filter(function(k){return lk[k]}).map(function(k){return '<a class="plink big" style="--c:'+PLC[k][1]+'" href="'+esc(lk[k])+'" target="_blank" rel="noopener noreferrer">▶ '+PLC[k][0]+'</a>'});
+  if(q.tmp3)rows.push('<a class="plink big" style="--c:'+PLC.mp3[1]+'" href="/api/track/mp3?id='+encodeURIComponent(q.trackId)+'" target="_blank" rel="noopener">⬇ MP3</a>');
+  if(lk.other)rows.push('<a class="plink big" style="--c:#6B5CFF" href="'+esc(lk.other)+'" target="_blank" rel="noopener noreferrer">▶ '+esc(L("fd_open"))+'</a>');
+  var cov=q.tcover?'<img class="fdcov" src="'+esc(q.tcover)+'" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'fdcov ph\',textContent:\'🎵\'}))">':'<span class="fdcov ph">🎵</span>';
+  return '<div class="trmod"><div class="fdtop">'+cov+'<div class="fdinfo"><b class="fdname">'+esc(q.track)+'</b><span class="fdart">'+esc(q.artist||"")+'</span><div>'+((q.tcats||[]).length?trCats({categories:q.tcats,otherCategory:q.tother}):'')+'</div></div></div>'+
+    (q.tdl?'<div class="trule">⏰ '+esc(L("tm_deadline"))+': <b>'+esc(q.tdl)+'</b></div>':'')+
+    '<h4>'+esc(L("tm_links"))+'</h4><div class="fdlinks">'+(rows.join("")||'<span class="hint">—</span>')+'</div>'+
+    '<h4>'+esc(L("tm_todo"))+'</h4>'+soundRules(q)+
+    '<div class="row"><button type="button" class="btn" data-l="mclose2">'+esc(L("tm_close"))+'</button></div></div>';
+}
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="trOpen"]');if(!el)return;var q=(LV.reqs||[]).filter(function(x){return x.id===el.getAttribute("data-q")})[0];if(q)openModal(trackModalHtml(q))});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);

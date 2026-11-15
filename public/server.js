@@ -82,6 +82,8 @@ async function broadcast(audience, title, text, url, type, withMail) {
 }
 function edUserOfOpen(openId) { return Object.values(db.users).find(u => (u.accounts || []).some(a => a.open_id === openId)); }
 const NT_EN = { ord_approved: 'Your order for "{t}" was approved. Send your video links within 16 days.', ord_rejected: 'Your order for "{t}" was not taken.', ord_completed: 'Your videos for "{t}" were accepted. Payment is on the way.', ord_returned: 'Your links for "{t}" were returned. Please fix and send again.', ord_cancelled: 'The order for "{t}" was cancelled.', money_paid: 'Payment sent: {a} for "{t}". Open My orders to see the receipt.', acc_approved: "Your account {h} is verified.", acc_rejected: "Your account {h} was not taken.", acc_banned: "Your account {h} was blocked.", price_ok: "The new price for {h} was approved: {p}.", price_no: "The manager kept the price {p} for {h}.", ord_reminder: 'Reminder: "{t}" — {d} left to send your video links.', price_suggest: "The manager suggests a new price for {h}: {p}. Open your dashboard to accept." };
+NT_EN.ord_remind = 'Reminder: "{t}": {d} days passed since approval, {l} days left. Publish your videos and send the links.';
+NT_EN.ord_last = 'LAST DAY for "{t}". If the videos are not sent today, we stop working with you and your account will be blocked.';
 function ntText(key, v) { return String(NT_EN[key] || key).replace(/\{(\w+)\}/g, (m, k) => (v || {})[k] !== undefined ? v[k] : ""); }
 function notifyUser(kind, user, type, key, vars) {   // a private message for one editor or producer (shown in the bell)
   if (!user) return; inboxAdd({ audience: kind, to: user.id, type, key, vars: vars || {}, title: "", text: "", url: "/" });
@@ -346,14 +348,16 @@ function expireOverdue() {
   Object.values(db.requests).forEach(r => { if (["approved", "returned"].includes(r.status) && r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000) { refundReq(r); r.status = "cancelled"; r.updated = Date.now(); n++; } });
   if (n) { saveDb(); notify(n + " order(s) expired after 16 days. The money went back to the track budget."); }
 }
-function remindEditors() {   // editors always get a nudge when an order's 16 days are running out
+function remindEditors() {   // a nudge every 3 days after approval, and a strong one on the last day (16-day deadline)
   let n = 0;
   Object.values(db.requests).forEach(r => {
     if (!["approved", "returned"].includes(r.status) || !r.approvedAt || r.demo) return;
-    const left = r.approvedAt + 16 * 86400000 - Date.now(); if (left <= 0) return;
-    const stage = left <= 86400000 ? 1 : left <= 3 * 86400000 ? 3 : 0; if (!stage || (r.remStage && r.remStage <= stage)) return;
-    r.remStage = stage; n++;
-    notifyUser("editors", edUserOfOpen(r.openId), "orders", "ord_reminder", { t: (db.tracks[r.trackId] || {}).title || "", d: stage === 1 ? "less than 1 day" : "3 days or less" });
+    const el = Date.now() - r.approvedAt, left = 16 * 86400000 - el; if (left <= 0) return;
+    const stage = left <= 86400000 ? 99 : Math.floor(el / (3 * 86400000)); if (stage < 1 || stage <= (r.remN || 0)) return;
+    r.remN = stage; n++;
+    const title = (db.tracks[r.trackId] || {}).title || "", days = Math.floor(el / 86400000), l = Math.max(1, Math.ceil(left / 86400000));
+    if (stage === 99) notifyUser("editors", edUserOfOpen(r.openId), "orders", "ord_last", { t: title });
+    else notifyUser("editors", edUserOfOpen(r.openId), "orders", "ord_remind", { t: title, d: days, l });
   });
   if (n) saveDb();
 }
@@ -385,7 +389,7 @@ function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
-    internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, descRule: !!t.descRule, message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
+    internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, tdl: t.deadline || "", descRule: !!t.descRule, message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)), pp = accPayoutRaw(ou, acc); if (pp) o.payout = decObj(pp.enc); }
   if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.tiers = acc.tiers || []; o.bulk = maxTier(acc); o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
@@ -511,8 +515,7 @@ const server = http.createServer(async (req, res) => {
       if (!acc) return send(res, 404, { error: "no such account" });
       if (!(price >= 1 && price <= 200)) return send(res, 400, { error: "price 1..200" });
       const np = Math.round(price * 100) / 100;
-      if (acc.demo || !acc.price || acc.adminStatus !== "approved") acc.price = np;
-      else if (np !== acc.price) { acc.priceReq = np; notify("An editor wants a new price for @" + ((acc.profile || {}).username || "") + ": $" + np + ". Open Waiting for your decision."); }
+      acc.price = np; acc.priceReq = null;   // after the first approval the editor changes the price any time
       saveDb(); return send(res, 200, view(u));
     }
     if (P === "/api/account/update" && M === "POST") {   // internal name, categories, bulk discount (one account or all)
@@ -522,14 +525,14 @@ const server = http.createServer(async (req, res) => {
       if (b.internalName !== undefined) acc.internal_name = String(b.internalName).slice(0, 60);
       if (b.categories !== undefined) acc.categories = cleanCats(b.categories);
       if (b.otherCategory !== undefined) acc.other_category = String(b.otherCategory).slice(0, 60);
-      if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 600); if (!need(res, !ab || ab.split(/\s+/).length >= 3, 400, "Describe your account in at least 3 words")) return; acc.about = ab; }
+      if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 300), wn = ab ? ab.split(/\s+/).length : 0; if (!need(res, !ab || (wn >= 3 && wn <= 8), 400, "Describe your account in 3 to 8 words")) return; acc.about = ab; }
       if (b.tiers !== undefined) {
         const ts = cleanTiers(b.tiers);
         (b.discountAll ? u.accounts : [acc]).forEach(a => { a.tiers = ts; a.discount = ts.length ? Math.max(...ts.map(t => t.pct)) : 0; });
       }
-      if ((b.review || before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []])) && !acc.demo && ["approved", "new"].includes(acc.adminStatus || "new")) {
-        acc.adminStatus = "new"; notify("An editor changed account @" + ((acc.profile || {}).username || "") + ". It is waiting for your decision.");   // changes go to the manager for review
-      }
+      if ((b.review || before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []])) && !acc.demo && (acc.adminStatus || "new") === "new") {
+        acc.adminStatus = "new"; notify("An editor sent account @" + ((acc.profile || {}).username || "") + " for review. It is waiting for your decision.");
+      }   // an approved account keeps its status: the editor can change topics, about, deals and price any time
       if (b.discount !== undefined) {
         const d = Math.round(Number(b.discount) || 0);
         if (d < 0 || d > 99) return send(res, 400, { error: "discount 0..99" });
