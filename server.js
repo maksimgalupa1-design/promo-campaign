@@ -331,8 +331,8 @@ function overview() {
       pendingRequests: reqs.filter(r => r.status === "pending").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
-    tracks: Object.values(db.tracks).map(t => ({ message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
-    topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
+    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
+    topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", deadline: (db.tracks[p.trackId] || {}).deadline || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
         paid: Math.round(Object.values(db.topups).filter(x => x.producerId === p.id && x.status === "confirmed").reduce((q, x) => q + x.amount, 0) * 100) / 100 }; }),
@@ -458,10 +458,10 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, { now: Date.now(), items: (db.settings.inbox || []).filter(x => x.at > since).slice(-5).map(x => ({ id: x.id, at: x.at, audience: x.audience, title: x.title, text: x.text, url: x.url })) });
     }
     if (P === "/api/price-ranges" && M === "GET") return send(res, 200, { ranges: db.settings.ranges || { visual: { min: 3, max: 5 } } });
-    if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "" }); }
+    if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "", instagram: c.instagram || "", tiktok: c.tiktok || "" }); }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
-      const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
+      const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, hasMp3: !!t.mp3, deadline: t.deadline || "", producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
       return send(res, 200, { tracks: list, signedIn: !!u });
     }
     if (P === "/api/requests" && M === "GET") {          // editor's own requests
@@ -558,14 +558,14 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
         const b = await readBody(req), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
-        if (!need(res, title && budget >= 1 && budget <= 1000000, 400, "title and budget (1..1000000) required")) return;
+        if (!need(res, title && budget >= 100 && budget <= 1000000, 400, "minimum budget is $100")) return;
         const L = {}, src = b.links && typeof b.links === "object" ? b.links : {};
         for (const k of ["spotify", "soundcloud", "tiktok", "mp3"]) { const v = String(src[k] || "").trim().slice(0, 400); if (v) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(v), 400, "link must start with https://")) return; const kk = classifyLink(v); if (!L[kk]) L[kk] = v; } }
         if (!need(res, Object.keys(L).length > 0 || b.willUpload, 400, "add at least one link or an mp3 file")) return;
         const plats = (Array.isArray(b.platforms) ? b.platforms : []).filter(x => PLATFORMS.includes(x));
         const cats = cleanCats(b.categories);
         const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0] || "", links: L, budget: 0, spent: 0,
-          platforms: plats.length ? plats : ["tiktok"], descRule: !!b.descRule, message: String(b.message || "").trim().slice(0, 600),
+          platforms: plats.length ? plats : ["tiktok"], descRule: !!b.descRule, message: String(b.message || "").trim().slice(0, 600), deadline: String(b.deadline || "").trim().slice(0, 60),
           categories: cats, otherCategory: cats.includes("other") ? String(b.otherCategory || "").slice(0, 60) : "", status: "review", created: Date.now() };
         db.tracks[t.id] = t;
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(budget * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", coin: COINS.includes(b.coin) ? b.coin : "", status: "pending", created: Date.now() };
@@ -579,7 +579,7 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/producer/topup" && M === "POST") {     // "Add budget": owner confirms the payment by hand
         const b = await readBody(req), t = db.tracks[b.trackId], amount = Number(b.amount);
-        if (!need(res, t && t.producerId === p.id && t.status !== "deleted" && amount >= 1 && amount <= 1000000, 400, "track and amount (1..1000000) required")) return;
+        if (!need(res, t && t.producerId === p.id && t.status !== "deleted" && amount >= 100 && amount <= 1000000, 400, "minimum budget is $100")) return;
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(amount * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", coin: COINS.includes(b.coin) ? b.coin : "", status: "pending", created: Date.now() };
         db.topups[tp.id] = tp; saveDb(); notify("budget top-up "+tp.amount+" USD for track \""+t.title+"\" waits for confirmation"); return send(res, 200, pview());
       }
@@ -634,7 +634,9 @@ const server = http.createServer(async (req, res) => {
         for (const c of CATEGORIES) { const x = src[c] || {}, mn = Number(x.min), mx = Number(x.max); if (mn > 0 && mx >= mn && mx <= 200) out[c] = { min: Math.round(mn * 100) / 100, max: Math.round(mx * 100) / 100 }; }
         db.settings.ranges = out; saveDb(); return send(res, 200, { ranges: out });
       }
-      if (P === "/api/admin/contacts" && M === "POST") { const tg = String(b.telegram || "").trim().replace(/^https?:\/\/t\.me\//i, "").replace(/^@/, "").slice(0, 60), dc = String(b.discord || "").trim().slice(0, 200); db.settings.contacts = { telegram: tg, discord: dc }; saveDb(); return send(res, 200, db.settings.contacts); }
+      if (P === "/api/admin/contacts" && M === "POST") { let tg = String(b.telegram || "").trim().slice(0, 200); if (tg && !/^https?:\/\//i.test(tg)) tg = "https://t.me/" + tg.replace(/^@/, "").replace(/^t\.me\//i, ""); if (tg && !/^https:\/\/(t|telegram)\.me\/\S+$/i.test(tg)) tg = ""; const dc = String(b.discord || "").trim().slice(0, 200); const link = (v, base, re) => { v = String(v || "").trim().slice(0, 200); if (!v) return ""; if (!/^https?:\/\//i.test(v)) v = base + v.replace(/^@/, ""); return re.test(v) ? v : ""; };
+        const ig = link(b.instagram, "https://instagram.com/", /^https:\/\/(www\.)?instagram\.com\/\S+$/i), tk = link(b.tiktok, "https://www.tiktok.com/@", /^https:\/\/(www\.)?tiktok\.com\/\S+$/i);
+        db.settings.contacts = { telegram: tg, discord: dc, instagram: ig, tiktok: tk }; saveDb(); return send(res, 200, db.settings.contacts); }
       if (P === "/api/admin/broadcast" && M === "POST") {
         const text = String(b.text || "").trim().slice(0, 300), title = String(b.title || "Promo Campaign").trim().slice(0, 80), aud = ["editors", "producers", "all"].includes(b.audience) ? b.audience : "editors";
         if (!need(res, text, 400, "write a message")) return;
