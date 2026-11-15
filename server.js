@@ -499,7 +499,7 @@ const server = http.createServer(async (req, res) => {
         const ts = cleanTiers(b.tiers);
         (b.discountAll ? u.accounts : [acc]).forEach(a => { a.tiers = ts; a.discount = ts.length ? Math.max(...ts.map(t => t.pct)) : 0; });
       }
-      if (before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []]) && !acc.demo && acc.adminStatus === "approved") {
+      if ((b.review || before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []])) && !acc.demo && ["approved", "new"].includes(acc.adminStatus || "new")) {
         acc.adminStatus = "new"; notify("An editor changed account @" + ((acc.profile || {}).username || "") + ". It is waiting for your decision.");   // changes go to the manager for review
       }
       if (b.discount !== undefined) {
