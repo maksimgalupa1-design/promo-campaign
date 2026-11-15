@@ -467,6 +467,21 @@ textarea{background:var(--bg);color:var(--fg);border:1px solid var(--line);borde
 .mkfor{margin:6px 0;font-size:14px}
 @media(max-width:420px){.mkt span{font-size:11px}}
 
+/* v13 */
+button.ms{cursor:pointer;text-align:left;font:inherit;color:inherit;transition:transform .16s,box-shadow .16s}
+button.ms:hover{transform:translateY(-3px);box-shadow:0 0 0 2px #E8445A,0 0 16px rgba(232,68,90,.45)}
+.mbl{display:grid;gap:8px;max-height:60vh;overflow:auto}.mbrow{display:grid;gap:2px;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:transparent;color:inherit;font:inherit}
+button.mbrow{cursor:pointer}button.mbrow:hover{border-color:#E8445A}.mbrow b{font-size:16px}.mbrow small{opacity:.7}.okc{color:#2FB574}.badc{color:#E8445A}
+.trf{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.lkopen{margin:6px 0}.lkwrap{margin-top:8px}
+#sCats+.row,#anCats+.row{display:none}
+#paySec{margin-top:26px}#paySec .btn.primary,#paySec [data-l="pySave"]{background:#1FA85A;border-color:#1FA85A;color:#fff}
+.setcard [data-l="saveAcc"]{background:#E8445A;color:#fff;font-size:17px;padding:14px 22px}
+.setcard #sCats{margin-bottom:26px}
+.ord[class*="rq-"] .pill.warn,.ord .pill.warn{background:#F5C518;color:#3a2c00;font-weight:800}
+.accsum .rsh b{font-size:20px}.rsp span{font-size:15px}.rsp .rstar{background:#F5C518!important;color:#3a2c00;font-size:17px;padding:2px 10px}
+.ord[class*="rq-"] .kv b{font-size:22px}.tkopen{margin-left:8px}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -784,7 +799,7 @@ st_pending:"Ждёт решения менеджера",st_approved:"Одобр�
 o_track:"Трек",o_price:"Оплата",o_exp:"Ваши просмотры",o_req:"Заявка от",
 o_left:"дн. осталось на ролик",o_sendlink:"Отправить ссылку",o_badlink:"Вставьте ссылку на ролик, например https://www.tiktok.com/@username/video/123",o_checking:"Менеджер проверяет ссылку.",o_done:"Менеджер подтвердил ролик. Кампания завершена.",o_back:"Менеджер вернул ролик на доработку: отправьте ссылку снова.",
 d_revoke:"Отозвать разрешение на анализ просмотров",d_revoked:"Разрешение отозвано. Новые заявки недоступны, пока вы не подключите TikTok снова.",d_regrant:"Подключить TikTok снова",
-pay_title:"Вывод средств",pay_method:"Способ выплаты",pay_paypal:"PayPal",pay_card:"Банковская карта (Monobank и другие)",pay_bank:"Банковский перевод",pay_crypto:"Криптовалюта",
+pay_title:"Реквизиты для выплат",pay_method:"Способ выплаты",pay_paypal:"PayPal",pay_card:"Банковская карта (Monobank и другие)",pay_bank:"Банковский перевод",pay_crypto:"Криптовалюта",
 pay_email:"Почта PayPal",pay_cardname:"Имя получателя",pay_cardnum:"Номер карты",pay_holder:"Имя получателя",pay_iban:"IBAN",pay_bankname:"Название банка",
 pay_coin:"Монета",pay_net:"Сеть",pay_addr:"Адрес кошелька",pay_memo:"Memo или тег (если нужен)",
 pay_cvv:"Для выплаты нужны только номер карты и имя получателя. Код на обороте (CVV) не нужен, никогда его не вводите.",
@@ -860,7 +875,7 @@ st_pending:"Awaiting manager decision",st_approved:"Approved, paid",st_submitted
 o_track:"Track",o_price:"Payment",o_exp:"Your views",o_req:"Requested",
 o_left:"days left for the video",o_sendlink:"Send link",o_badlink:"Paste the video link, e.g. https://www.tiktok.com/@username/video/123",o_checking:"A manager is checking your link.",o_done:"A manager confirmed your video. Campaign complete.",o_back:"The manager sent the video back: please send the link again.",
 d_revoke:"Withdraw permission to analyze views",d_revoked:"Permission withdrawn. New requests are unavailable until you connect TikTok again.",d_regrant:"Connect TikTok again",
-pay_title:"Withdraw funds",pay_method:"Payout method",pay_paypal:"PayPal",pay_card:"Bank card (Monobank and others)",pay_bank:"Bank transfer",pay_crypto:"Cryptocurrency",
+pay_title:"Payout details",pay_method:"Payout method",pay_paypal:"PayPal",pay_card:"Bank card (Monobank and others)",pay_bank:"Bank transfer",pay_crypto:"Cryptocurrency",
 pay_email:"PayPal email",pay_cardname:"Recipient name",pay_cardnum:"Card number",pay_holder:"Recipient name",pay_iban:"IBAN",pay_bankname:"Bank name",
 pay_coin:"Coin",pay_net:"Network",pay_addr:"Wallet address",pay_memo:"Memo or tag (if required)",
 pay_cvv:"A payout only needs the card number and recipient name. The code on the back (CVV) is not needed, never enter it.",
@@ -1672,8 +1687,8 @@ function renderOwner(){
       COINS.map(function(c){return '<label class="f" for="pay_c_'+c+'"><span>'+esc(coinL(c))+'</span><input id="pay_c_'+c+'" type="text" maxlength="140" value="'+esc(C[c]||"")+'"></label>'}).join("")+
       '<div class="row"><button class="btn primary" data-l="paySave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="payOk"></span></div></div>';
   }else{
-    var tl=D.tracks.filter(function(t){return t.status!=="deleted"}).sort(function(x,y){return (x.status==="review"?0:1)-(y.status==="review"?0:1)});
-    body=moneySum(D)+addTrackHtml()+(LV.bcMsg?'<div class="note">'+esc(LV.bcMsg)+'</div>':'')+'<div class="list">'+(tl.length?tl.map(function(t){
+    var tl=D.tracks.filter(function(t){return t.status!=="deleted"&&trPass(t)}).sort(function(x,y){return (x.status==="review"?0:1)-(y.status==="review"?0:1)});
+    body=moneySum(D)+trFNote()+addTrackHtml()+(LV.bcMsg?'<div class="note">'+esc(LV.bcMsg)+'</div>':'')+'<div class="list">'+(tl.length?tl.map(function(t){
       var lk=["spotify","soundcloud","tiktok","mp3"].filter(function(k){return t.links&&t.links[k]}).map(function(k){return '<a class="pill" href="'+esc(t.links[k])+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join(" ");
       var act=t.status==="review"?'<div class="row"><button class="btn sm primary" data-l="trAct" data-id="'+esc(t.id)+'" data-s="approved">'+esc(L("a_approve_t"))+'</button><button class="btn sm danger" data-l="trAct" data-id="'+esc(t.id)+'" data-s="rejected">'+esc(L("a_reject_t"))+'</button></div>':(t.status==="active"?'<div class="row"><button class="btn sm primary" data-l="bcTrack" data-id="'+esc(t.id)+'">📣 '+esc(L("bc_track"))+'</button></div>':'');
       act+='<div class="row"><button class="btn sm danger" data-l="trDel" data-id="'+esc(t.id)+'">🗑 '+esc(L("tr_del"))+'</button></div>';
@@ -1959,7 +1974,7 @@ document.addEventListener("click",function(e){
 function roleGet(){try{return localStorage.getItem("pc_role")||""}catch(e){return ""}}
 function roleSet(r){try{localStorage.setItem("pc_role",r)}catch(e){}}
 function navRole(){
-  if(!LIVE)return;var h=(location.hash||"#home").replace(/\?.*/,""),off=h==="#admin"||h==="#home"||h==="",r=roleGet(),show={campaigns:r==="editor",dashboard:r==="editor",orders:r==="editor",producer:r==="producer",admin:false,home:!!r};
+  if(!LIVE)return;var h=(location.hash||"#home").replace(/\?.*/,""),off=h==="#admin"||h==="#home"||h==="",r=roleGet(),show={campaigns:false,dashboard:r==="editor",orders:r==="editor",producer:r==="producer",admin:false,home:!!r};
   document.querySelectorAll("nav .lnk").forEach(function(b){b.hidden=off||!show[b.getAttribute("data-go")]});
   var no=$("navOrders");if(no)no.textContent=L("nav_orders");
   var sw=$("navSwitch");if(sw){sw.textContent=L("nav_switch");sw.hidden=off||!r}
@@ -2218,7 +2233,7 @@ setInterval(tickCd,1000);
 function ordCard(q,u,i){
   var g=ordGroup(q),body="";
   if(g==="work"){
-    body=cdHtml(q)+''+lkInputs(q,u)+'<div class="note err" id="lkErr_'+esc(q.id)+'" hidden></div><div class="hint">'+esc(L("od_early"))+'</div><div><button class="btn sm primary" data-l="sendLinks" data-id="'+esc(q.id)+'" data-n="'+q.videos+'">'+esc(L("dl_send"))+'</button></div>';
+    body=cdHtml(q)+''+lkOpenBtn(q)+'<div class="lkwrap" id="lkw_'+esc(q.id)+'" hidden>'+lkInputs(q,u)+'<div class="note err" id="lkErr_'+esc(q.id)+'" hidden></div><div class="hint">'+esc(L("od_early"))+'</div><div><button class="btn sm primary" data-l="sendLinks" data-id="'+esc(q.id)+'" data-n="'+q.videos+'">'+esc(L("dl_send"))+'</button></div></div>';
   }else if(g==="wait"){
     body=q.status==="completed"?'<div class="odwait"><span class="odpulse"></span><div><b>💸 '+esc(L("od_pay_wait"))+'</b><div class="hint">'+esc(L("od_pay_wait_h"))+'</div></div></div>':'<div class="odwait"><span class="odpulse"></span><div><b>'+esc(L("od_wait_t"))+'</b><div class="hint">'+esc(L("od_wait_h"))+'</div></div></div>';
   }
@@ -2352,7 +2367,7 @@ function reqTabHtml(D){
     if(LV.rSort==="disc")return (b.bulk||0)-(a.bulk||0)||st(b)-st(a)||b.created-a.created;
     if(LV.rSort==="price")return (a.price||0)-(b.price||0)||b.created-a.created;
     if(LV.rSort==="new")return b.created-a.created;
-    return ((b.bulk>0?1:0)-(a.bulk>0?1:0))||st(b)-st(a)||(b.bulk||0)-(a.bulk||0)||b.created-a.created;
+    return (b.bulk||0)-(a.bulk||0)||st(b)-st(a)||(a.price||0)-(b.price||0)||b.created-a.created;
   });
   var cnt={act:0,work:0,done:0};all.forEach(function(q){var g=rGroup(q);if(cnt[g]!==undefined)cnt[g]++});
   var chips=["act","work","done","all"].map(function(f){return '<button type="button" class="chip" data-l="rFil" data-f="'+f+'" aria-pressed="'+(LV.rFilter===f)+'">'+esc(L("rf_"+f))+(f==="all"?' ('+all.length+')':(cnt[f]?' ('+cnt[f]+')':''))+'</button>'}).join("");
@@ -2598,14 +2613,14 @@ function tiersTxt(ts){return (ts&&ts.length)?ts.map(function(x){return x.min+"+:
 var TIER_OPTS=[[3,5],[6,10],[12,15]];
 function tiersHtml(u){
   var cur=u.tiers||[],pre=function(x){return TIER_OPTS.some(function(o){return o[0]===x.min&&o[1]===x.pct})},cust=cur.filter(function(x){return !pre(x)})[0]||{min:"",pct:""};
-  return '<div class="f tiers"><span>'+esc(L("tr_h"))+'</span><span class="hint">'+esc(L("tr_h3"))+'</span>'+TIER_OPTS.map(function(o,i){var on=cur.some(function(x){return x.min===o[0]&&x.pct===o[1]});return '<label class="chk tieropt" for="tOpt'+i+'"><input type="checkbox" id="tOpt'+i+'" data-min="'+o[0]+'" data-pct="'+o[1]+'"'+(on?' checked':'')+'><span><b>'+o[0]+' '+esc(L("tr_vid"))+'</b> → −'+o[1]+'%</span></label>'}).join("")+
+  return '<div class="f tiers"><span>'+esc(L("tr_h"))+'</span><div id="tiersAllHost"></div><span class="hint">'+esc(L("tr_h3"))+'</span>'+TIER_OPTS.map(function(o,i){var on=cur.some(function(x){return x.min===o[0]&&x.pct===o[1]});return '<label class="chk tieropt" for="tOpt'+i+'"><input type="checkbox" id="tOpt'+i+'" data-min="'+o[0]+'" data-pct="'+o[1]+'"'+(on?' checked':'')+'><span><b>'+o[0]+' '+esc(L("tr_vid"))+'</b> → −'+o[1]+'%</span></label>'}).join("")+
    '<div class="tieropt cust"><b>'+esc(L("tr_own"))+'</b><div class="tierrow"><span>'+esc(L("tr_from"))+'</span><input id="tcMin" type="text" maxlength="3" inputmode="numeric" pattern="[0-9]*" value="'+cust.min+'" placeholder="8"><span>'+esc(L("tr_vid"))+'</span><b>−</b><input id="tcPct" type="text" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="'+cust.pct+'" placeholder="12"><span>%</span></div></div>'+
    '<div class="row"><button type="button" class="btn primary" data-l="saveTiers">'+esc(L("tr_save"))+'</button></div></div>';
 }
 function readTiers(){var o=[];document.querySelectorAll(".tieropt input[data-min]:checked").forEach(function(c){o.push({min:Number(c.getAttribute("data-min")),pct:Number(c.getAttribute("data-pct"))})});var m=Number(val("tcMin")),p=Number(val("tcPct"));if(m>=2&&m<=500&&p>=1&&p<=99)o.push({min:m,pct:p});return o}
 (function(){var o=renderDashLive;renderDashLive=function(){
   o.apply(this,arguments);var u=S.user;
-  var d=$("sDisc");if(d&&u){var lab=d.closest("label");if(lab)lab.outerHTML=tiersHtml(u)}
+  var d=$("sDisc");if(d&&u){var lab=d.closest("label");if(lab)lab.outerHTML=tiersHtml(u);var sa=document.querySelector('#profCard label[for="sAll"]');if(sa&&$("tiersAllHost")){$("tiersAllHost").appendChild(sa)}else if(sa)sa.remove()}
   var nm=$("sName"),blk=nm&&nm.closest(".blk");if(blk){blk.classList.add("setcard");var sb=blk.querySelector('[data-l="saveAcc"]');if(sb)sb.textContent=L("ad_send");var h=blk.querySelector("h3");if(h)h.insertAdjacentHTML("afterend",'<p class="hint">'+esc(L("ad_rev_note"))+'</p>')}
   var ach=document.querySelector("#profCard .achd");if(ach&&u&&u.priceReq)ach.insertAdjacentHTML("afterend",'<div class="note">⏳ '+esc(L("pr_wait").replace("{p}","$"+u.priceReq))+'</div>');
   putSw();
@@ -2826,7 +2841,7 @@ function rcOpen(id){
 /* ===== Marketplace (was "My orders"): Find, Pending, Approved, Declined, Completed ===== */
 Object.assign(LT.en,{nav_orders:"Marketplace",od_title:"Marketplace",mk_find:"Find",mk_pending:"Pending",mk_approved:"Approved",mk_declined:"Declined",mk_completed:"Completed",mk_all:"All",mk_paid_tot:"Paid to you",mk_paid:"Paid",mk_for:"Track for account",mk_none:"Nothing here yet."});
 Object.assign(LT.ru,{nav_orders:"Маркетплейс",od_title:"Маркетплейс",mk_find:"Найти",mk_pending:"В ожидании",mk_approved:"Одобрено",mk_declined:"Отклонено",mk_completed:"Выполнено",mk_all:"Все",mk_paid_tot:"Вам оплачено",mk_paid:"Оплачено",mk_for:"Трек для аккаунта",mk_none:"Здесь пока ничего нет."});
-function mkGroup(q){var s=q.status;return s==="pending"?"pending":(["approved","returned","submitted"].indexOf(s)>=0?"approved":(s==="completed"?"completed":"declined"))}
+function mkGroup(q){var s=q.status;return (s==="pending"||s==="submitted")?"pending":(["approved","returned"].indexOf(s)>=0?"approved":(s==="completed"?"completed":"declined"))}
 var MK_TABS=[["pending","⏱","mk_pending"],["approved","✓","mk_approved"],["declined","✕","mk_declined"],["completed","✓✓","mk_completed"]];
 function ordList(){
   var u=S.user,all=(LV.reqs||[]).slice().sort(function(a,b){return b.created-a.created}),qq=(LV.oq||"").toLowerCase().trim(),f=LV.mk||"approved";
@@ -2847,6 +2862,52 @@ function renderOrders(){
   ordList();
 }
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="mkF"]');if(!el)return;LV.mk=el.getAttribute("data-f");renderOrders()});
+
+/* ===== v13 ===== */
+Object.assign(LT.en,{lk_open:"➕ Add links",ms_back:"Show all tracks",ms_flt:"Filtered tracks",ms_by_track:"By track",ms_spent_h:"Who got the money",ms_status:"Status",ms_open:"Open track",ms_none:"Nothing yet",ms_total:"Total budget",rs_smart:"Best first: deals, rating, price",c_one:"Pick one topic",tk_open:"Open TikTok",niche:"Niche",rs_niche_all:"All niches"});
+Object.assign(LT.ru,{lk_open:"➕ Добавить ссылки",ms_back:"Показать все треки",ms_flt:"Отфильтрованные треки",ms_by_track:"По трекам",ms_spent_h:"Кому ушли деньги",ms_status:"Статус",ms_open:"Открыть трек",ms_none:"Пока ничего",ms_total:"Общий бюджет",rs_smart:"Сначала лучшие: скидки, рейтинг, цена",c_one:"Выберите одну тему",tk_open:"Открыть TikTok",niche:"Ниша",rs_niche_all:"Все ниши"});
+LT.en.rs_smart="Best first: deals, rating, price";LT.ru.rs_smart="Сначала лучшие: скидки, рейтинг, цена";
+function lkOpenBtn(q){return '<div><button type="button" class="btn primary lkopen" data-l="lkOpen" data-id="'+esc(q.id)+'">'+esc(L("lk_open"))+'</button></div>'}
+document.addEventListener("click",function(e){var el=e.target.closest('[data-l="lkOpen"]');if(!el)return;var w=$("lkw_"+el.getAttribute("data-id"));if(w){w.hidden=!w.hidden;if(!w.hidden){var f=w.querySelector(".lkin");if(f)f.focus()}}});
+/* one topic only */
+document.addEventListener("change",function(e){var t=e.target;if(!t||t.type!=="checkbox"||!t.checked)return;var box=t.closest("#sCats,#anCats");if(!box)return;box.querySelectorAll("input:checked").forEach(function(i){if(i!==t)i.checked=false});var o=$("sOtherRow");if(o)o.hidden=t.value!=="other"});
+/* tracks: filter from the money tiles */
+function trPass(t){var f=LV.trF||"all";if(f==="all")return true;if(f==="active")return t.status==="active";if(f==="empty")return t.status==="active"&&(t.left||0)<=0;if(f==="review")return t.status==="review";if(f.indexOf("one:")===0)return t.id===f.slice(4);return true}
+function trFNote(){return (LV.trF&&LV.trF!=="all")?'<div class="note trf">🔎 '+esc(L("ms_flt"))+' <button class="btn sm" data-l="trFClear">'+esc(L("ms_back"))+'</button></div>':''}
+function moneySum(D){
+  var T=(D.tracks||[]).filter(function(t){return t.status==="active"}),tot=0,sp=0,fr=0,empty=0;
+  T.forEach(function(t){tot+=t.budget||0;sp+=t.spent||0;fr+=t.left||0;if((t.left||0)<=0)empty++});
+  var rev=(D.tracks||[]).filter(function(t){return t.status==="review"}).length,tile=function(k,c,v,l){return '<button type="button" class="ms '+c+'" data-l="msGo" data-k="'+k+'"><b>'+v+'</b><span>'+esc(L(l))+' ›</span></button>'};
+  return '<div class="msum">'+tile("act","a",T.length,"ms_act")+tile("tot","",money(tot),"ms_total")+tile("spent","",money(sp),"ms_spent")+tile("free","g",money(fr),"ms_free")+tile("empty","r",empty,"ms_empty")+tile("rev","w",rev,"ms_rev")+'</div>';
+}
+function moneyBreak(D,mode){
+  var T=(D.tracks||[]).filter(function(t){return t.status==="active"});
+  return '<h3>'+esc(L(mode==="free"?"ms_free":"ms_total"))+' · '+esc(L("ms_by_track"))+'</h3><div class="mbl">'+(T.length?T.map(function(t){return '<button type="button" class="mbrow" data-l="msTr" data-id="'+esc(t.id)+'"><b>'+esc(t.title)+'</b><small>'+esc(t.artist||"")+'</small><span>'+esc(L("ms_total"))+' '+money(t.budget||0)+' · '+esc(L("ms_spent"))+' '+money(t.spent||0)+' · <b class="'+((t.left||0)>0?'okc':'badc')+'">'+esc(L("a_left"))+' '+money(t.left||0)+'</b></span></button>'}).join(""):'<div class="empty">'+esc(L("ms_none"))+'</div>')+'</div><div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("a_close"))+'</button></div>';
+}
+function spentList(D){
+  var R=(D.requests||[]).filter(function(q){return ["approved","submitted","returned","completed"].indexOf(q.status)>=0}).sort(function(a,b){return (b.approvedAt||b.created)-(a.approvedAt||a.created)});
+  return '<h3>'+esc(L("ms_spent_h"))+'</h3><div class="mbl">'+(R.length?R.map(function(q){return '<div class="mbrow"><b>'+esc(q.handle)+'</b><small>'+esc(q.track)+'</small><span>'+money(q.cost)+' · '+stL(q.status)+(q.status==="completed"?(q.paid?' ✓ '+esc(L("mk_paid")):' 💸'):'')+'</span></div>'}).join(""):'<div class="empty">'+esc(L("ms_none"))+'</div>')+'</div><div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("a_close"))+'</button></div>';
+}
+document.addEventListener("click",function(e){var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),k=el.getAttribute("data-k"),id=el.getAttribute("data-id");
+  if(a==="msGo"){var D=D0();
+    if(k==="act"){LV.adTab="tracks";LV.trF="active";renderOwner();return}
+    if(k==="empty"){LV.adTab="tracks";LV.trF="empty";renderOwner();return}
+    if(k==="rev"){LV.adTab="tracks";LV.trF="review";renderOwner();return}
+    if(k==="spent"){openModal('<div class="mbox">'+spentList(D)+'</div>');return}
+    openModal('<div class="mbox">'+moneyBreak(D,k)+'</div>');return}
+  if(a==="msTr"){closeModal();LV.adTab="tracks";LV.trF="one:"+id;renderOwner();return}
+  if(a==="trFClear"){LV.trF="all";renderOwner();return}
+});
+/* requests: niche filter + best-first sort + TikTok button */
+(function(){var o=reqTabHtml;reqTabHtml=function(D){
+  var f=LV.rNiche||"all",save=D.requests;
+  if(f!=="all")D=Object.assign({},D,{requests:D.requests.filter(function(q){return (q.categories||[]).indexOf(f)>=0})});
+  var h=o(D),cats={};save.forEach(function(q){(q.categories||[]).forEach(function(c){cats[c]=1})});
+  var sel='<label class="f rsort" for="rNiche"><span>'+esc(L("niche"))+'</span><select id="rNiche"><option value="all">'+esc(L("rs_niche_all"))+'</option>'+Object.keys(cats).map(function(c){return '<option value="'+c+'"'+(f===c?' selected':'')+'>'+esc(L("c_"+c))+'</option>'}).join("")+'</select></label>';
+  h=h.replace('<div class="rbar">','<div class="rbar">'+sel);
+  return h.replace(/(<div class="rsh"><b>)(@[^<]*)(<\/b>)/g,function(m,a1,hd,a3){return a1+hd+a3+'<a class="btn sm tkopen" href="https://www.tiktok.com/'+hd+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("tk_open"))+'</a>'});
+}})();
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="rNiche"){LV.rNiche=e.target.value;renderOwner()}});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
