@@ -272,6 +272,10 @@ footer button{background:none;border:0;padding:0;cursor:pointer;color:var(--mute
 .crbar i{display:block;height:100%;width:var(--w);border-radius:99px;background:linear-gradient(90deg,#3AA0FF,#1FA85A);animation:wGrow .9s cubic-bezier(.2,.8,.2,1) both}
 @keyframes wGrow{from{width:0}}
 .ct-ig{background:linear-gradient(45deg,#F9A03C,#E1306C,#833AB4)!important;color:#fff!important}.ct-tk{background:#111!important;color:#fff!important}
+input[type=file]{width:100%;padding:14px;border:2px dashed #2F7BFF;border-radius:14px;background:rgba(47,123,255,.08);color:var(--fg);font:inherit;font-size:14px;cursor:pointer;transition:background .2s,border-color .2s}
+input[type=file]:hover{background:rgba(47,123,255,.16);border-color:#7C5CFF}
+input[type=file]::file-selector-button{margin-right:14px;padding:10px 18px;border:0;border-radius:10px;background:linear-gradient(135deg,#2F7BFF,#7C5CFF);color:#fff;font:inherit;font-weight:700;cursor:pointer;transition:transform .15s,filter .15s}
+input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:translateY(-1px)}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1575,21 +1579,22 @@ a_approve_t:"Одобрить трек",a_reject_t:"Отклонить трек"
 function coinL(c){return L("coin_"+c)}
 function coinOpts(sel){return COINS.map(function(c){return '<option value="'+c+'"'+(c===sel?' selected':'')+'>'+esc(coinL(c))+'</option>'}).join("")}
 function methodOpts(sel){return ["paypal","crypto","card"].map(function(m){return '<option value="'+m+'"'+(m===sel?' selected':'')+'>'+esc(m==="card"?L("m_card"):L("m_"+m))+'</option>'}).join("")}
-function payBoxHtml(method,amount,coin){
+function payBoxHtml(method,amount,coin,compact){
   var x=(LV.prod&&LV.prod.pay)||{},rows=[];
-  if(method==="paypal"&&x.paypal)rows.push([L("p_to_paypal"),x.paypal]);
+  if(method==="paypal"&&x.paypal)rows.push(["PayPal",x.paypal]);
   if(method==="crypto"){var ad=(x.crypto||{})[coin||"solana"];if(ad){rows.push([coinL(coin||"solana"),ad])}}
-  if(method==="card"&&x.card){rows.push([L("p_to_card"),x.card]);if(x.cardHolder)rows.push([L("p_to_holder"),x.cardHolder])}
+  if(method==="card"&&x.card){if(x.cardHolder)rows.push([L("p_recipient"),x.cardHolder]);rows.push([L("p_cardno"),x.card])}
   var a=Number(amount)||0,fee=Math.round(a*0.2*100)/100;
   return '<div class="note"><b>'+esc(L("p_send_to"))+'</b>'+(rows.length?rows.map(function(r){return '<div style="overflow-wrap:anywhere">'+esc(r[0])+': <b>'+esc(r[1])+'</b></div>'}).join(""):'<div>'+esc(L("p_no_pay"))+'</div>')+
-    (a>0?'<div class="hotnote" style="margin-top:8px">'+esc(L("p_you_get"))+': <b>'+money(a-fee)+'</b> ('+money(a)+' − 20% = '+money(fee)+')<br><small>'+esc(L("p_fee_short"))+'</small></div>':'')+'<div class="hint" style="margin-top:6px">'+esc(L("p_fee"))+'</div></div>';
+    (compact?'':(a>0?'<div class="hotnote" style="margin-top:8px">'+esc(L("p_you_get"))+': <b>'+money(a-fee)+'</b> ('+money(a)+' − 20% = '+money(fee)+')<br><small>'+esc(L("p_fee_short"))+'</small></div>':'')+'<div class="hint" style="margin-top:6px">'+esc(L("p_fee"))+'</div>')+'</div>';
 }
 function refreshPayBox(){
   var c=$("nCoinRow");if(c)c.hidden=val("nMethod")!=="crypto";
   var m=$("tCoinRow");if(m)m.hidden=val("tMeth")!=="crypto";
   var o=$("nOtherRow");if(o){var on=checked("nCats").indexOf("other")>=0;o.hidden=!on}
   var b=$("payBoxM");if(b)b.innerHTML=payBoxHtml(val("tMeth"),val("tAmt"),val("tCoin"));
-  var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;q.textContent=a>0?L("p_you_get")+": "+money(a*0.8)+" ("+money(a)+" − 20%). "+L("p_fee_short"):L("p_fee");q.className=a>0?"hotnote":"hint"}
+  var np=$("nPayBox");if(np)np.innerHTML=payBoxHtml(val("nMethod"),0,val("nCoin"),true);
+  var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;if(a>0&&a<100){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=a>0?L("p_you_get")+": "+money(a*0.8)+" ("+money(a)+" − 20%). "+L("p_fee_short"):L("p_fee");q.className=a>0?"hotnote":"hint"}}
   var so=$("sOtherRow");if(so&&$("sCats"))so.hidden=checked("sCats").indexOf("other")<0;
   var pc=$("pyCoinRow");if(pc)pc.hidden=val("pyMethod")!=="crypto";var ph=$("pyHolderRow");if(ph)ph.hidden=val("pyMethod")!=="card";
   var pv=$("pyValueL");if(pv)pv.textContent=L("py_value_"+val("pyMethod"));
@@ -1609,7 +1614,7 @@ function drawProd(){
   if(!P){$("lprodBody").innerHTML=authForm();return}
   var keep=null;try{keep={t:val("nTitle"),a:val("nArtist"),b:val("nBudget")}}catch(e){}
   $("lprodBody").innerHTML='<div class="row" style="justify-content:space-between"><h2>'+esc(L("p_tracks"))+'</h2><div class="row"><span class="hint">'+esc(P.name?P.name+" · ":"")+esc(P.email)+'</span><button class="btn sm" data-l="pOut">'+esc(L("p_logout"))+'</button></div></div>'+
-    payAllHtml(P)+'<div class="list" style="margin-top:14px">'+(P.tracks.length?P.tracks.map(function(t){
+    '<div class="list" style="margin-top:14px">'+(P.tracks.length?P.tracks.map(function(t){
       var stc={review:"warn",active:"ok",rejected:"bad"}[t.status]||"";
       var pays=(t.status==="active"&&t.topups&&t.topups.length)?t.topups.map(function(tp){return '<div><b>'+esc(L("p_pay_now"))+': '+money(tp.amount)+'</b>'+payBoxHtml(tp.method,tp.amount,tp.coin)+(tp.proof?'<div class="note">'+esc(L("p_proof_sent"))+'</div>':'')+'<label class="f" for="ps_'+esc(tp.id)+'"><span>'+esc(L("p_proof_pick"))+'</span><input id="ps_'+esc(tp.id)+'" type="file" accept="image/*"></label><div class="note err" id="pe_'+esc(tp.id)+'" hidden></div><button class="btn sm primary" data-l="proofSend" data-id="'+esc(tp.id)+'">'+esc(L("p_proof_send"))+'</button></div>'}).join(""):'';
       return '<div class="card ord"><div class="t"><div><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span><span class="pill '+stc+'">'+esc(L("p_st_"+t.status))+'</span></div><div class="row">'+(t.status==="active"?'<button class="btn sm" data-l="pTop" data-id="'+esc(t.id)+'">'+esc(L("p_addb"))+'</button>':'')+'<button class="btn sm danger" data-l="pDel" data-id="'+esc(t.id)+'">'+esc(L("p_del"))+'</button></div></div>'+
@@ -1626,6 +1631,8 @@ function drawProd(){
     '<label class="f" for="nBudget"><span>'+esc(L("p_budget"))+'</span><input id="nBudget" type="number" min="100" inputmode="decimal" placeholder="100"></label><p class="hint" id="nBudgetInfo">'+esc(L("p_fee"))+'</p>'+
     '<label class="f" for="nMethod"><span>'+esc(L("p_method"))+'</span><select id="nMethod">'+methodOpts("paypal")+'</select></label>'+
     '<label class="f" id="nCoinRow" for="nCoin" hidden><span>'+esc(L("p_coin"))+'</span><select id="nCoin">'+coinOpts("solana")+'</select></label>'+
+    '<div id="nPayBox">'+payBoxHtml("paypal",0,"solana",true)+'</div>'+
+    '<label class="f" for="nProof"><span>'+esc(L("p_attach"))+'</span><input id="nProof" type="file" accept="image/*"></label><p class="hint">'+esc(L("p_attach_h"))+'</p>'+
     '<details class="card" open><summary><b>'+esc(L("p_links"))+'</b></summary><p class="hint">'+esc(L("p_links_h"))+'</p><label class="f" for="nMp3"><span>'+esc(L("p_mp3_file"))+'</span><input id="nMp3" type="file" accept=".mp3,audio/mpeg"></label>'+
     ["spotify","soundcloud","tiktok","mp3"].map(function(k){return '<label class="f" for="nl_'+k+'"><span>'+esc(L("l_"+k))+'</span><input id="nl_'+k+'" type="text" inputmode="url" placeholder="https://"></label>'}).join("")+'</details>'+
     '<label class="f" for="nMsg"><span>'+esc(L("p_msg"))+'</span><textarea id="nMsg" rows="3" maxlength="600" placeholder="'+esc(L("p_msg_ph"))+'"></textarea></label>'+
@@ -1671,12 +1678,20 @@ document.addEventListener("click",function(e){
     if(badL||(!Object.keys(links).length&&!mf)){bad(L("p_bad_link"));return}
     if(mf&&mf.size>8*1024*1024){bad(L("p_mp3_big"));return}
     b.willUpload=!!mf;ne.hidden=true;
+    var pf=$("nProof")&&$("nProof").files&&$("nProof").files[0];
     api("/api/producer/track",b).then(function(r){
       if(!r.ok){bad((r.j&&r.j.error)||L("p_err"));return}
       LV.prod=r.j;
-      if(!mf){drawProd();return}
       var mine=r.j.tracks.slice().sort(function(x,y){return (y.created||0)-(x.created||0)})[0];
-      fetch("/api/producer/mp3?id="+encodeURIComponent(mine.id),{method:"POST",credentials:"same-origin",headers:{"Content-Type":"audio/mpeg"},body:mf}).then(function(x){return x.json().then(function(j){return {ok:x.ok,j:j}})}).then(function(u){if(u.ok)LV.prod=u.j;drawProd();if(!u.ok){var e2=$("nErr");if(e2){e2.textContent=(u.j&&u.j.error)||L("p_err");e2.hidden=false}}});
+      function stepMp3(){
+        if(!mf)return Promise.resolve();
+        return fetch("/api/producer/mp3?id="+encodeURIComponent(mine.id),{method:"POST",credentials:"same-origin",headers:{"Content-Type":"audio/mpeg"},body:mf}).then(function(x){return x.json().then(function(j){if(x.ok)LV.prod=j})});
+      }
+      function stepProof(){
+        if(!pf||!mine.topups||!mine.topups[0])return Promise.resolve();
+        return new Promise(function(res){shrinkImage(pf,function(img){if(!img){res();return}api("/api/producer/proof",{id:mine.topups[0].id,image:img}).then(function(u){if(u.ok)LV.prod=u.j;res()})})});
+      }
+      stepMp3().then(stepProof).then(function(){drawProd()}).catch(function(){drawProd()});
     });return}
   if(a==="pTop"){LV.modal={type:"top",id:id};openModal('<h3>'+esc(L("p_addb"))+'</h3><label class="f" for="tAmt"><span>'+esc(L("p_amount"))+'</span><input id="tAmt" type="number" min="100" inputmode="decimal" placeholder="100"></label><label class="f" for="tMeth"><span>'+esc(L("p_method"))+'</span><select id="tMeth">'+methodOpts("paypal")+'</select></label><label class="f" id="tCoinRow" for="tCoin" hidden><span>'+esc(L("p_coin"))+'</span><select id="tCoin">'+coinOpts("solana")+'</select></label><div id="payBoxM">'+payBoxHtml("paypal",0,"solana")+'</div><div class="note err" id="tErr" hidden></div><div class="row"><button class="btn primary" data-l="pTopGo" data-id="'+esc(id)+'">'+esc(L("p_topup"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
   if(a==="pySave"){
@@ -1697,6 +1712,8 @@ function payAllHtml(P){
   if(!rows.length)return "";
   return '<details class="card" style="margin-top:12px" open><summary><b>'+esc(L("p_where"))+'</b></summary><p class="hint">'+esc(L("p_where_h"))+'</p>'+rows.join("")+'</details>';
 }
+
+function payAllHtml(){return ""}
 /* ===== round 3: payment timeline, screenshots, eta, ban ===== */
 Object.assign(LT.en,{p_proof_pick:"Screenshot or photo of your payment",p_proof_send:"I paid, send screenshot",p_proof_sent:"Screenshot sent. The manager will check your payment.",p_proof_bad:"Choose an image file first.",tl_sent:"Request sent",tl_ok:"Account checked, request approved",tl_link:"Video link sent",tl_acc:"Video accepted",tl_way:"Payment on the way",tl_paid:"Paid",tl_eta:"Expected",tl_proof:"View payment screenshot",tl_overdue:"The deadline has passed. Send the video link or the account will be banned.",tl_rej:"Request rejected",tl_ret:"Returned: fix the video and send the link again",d_banned:"Your account is banned for breaking the terms. Contact the manager.",a_ban:"Ban",a_eta:"Payment expected (date or note)",a_eta_save:"Save",a_overdue:"Overdue",a_proof_pick:"Payment screenshot (optional)",a_view_proof:"View screenshot",a_banned:"banned",a_close:"Close"});
 Object.assign(LT.ru,{p_proof_pick:"Скриншот или фото вашей оплаты",p_proof_send:"Я оплатил, отправить скриншот",p_proof_sent:"Скриншот отправлен. Менеджер проверит вашу оплату.",p_proof_bad:"Сначала выберите файл-картинку.",tl_sent:"Заявка отправлена",tl_ok:"Аккаунт проверен, заявка одобрена",tl_link:"Ссылка на видео отправлена",tl_acc:"Видео принято",tl_way:"Оплата в пути",tl_paid:"Оплачено",tl_eta:"Ожидается",tl_proof:"Посмотреть скриншот оплаты",tl_overdue:"Срок прошёл. Отправьте ссылку на видео, иначе аккаунт будет заблокирован.",tl_rej:"Заявка отклонена",tl_ret:"Возвращено: исправьте видео и отправьте ссылку снова",d_banned:"Ваш аккаунт заблокирован за нарушение условий. Свяжитесь с менеджером.",a_ban:"Заблокировать",a_eta:"Когда ожидается оплата (дата или заметка)",a_eta_save:"Сохранить",a_overdue:"Просрочено",a_proof_pick:"Скриншот оплаты (по желанию)",a_view_proof:"Показать скриншот",a_banned:"заблокирован",a_close:"Закрыть"});
@@ -1948,6 +1965,8 @@ Object.assign(LT.en,{p_min100:"The minimum budget is $100.",p_where:"Where to se
 Object.assign(LT.ru,{p_min100:"Минимальный бюджет $100.",p_where:"Куда отправлять деньги",p_where_h:"Отправьте платёж на любой из этих реквизитов. Потом приложите скриншот под своим треком.",p_review_wait:"Ваш трек ждёт одобрения. Когда менеджер его одобрит, здесь появятся реквизиты для оплаты."});
 Object.assign(LT.en,{p_fee_short:"The 20% is payment for the promoter's work."});
 Object.assign(LT.ru,{p_fee_short:"20% это плата за работу промоутера."});
+Object.assign(LT.en,{p_recipient:"Recipient",p_cardno:"Card number",p_send_to:"Send the money here",p_attach:"Attach a screenshot of your payment",p_attach_h:"After you pay, attach the screenshot here. You can also add it later under your track.",p_too_small:"Too small. The minimum budget is $100."});
+Object.assign(LT.ru,{p_recipient:"Получатель",p_cardno:"Номер карты",p_send_to:"Отправьте деньги сюда",p_attach:"Прикрепите скриншот оплаты",p_attach_h:"После оплаты прикрепите скриншот здесь. Его можно добавить и позже, под своим треком.",p_too_small:"Слишком мало. Минимальный бюджет $100."});
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
