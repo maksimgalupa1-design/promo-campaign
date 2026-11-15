@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 33;
+const SERVER_VER = 34;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -817,10 +817,32 @@ const server = http.createServer(async (req, res) => {
       const c = cookie(req, "psid"); if (c) { delete db.psessions[c]; saveDb(); }
       return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("psid", "", 0) });
     }
+    if (P.startsWith("/api/dm")) {     // private messages between a user (editor or producer) and the manager
+      const pr0 = producerOf(req), eu0 = sessionUser(req);
+      if (!pr0 && !eu0) return send(res, 401, { error: "not signed in" });
+      const key = pr0 ? "p:" + pr0.id : "e:" + eu0.id;
+      const D = db.settings.dm = db.settings.dm || { threads: {} };
+      const th = D.threads[key] = D.threads[key] || { key, kind: pr0 ? "producer" : "editor", name: pr0 ? (pr0.name || pr0.email) : ((((eu0.accounts || [])[0] || {}).profile || {}).username ? "@" + eu0.accounts[0].profile.username : (eu0.chatNick || eu0.id)), sub: "", msgs: [], updated: 0, userSeen: 0, adminSeen: 0 };
+      th.sub = pr0 ? [pr0.email, pr0.instagram && "IG " + pr0.instagram, pr0.tiktok && "TikTok " + pr0.tiktok, pr0.discord && "Discord " + pr0.discord].filter(Boolean).join(" · ") : (eu0.chatNick ? "chat: " + eu0.chatNick : "");
+      const mine = () => th.msgs.filter(m => !m.hideU).slice(-200).map(m => ({ id: m.id, at: m.at, mgr: !!m.mgr, text: m.text }));
+      if (P === "/api/dm" && M === "GET") { th.userSeen = Date.now(); return send(res, 200, { msgs: mine() }); }
+      if (P === "/api/dm" && M === "POST") {
+        const b = await readBody(req), text = String(b.text || "").trim().replace(/[ \t]+/g, " ").slice(0, 1000);
+        if (!need(res, text, 400, "write a message")) return;
+        if (!need(res, th.msgs.filter(m => !m.mgr && Date.now() - m.at < 60000).length < 8, 429, "Too many messages, wait a minute")) return;
+        th.msgs.push({ id: uid8(), at: Date.now(), mgr: false, text }); th.msgs = th.msgs.slice(-1000); th.updated = Date.now(); th.userSeen = Date.now(); saveDb();
+        notify("new message from " + th.name + ": " + text.slice(0, 80)); return send(res, 200, { msgs: mine() });
+      }
+      if (P === "/api/dm/delete" && M === "POST") {
+        const b = await readBody(req), m = th.msgs.find(x => x.id === b.id); if (!need(res, m, 404, "no such message")) return;
+        m.hideU = true; saveDb(); return send(res, 200, { msgs: mine() });
+      }
+      return send(res, 404, { error: "not found" });
+    }
     if (P.startsWith("/api/producer/")) {
       const p = producerOf(req); if (!p) return send(res, 401, { error: "not signed in" });
       const mine = () => Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
-      const pview = () => ({ email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", name: p.name || "", fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, hasMp3: !!t.mp3, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "",
+      const pview = () => ({ email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", discord: p.discord || "", name: p.name || "", fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, hasMp3: !!t.mp3, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "",
         topups: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").map(x => ({ id: x.id, amount: x.amount, method: x.method, coin: x.coin || "", proof: !!x.proof })),
         pendingTopup: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").reduce((s, x) => s + x.amount, 0) })) });
       if (P === "/api/producer/me" && M === "GET") { const c = cookie(req, "psid"); if (db.psessions[c]) db.psessions[c].exp = Date.now() + 30 * 86400000; return send(res, 200, pview(), { "Set-Cookie": setCookie("psid", c, 2592000) }); }
@@ -848,7 +870,7 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, deadlineOk(b.deadline), 400, "The deadline must be at least 1 week (for example: 2 weeks, 1 month)")) return;
         if (!need(res, !b.descRule || String(b.descText || "").trim(), 400, "write what editors must put in the description")) return;
         const ig = String(b.instagram || "").trim().slice(0, 100); if (!need(res, ig, 400, "write your Instagram")) return;
-        p.instagram = ig; p.tiktok = String(b.tiktok || "").trim().slice(0, 100);
+        p.instagram = ig; p.tiktok = String(b.tiktok || "").trim().slice(0, 100); p.discord = String(b.discord || "").trim().slice(0, 100);
         const cats = cleanCats(b.categories);
         const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0] || "", links: L, budget: 0, spent: 0,
           platforms: plats.length ? plats : ["tiktok"], descRule: !!b.descRule, descText: b.descRule ? String(b.descText || "").trim().slice(0, 120) : "", message: String(b.message || "").trim().slice(0, 600), deadline: String(b.deadline || "").trim().slice(0, 60),
@@ -1051,6 +1073,24 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/chat/say" && M === "POST") {
         const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; const text = String(b.text || "").trim().slice(0, 300); if (!need(res, text, 400, "write a message")) return;
         C.msgs.push({ id: uid8(), at: Date.now(), uid: "manager", name: "Manager", text, mgr: true }); C.msgs = C.msgs.slice(-500); saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/dm" && M === "GET") {
+        const D = db.settings.dm = db.settings.dm || { threads: {} };
+        return send(res, 200, { threads: Object.values(D.threads).filter(t => t.msgs.length).sort((a, c) => c.updated - a.updated).map(t => { const last = t.msgs[t.msgs.length - 1]; return { key: t.key, kind: t.kind, name: t.name, sub: t.sub || "", last: last.text.slice(0, 80), lastMgr: !!last.mgr, updated: t.updated, unread: t.msgs.filter(m => !m.mgr && m.at > (t.adminSeen || 0)).length }; }) });
+      }
+      if (P === "/api/admin/dm/thread" && M === "GET") {
+        const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[url.searchParams.get("key") || ""]; if (!need(res, t, 404, "no such chat")) return;
+        t.adminSeen = Date.now(); saveDb(); return send(res, 200, { key: t.key, kind: t.kind, name: t.name, sub: t.sub || "", msgs: t.msgs.slice(-300).map(m => ({ id: m.id, at: m.at, mgr: !!m.mgr, text: m.text, hideU: !!m.hideU })) });
+      }
+      if (P === "/api/admin/dm/say" && M === "POST") {
+        const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;
+        const text = String(b.text || "").trim().slice(0, 1000); if (!need(res, text, 400, "write a message")) return;
+        t.msgs.push({ id: uid8(), at: Date.now(), mgr: true, text }); t.updated = Date.now(); t.adminSeen = Date.now(); saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/dm/delete" && M === "POST") {
+        const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;
+        if (b.id) t.msgs = t.msgs.filter(m => m.id !== b.id); else t.msgs = [];
+        saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/producer/delete" && M === "POST") {    // the owner removes a producer (test accounts); money records stay
         const pr = db.producers[b.id]; if (!need(res, pr, 404, "no such producer")) return;
