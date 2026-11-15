@@ -340,7 +340,7 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 
 .rbar{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;margin-bottom:12px}.rsort{min-width:220px;flex:1 1 220px;max-width:340px}
 .accsum{display:flex;gap:12px;align-items:flex-start;padding:10px;border-radius:14px;background:rgba(107,92,255,.07);margin-bottom:10px}
-.rsav{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none;background:linear-gradient(135deg,#EE3B5F,#6B5CFF)}.rsav.ph{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
+.rsav{width:46px;height:46px;border-radius:50%;object-fit:cover;flex:none;background:linear-gradient(135deg,#8E7BFF,#6B5CFF)}.rsav.ph{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px}
 .rsb{min-width:0;flex:1}.rsh{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}.rsh span{opacity:.7;font-size:13px}
 .rsp{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0;font-size:13px}.rsp>span{padding:2px 9px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
 .rsp .rstar{background:rgba(232,169,30,.18);border-color:transparent;font-weight:700}.rsp .rsdisc{background:rgba(31,168,90,.16);border-color:transparent;color:#15803d;font-weight:700}
@@ -350,7 +350,7 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 .aclist{display:grid;gap:10px;margin-top:10px}
 .acitem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:inherit;font:inherit;cursor:pointer;opacity:0;animation:cardIn .5s cubic-bezier(.2,.8,.2,1) forwards;transition:transform .2s,box-shadow .2s}
 .acitem:hover{transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(107,92,255,.6)}
-.acav{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;background:linear-gradient(135deg,#EE3B5F,#6B5CFF)}.acav.ph{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px}.acav.big{width:72px;height:72px;font-size:28px}
+.acav{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;background:linear-gradient(135deg,#8E7BFF,#6B5CFF)}.acav.ph{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px}.acav.big{width:72px;height:72px;font-size:28px}
 .acn{flex:1;min-width:0;display:flex;flex-direction:column}.acn b{font-size:16px;overflow-wrap:anywhere}.acn small{opacity:.7}.acarr{font-size:24px;opacity:.5}
 .achd{display:flex;gap:14px;align-items:center;margin:14px 0}.achd b{font-size:20px}
 .ttlink{overflow-wrap:anywhere;color:#2F6BFF}
@@ -530,7 +530,7 @@ button.mbrow{cursor:pointer}button.mbrow:hover{border-color:#E8445A}.mbrow b{fon
 .dual input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:22px;height:22px;margin-top:6px;border-radius:50%;background:#fff;border:3px solid #F5B731;box-shadow:0 1px 6px rgba(0,0,0,.5);cursor:grab}
 .dual input[type=range]::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #F5B731;cursor:grab}
 .fdtop{display:flex;gap:14px;align-items:flex-start}
-.fdcov{width:84px;height:84px;border-radius:14px;object-fit:cover;flex:0 0 84px;background:linear-gradient(135deg,#6B5CFF,#E8445A)}
+.fdcov{width:84px;height:84px;border-radius:14px;object-fit:cover;flex:0 0 84px;background:linear-gradient(135deg,#6B5CFF,#8E7BFF)}
 .fdcov.ph{display:flex;align-items:center;justify-content:center;font-size:34px}
 .fdinfo{display:grid;gap:4px;min-width:0}
 .fdname{font-size:19px}.fdart{opacity:.8;font-weight:600}
@@ -572,7 +572,7 @@ button.mbrow{cursor:pointer}button.mbrow:hover{border-color:#E8445A}.mbrow b{fon
 .mchip.on:has(.mcn) i{display:none}
 .mcall{font-weight:600;color:#6B5CFF}
 .wrh{margin:16px 0 8px}
-.acav.ph{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#6B5CFF,#E8445A);color:#fff;font-weight:800}
+.acav.ph{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#6B5CFF,#8E7BFF);color:#fff;font-weight:800}
 .trlink{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}.trlink:hover{color:#6B5CFF}
 .trmod h4{margin:14px 0 8px}
 .plink.big{padding:10px 16px;font-size:15px}
@@ -849,6 +849,43 @@ body.isadmin .wrap{max-width:1320px}
 .pmsum{white-space:nowrap}
 .pmtag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;background:var(--line);margin-top:8px}
 .pmrow{display:flex;gap:10px;align-items:center;margin:10px 0}
+/* v37 */
+.mbg{z-index:200!important}
+body.chatopen header.bar{z-index:120}
+.chatov{top:60px;left:0;padding:0!important}
+@media (min-width:900px){.chatov{left:268px;top:60px;padding:0!important}.chatov .chatbox{border-radius:0!important;border:0!important;border-left:1px solid var(--line)!important;background:var(--bg)!important;max-width:none!important}}
+@media (max-width:899px){.chatov{padding-bottom:88px!important}}
+.chatov .chatbox{padding-left:max(16px,2vw);padding-right:max(16px,2vw)}
+.chath{position:relative;display:flex;align-items:center;gap:8px}.chsp{flex:1}
+.chmenu{position:absolute;right:0;top:calc(100% + 6px);z-index:130;min-width:240px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 18px 50px rgba(0,0,0,.45);animation:chcPop .25s ease both;display:flex;flex-direction:column;gap:2px}
+.chmenu .chmt{padding:6px 10px 8px;display:flex;flex-direction:column}.chmenu .chmt small{color:var(--muted)}
+.chmenu button{all:unset;cursor:pointer;padding:10px 12px;border-radius:10px;font-weight:600;font-size:14px}.chmenu button:hover{background:var(--soft)}
+.chimg{display:block;max-width:min(260px,100%);max-height:260px;border-radius:12px;margin-top:6px;object-fit:cover}
+.chfile{display:flex;gap:8px;align-items:center;margin-top:6px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.1);color:inherit;text-decoration:none;max-width:100%}
+.chfile span{overflow-wrap:anywhere}.chfile small{opacity:.7;white-space:nowrap}
+.chm a{color:inherit;text-decoration:underline}.chm a.chfile{text-decoration:none}
+.chgone{opacity:.6;font-size:13px;margin-top:4px}
+.chfp{padding:6px 0;display:flex;gap:8px;align-items:center;font-size:14px}
+.chatt{padding:0 12px;font-size:18px}
+#dock button.dkbadge i{position:relative}#dock button.dkbadge i::after{content:"";position:absolute;top:-3px;right:-6px;width:10px;height:10px;border-radius:50%;background:#EF4444;box-shadow:0 0 0 2px var(--surface)}
+.pmc.glow{position:relative;border-color:#E8A91E!important;animation:pmGlow 2.4s ease-in-out infinite!important}
+@keyframes pmGlow{0%,100%{box-shadow:0 0 0 1px rgba(232,169,30,.55),0 0 14px rgba(232,169,30,.25)}50%{box-shadow:0 0 0 1px rgba(255,200,60,.95),0 0 30px 4px rgba(255,190,50,.5)}}
+.pmpill{display:inline-block;margin-bottom:8px;padding:4px 12px;border-radius:99px;background:linear-gradient(135deg,#FFD25A,#E8A91E);color:#3a2600;font-weight:800;font-size:12.5px;animation:pmPill 1.8s ease-in-out infinite}
+@keyframes pmPill{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18);transform:scale(1.03)}}
+button.wgt{all:unset;box-sizing:border-box;display:block;cursor:pointer;border-radius:20px;padding:16px 16px 14px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,0)),var(--surface);box-shadow:var(--sh);position:relative;overflow:hidden;min-height:96px;transition:transform .2s,box-shadow .2s,border-color .2s}
+button.wgt:hover,button.wgt:focus-visible{transform:translateY(-4px);border-color:var(--accent)}
+button.wgt.w:hover{border-color:var(--warn)}
+button.wgt::after{opacity:.2;transition:opacity .2s}button.wgt:hover::after{opacity:.5}
+.wgt.a::after{animation:boxIdle 3.2s ease-in-out infinite;transform-origin:50% 90%}
+.wgt.w::after{animation:hgIdle 5s ease-in-out infinite}
+.wgt.a:hover::after{animation:boxHop .7s ease-in-out infinite}
+.wgt.w:hover::after{animation:hgFlip 1.1s ease-in-out infinite}
+@keyframes boxIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes boxHop{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-12px) rotate(-8deg)}50%{transform:translateY(0) rotate(0)}75%{transform:translateY(-8px) rotate(8deg)}}
+@keyframes hgIdle{0%,80%,100%{transform:rotate(0)}90%{transform:rotate(12deg)}}
+@keyframes hgFlip{0%{transform:rotate(0)}60%,100%{transform:rotate(180deg)}}
+.wgt .wgh{margin:8px 0 0;font-size:12px;line-height:1.35;color:rgba(255,255,255,.78)}
+.wgt.big{min-height:0}.wgt.big em{display:block;margin-top:6px;font-weight:600}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1027,7 +1064,7 @@ body.isadmin .wrap{max-width:1320px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v36 · 15.11 22:10</span>
+  <span>© Promo Campaign · v37 · 15.11 23:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -1288,14 +1325,14 @@ privacy:'<p class="eyebrow">Draft</p><h2>Privacy policy</h2><p>Sample text for t
 '<h3>2. Permission to analyze views</h3><p>You connect your account through TikTok’s permission window. You cannot register without it because your approval chance and payment depend on your views. We never receive your TikTok password. You can withdraw the permission in your dashboard and in TikTok settings.</p>'+
 '<h3>3. Why we use this data</h3><p>To evaluate the account, show your approval chance, check campaign terms, calculate payments and prevent fake views.</p>'+
 '<h3>4. Who receives data</h3><p>Payment providers for payouts, and artists or labels as aggregate campaign statistics. We do not sell personal data.</p>'+
-'<h3>5. Retention and deletion</h3><p>Data is kept while the account is active and as long as the law requires. If a creator does not send videos on time, the account is banned and moved to an archive: we no longer order from it, and its data and a record of the ban are kept so the manager can review an appeal and unban the account if needed. By using the editors chat you agree to its rules (no swearing, business topics only). Editors chat messages (the last 500) are stored on the server and visible to the manager. Payout details are stored encrypted. You can ask support to delete your account.</p>'+
+'<h3>5. Retention and deletion</h3><p>Data is kept while the account is active and as long as the law requires. If a creator does not send videos on time, the account is banned and moved to an archive: we no longer order from it, and its data and a record of the ban are kept so the manager can review an appeal and unban the account if needed. By using the editors chat you agree to its rules (no swearing, business topics only). Editors chat messages (the last 500) and files sent in the chat (the last 40) are stored on the server and visible to the manager. Payout details are stored encrypted. You can ask support to delete your account.</p>'+
 '<h3>6. Payout details and responsibility</h3><p>You enter your payout details (PayPal, crypto wallet or card) yourself and confirm that they are correct before saving. If you give a wrong address or make a mistake, the money cannot be recovered and this is not our responsibility. You must still complete the order. If an order is not completed, we stop working with you permanently.</p>'+
 '<h3>7. Contact</h3><p>[support address goes here]</p>',
 terms:'<p class="eyebrow">Draft</p><h2>Terms of use</h2><p>Sample text for the prototype. A lawyer must review it before launch.</p>'+
 '<h3>1. Who can take part</h3><p>Adult creators with their own account that posts regularly. Empty and long-inactive accounts are not accepted.</p>'+
 '<h3>2. How campaigns work</h3><p>The creator requests a track, a manager checks the account and approves the request, then the creator posts a video with the campaign sound. The link is due within 16 days. After a manager checks the link, the campaign is complete and the payout is sent: the dashboard shows “payment on the way”, and once it is paid the creator receives a screenshot of the transfer.</p>'+
 '<h3>3. Price and payment</h3><p>The creator sets their own price per video. Payouts go to the details saved in the dashboard.</p>'+
-'<h3>4. Not allowed</h3><ul><li>Fake views and accounts that are not yours.</li><li>Swearing, insults, spam, links and payment details in the editors chat. The chat is for business only: questions about campaigns, orders and payments, and helping other editors when the manager is busy. The manager may delete a message and mute the chat for a violator.</li><li>Content that breaks platform rules or third-party rights.</li></ul>'+
+'<h3>4. Not allowed</h3><ul><li>Fake views and accounts that are not yours.</li><li>Swearing, insults, spam and payment details in the editors chat. Links, photos and files may be sent. The chat is for business only: questions about campaigns, orders and payments, and helping other editors when the manager is busy. The manager may delete a message and mute the chat for a violator.</li><li>Content that breaks platform rules or third-party rights.</li></ul>'+
 '<h3>5. Consequences</h3><p>We may reject a video, suspend an account and ask for a refund of payments made for breached terms. If a creator misses deadlines and does not send the video link within 16 days after the request is approved (or within another period the manager set for that order), the account is banned automatically and we never work with that account again. The data of a banned account is not deleted: it is moved to an archive. If you disagree with a ban, write to the manager, who will review the case and may unban the account.</p>'+
 '<h3>6. Bulk discounts</h3><p>A creator may offer a discount from 1% to 99% for several videos (for example 5% from 3 videos). Requests with a discount are reviewed faster and the manager sees the discount. The final amount is calculated with the discount applied.</p>'+
 '<h3>7. Changes</h3><p>We may update these terms and will announce it in your dashboard.</p>'
@@ -4068,16 +4105,16 @@ for(var k in P)Object.assign(XLL[k],P[k])})();
 /* ===== v36: chat rules checkbox, payments tab, dock/chat fixes ===== */
 (function(){
 var N={
-en:{ch_rule:"Be kind and respect the other editors. No swearing, insults or spam. No links and no payment details. The chat is for business only: ask about campaigns, orders and payments, and help other editors with their questions when the manager is busy. The manager can read the chat and remove messages.",ch_cb:"I agree to the {p} and the {t}",ch_pp:"Privacy Policy",ch_tt:"Terms",
+en:{ch_rule:"Be kind and respect the other editors. No swearing, insults or spam. No payment details. Links, photos and files are allowed. The chat is for business only: ask about campaigns, orders and payments, and help other editors with their questions when the manager is busy. The manager can read the chat and remove messages.",ch_cb:"I agree to the {p} and the {t}",ch_pp:"Privacy Policy",ch_tt:"Terms",
 pm_title:"Payments",pm_way:"On the way",pm_way_h:"The money for an approved order is reserved for you. The status changes by itself.",pm_none:"Nothing on the way yet. Approved orders will appear here.",pm_hist:"Payment history",pm_hist_none:"No payments yet.",pm_s1:"Request approved",pm_s2:"Money reserved for you",pm_s3:"Payout on the way",pm_s3d:"Payout on the way · by {d}",pm_s4:"Payout sent",pm_paid:"Paid",pm_sent:"Sent {d}",pm_inv:"Invoice",pm_proof:"Transfer proof",pm_acc:"Accepted",pm_camp:"Regular campaign",pm_vid:"{n} video(s)"},
-ru:{ch_rule:"Уважайте других эдиторов. Не материтесь, не оскорбляйте и не спамьте. Без ссылок и платёжных данных. Чат только по делу: вопросы по кампаниям, заказам и платежам, а также ответы на вопросы других, когда менеджер занят. Менеджер читает чат и может удалять сообщения.",ch_cb:"Я согласен с {p} и {t}",ch_pp:"Политикой конфиденциальности",ch_tt:"Условиями",
+ru:{ch_rule:"Уважайте других эдиторов. Не материтесь, не оскорбляйте и не спамьте. Без платёжных данных. Ссылки, фото и файлы можно. Чат только по делу: вопросы по кампаниям, заказам и платежам, а также ответы на вопросы других, когда менеджер занят. Менеджер читает чат и может удалять сообщения.",ch_cb:"Я согласен с {p} и {t}",ch_pp:"Политикой конфиденциальности",ch_tt:"Условиями",
 pm_title:"Платежи",pm_way:"В пути",pm_way_h:"Деньги за одобренный заказ закреплены за вами. Статус меняется сам.",pm_none:"Пока ничего нет в пути. Одобренные заказы появятся здесь.",pm_hist:"История платежей",pm_hist_none:"Платежей пока нет.",pm_s1:"Заявка одобрена",pm_s2:"Деньги зарезервированы для вас",pm_s3:"Выплата в пути",pm_s3d:"Выплата в пути · до {d}",pm_s4:"Выплата отправлена",pm_paid:"Оплачено",pm_sent:"Отправлено {d}",pm_inv:"Счёт",pm_proof:"Подтверждение перевода",pm_acc:"Принят",pm_camp:"Обычная кампания",pm_vid:"Видео: {n}"},
-uk:{ch_rule:"Поважайте інших едиторів. Без лайки, образ і спаму. Без посилань і платіжних даних. Чат лише по справі: питання про кампанії, замовлення й платежі та відповіді іншим, коли менеджер зайнятий. Менеджер читає чат і може видаляти повідомлення.",ch_cb:"Я погоджуюсь з {p} та {t}",ch_pp:"Політикою конфіденційності",ch_tt:"Умовами",pm_title:"Платежі",pm_way:"У дорозі",pm_way_h:"Гроші за схвалене замовлення закріплені за вами. Статус змінюється сам.",pm_none:"Поки нічого в дорозі. Схвалені замовлення зʼявляться тут.",pm_hist:"Історія платежів",pm_hist_none:"Платежів поки немає.",pm_s1:"Заявку схвалено",pm_s2:"Гроші зарезервовано для вас",pm_s3:"Виплата в дорозі",pm_s3d:"Виплата в дорозі · до {d}",pm_s4:"Виплату надіслано",pm_paid:"Оплачено",pm_sent:"Надіслано {d}",pm_inv:"Рахунок",pm_proof:"Підтвердження переказу",pm_acc:"Прийнято",pm_camp:"Звичайна кампанія",pm_vid:"Відео: {n}"},
-de:{ch_rule:"Respektiere die anderen Editoren. Keine Beschimpfungen, Beleidigungen oder Spam. Keine Links und keine Zahlungsdaten. Der Chat ist nur für Geschäftliches: Fragen zu Kampagnen, Aufträgen und Zahlungen, und Antworten für andere, wenn der Manager beschäftigt ist. Der Manager kann den Chat lesen und Nachrichten löschen.",ch_cb:"Ich stimme der {p} und den {t} zu",ch_pp:"Datenschutzerklärung",ch_tt:"Nutzungsbedingungen",pm_title:"Zahlungen",pm_way:"Unterwegs",pm_way_h:"Das Geld für einen genehmigten Auftrag ist für dich reserviert. Der Status ändert sich automatisch.",pm_none:"Noch nichts unterwegs. Genehmigte Aufträge erscheinen hier.",pm_hist:"Zahlungsverlauf",pm_hist_none:"Noch keine Zahlungen.",pm_s1:"Anfrage genehmigt",pm_s2:"Geld für dich reserviert",pm_s3:"Auszahlung unterwegs",pm_s3d:"Auszahlung unterwegs · bis {d}",pm_s4:"Auszahlung gesendet",pm_paid:"Bezahlt",pm_sent:"Gesendet {d}",pm_inv:"Rechnung",pm_proof:"Überweisungsbeleg",pm_acc:"Bestätigt",pm_camp:"Normale Kampagne",pm_vid:"Videos: {n}"},
-es:{ch_rule:"Respeta a los demás editores. Sin insultos, groserías ni spam. Sin enlaces ni datos de pago. El chat es solo para temas de trabajo: preguntas sobre campañas, pedidos y pagos, y responder a otros cuando el gerente está ocupado. El gerente puede leer el chat y borrar mensajes.",ch_cb:"Acepto la {p} y los {t}",ch_pp:"Política de privacidad",ch_tt:"Términos",pm_title:"Pagos",pm_way:"En camino",pm_way_h:"El dinero de un pedido aprobado está reservado para ti. El estado cambia solo.",pm_none:"Aún no hay nada en camino. Los pedidos aprobados aparecerán aquí.",pm_hist:"Historial de pagos",pm_hist_none:"Aún no hay pagos.",pm_s1:"Solicitud aprobada",pm_s2:"Dinero reservado para ti",pm_s3:"Pago en camino",pm_s3d:"Pago en camino · hasta el {d}",pm_s4:"Pago enviado",pm_paid:"Pagado",pm_sent:"Enviado {d}",pm_inv:"Factura",pm_proof:"Comprobante de transferencia",pm_acc:"Aceptado",pm_camp:"Campaña normal",pm_vid:"Vídeos: {n}"},
-pt:{ch_rule:"Respeite os outros editores. Sem xingamentos, insultos ou spam. Sem links e sem dados de pagamento. O chat é só para assuntos de trabalho: dúvidas sobre campanhas, pedidos e pagamentos, e respostas a outros quando o gerente está ocupado. O gerente pode ler o chat e apagar mensagens.",ch_cb:"Concordo com a {p} e os {t}",ch_pp:"Política de Privacidade",ch_tt:"Termos",pm_title:"Pagamentos",pm_way:"A caminho",pm_way_h:"O dinheiro de um pedido aprovado está reservado para você. O status muda sozinho.",pm_none:"Nada a caminho ainda. Pedidos aprovados aparecerão aqui.",pm_hist:"Histórico de pagamentos",pm_hist_none:"Ainda não há pagamentos.",pm_s1:"Solicitação aprovada",pm_s2:"Dinheiro reservado para você",pm_s3:"Pagamento a caminho",pm_s3d:"Pagamento a caminho · até {d}",pm_s4:"Pagamento enviado",pm_paid:"Pago",pm_sent:"Enviado {d}",pm_inv:"Fatura",pm_proof:"Comprovante da transferência",pm_acc:"Aceito",pm_camp:"Campanha comum",pm_vid:"Vídeos: {n}"},
-fr:{ch_rule:"Respectez les autres éditeurs. Pas d’insultes, de gros mots ni de spam. Pas de liens ni de données de paiement. Le chat est réservé au travail : questions sur les campagnes, commandes et paiements, et réponses aux autres quand le manager est occupé. Le manager peut lire le chat et supprimer des messages.",ch_cb:"J’accepte la {p} et les {t}",ch_pp:"Politique de confidentialité",ch_tt:"Conditions",pm_title:"Paiements",pm_way:"En route",pm_way_h:"L’argent d’une commande approuvée est réservé pour vous. Le statut change tout seul.",pm_none:"Rien en route pour l’instant. Les commandes approuvées apparaîtront ici.",pm_hist:"Historique des paiements",pm_hist_none:"Aucun paiement pour l’instant.",pm_s1:"Demande approuvée",pm_s2:"Argent réservé pour vous",pm_s3:"Paiement en route",pm_s3d:"Paiement en route · avant le {d}",pm_s4:"Paiement envoyé",pm_paid:"Payé",pm_sent:"Envoyé le {d}",pm_inv:"Facture",pm_proof:"Preuve de virement",pm_acc:"Accepté",pm_camp:"Campagne classique",pm_vid:"Vidéos : {n}"},
-tr:{ch_rule:"Diğer editörlere saygı göster. Küfür, hakaret ve spam yok. Bağlantı ve ödeme bilgisi yok. Sohbet yalnızca iş içindir: kampanyalar, siparişler ve ödemeler hakkında sorular ve yönetici meşgulken başkalarının sorularına cevaplar. Yönetici sohbeti okuyabilir ve mesajları silebilir.",ch_cb:"{p} ve {t} kabul ediyorum",ch_pp:"Gizlilik Politikasını",ch_tt:"Kullanım Şartlarını",pm_title:"Ödemeler",pm_way:"Yolda",pm_way_h:"Onaylanan siparişin parası senin için ayrıldı. Durum kendiliğinden değişir.",pm_none:"Henüz yolda bir şey yok. Onaylanan siparişler burada görünür.",pm_hist:"Ödeme geçmişi",pm_hist_none:"Henüz ödeme yok.",pm_s1:"Başvuru onaylandı",pm_s2:"Para senin için ayrıldı",pm_s3:"Ödeme yolda",pm_s3d:"Ödeme yolda · {d} tarihine kadar",pm_s4:"Ödeme gönderildi",pm_paid:"Ödendi",pm_sent:"Gönderildi {d}",pm_inv:"Fatura",pm_proof:"Transfer kanıtı",pm_acc:"Kabul edildi",pm_camp:"Normal kampanya",pm_vid:"Video: {n}"}};
+uk:{ch_rule:"Поважайте інших едиторів. Без лайки, образ і спаму. Без платіжних даних. Посилання, фото й файли можна. Чат лише по справі: питання про кампанії, замовлення й платежі та відповіді іншим, коли менеджер зайнятий. Менеджер читає чат і може видаляти повідомлення.",ch_cb:"Я погоджуюсь з {p} та {t}",ch_pp:"Політикою конфіденційності",ch_tt:"Умовами",pm_title:"Платежі",pm_way:"У дорозі",pm_way_h:"Гроші за схвалене замовлення закріплені за вами. Статус змінюється сам.",pm_none:"Поки нічого в дорозі. Схвалені замовлення зʼявляться тут.",pm_hist:"Історія платежів",pm_hist_none:"Платежів поки немає.",pm_s1:"Заявку схвалено",pm_s2:"Гроші зарезервовано для вас",pm_s3:"Виплата в дорозі",pm_s3d:"Виплата в дорозі · до {d}",pm_s4:"Виплату надіслано",pm_paid:"Оплачено",pm_sent:"Надіслано {d}",pm_inv:"Рахунок",pm_proof:"Підтвердження переказу",pm_acc:"Прийнято",pm_camp:"Звичайна кампанія",pm_vid:"Відео: {n}"},
+de:{ch_rule:"Respektiere die anderen Editoren. Keine Beschimpfungen, Beleidigungen oder Spam. Keine Zahlungsdaten. Links, Fotos und Dateien sind erlaubt. Der Chat ist nur für Geschäftliches: Fragen zu Kampagnen, Aufträgen und Zahlungen, und Antworten für andere, wenn der Manager beschäftigt ist. Der Manager kann den Chat lesen und Nachrichten löschen.",ch_cb:"Ich stimme der {p} und den {t} zu",ch_pp:"Datenschutzerklärung",ch_tt:"Nutzungsbedingungen",pm_title:"Zahlungen",pm_way:"Unterwegs",pm_way_h:"Das Geld für einen genehmigten Auftrag ist für dich reserviert. Der Status ändert sich automatisch.",pm_none:"Noch nichts unterwegs. Genehmigte Aufträge erscheinen hier.",pm_hist:"Zahlungsverlauf",pm_hist_none:"Noch keine Zahlungen.",pm_s1:"Anfrage genehmigt",pm_s2:"Geld für dich reserviert",pm_s3:"Auszahlung unterwegs",pm_s3d:"Auszahlung unterwegs · bis {d}",pm_s4:"Auszahlung gesendet",pm_paid:"Bezahlt",pm_sent:"Gesendet {d}",pm_inv:"Rechnung",pm_proof:"Überweisungsbeleg",pm_acc:"Bestätigt",pm_camp:"Normale Kampagne",pm_vid:"Videos: {n}"},
+es:{ch_rule:"Respeta a los demás editores. Sin insultos, groserías ni spam. Sin datos de pago. Se permiten enlaces, fotos y archivos. El chat es solo para temas de trabajo: preguntas sobre campañas, pedidos y pagos, y responder a otros cuando el gerente está ocupado. El gerente puede leer el chat y borrar mensajes.",ch_cb:"Acepto la {p} y los {t}",ch_pp:"Política de privacidad",ch_tt:"Términos",pm_title:"Pagos",pm_way:"En camino",pm_way_h:"El dinero de un pedido aprobado está reservado para ti. El estado cambia solo.",pm_none:"Aún no hay nada en camino. Los pedidos aprobados aparecerán aquí.",pm_hist:"Historial de pagos",pm_hist_none:"Aún no hay pagos.",pm_s1:"Solicitud aprobada",pm_s2:"Dinero reservado para ti",pm_s3:"Pago en camino",pm_s3d:"Pago en camino · hasta el {d}",pm_s4:"Pago enviado",pm_paid:"Pagado",pm_sent:"Enviado {d}",pm_inv:"Factura",pm_proof:"Comprobante de transferencia",pm_acc:"Aceptado",pm_camp:"Campaña normal",pm_vid:"Vídeos: {n}"},
+pt:{ch_rule:"Respeite os outros editores. Sem xingamentos, insultos ou spam. Sem dados de pagamento. Links, fotos e arquivos são permitidos. O chat é só para assuntos de trabalho: dúvidas sobre campanhas, pedidos e pagamentos, e respostas a outros quando o gerente está ocupado. O gerente pode ler o chat e apagar mensagens.",ch_cb:"Concordo com a {p} e os {t}",ch_pp:"Política de Privacidade",ch_tt:"Termos",pm_title:"Pagamentos",pm_way:"A caminho",pm_way_h:"O dinheiro de um pedido aprovado está reservado para você. O status muda sozinho.",pm_none:"Nada a caminho ainda. Pedidos aprovados aparecerão aqui.",pm_hist:"Histórico de pagamentos",pm_hist_none:"Ainda não há pagamentos.",pm_s1:"Solicitação aprovada",pm_s2:"Dinheiro reservado para você",pm_s3:"Pagamento a caminho",pm_s3d:"Pagamento a caminho · até {d}",pm_s4:"Pagamento enviado",pm_paid:"Pago",pm_sent:"Enviado {d}",pm_inv:"Fatura",pm_proof:"Comprovante da transferência",pm_acc:"Aceito",pm_camp:"Campanha comum",pm_vid:"Vídeos: {n}"},
+fr:{ch_rule:"Respectez les autres éditeurs. Pas d’insultes, de gros mots ni de spam. Pas de données de paiement. Liens, photos et fichiers autorisés. Le chat est réservé au travail : questions sur les campagnes, commandes et paiements, et réponses aux autres quand le manager est occupé. Le manager peut lire le chat et supprimer des messages.",ch_cb:"J’accepte la {p} et les {t}",ch_pp:"Politique de confidentialité",ch_tt:"Conditions",pm_title:"Paiements",pm_way:"En route",pm_way_h:"L’argent d’une commande approuvée est réservé pour vous. Le statut change tout seul.",pm_none:"Rien en route pour l’instant. Les commandes approuvées apparaîtront ici.",pm_hist:"Historique des paiements",pm_hist_none:"Aucun paiement pour l’instant.",pm_s1:"Demande approuvée",pm_s2:"Argent réservé pour vous",pm_s3:"Paiement en route",pm_s3d:"Paiement en route · avant le {d}",pm_s4:"Paiement envoyé",pm_paid:"Payé",pm_sent:"Envoyé le {d}",pm_inv:"Facture",pm_proof:"Preuve de virement",pm_acc:"Accepté",pm_camp:"Campagne classique",pm_vid:"Vidéos : {n}"},
+tr:{ch_rule:"Diğer editörlere saygı göster. Küfür, hakaret ve spam yok. Ödeme bilgisi yok. Bağlantı, fotoğraf ve dosya serbest. Sohbet yalnızca iş içindir: kampanyalar, siparişler ve ödemeler hakkında sorular ve yönetici meşgulken başkalarının sorularına cevaplar. Yönetici sohbeti okuyabilir ve mesajları silebilir.",ch_cb:"{p} ve {t} kabul ediyorum",ch_pp:"Gizlilik Politikasını",ch_tt:"Kullanım Şartlarını",pm_title:"Ödemeler",pm_way:"Yolda",pm_way_h:"Onaylanan siparişin parası senin için ayrıldı. Durum kendiliğinden değişir.",pm_none:"Henüz yolda bir şey yok. Onaylanan siparişler burada görünür.",pm_hist:"Ödeme geçmişi",pm_hist_none:"Henüz ödeme yok.",pm_s1:"Başvuru onaylandı",pm_s2:"Para senin için ayrıldı",pm_s3:"Ödeme yolda",pm_s3d:"Ödeme yolda · {d} tarihine kadar",pm_s4:"Ödeme gönderildi",pm_paid:"Ödendi",pm_sent:"Gönderildi {d}",pm_inv:"Fatura",pm_proof:"Transfer kanıtı",pm_acc:"Kabul edildi",pm_camp:"Normal kampanya",pm_vid:"Video: {n}"}};
 Object.assign(LT.en,N.en);Object.assign(LT.ru,N.ru);
 for(var k in N){if(k==="en"||k==="ru")continue;Object.assign(XLL[k],N[k])}
 })();
@@ -4109,7 +4146,7 @@ function pmCard(q,i){
   var s3=q.eta?L("pm_s3d").replace("{d}",q.eta):L("pm_s3");
   var st=[[L("pm_s1"),"done"],[L("pm_s2"),"done"],[s3,comp?"cur":"todo"],[L("pm_s4"),"todo"]];
   var tl='<ol class="tl">'+st.map(function(x){return '<li class="'+x[1]+'"><span>'+esc(x[0])+'</span></li>'}).join("")+'</ol>';
-  return '<div class="card pmc" style="animation-delay:'+Math.min(i,8)*0.05+'s"><div class="t"><div><b>'+esc(q.track)+' — '+esc(q.artist)+'</b><span>#'+esc(String(q.id).slice(-5))+' · '+esc(L("pm_vid").replace("{n}",q.videos))+' · '+fmtDate(q.approvedAt||q.created)+'</span></div><b class="pmsum">'+money(q.cost)+'</b></div><span class="pmtag">'+esc(L("pm_camp"))+'</span>'+tl+'</div>';
+  return '<div class="card pmc glow" style="animation-delay:'+Math.min(i,8)*0.05+'s"><span class="pmpill">'+esc(L("pm_pill"))+'</span><div class="t"><div><b>'+esc(q.track)+' — '+esc(q.artist)+'</b><span>#'+esc(String(q.id).slice(-5))+' · '+esc(L("pm_vid").replace("{n}",q.videos))+' · '+fmtDate(q.approvedAt||q.created)+'</span></div><b class="pmsum">'+money(q.cost)+'</b></div><span class="pmtag">'+esc(L("pm_camp"))+'</span>'+tl+'</div>';
 }
 function pmHist(q,i){
   return '<div class="card pmh" style="animation-delay:'+Math.min(i,8)*0.05+'s"><div class="t"><div><b>'+esc(q.track)+' — '+esc(q.artist)+'</b><span>#'+esc(String(q.id).slice(-5))+' · '+esc(L("pm_vid").replace("{n}",q.videos))+'</span></div><b class="pmsum">'+money(q.cost)+'</b></div>'+
@@ -4125,6 +4162,110 @@ function renderPay(){
     '<h3 class="sub">'+esc(L("pm_hist"))+'</h3>'+(hist.length?hist.map(pmHist).join(""):'<div class="empty">'+esc(L("pm_hist_none"))+'</div>');
 }
 (function(){var o=route;route=function(){o.apply(this,arguments);if(LIVE&&(location.hash||"").replace(/\?.*/,"")==="#pay"){renderPay();refreshMe().then(loadReqs).then(renderPay)}}})();
+
+/* ===== v37: chat files/links, notifications, bell over chat, tiles ===== */
+(function(){
+var N={
+en:{chn_t:"Chat notifications",chn_on:"Keep on",chn_1h:"Mute for 1 hour",chn_8h:"Mute for 8 hours",chn_off:"Turn off forever",chn_snd:"🎵 Change sound",chn_st_on:"On",chn_st_off:"Off",chn_st_to:"Muted until {t}",ch_file:"Attach a photo or file",ch_file_bad:"Choose a photo, PDF, ZIP, audio or video file up to 1.4 MB.",ch_gone:"File removed",w_paid:"Paid to you",w_work:"In work",w_way:"Payout on the way",w_hint:"Paid = money already sent to you. In work = orders you are still making. Payout on the way = videos accepted, the money is being sent.",pm_pill:"💸 Payout on the way"},
+ru:{chn_t:"Уведомления чата",chn_on:"Оставить включёнными",chn_1h:"Выключить на 1 час",chn_8h:"Выключить на 8 часов",chn_off:"Выключить навсегда",chn_snd:"🎵 Выбрать звук",chn_st_on:"Включены",chn_st_off:"Выключены",chn_st_to:"Выключены до {t}",ch_file:"Прикрепить фото или файл",ch_file_bad:"Выберите фото, PDF, ZIP, аудио или видео до 1,4 МБ.",ch_gone:"Файл удалён",w_paid:"Уже выплачено вам",w_work:"В работе",w_way:"Выплата в пути",w_hint:"Выплачено = деньги уже отправлены вам. В работе = заказы, которые вы ещё делаете. Выплата в пути = видео принято, деньги отправляются.",pm_pill:"💸 Выплата в пути"},
+uk:{chn_t:"Сповіщення чату",chn_on:"Залишити ввімкненими",chn_1h:"Вимкнути на 1 годину",chn_8h:"Вимкнути на 8 годин",chn_off:"Вимкнути назавжди",chn_snd:"🎵 Обрати звук",chn_st_on:"Увімкнені",chn_st_off:"Вимкнені",chn_st_to:"Вимкнені до {t}",ch_file:"Прикріпити фото або файл",ch_file_bad:"Оберіть фото, PDF, ZIP, аудіо або відео до 1,4 МБ.",ch_gone:"Файл видалено",w_paid:"Уже виплачено вам",w_work:"У роботі",w_way:"Виплата в дорозі",w_hint:"Виплачено = гроші вже надіслані вам. У роботі = замовлення, які ви ще робите. Виплата в дорозі = відео прийнято, гроші надсилаються.",pm_pill:"💸 Виплата в дорозі"},
+de:{chn_t:"Chat-Benachrichtigungen",chn_on:"Eingeschaltet lassen",chn_1h:"1 Stunde stumm",chn_8h:"8 Stunden stumm",chn_off:"Für immer ausschalten",chn_snd:"🎵 Ton ändern",chn_st_on:"An",chn_st_off:"Aus",chn_st_to:"Stumm bis {t}",ch_file:"Foto oder Datei anhängen",ch_file_bad:"Wähle ein Foto, PDF, ZIP, Audio oder Video bis 1,4 MB.",ch_gone:"Datei entfernt",w_paid:"Dir ausgezahlt",w_work:"In Arbeit",w_way:"Auszahlung unterwegs",w_hint:"Ausgezahlt = Geld ist schon an dich gesendet. In Arbeit = Aufträge, an denen du noch arbeitest. Auszahlung unterwegs = Video akzeptiert, das Geld wird gesendet.",pm_pill:"💸 Auszahlung unterwegs"},
+es:{chn_t:"Notificaciones del chat",chn_on:"Dejar activadas",chn_1h:"Silenciar 1 hora",chn_8h:"Silenciar 8 horas",chn_off:"Desactivar para siempre",chn_snd:"🎵 Cambiar sonido",chn_st_on:"Activadas",chn_st_off:"Desactivadas",chn_st_to:"Silenciado hasta {t}",ch_file:"Adjuntar foto o archivo",ch_file_bad:"Elige una foto, PDF, ZIP, audio o vídeo de hasta 1,4 MB.",ch_gone:"Archivo eliminado",w_paid:"Ya pagado a ti",w_work:"En curso",w_way:"Pago en camino",w_hint:"Pagado = dinero ya enviado a ti. En curso = pedidos que aún haces. Pago en camino = vídeo aceptado, el dinero se está enviando.",pm_pill:"💸 Pago en camino"},
+pt:{chn_t:"Notificações do chat",chn_on:"Manter ativadas",chn_1h:"Silenciar por 1 hora",chn_8h:"Silenciar por 8 horas",chn_off:"Desativar para sempre",chn_snd:"🎵 Mudar som",chn_st_on:"Ativadas",chn_st_off:"Desativadas",chn_st_to:"Silenciado até {t}",ch_file:"Anexar foto ou arquivo",ch_file_bad:"Escolha uma foto, PDF, ZIP, áudio ou vídeo de até 1,4 MB.",ch_gone:"Arquivo removido",w_paid:"Já pago a você",w_work:"Em andamento",w_way:"Pagamento a caminho",w_hint:"Pago = dinheiro já enviado a você. Em andamento = pedidos que você ainda faz. Pagamento a caminho = vídeo aceito, o dinheiro está sendo enviado.",pm_pill:"💸 Pagamento a caminho"},
+fr:{chn_t:"Notifications du chat",chn_on:"Laisser activées",chn_1h:"Couper 1 heure",chn_8h:"Couper 8 heures",chn_off:"Désactiver pour toujours",chn_snd:"🎵 Changer le son",chn_st_on:"Activées",chn_st_off:"Désactivées",chn_st_to:"Coupé jusqu’à {t}",ch_file:"Joindre une photo ou un fichier",ch_file_bad:"Choisissez une photo, PDF, ZIP, audio ou vidéo jusqu’à 1,4 Mo.",ch_gone:"Fichier supprimé",w_paid:"Déjà versé",w_work:"En cours",w_way:"Paiement en route",w_hint:"Versé = argent déjà envoyé. En cours = commandes que vous faites encore. Paiement en route = vidéo acceptée, l’argent est en cours d’envoi.",pm_pill:"💸 Paiement en route"},
+tr:{chn_t:"Sohbet bildirimleri",chn_on:"Açık bırak",chn_1h:"1 saat sustur",chn_8h:"8 saat sustur",chn_off:"Sonsuza kadar kapat",chn_snd:"🎵 Sesi değiştir",chn_st_on:"Açık",chn_st_off:"Kapalı",chn_st_to:"{t} saatine kadar sessiz",ch_file:"Fotoğraf veya dosya ekle",ch_file_bad:"1,4 MB’a kadar fotoğraf, PDF, ZIP, ses veya video seç.",ch_gone:"Dosya silindi",w_paid:"Sana ödenen",w_work:"Devam eden",w_way:"Ödeme yolda",w_hint:"Ödenen = sana gönderilmiş para. Devam eden = hâlâ yaptığın siparişler. Ödeme yolda = video kabul edildi, para gönderiliyor.",pm_pill:"💸 Ödeme yolda"}};
+Object.assign(LT.en,N.en);Object.assign(LT.ru,N.ru);
+for(var k in N){if(k==="en"||k==="ru")continue;Object.assign(XLL[k],N[k])}
+})();
+
+/* mute state */
+function chMute(){try{var v=localStorage.getItem("pc_chmute")||"";if(v==="forever")return "forever";var t=+v;return t>Date.now()?t:0}catch(e){return 0}}
+function chMuteSet(m){try{localStorage.setItem("pc_chmute",m==="on"?"":m==="off"?"forever":String(Date.now()+(m==="1h"?3600e3:8*3600e3)))}catch(e){}}
+function chMuteTxt(){var m=chMute();return !m?L("chn_st_on"):(m==="forever"?L("chn_st_off"):L("chn_st_to").replace("{t}",new Date(m).toLocaleTimeString(lang,{hour:"2-digit",minute:"2-digit"})))}
+function chLinkify(t){return esc(t).replace(/((?:https?:\/\/|www\.)[^\s<]+)/gi,function(u){var h=/^www\./i.test(u)?"https://"+u:u;return '<a href="'+h+'" target="_blank" rel="noopener noreferrer nofollow">'+u+'</a>'})}
+function chSize(n){return n>1048576?(n/1048576).toFixed(1)+" MB":Math.max(1,Math.round(n/1024))+" KB"}
+function chFileHtml(f){
+  if(!f)return "";if(f.gone)return '<div class="chgone">'+esc(L("ch_gone"))+'</div>';
+  var u='/api/chat/file?id='+encodeURIComponent(f.id);
+  if(/^image\//.test(f.type))return '<a href="'+u+'" target="_blank" rel="noopener"><img class="chimg" loading="lazy" src="'+u+'" alt="'+esc(f.name)+'"></a>';
+  return '<a class="chfile" href="'+u+'" target="_blank" rel="noopener" download="'+esc(f.name)+'">📎 <span>'+esc(f.name)+'</span><small>'+chSize(f.size)+'</small></a>'}
+chRender=function(j){
+  CHT.me=j.me;var log=$("chatLog"),f=$("chatForm");if(!log||!f)return;
+  var sig=JSON.stringify([j.msgs.map(function(m){return m.id+(m.file&&m.file.gone?"x":"")}),j.me]);
+  if(sig!==CHT.sig){
+    var last=j.msgs.length?j.msgs[j.msgs.length-1]:null;
+    if(CHT.shown&&last&&last.id!==CHT.lastId&&!last.mine&&!chMute())try{playSound()}catch(e){}
+    CHT.lastId=last?last.id:"";try{if(last)localStorage.setItem("pc_chseen",last.id)}catch(e){}chBadge(false);
+    CHT.sig=sig;var atEnd=log.scrollTop+log.clientHeight>=log.scrollHeight-40;
+    log.innerHTML=j.msgs.length?j.msgs.map(function(m){return '<div class="chm'+(m.mine?' mine':'')+(m.mgr?' mgr':'')+'"><div class="chn"><b>'+esc(m.name)+'</b>'+(m.mgr?'<i class="chb">'+esc(L("ch_mgr"))+'</i>':'')+'<span>'+chHm(m.at)+'</span>'+(m.mine||m.mgr?'':'<button type="button" class="chr" data-l="chRep" data-id="'+esc(m.id)+'" title="'+esc(L("ch_rep"))+'">⚑</button>')+'</div>'+chFileHtml(m.file)+(m.text?'<div class="cht">'+chLinkify(m.text)+'</div>':'')+'</div>'}).join(""):'<div class="empty">'+esc(L("ch_empty"))+'</div>';
+    if(atEnd||!CHT.shown){log.scrollTop=log.scrollHeight;CHT.shown=true}
+    var h;
+    if(j.me.banned)h='<div class="note err">'+esc(L("ch_ban"))+'</div>';
+    else if(!j.me.canWrite)h='<div class="note">'+esc(L("ch_wait"))+'</div>';
+    else if(!j.me.nick)h='';
+    else h='<div id="chFile" class="chfp" hidden></div><div class="row chin"><button type="button" class="btn chatt" data-l="chAttach" title="'+esc(L("ch_file"))+'" aria-label="'+esc(L("ch_file"))+'">📎</button><input type="file" id="chFileIn" hidden accept="image/*,.pdf,.txt,.zip,.doc,.docx,.xls,.xlsx,audio/*,video/mp4,video/webm,video/quicktime"><input id="chIn" type="text" maxlength="500" placeholder="'+esc(L("ch_ph"))+'" autocomplete="off"><button class="btn primary" data-l="chSend">'+esc(L("ch_send"))+'</button></div><div class="note err" id="chErr" hidden></div>';
+    var keep=$("chIn")?$("chIn").value:"",hadFocus=document.activeElement&&document.activeElement.id==="chIn";
+    f.innerHTML=h;if($("chIn")){$("chIn").value=keep;if(hadFocus)$("chIn").focus()}
+    chFileShow();chGate(j.me)
+  }
+};
+function chFileShow(){var e=$("chFile");if(!e)return;if(!CHT.file){e.hidden=true;e.innerHTML="";return}e.hidden=false;e.innerHTML='📎 <b>'+esc(CHT.file.name)+'</b> <button type="button" class="btn sm" data-l="chUnfile">✕</button>'}
+chSend=function(){var i=$("chIn");if(!i)return;var t=i.value.trim();if(!t&&!CHT.file)return;
+  var body={text:t};if(CHT.file)body.file=CHT.file;
+  api("/api/chat",body).then(function(r){if(!r.ok){chErr((r.j&&r.j.error)||L("p_err"));return}var e=$("chErr");if(e)e.hidden=true;i.value="";CHT.file=null;CHT.sig="";chPoll()})};
+function chPick(file){
+  if(!file)return;var done=function(d){if(!d){chErr(L("ch_file_bad"));return}CHT.file={name:file.name||"file",data:d};var e=$("chErr");if(e)e.hidden=true;chFileShow()};
+  if(/^image\//.test(file.type)&&file.type!=="image/gif"){shrinkImage(file,done);return}
+  if(file.size>1400000){chErr(L("ch_file_bad"));return}
+  var fr=new FileReader();fr.onload=function(){done(String(fr.result||""))};fr.onerror=function(){done(null)};fr.readAsDataURL(file)}
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="chFileIn"){chPick(e.target.files[0]);e.target.value=""}});
+/* chat header: notifications menu */
+openChat=function(){
+  if($("chatOv"))return;CHT.sig="";CHT.shown=false;CHT.file=null;
+  var o=document.createElement("div");o.id="chatOv";o.className="chatov";
+  o.innerHTML='<div class="chatbox"><div class="chath"><b>💬 '+esc(L("ch_t"))+'</b><span class="chsp"></span><button type="button" class="btn sm chbell" data-l="chBell" aria-label="'+esc(L("chn_t"))+'">🔔</button><button type="button" class="btn sm" data-l="chClose">✕ '+esc(L("ch_close"))+'</button></div><p class="hint chrule">'+esc(L("ch_rule"))+'</p><div id="chatLog" class="chlog"></div><div id="chatForm" class="chform"></div></div>';
+  document.body.appendChild(o);document.body.classList.add("chatopen");chPoll();CHT.timer=setInterval(chPoll,4000);
+};
+closeChat=function(){clearInterval(CHT.timer);var o=$("chatOv");if(o)o.remove();document.body.classList.remove("chatopen");var m=$("chMenu");if(m)m.remove()};
+document.addEventListener("click",function(e){
+  var el=e.target.closest&&e.target.closest("[data-l]");
+  var menu=$("chMenu");
+  if(menu&&!(el&&el.getAttribute("data-l")==="chBell")&&!e.target.closest("#chMenu"))menu.remove();
+  if(!el)return;var a=el.getAttribute("data-l");
+  if(a==="chAttach"){var i=$("chFileIn");if(i)i.click();return}
+  if(a==="chUnfile"){CHT.file=null;chFileShow();return}
+  if(a==="chBell"){if(menu){menu.remove();return}
+    var m=document.createElement("div");m.id="chMenu";m.className="chmenu";
+    m.innerHTML='<div class="chmt"><b>'+esc(L("chn_t"))+'</b><small>'+esc(chMuteTxt())+'</small></div>'+[["on","chn_on"],["1h","chn_1h"],["8h","chn_8h"],["off","chn_off"]].map(function(x){return '<button type="button" data-l="chMuteSet" data-m="'+x[0]+'">'+esc(L(x[1]))+'</button>'}).join("")+'<button type="button" data-l="chSnd">'+esc(L("chn_snd"))+'</button>';
+    var h=el.closest(".chath");h.appendChild(m);return}
+  if(a==="chMuteSet"){chMuteSet(el.getAttribute("data-m"));var mm=$("chMenu");if(mm)mm.remove();toast(chMuteTxt());return}
+  if(a==="chSnd"){var mm2=$("chMenu");if(mm2)mm2.remove();sndModal();return}
+});
+/* background check for new chat messages (dock badge + sound) */
+function chBadge(on){var b=document.querySelector('#dock [data-x="chat"]');if(b)b.classList.toggle("dkbadge",!!on)}
+(function(){var o=dockRender;dockRender=function(){o.apply(this,arguments);if(CHT&&CHT.unread)chBadge(true)}})();
+setInterval(function(){
+  if(!LIVE||document.hidden||$("chatOv")||roleGet()!=="editor"||!$("dock")||$("dock").hidden)return;
+  fetch("/api/chat",{credentials:"same-origin"}).then(function(r){return r.ok?r.json():null}).then(function(j){
+    if(!j||!j.me||!j.me.canWrite||!j.msgs.length)return;var l=j.msgs[j.msgs.length-1],seen="";try{seen=localStorage.getItem("pc_chseen")||""}catch(e){}
+    if(!seen){try{localStorage.setItem("pc_chseen",l.id)}catch(e){}return}
+    if(l.id!==seen&&!l.mine){if(!CHT.unread){CHT.unread=true;if(!chMute())try{playSound()}catch(e){}}chBadge(true)}
+    else if(l.mine){try{localStorage.setItem("pc_chseen",l.id)}catch(e){}}
+  }).catch(function(){})},25000);
+(function(){var o=chRender;chRender=function(j){CHT.unread=false;o.apply(this,arguments)}})();
+
+/* editor stat tiles: clear numbers, clickable, animated */
+wgtHtml=function(){
+  var R=LV.reqs||[],act=0,wait=0,paid=0,work=0,way=0;
+  R.forEach(function(q){var g=mkGroup(q);
+    if(g==="approved"){act++;work+=q.cost||0}
+    else if(g==="pending"){wait++}
+    else if(g==="completed"){if(q.paid)paid+=q.cost||0;else way+=q.cost||0}});
+  return '<div class="wgrid" data-s="'+[act,wait,paid,work,way,lang].join("|")+'"><div class="wgt big" data-i="💵"><small>'+esc(L("w_paid"))+'</small><b>'+money(paid)+'</b><em>'+esc(L("w_work"))+': '+money(work)+' · '+esc(L("w_way"))+': '+money(way)+'</em><p class="wgh">'+esc(L("w_hint"))+'</p></div>'+
+    '<button type="button" class="wgt a" data-l="wgtGo" data-m="approved" data-i="📦"><small>'+esc(L("w_active"))+'</small><b>'+act+'</b><em>'+esc(L("w_orders"))+'</em></button>'+
+    '<button type="button" class="wgt w" data-l="wgtGo" data-m="pending" data-i="⏳"><small>'+esc(L("w_wait"))+'</small><b>'+wait+'</b><em>'+esc(L("w_orders"))+'</em></button></div>'};
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="wgtGo"]');if(!el)return;e.stopImmediatePropagation();
+  LV.mk=el.getAttribute("data-m");LV.oq="";renderOrders();var t=$("ordList");if(t)t.scrollIntoView({behavior:"smooth",block:"start"})},true);
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);

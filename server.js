@@ -107,7 +107,17 @@ const REDIRECT = PUBLIC_URL + "/auth/tiktok/callback";
 const SCOPES = "user.info.basic,user.info.profile,user.info.stats,video.list";
 /* ---- forbidden words in nicknames (ru, uk, en, es, pt, fr, de, tr) ---- */
 const NICK_STRONG = ["хуй","хуе","хуи","хуя","хуё","пизд","пезд","піздa","пізд","ебан","ебат","ебал","ебл","ебну","ебуч","ёбан","ёб","їб","заеб","уеб","наеб","выеб","пидор","пидар","пидр","підор","підар","педик","гомик","мудак","мудил","мразь","сука","сучка","сучар","блят","бляд","блядь","шлюх","шлюш","шалав","залуп","жоп","говн","дроч","минет","сосат","хуесос","еблан","гандон","пенис","член","вагин","сиськ","титьк","порн","секс","эрот","сперм","оргазм","нахуй","похуй","курва","сракa","дрист","ссыкл","fuck","fuk","shit","bitch","cunt","dick","pussy","penis","vagina","porn","sex","nude","nigg","fagg","whore","slut","asshole","bastard","wank","jizz","blowjob","horny","milf","xxx","hentai","dildo","sperm","orgasm","erotic","retard","rapist","huy","xuy","xyu","hyu","khuy","pizd","pisd","ebat","eban","eblan","blyad","blyat","bliad","mudak","pidor","pidar","pidr","zalup","gandon","dolboeb","shlyuh","shlyux","shalav","nahuy","pohuy","zhopa","mierda","follar","joder","cabron","pendejo","chinga","sexo","porno","maricon","hijueputa","hdp","caralho","buceta","foder","viado","merda","siririca","punheta","xoxota","bosta","arrombad","filhodaputa","putain","salope","connard","encul","nique","couille","branle","scheiss","scheiß","ficken","fotze","hurensohn","wichser","pimmel","nutte","schlampe","orospu","siktir","yarrak","amcik","pezevenk","ibne","kahpe","sikis","porna"];
-const NICK_WEAK = ["хер","хрен","трах","анал","лох","жопа","суч","срак","сс","puta","puto","pene","pija","polla","teta","coño","cono","culo","culero","concha","zorra","verga","cock","cum","tit","tits","ass","anal","boob","boobs","rape","pau","pica","porra","cuzao","bite","pute","chatte","cul","bordel","arsch","schwanz","muschi","geil","sik","got","göt","amk","pic","piç","taşak","tasak","nazi","hitler","gay"];
+const NICK_WEAK = ["еб","ёб","їб","хер","хрен","трах","анал","лох","жопа","суч","срак","сс","puta","puto","pene","pija","polla","teta","coño","cono","culo","culero","concha","zorra","verga","cock","cum","tit","tits","ass","anal","boob","boobs","rape","pau","pica","porra","cuzao","bite","pute","chatte","cul","bordel","arsch","schwanz","muschi","geil","sik","got","göt","amk","pic","piç","taşak","tasak","nazi","hitler","gay"];
+const NICK_EXTRA = ["хуила","хуйл","хуйн","хуев","хуёв","хуяр","хуярь","хуесос","хуепут","пиздец","пиздюк","пиздабол","пиздобрат","распизд","спизд","опизд","ебись","ебись","ебись","ебало","ебальн","ёбт","ёпт","еблан","долбоеб","долбаеб","долбоёб","уебан","уёбищ","уебищ","мудозвон","мудоз","мудан","пидорас","пидарас","педераст","гомосек","гомосят","шлюха","шалава","проститут","путана","манда","мандав","целк","елда","елдак","хер","жопошник","говнюк","говнод","дерьм","срань","срач","падла","ублюд","выблядок","выблядк","блядин","блядск","сволочь","сволоч","тварь","мразот","мразь","гнида","ссанин","ссаный","ссать","срать","ссуч","дрочил","дрочить","мастурб","онанист","оральн","анальн","фелляц","куннилингус","отсос","отсоси","отсосу","сосуч","вагин","влагалищ","клитор","мошонк","яйца","хуйня","шмара","шмар","чмошн","чмо","лохуш","нацист","фашист","гитлер","свастик","террорист","убью","убийц","насилов","изнасил","педофил","педо","малолетк","зоофил","некрофил","инцест","хохол","кацап","москаль","чурка","чурбан","хач","жидяр","жидов","нигер","нигга","ниггер","негр","черномаз","узкогла",
+"бля","блять","блядь","їбан","єбан","їбат","єбат","хуйло","хуєсос","пізд","підар","підор","курва","курв","шльонд","шльондр","сцикл","сцикун","гівно","лайно","мудак","сука","сучара","ублюдок","довбойоб","довбоеб","дрочи","мастурбац","кончи","кончил",
+"fuck","fucker","fucking","motherfuck","mofo","shit","shitty","bullshit","bitch","bitches","cunt","dick","dickhead","cock","cocksuck","pussy","slut","whore","hooker","bastard","asshole","arsehole","douche","wanker","tosser","twat","prick","faggot","fagot","nigger","nigga","negro","coon","spic","chink","kike","tranny","retard","rapist","rape","molest","pedo","paedo","incest","porn","porno","xnxx","xvideos","pornhub","onlyfans","sexy","sexo","blowjob","handjob","cumshot","cumslut","jerkoff","jackoff","masturb","dildo","vibrator","orgy","gangbang","bukkake","hentai","milf","boobs","tits","titties","nipple","clit","vulva","penis","testicle","scrotum","anus","rimjob","fetish","bdsm","threesome","nazi","hitler","isis","terrorist","killall",
+"mierda","puta","puto","putita","hijoputa","hijueputa","hijodeputa","cabron","cabrona","pendejo","pendeja","gilipollas","gilipolla","capullo","coño","cono","joder","jodete","follar","folla","chingar","chingada","chingue","verga","pinche","culero","culo","polla","pollon","pene","pija","concha","conchudo","zorra","maricon","maricón","marica","puñeta","paja","pajero","mamada","mamon","chupame","chupala","coger","cojones","cojon","huevon","boludo","pelotudo","estupido","imbecil","subnormal","violador","violacion","sida",
+"caralho","caralh","porra","foda","fodase","foder","fudeu","fuder","puta","filhodaputa","fdp","viado","viadinho","bicha","buceta","bucetinha","cuzao","cuzão","merda","bosta","babaca","otario","otário","vagabund","arrombad","punheta","siririca","xoxota","xereca","piroca","pirocao","rola","pau","safada","safado","vadia","corno","estuprador","estupro","pedofilo",
+"putain","pute","merde","salope","salaud","connard","connasse","enculer","encule","enculé","niquer","nique","bite","couille","couilles","branleur","branlette","bordel","batard","bâtard","fdp","ntm","tg","chatte","foutre","baiser","suce","sucer","pd","pede","pédé","tarlouze","gouine","negre","nègre","bougnoule","youpin","violeur","viol","pedophile",
+"scheisse","scheiße","scheis","kacke","arsch","arschloch","fick","ficken","ficker","fotze","hure","hurensohn","wichser","wixer","schwanz","schwuchtel","nutte","schlampe","missgeburt","spast","spasti","mongo","vollidiot","depp","penner","titten","muschi","pimmel","vergewalt","pedo","kinderficker","neger","nazis","heil",
+"orospu","orospuçocuğu","orospucocugu","siktir","sikik","sikis","sikiş","sikeyim","amk","aq","amına","amina","amcik","amcık","yarrak","yarak","göt","gotveren","götveren","piç","pic","ibne","puşt","pust","pezevenk","kahpe","kaltak","şerefsiz","serefsiz","gavat","oç","taşak","tasak","meme","porno","tecavuz","tecavüz","pedofil","salak","gerizekali","gerizekalı","mal","aptal"];
+const NICK_EXTRA_WEAK = new Set(["mal","pau","rola","paja","meme","tg","pd","aq","pic","viol","heil","sida","cono","coon","hooker","bite","pede","tosser","pinche","coger","folla","negro","negre","nègre","rape","hure","depp","penner","mongo","hitler","nazi","nazis","nipple","jackoff","ass","aptal","salak","oç","göt","amk","fdp","ntm","tits","boobs","cock","dick","hentai"]);
+NICK_EXTRA.forEach(w => { if (NICK_EXTRA_WEAK.has(w) || w.length < 4) NICK_WEAK.push(w); else NICK_STRONG.push(w); });
 const LAT2CYR = {a:"а",e:"е",o:"о",p:"р",c:"с",x:"х",y:"у",k:"к",m:"м",t:"т",h:"н",b:"в",i:"и",z:"з",d:"д",u:"у",s:"с",n:"н",l:"л",r:"р",g:"г",v:"в",f:"ф"};
 function nickNorm(str) {
   let t = String(str).toLowerCase().replace(/[0@]/g, "o").replace(/1|!/g, "i").replace(/3/g, "e").replace(/4/g, "a").replace(/5|\$/g, "s").replace(/7/g, "t").replace(/ё/g, "е").replace(/й/g, "и");
@@ -118,15 +128,32 @@ const NICK_STRONG_N = NICK_STRONG.map(nickNorm).filter(r => r.length >= 2);
 function badNick(nick) {
   const n = nickNorm(nick);
   const n2 = n.replace(/[a-z]/g, c => LAT2CYR[c] || c);
-  for (const r of NICK_STRONG_N) { if (n.includes(r) || n2.includes(r)) return true; }
+  for (const r of NICK_STRONG_N) { if (r.length < 3) continue; if (n.includes(r) || n2.includes(r)) return true; }
   const r2 = NICK_STRONG_N.map(r => r.replace(/[a-z]/g, c => LAT2CYR[c] || c));
-  for (const r of r2) { if (n2.includes(r)) return true; }
+  for (const r of r2) { if (r.length >= 3 && n2.includes(r)) return true; }
   const toks = String(nick).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean).map(nickNorm);
   const weak = NICK_WEAK.map(nickNorm);
   return toks.some(tk => weak.includes(tk));
 }
 
-const SERVER_VER = 28;
+const NICK_WEAK_N = new Set(NICK_WEAK.map(nickNorm));
+const TXT_OK = /^(членст|членск|секстет|секстант|сексуальн)/;
+function badText(text) {
+  const toks = String(text).toLowerCase().split(/[^\p{L}\p{N}@$!]+/u).filter(Boolean);
+  for (const raw of toks) {
+    const a = nickNorm(raw); if (!a || TXT_OK.test(a)) continue;
+    const b = a.replace(/[a-z]/g, c => LAT2CYR[c] || c);
+    if (NICK_WEAK_N.has(a) || NICK_WEAK_N.has(b)) return true;
+    for (const r of NICK_STRONG_N) {
+      const rc = r.replace(/[a-z]/g, c => LAT2CYR[c] || c);
+      for (const [w, rr] of [[a, r], [b, rc], [a, rc], [b, r]]) {
+        if (rr.length >= 4 ? w.includes(rr) : (rr.length === 3 ? w.startsWith(rr) : w === rr)) return true;
+      }
+    }
+  }
+  return false;
+}
+const SERVER_VER = 29;
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
@@ -635,9 +662,16 @@ const server = http.createServer(async (req, res) => {
 
       const linkRe = /(https?:\/\/|www\.|t\.me|@[a-z0-9_]{3,}|\b[a-z0-9-]+\.(com|ru|ua|net|org|io|me|gg|ly|cc|info)\b)/i;
       if (P === "/api/chat" && M === "GET") {
-        return send(res, 200, { me: { nick: u.chatNick || "", canWrite, banned: !!C.bans[u.id] }, msgs: C.msgs.slice(-100).map(m => ({ id: m.id, at: m.at, name: m.name, text: m.text, mine: m.uid === u.id, mgr: !!m.mgr })) });
+        if (u.chatNick && badNick(u.chatNick)) { u.chatNick = ""; saveDb(); }
+        return send(res, 200, { me: { nick: u.chatNick || "", canWrite, banned: !!C.bans[u.id] }, msgs: C.msgs.slice(-100).map(m => ({ id: m.id, at: m.at, name: m.name, text: m.text, mine: m.uid === u.id, mgr: !!m.mgr, file: m.file ? { id: m.file.id, name: m.file.name, type: m.file.type, size: m.file.size, gone: !(C.files && C.files[m.file.id]) } : null })) });
       }
-      const b = await readBody(req);
+      if (P === "/api/chat/file" && M === "GET") {
+        const fid = new URL(req.url, "http://x").searchParams.get("id") || ""; const f = C.files && C.files[fid];
+        if (!f) return send(res, 404, { error: "gone" });
+        res.writeHead(200, { "Content-Type": f.type, "Content-Disposition": (f.type.startsWith("image/") ? "inline" : "attachment") + "; filename*=UTF-8''" + encodeURIComponent(f.name), "X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'", "Cache-Control": "private, max-age=3600" });
+        return res.end(Buffer.from(f.data, "base64"));
+      }
+      const b = await readBody(req, 2.2e6);
       if (P === "/api/chat/nick" && M === "POST") {
         const nick = String(b.nick || "").trim().replace(/\s+/g, " ");
         if (!need(res, /^[\p{L}\p{N} _.-]{2,10}$/u.test(nick) && !linkRe.test(nick), 400, "Nickname: 2-10 letters or digits, no links")) return;
@@ -649,13 +683,26 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, !C.bans[u.id], 403, "You cannot write in the chat")) return;
         if (!need(res, canWrite, 403, "The chat opens after the manager approves your account")) return;
         if (!need(res, u.chatNick, 400, "Choose a nickname first")) return;
-        const text = String(b.text || "").trim().replace(/\s+/g, " ").slice(0, 300);
-        if (!need(res, text, 400, "Write a message")) return;
-        if (!need(res, !linkRe.test(text), 400, "Links and contacts are not allowed in the chat")) return;
+        const text = String(b.text || "").trim().replace(/[ \t]+/g, " ").slice(0, 500);
+        let file = null;
+        if (b.file && typeof b.file.data === "string") {
+          const mm = /^data:([a-z0-9.+\/-]+);base64,([A-Za-z0-9+\/=]+)$/i.exec(b.file.data);
+          const OKT = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf", "text/plain", "application/zip", "application/x-zip-compressed", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "audio/mpeg", "audio/mp4", "audio/wav", "audio/ogg", "video/mp4", "video/webm", "video/quicktime"];
+          if (!need(res, mm && OKT.includes(mm[1].toLowerCase()), 400, "This file type is not allowed")) return;
+          if (!need(res, mm[2].length <= 1.9e6, 400, "File is too big (max 1.4 MB)")) return;
+          file = { id: uid8(), name: String(b.file.name || "file").replace(/[\r\n"\\\/]/g, "_").slice(0, 80), type: mm[1].toLowerCase(), size: Math.floor(mm[2].length * 0.75), data: mm[2] };
+        }
+        if (!need(res, text || file, 400, "Write a message")) return;
+        if (!need(res, !badText(text), 400, "Please keep the chat polite: no swearing")) return;
+        if (!need(res, !/(?:\d[ -]?){13,19}/.test(text) && !/\biban\b/i.test(text), 400, "Payment details are not allowed in the chat")) return;
         global.__chatLast = global.__chatLast || {}; const now = Date.now();
-        if (!need(res, now - (global.__chatLast[u.id] || 0) >= 3000, 429, "Too fast. Wait a few seconds")) return;
+        if (!need(res, now - (global.__chatLast[u.id] || 0) >= 2500, 429, "Too fast. Wait a few seconds")) return;
         global.__chatLast[u.id] = now;
-        C.msgs.push({ id: uid8(), at: now, uid: u.id, name: u.chatNick, text }); C.msgs = C.msgs.slice(-500); saveDb();
+        const msg = { id: uid8(), at: now, uid: u.id, name: u.chatNick, text };
+        if (file) { C.files = C.files || {}; C.files[file.id] = { name: file.name, type: file.type, data: file.data }; msg.file = { id: file.id, name: file.name, type: file.type, size: file.size }; }
+        C.msgs.push(msg); C.msgs = C.msgs.slice(-500);
+        if (C.files) { const keep = new Set(C.msgs.filter(m => m.file).slice(-40).map(m => m.file.id)); Object.keys(C.files).forEach(k => { if (!keep.has(k)) delete C.files[k]; }); }
+        saveDb();
         return send(res, 200, { ok: true });
       }
       if (P === "/api/chat/report" && M === "POST") {
@@ -966,10 +1013,10 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/chat" && M === "GET") {
         const C = db.settings.chat || { msgs: [], bans: {} };
-        return send(res, 200, { msgs: C.msgs.slice(-200).map(m => ({ id: m.id, at: m.at, uid: m.uid, name: m.name, text: m.text, mgr: !!m.mgr, reps: (m.reps || []).length, banned: !!C.bans[m.uid] })) });
+        return send(res, 200, { msgs: C.msgs.slice(-200).map(m => ({ id: m.id, at: m.at, uid: m.uid, name: m.name, text: m.text + (m.file ? " [file: " + m.file.name + "]" : ""), mgr: !!m.mgr, reps: (m.reps || []).length, banned: !!C.bans[m.uid] })) });
       }
       if (P === "/api/admin/chat/delete" && M === "POST") {
-        const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; C.msgs = C.msgs.filter(m => m.id !== b.id); saveDb(); return send(res, 200, { ok: true });
+        const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; { const dm = C.msgs.find(m => m.id === b.id); if (dm && dm.file && C.files) delete C.files[dm.file.id]; } C.msgs = C.msgs.filter(m => m.id !== b.id); saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/chat/ban" && M === "POST") {
         const C = db.settings.chat = db.settings.chat || { msgs: [], bans: {} }; if (!need(res, b.uid && db.users[b.uid], 404, "no such user")) return;
