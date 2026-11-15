@@ -52,15 +52,37 @@ function pushSend(sub, payload) {
     } catch (e) { resolve(0); }
   });
 }
-async function broadcast(audience, title, text, url) {
-  db.settings.inbox = (db.settings.inbox || []).concat([{ id: uid8(), at: Date.now(), audience, title, text, url: url || "/" }]).slice(-30);
+const NTYPES = ["money", "orders", "campaigns", "accounts", "support"];
+function inboxAdd(item) { db.settings.inbox = (db.settings.inbox || []).concat([Object.assign({ id: uid8(), at: Date.now() }, item)]).slice(-300); }
+async function sendMail(to, subject, text) {   // optional: works when RESEND_API_KEY and MAIL_FROM are set in Render
+  const key = process.env.RESEND_API_KEY, from = process.env.MAIL_FROM; if (!key || !from || !to) return false;
+  try { const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" }, body: JSON.stringify({ from, to: [to], subject, text }) }); return r.ok; } catch (e) { return false; }
+}
+function mailList(audience, type) {
+  const out = [], ok = o => o && o.notif && o.notif.email && (o.notif.types || {})[type] !== false;
+  if (audience !== "producers") Object.values(db.users).forEach(u => { if (ok(u) && !(u.accounts || []).every(a => a.demo)) out.push(u.notif.email); });
+  if (audience !== "editors") Object.values(db.producers).forEach(p => { if (ok(p)) out.push(p.notif.email); });
+  return [...new Set(out)];
+}
+async function broadcast(audience, title, text, url, type, withMail) {
+  type = NTYPES.includes(type) ? type : "support";
+  inboxAdd({ audience, title, text, url: url || "/", type });
   const subs = db.settings.push || {}; let sent = 0;
   for (const [k, s] of Object.entries(subs)) {
     if (audience !== "all" && s.role !== audience) continue;
     const code = await pushSend(s.sub, { title, body: text, url: url || "/" });
     if (code === 404 || code === 410) delete subs[k]; else if (code >= 200 && code < 300) sent++;
   }
-  saveDb(); return sent;
+  let mails = 0; if (withMail) for (const e of mailList(audience, type)) if (await sendMail(e, title, text)) mails++;
+  saveDb(); return { sent, mails };
+}
+function edUserOfOpen(openId) { return Object.values(db.users).find(u => (u.accounts || []).some(a => a.open_id === openId)); }
+const NT_EN = { ord_approved: 'Your order for "{t}" was approved. Send your video links within 16 days.', ord_rejected: 'Your order for "{t}" was not taken.', ord_completed: 'Your videos for "{t}" were accepted. Payment is on the way.', ord_returned: 'Your links for "{t}" were returned. Please fix and send again.', ord_cancelled: 'The order for "{t}" was cancelled.', money_paid: 'Payment sent: {a} for "{t}". Open My orders to see the receipt.', acc_approved: "Your account {h} is verified.", acc_rejected: "Your account {h} was not taken.", acc_banned: "Your account {h} was blocked.", price_suggest: "The manager suggests a new price for {h}: {p}. Open your dashboard to accept." };
+function ntText(key, v) { return String(NT_EN[key] || key).replace(/\{(\w+)\}/g, (m, k) => (v || {})[k] !== undefined ? v[k] : ""); }
+function notifyUser(kind, user, type, key, vars) {   // a private message for one editor or producer (shown in the bell)
+  if (!user) return; inboxAdd({ audience: kind, to: user.id, type, key, vars: vars || {}, title: "", text: "", url: "/" });
+  const em = user.notif && user.notif.email && (user.notif.types || {})[type] !== false ? user.notif.email : "";
+  if (em) sendMail(em, "Promo Campaign", ntText(key, vars)).catch(() => {});
 }
 function classifyLink(u) {
   const h = (u.match(/^https?:\/\/([^\/?#]+)/i) || [, ""])[1].toLowerCase();
@@ -267,7 +289,7 @@ function autoStars(acc) {
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
-    avatar: (acc.profile && acc.profile.avatar_url) || "", internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
+    avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
     analysis: A, price: acc.price || null, evaluation: PC.evaluate(A, acc.price), adminStatus: acc.adminStatus || "new", recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
@@ -330,7 +352,7 @@ async function refreshStale(max) {
   }
 }
 function overview() {
-  const accs = allAccounts().filter(a => !a.demo), reqs = Object.values(db.requests);
+  const accs = allAccounts().filter(a => !a.demo), reqs = Object.values(db.requests).filter(r => !r.demo);
   const live = reqs.filter(r => ["approved", "submitted", "completed"].includes(r.status));
   const now = Date.now(), D30 = 30 * 86400000;
   let views30 = 0; accs.forEach(a => { views30 += PC.analyze(a.videos || [], now).month.views; });
@@ -349,7 +371,7 @@ function overview() {
       pendingRequests: reqs.filter(r => r.status === "pending").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
-    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
+    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
     topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", deadline: (db.tracks[p.trackId] || {}).deadline || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
@@ -444,13 +466,18 @@ const server = http.createServer(async (req, res) => {
       if (b.internalName !== undefined) acc.internal_name = String(b.internalName).slice(0, 60);
       if (b.categories !== undefined) acc.categories = cleanCats(b.categories);
       if (b.otherCategory !== undefined) acc.other_category = String(b.otherCategory).slice(0, 60);
-      if (b.about !== undefined) acc.about = String(b.about).trim().slice(0, 600);
+      if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 600); if (!need(res, !ab || ab.split(/\s+/).length >= 3, 400, "Describe your account in at least 3 words")) return; acc.about = ab; }
       if (b.discount !== undefined) {
         const d = Math.round(Number(b.discount) || 0);
         if (d < 0 || d > 99) return send(res, 400, { error: "discount 0..99" });
         (b.discountAll ? u.accounts : [acc]).forEach(a => { a.discount = d; });
       }
       saveDb(); return send(res, 200, view(u));
+    }
+    if (P === "/api/account/suggest" && M === "POST") {
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req, 2e4), acc = findAcc(u, b.id); if (!need(res, acc && acc.suggested, 404, "no suggestion")) return;
+      if (b.action === "accept") acc.price = acc.suggested; delete acc.suggested; saveDb(); return send(res, 200, view(u));
     }
     if (P === "/api/account/delete" && M === "POST") {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
@@ -472,9 +499,16 @@ const server = http.createServer(async (req, res) => {
       db.settings.push = db.settings.push || {}; db.settings.push[crypto.createHash("sha1").update(sub.endpoint).digest("hex")] = { sub: { endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth } }, role, at: Date.now() };
       saveDb(); return send(res, 200, { ok: true });
     }
-    if (P === "/api/inbox" && M === "GET") {
-      const since = Number(new URL(req.url, "http://x").searchParams.get("since")) || 0;
-      return send(res, 200, { now: Date.now(), items: (db.settings.inbox || []).filter(x => x.at > since).slice(-5).map(x => ({ id: x.id, at: x.at, audience: x.audience, title: x.title, text: x.text, url: x.url })) });
+    if (P === "/api/inbox" && M === "GET") {     // broadcasts + private messages for the signed-in editor or producer
+      const wantP = new URL(req.url, "http://x").searchParams.get("role") === "producers", me = wantP ? producerOf(req) : sessionUser(req), aud = wantP ? "producers" : "editors";
+      const items = (db.settings.inbox || []).filter(x => (x.audience === "all" || x.audience === aud) && (!x.to || (me && x.to === me.id))).slice(-80).map(x => ({ id: x.id, at: x.at, type: x.type || "support", title: x.title, text: x.text, key: x.key || "", vars: x.vars || {}, url: x.url }));
+      return send(res, 200, { now: Date.now(), items, prefs: me ? { types: (me.notif || {}).types || {}, email: (me.notif || {}).email || "" } : null });
+    }
+    if (P === "/api/notif/prefs" && M === "POST") {
+      const b = await readBody(req, 2e4), me = b.role === "producers" ? producerOf(req) : sessionUser(req); if (!me) return send(res, 401, { error: "not signed in" });
+      const types = {}; for (const k of NTYPES) types[k] = b.types && b.types[k] === false ? false : true;
+      const em = String(b.email || "").trim().slice(0, 120); if (!need(res, !em || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em), 400, "email looks wrong")) return;
+      me.notif = { types, email: em }; saveDb(); return send(res, 200, { ok: true, prefs: me.notif });
     }
     if (P === "/api/price-ranges" && M === "GET") return send(res, 200, { ranges: db.settings.ranges || { visual: { min: 3, max: 5 } } });
     if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "", instagram: c.instagram || "", tiktok: c.tiktok || "" }); }
@@ -670,8 +704,8 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/broadcast" && M === "POST") {
         const text = String(b.text || "").trim().slice(0, 300), title = String(b.title || "Promo Campaign").trim().slice(0, 80), aud = ["editors", "producers", "all"].includes(b.audience) ? b.audience : "editors";
         if (!need(res, text, 400, "write a message")) return;
-        const n = Object.values(db.settings.push || {}).filter(x => aud === "all" || x.role === aud).length, sent = await broadcast(aud, title, text, "/");
-        return send(res, 200, { ok: true, subscribers: n, delivered: sent });
+        const n = Object.values(db.settings.push || {}).filter(x => aud === "all" || x.role === aud).length, r0 = await broadcast(aud, title, text, "/", b.type, !!b.email);
+        return send(res, 200, { ok: true, subscribers: n, delivered: r0.sent, emails: r0.mails, mailReady: !!(process.env.RESEND_API_KEY && process.env.MAIL_FROM) });
       }
       if (P === "/api/admin/demo-editor" && M === "POST") {    // test editor with fake videos, only for the owner's own checks
         const uid = "demo-editor"; let u = db.users[uid];
@@ -679,7 +713,20 @@ const server = http.createServer(async (req, res) => {
         const now = Date.now(), vids = Array.from({ length: 14 }, (_, i) => ({ id: "9" + String(1e17 + i * 7919).slice(1), created: now - i * 2 * 86400000 - 3600000, views: Math.round(12000 + ((i * 7331) % 9) * 4200), likes: Math.round(1500 + ((i * 313) % 7) * 400), url: "" }));
         let acc = u.accounts.find(a => a.demo);
         if (!acc) { acc = { open_id: "demo_editor_acc", createdAt: now, categories: [], discount: 0, demo: true, profile: { username: "demo_editor", display_name: "Test editor" } }; u.accounts.push(acc); }
-        acc.videos = vids; acc.price = null; acc.categories = []; acc.about = ""; acc.adminStatus = "approved"; acc.analysisAt = now; acc.discount = 0;
+        acc.videos = vids; acc.price = 3; acc.categories = ["gaming", "anime"]; acc.about = "Gaming and anime edits, fast cuts, three videos a week"; acc.adminStatus = "approved"; acc.analysisAt = now; acc.discount = 10; acc.internal_name = "Hex (test)";
+        u.payout = { method: "paypal", coin: "", label: "d***@test.com", enc: encObj({ method: "paypal", coin: "", value: "demo@test.com", holder: "" }) };
+        // a ready demo track and a few demo orders in every state, so the owner can click through the editor screens
+        let dp = Object.values(db.producers).find(x => x.email === "demo-producer@promo.test");
+        if (!dp) { dp = { id: uid8(), email: "demo-producer@promo.test", name: "TEST producer", created: now }; db.producers[dp.id] = dp; }
+        let dt = Object.values(db.tracks).find(x => x.demoEd && x.status !== "deleted");
+        if (!dt) { dt = { id: uid8(), producerId: dp.id, title: "TEST track for editors", artist: "Demo artist", link: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", links: { spotify: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT" }, budget: 80, spent: 0, platforms: ["tiktok"], categories: [], otherCategory: "", status: "active", created: now, demo: true, demoEd: true }; db.tracks[dt.id] = dt; }
+        Object.values(db.requests).forEach(r => { if (r.demo && r.openId === acc.open_id) delete db.requests[r.id]; });
+        const D = 86400000, mk = (st, videos, extra) => { const r = Object.assign({ id: uid8(), trackId: dt.id, openId: acc.open_id, price: 3, videos, discount: 10, priority: 5, status: st, links: [], created: now - 3 * D, updated: now, demo: true }, extra || {}); db.requests[r.id] = r; return r; };
+        mk("pending", 2, { created: now - 3600e3 }); mk("submitted", 2, { created: now - 4 * D, approvedAt: now - 3 * D });
+        mk("approved", 4, { created: now - 2 * D, approvedAt: now - 2 * D + 3600e3 });
+        mk("completed", 1, { created: now - 8 * D, approvedAt: now - 7 * D, completedAt: now - 5 * D, paid: true, paidAt: now - 4 * D });
+        mk("completed", 3, { created: now - 6 * D, approvedAt: now - 5 * D, completedAt: now - 2 * D });
+        dt.spent = Math.round(Object.values(db.requests).filter(r => r.trackId === dt.id && ["approved", "submitted", "completed"].includes(r.status)).reduce((s, r) => s + reqCost(r), 0) * 100) / 100;
         const sid = newSid(); db.sessions[sid] = u.id; saveDb();
         return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("sid", sid, 43200) });
       }
@@ -707,7 +754,32 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/decision" && M === "POST") {
         if (!need(res, ["approved", "rejected", "new", "banned"].includes(b.status), 400, "bad status")) return;
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
-        a.adminStatus = b.status; saveDb(); return send(res, 200, { ok: true });
+        a.adminStatus = b.status; saveDb();
+        if (["approved", "rejected", "banned"].includes(b.status)) notifyUser("editors", edUserOfOpen(a.open_id), "accounts", "acc_" + b.status, { h: "@" + ((a.profile || {}).username || "") });
+        return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/suggest-price" && M === "POST") {   // the manager suggests a new price, the editor accepts or declines
+        const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
+        const pr = Number(b.price);
+        if (b.price === null || b.price === "" || b.price === undefined) { delete a.suggested; saveDb(); return send(res, 200, { ok: true }); }
+        if (!need(res, pr >= 1 && pr <= 200, 400, "price 1..200")) return;
+        a.suggested = Math.round(pr * 100) / 100; saveDb();
+        notifyUser("editors", edUserOfOpen(a.open_id), "accounts", "price_suggest", { h: "@" + ((a.profile || {}).username || ""), p: "$" + a.suggested });
+        return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/track/create" && M === "POST") {    // the owner adds a track himself (already approved, budget as he sets it)
+        const title = String(b.title || "").trim().slice(0, 120); if (!need(res, title, 400, "write the track title")) return;
+        const link = String(b.link || "").trim().slice(0, 400); if (!need(res, !link || /^https?:\/\/\S+\.\S+/i.test(link), 400, "the link must start with https://")) return;
+        const budget = Math.max(0, Math.min(100000, Math.round(Number(b.budget) * 100) / 100 || 0));
+        const t = { id: uid8(), producerId: "owner", title, artist: String(b.artist || "").trim().slice(0, 120), link, links: link ? { [classifyLink(link)]: link } : {}, budget, spent: 0, platforms: ["tiktok"], categories: cleanCats(b.categories), otherCategory: "", status: "active", created: Date.now() };
+        db.tracks[t.id] = t; saveDb(); return send(res, 200, { ok: true, id: t.id });
+      }
+      if (P === "/api/admin/track/delete" && M === "POST") {    // the owner can delete any track; its data stays in the database
+        const t = db.tracks[b.id]; if (!need(res, t && t.status !== "deleted", 404, "no such track")) return;
+        const open = Object.values(db.requests).filter(r => r.trackId === t.id && ["approved", "submitted", "returned"].includes(r.status)).length;
+        if (!need(res, open === 0, 409, "This track has " + open + " open order(s). Finish or cancel them first.")) return;
+        t.status = "deleted"; Object.values(db.requests).forEach(r => { if (r.trackId === t.id && r.status === "pending") r.status = "cancelled"; });
+        saveDb(); return send(res, 200, { ok: true, left: trackLeft(t) });
       }
       if (P === "/api/admin/rating" && M === "POST") {       // manual stars 1..5 (null = back to automatic)
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
@@ -726,7 +798,9 @@ const server = http.createServer(async (req, res) => {
           t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100; r.approvedAt = Date.now();
         }
         if (st === "cancelled") refundReq(r);
-        r.status = st; r.updated = Date.now(); if (st === "completed") r.completedAt = Date.now(); saveDb(); return send(res, 200, { ok: true });
+        r.status = st; r.updated = Date.now(); if (st === "completed") r.completedAt = Date.now(); saveDb();
+        notifyUser("editors", edUserOfOpen(r.openId), "orders", "ord_" + st, { t: (db.tracks[r.trackId] || {}).title || "" });
+        return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/eta" && M === "POST") {
         const r = db.requests[b.id]; if (!need(res, r, 404, "no such request")) return;
@@ -735,7 +809,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/proof" && M === "GET") { const img = await getProof(url.searchParams.get("id") || ""); return send(res, 200, { image: img }); }
       if (P === "/api/admin/payout" && M === "POST") {     // mark that the editor has been paid for a completed request
         const r = db.requests[b.id]; if (!need(res, r && r.status === "completed", 404, "no completed request")) return;
-        r.paid = !!b.paid; r.paidAt = r.paid ? Date.now() : 0;
+        r.paid = !!b.paid; r.paidAt = r.paid ? Date.now() : 0; if (r.paid) notifyUser("editors", edUserOfOpen(r.openId), "money", "money_paid", { a: "$" + reqCost(r), t: (db.tracks[r.trackId] || {}).title || "" });
         if (b.image) { if (!need(res, /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.image) && b.image.length < 700000, 400, "bad image")) return; await putProof(r.id, b.image); r.proof = true; } saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track

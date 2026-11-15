@@ -356,6 +356,27 @@ input[type=file]::file-selector-button:hover{filter:brightness(1.12);transform:t
 .delzone{margin-top:28px;padding:16px;border-radius:16px;border:1px dashed #D8445A}.delrule{font-size:14px;margin:6px 0 12px}
 .refbig{font-size:22px;line-height:1.3;font-weight:800;padding:18px 20px;border-radius:18px;margin:12px 0 18px;background:linear-gradient(120deg,rgba(31,168,90,.18),rgba(47,107,255,.16));border-left:6px solid #1FA85A}
 
+.accchip{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:18px;background:var(--surface);margin:0 0 14px;animation:cardIn .5s ease both}
+
+.okg,.hint.okg{color:#15803d!important;font-weight:700}
+.savedg{background:#1FA85A!important;border-color:#1FA85A!important;color:#fff!important;transition:background .3s}
+.okn{background:rgba(31,168,90,.15);border-color:#1FA85A;color:#15803d;font-weight:600}
+.waitbig{font-size:22px;font-weight:800;margin:6px 0 14px}
+.sugrow{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+
+.astats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+.astat{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--surface);text-align:center;opacity:0;animation:cardIn .5s ease forwards}.astat b{display:block;font-size:26px}.astat span{font-size:12px;opacity:.7}
+.sugban{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:18px;background:linear-gradient(120deg,rgba(232,169,30,.22),rgba(238,59,95,.16));border:1px solid rgba(232,169,30,.6);margin:10px 0;animation:prpulse 2.6s ease-in-out infinite}.sgi{font-size:28px}.sgt{flex:1 1 180px;font-size:17px}
+.actrow{margin:12px 0}
+.asum{display:grid;gap:10px;padding:14px;border-radius:16px;background:rgba(107,92,255,.06)}.asum span{display:block;font-size:12px;opacity:.7;margin-bottom:2px}.asum p{margin:0;overflow-wrap:anywhere}
+
+.ntm{max-height:78vh;overflow:auto}.ntabs{display:flex;gap:8px;margin:10px 0}
+.nlist{display:grid;gap:8px;margin-top:8px}.nitem{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer}
+.nitem.unr{border-color:#6B5CFF;background:rgba(107,92,255,.08)}.ndot{width:10px;height:10px;border-radius:50%;background:transparent;flex:none;margin-top:6px}.nitem.unr .ndot{background:#EE3B5F}
+.nb{flex:1;min-width:0}.nt{overflow-wrap:anywhere}.nb small{opacity:.65}
+.ntm h4{margin:14px 0 6px}
+.bellb{position:relative}.bdg{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:#EE3B5F;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -948,7 +969,7 @@ function renderAnalysis(){loadRanges();
       h+='<div class="blk"><h3>'+esc(t("rp_bad"))+'</h3>'+reasonList([A.reject],"b")+'<p class="hint" style="margin-top:8px">'+esc(t("rej_hint"))+'</p></div>'+
         '<button class="btn primary" id="otherAcc">'+esc(t("rej_other"))+'</button>';
     }else{
-      h+='<div class="card" style="margin-top:18px"><h3>'+esc(L("tp_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(L("tp_h"))+'</p>'+catChecks("anCats",u.categories||[])+'<div class="note err" id="topicErr" hidden style="margin-top:12px">'+esc(L("tp_err"))+'</div></div>'+
+      h+='<div class="card" style="margin-top:18px"><h3>'+esc(L("tp_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(L("tp_h"))+'</p>'+catChecks("anCats",u.categories||[])+(LIVE?'<label class="f" for="anAbout" style="margin-top:14px"><span>'+esc(L("an_about"))+'</span><textarea id="anAbout" rows="3" maxlength="600" placeholder="'+esc(L("dl_about_ph"))+'">'+esc(u.about||"")+'</textarea><span class="hint">'+esc(L("an_about_h"))+'</span></label><div class="note err" id="aboutErr" hidden>'+esc(L("an_about_err"))+'</div>':'')+'<div class="note err" id="topicErr" hidden style="margin-top:12px">'+esc(L("tp_err"))+'</div></div>'+
         '<div class="card" style="margin-top:18px"><h3>'+esc(t("price_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(t("price_hint"))+'</p><div class="note" id="rangeHint" hidden style="margin-bottom:12px"></div>'+
         '<div class="pricebox"><span style="font-family:var(--display);font-size:24px;font-weight:700">$</span><input type="number" id="priceIn" min="1" max="200" step="0.5" inputmode="decimal" aria-label="'+esc(t("price_title"))+'" value="'+(u.price||PC.recommend(A))+'"></div>'+
         '<div class="note err" id="priceErr" hidden style="margin-top:12px">'+esc(t("price_err"))+'</div></div>'+
@@ -1024,7 +1045,7 @@ function renderDash(){
   var dn=S.orders.filter(function(o){return o.status==="completed"}).length;
   $("tiles").innerHTML=[["$"+balance(),"d_bal"],[act,"d_act"],[dn,"d_done"],[E.chance+"%","d_chance"]].map(function(x){return '<div class="card tile"><b>'+x[0]+'</b><span>'+esc(t(x[1]))+'</span></div>'}).join("");
   $("profCard").innerHTML=accBar()+'<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>'+esc(t("d_prof"))+'</h3>'+decPill(E.decision,false)+'</div>'+winTable(A)+videoTable(u)+
-    '<div class="row" style="margin-top:14px"><button class="btn sm" id="reanalyze">'+esc(t("d_reanalyze"))+'</button><button class="btn sm" id="changePrice2">'+esc(t("d_pricebtn"))+(u.price?' ($'+u.price+')':'')+'</button></div>';
+    '<div class="row" style="margin-top:14px"><button class="btn sm" id="changePrice2">'+esc(t("d_pricebtn"))+(u.price?' ($'+u.price+')':'')+'</button></div>';
   var html="";
   if(!S.orders.length)html='<div class="empty">'+esc(t("d_none"))+'</div>';
   S.orders.forEach(function(o,i){
@@ -1206,7 +1227,8 @@ document.addEventListener("click",function(e){
     if(!(pv>=1&&pv<=200)){$("priceErr").hidden=false;return}
     var pr2=Math.round(pv*100)/100;
     if(LIVE&&!checked("anCats").length){$("topicErr").hidden=false;$("topicErr").scrollIntoView({behavior:"smooth",block:"center"});return}
-    if(LIVE){fetch("/api/account/update",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:S.user.id,categories:checked("anCats")})}).then(function(){return fetch("/api/price",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:S.user.id,price:pr2})})}).then(function(r){if(!r.ok)throw 0;S.user.price=pr2;S.user.reviewed=true;save();go("report")}).catch(function(){$("priceErr").textContent=t("live_err");$("priceErr").hidden=false});return}
+    if(LIVE&&$("anAbout")&&wordCount($("anAbout").value)<3){$("aboutErr").hidden=false;$("aboutErr").scrollIntoView({behavior:"smooth",block:"center"});return}
+    if(LIVE){fetch("/api/account/update",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:S.user.id,categories:checked("anCats"),about:$("anAbout")?$("anAbout").value:undefined})}).then(function(){return fetch("/api/price",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:S.user.id,price:pr2})})}).then(function(r){if(!r.ok)throw 0;S.user.price=pr2;S.user.reviewed=true;save();go("report")}).catch(function(){$("priceErr").textContent=t("live_err");$("priceErr").hidden=false});return}
     S.user.price=pr2;S.user.reviewed=true;save();go("report");return}
   if(id==="changePrice"||id==="changePrice2"){S.user.reviewed=false;save();go("analysis");return}
   if(id==="reanalyze"){
@@ -1388,7 +1410,7 @@ function renderDashLive(){
   $("dashTitle").textContent=u.handle+(u.internalName?" · "+u.internalName:"");
   $("tiles").innerHTML=[[money(earn),"dl_earn"],[money(prog),"dl_prog"],[done,"dl_done"],[u.price?money(u.price):"—","a_price"]].map(function(x){return '<div class="card tile"><b>'+esc(x[0])+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("");
   $("profCard").innerHTML=stepsHtml(u)+accBar()+priceBig(u)+'<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A,u)+videoTable(u)+
-    '<div class="row" style="margin-top:14px"><button class="btn sm" id="reanalyze">'+esc(t("d_reanalyze"))+'</button></div>'+
+    ''+
     '<div class="blk"><h3>'+esc(L("dl_acc"))+'</h3>'+
     '<label class="f" for="sName"><span>'+esc(L("dl_name"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"></label>'+
     '<b>'+esc(L("dl_cats"))+'</b>'+catChecks("sCats",u.categories)+
@@ -1532,7 +1554,8 @@ function renderOwner(){
     body='<div class="card form"><p class="hint">'+esc(L("a_prices_h"))+'</p>'+CATS.map(function(c){var r=RG[c]||{};return '<div class="row" style="align-items:center"><span style="flex:1 1 200px">'+esc(L("c_"+c))+'</span><label>$ <input id="prmin_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.min||"")+'" placeholder="min"></label><label>– <input id="prmax_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.max||"")+'" placeholder="max"></label></div>'}).join("")+'<div class="row"><button class="btn primary" data-l="prSave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="prOk"></span></div></div>';
   }else if(LV.adTab==="waiting"){
     var wl=D.accounts.filter(function(a){return a.adminStatus==="new"||!a.adminStatus}).map(function(a){return accCardHtml(a)}).join("");
-    body=wl?'<div class="list">'+wl+'</div>':'<div class="empty">'+esc(L("a_wait_none"))+'</div>';
+    var wn=D.accounts.filter(function(a){return a.adminStatus==="new"||!a.adminStatus}).length;
+    body=wl?'<div class="waitbig">'+esc(L("a_wait_cnt").replace("{n}",wn))+'</div><div class="list">'+wl+'</div>':'<div class="empty">'+esc(L("a_wait_none"))+'</div>';
   }else if(LV.adTab==="accounts"){
     var fs=LV.fStars;
     var list=D.accounts.filter(function(a){if(a.adminStatus==='new'||!a.adminStatus)return false;var s=a.stars.final;if(fs!=="all"&&(s==null||s<2))return false;var okS=fs==="all"||fs==="2+"?true:(fs==="5"?s>=5:(s>=Number(fs)&&s<Number(fs)+1));return okS&&(LV.fDisc!=="yes"||(a.discount||0)>0)&&(LV.fCat==="all"||(a.categories||[]).indexOf(LV.fCat)>=0)}).sort(function(x,y){return (y.stars.final||0)-(x.stars.final||0)||(y.discount||0)-(x.discount||0)||(x.cpm||9)-(y.cpm||9)});
@@ -1556,9 +1579,10 @@ function renderOwner(){
       '<div class="row"><button class="btn primary" data-l="paySave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="payOk"></span></div></div>';
   }else{
     var tl=D.tracks.filter(function(t){return t.status!=="deleted"}).sort(function(x,y){return (x.status==="review"?0:1)-(y.status==="review"?0:1)});
-    body=(LV.bcMsg?'<div class="note">'+esc(LV.bcMsg)+'</div>':'')+'<div class="list">'+(tl.length?tl.map(function(t){
+    body=addTrackHtml()+(LV.bcMsg?'<div class="note">'+esc(LV.bcMsg)+'</div>':'')+'<div class="list">'+(tl.length?tl.map(function(t){
       var lk=["spotify","soundcloud","tiktok","mp3"].filter(function(k){return t.links&&t.links[k]}).map(function(k){return '<a class="pill" href="'+esc(t.links[k])+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join(" ");
       var act=t.status==="review"?'<div class="row"><button class="btn sm primary" data-l="trAct" data-id="'+esc(t.id)+'" data-s="approved">'+esc(L("a_approve_t"))+'</button><button class="btn sm danger" data-l="trAct" data-id="'+esc(t.id)+'" data-s="rejected">'+esc(L("a_reject_t"))+'</button></div>':(t.status==="active"?'<div class="row"><button class="btn sm primary" data-l="bcTrack" data-id="'+esc(t.id)+'">📣 '+esc(L("bc_track"))+'</button></div>':'');
+      act+='<div class="row"><button class="btn sm danger" data-l="trDel" data-id="'+esc(t.id)+'">🗑 '+esc(L("tr_del"))+'</button></div>';
       return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+catPills(t.categories,t.otherCategory)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · Song: '+esc(t.title):'')+'</div>'+act+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_tr"))+'</div>')+'</div>';
   }
@@ -1878,7 +1902,7 @@ function accCardHtml(a){
   var why=V.E?'<div class="blk">'+reasonList(V.E.good,"g")+reasonList(V.E.bad,"b")+'</div>':'';
   return '<div class="card arow v-'+V.k+'"><div class="row" style="justify-content:space-between"><span><b><a href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">'+esc(a.handle)+' ↗</a></b>'+(a.internalName?' · '+esc(a.internalName):'')+'</span><span class="vbadge v-'+V.k+'">'+esc(L(V.t))+'</span></div>'+
     '<div class="row" style="gap:18px;margin:8px 0"><span><b>'+(A.refAvg||0).toLocaleString()+'</b> '+esc(L("a_avg"))+'</span><span><b>'+(A.month?A.month.views:0).toLocaleString()+'</b> '+esc(L("a_m_views"))+'</span><span><b>'+(A.month?A.month.videos:0)+'</b> '+esc(L("a_m_videos"))+'</span><span><b>'+(a.price?'$'+a.price:'—')+'</b>'+(a.price?'':' ('+esc(L("a_price_none"))+')')+'</span></div>'+why+
-    '<div class="row"><a class="btn sm" href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">'+esc(L("a_open_tt"))+'</a><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button></div></div>';
+    '<div class="row"><a class="btn sm" href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">'+esc(L("a_open_tt"))+'</a><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><button class="btn sm" data-l="decide" data-id="'+esc(a.id)+'" data-s="banned">'+esc(L("a_ban"))+'</button></div>'+sugRow(a)+'</div>';
 }
 Object.assign(LT.en,{a_waiting:"Waiting for your decision",a_wait_none:"No accounts are waiting for your decision.",a_from:"From"});
 Object.assign(LT.ru,{a_waiting:"Ждут решения",a_wait_none:"Нет аккаунтов, ожидающих решения.",a_from:"От кого"});
@@ -1901,7 +1925,7 @@ function contactBtn(){
 loadContacts();
 function wordCount(s){return (String(s||"").trim().match(/\S+/g)||[]).length}
 function stepsHtml(u){
-  var wc=wordCount(u.about),topic=(u.categories&&u.categories.length>0)||wc>=8;
+  var wc=wordCount(u.about),topic=(u.categories&&u.categories.length>0)||wc>=3;
   var st=[{k:"st1",ok:true,go:""},{k:"st2",ok:topic,go:"sName"},{k:"st3",ok:!!u.price,go:"changePrice2"},{k:"st4",ok:(u.discount||0)>0,go:"sDisc",opt:true}];
   var done=st.filter(function(s){return s.ok}).length,cur=st.findIndex(function(s){return !s.ok});
   return '<div class="stepsx card"><div class="stbar"><i style="width:'+Math.round(done/4*100)+'%"></i></div>'+st.map(function(s,i){
@@ -1909,8 +1933,8 @@ function stepsHtml(u){
 }
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="stGo"]');if(!el)return;var g=el.getAttribute("data-g"),t=g&&$(g);if(t){t.scrollIntoView({behavior:"smooth",block:"center"});if(t.focus)try{t.focus()}catch(x){}}});
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="sAbout"){var n=$("sAboutN");if(n)n.textContent=wordCount(e.target.value)+" / 8 "+L("dl_words")}});
-Object.assign(LT.en,{st1:"Connect your TikTok",st1h:"Done. Your account is connected.",st2:"Set your price",st2h:"Price per video. We check it against your real views.",st3:"Pick your topic and describe your account",st3h:"Choose a topic or write at least 8 words about your account.",st4:"Add a discount",st4h:"With a discount you have a bigger chance to be taken.",st_opt:"optional",dl_about:"Describe your account (at least 8 words)",dl_about_ph:"What do you post, who watches you, which countries",dl_words:"words",ct_btn:"Write to the manager",ct_title:"Contact the manager",a_contacts:"Your contacts for users",a_dc_h:"invite link",a_demo:"Create a test producer",a_demo_ok:"Test producer is ready. Log in at the producer page with:",a_notif_ok:"Notifications are on",a_notif_no:"Notifications are blocked in this browser. Allow them in the address bar settings.",a_notif_na:"This browser cannot show notifications. Open the site in Chrome. The sound still works."});
-Object.assign(LT.ru,{st1:"Подключите TikTok",st1h:"Готово. Аккаунт подключён.",st2:"Укажите цену",st2h:"Цена за одно видео. Мы сверим её с вашими просмотрами.",st3:"Выберите тематику и опишите аккаунт",st3h:"Выберите тематику или напишите про аккаунт минимум 8 слов.",st4:"Добавьте скидку",st4h:"Со скидкой больше шансов, что вас возьмут.",st_opt:"по желанию",dl_about:"Опишите свой аккаунт (минимум 8 слов)",dl_about_ph:"Что вы публикуете, кто вас смотрит, из каких стран",dl_words:"слов",ct_btn:"Написать менеджеру",ct_title:"Связаться с менеджером",a_contacts:"Ваши контакты для пользователей",a_dc_h:"ссылка-приглашение",a_demo:"Создать тестового продюсера",a_demo_ok:"Тестовый продюсер готов. Войдите на странице продюсера:",a_notif_ok:"Уведомления включены",a_notif_no:"Уведомления заблокированы в этом браузере. Разрешите их в настройках рядом с адресом сайта.",a_notif_na:"Этот браузер не умеет показывать уведомления. Откройте сайт в Chrome. Звук всё равно работает."});
+Object.assign(LT.en,{st1:"Connect your TikTok",st1h:"Done. Your account is connected.",st2:"Set your price",st2h:"Price per video. We check it against your real views.",st3:"Pick your topic and describe your account",st3h:"Choose a topic or write at least 3 words about your account.",st4:"Add a discount",st4h:"With a discount you have a bigger chance to be taken.",st_opt:"optional",dl_about:"Describe your account (at least 3 words)",dl_about_ph:"What do you post, who watches you, which countries",dl_words:"words",ct_btn:"Write to the manager",ct_title:"Contact the manager",a_contacts:"Your contacts for users",a_dc_h:"invite link",a_demo:"Create a test producer",a_demo_ok:"Test producer is ready. Log in at the producer page with:",a_notif_ok:"Notifications are on",a_notif_no:"Notifications are blocked in this browser. Allow them in the address bar settings.",a_notif_na:"This browser cannot show notifications. Open the site in Chrome. The sound still works."});
+Object.assign(LT.ru,{st1:"Подключите TikTok",st1h:"Готово. Аккаунт подключён.",st2:"Укажите цену",st2h:"Цена за одно видео. Мы сверим её с вашими просмотрами.",st3:"Выберите тематику и опишите аккаунт",st3h:"Выберите тематику или напишите про аккаунт минимум 3 слова.",st4:"Добавьте скидку",st4h:"Со скидкой больше шансов, что вас возьмут.",st_opt:"по желанию",dl_about:"Опишите свой аккаунт (минимум 3 слова)",dl_about_ph:"Что вы публикуете, кто вас смотрит, из каких стран",dl_words:"слов",ct_btn:"Написать менеджеру",ct_title:"Связаться с менеджером",a_contacts:"Ваши контакты для пользователей",a_dc_h:"ссылка-приглашение",a_demo:"Создать тестового продюсера",a_demo_ok:"Тестовый продюсер готов. Войдите на странице продюсера:",a_notif_ok:"Уведомления включены",a_notif_no:"Уведомления заблокированы в этом браузере. Разрешите их в настройках рядом с адресом сайта.",a_notif_na:"Этот браузер не умеет показывать уведомления. Откройте сайт в Chrome. Звук всё равно работает."});
 Object.assign(LT.en,{pl_title:"Auto-plan for a track",pl_h:"Pick a track. The site chooses accounts and the number of videos by rating, views and price, and spends the budget as exactly as it can. This is only a suggestion, nothing is sent.",pl_go:"Make a plan",pl_videos:"videos",pl_left:"left",pl_views:"views",pl_acc:"Account",pl_cost:"Cost",pl_none:"No suitable accounts for this track (they must be approved, with a price, matching the topic, and 1,000+ views in 30 days)."});
 Object.assign(LT.ru,{pl_title:"Автоплан по треку",pl_h:"Выберите трек. Сайт сам выберет аккаунты и количество видео по рейтингу, просмотрам и цене и потратит бюджет максимально точно. Это только предложение, ничего не отправляется.",pl_go:"Составить план",pl_videos:"видео",pl_left:"остаток",pl_views:"просмотров",pl_acc:"Аккаунт",pl_cost:"Стоимость",pl_none:"Нет подходящих аккаунтов для этого трека (нужны одобренные, с ценой, подходящей тематикой и 1000+ просмотров за 30 дней)."});
 
@@ -2058,9 +2082,9 @@ Object.assign(LT.en,{an_today:"today",an_ago:"{n} days ago",an_title:"Account br
 Object.assign(LT.ru,{an_today:"сегодня",an_ago:"{n} дн. назад",an_title:"Разбор аккаунта",an_algo:"На что мы смотрим",an_of:"из 100",an_freq:"Как часто вы постите",an_week:"в неделю",an_views:"Просмотров на видео",an_likes:"Лайки к просмотрам",an_last:"Последний пост",an_checked:"Мы читаем вашу открытую страницу TikTok раз в сутки. Считаются видео за последние 30 дней. Один столбец это одно видео, пунктир это 10 000 просмотров.",an_algo_h:"Оценка наша собственная, из ваших открытых цифр. Вот сколько весит каждая часть.",cr_views:"Просмотров на видео",cr_stable:"Стабильные просмотры",cr_price:"Цена подходит",cr_freq:"Как часто вы постите",cr_fresh:"Свежие посты"});
 
 Object.assign(LT.en,{tp_title:"Your topic",tp_h:"Choose what your videos are about. The price we suggest depends on your topic.",tp_err:"Choose at least one topic first.",tp_range:"For {t}, editors usually get ${a} to ${b} per video.",tp_sug:"Suggested price for you: ${p}.",a_prices:"Prices by topic",a_prices_h:"Set the usual price range per video for each topic. Editors see the range for their topic and get a suggested price inside it. Leave empty to use only the views-based suggestion.",
- st2:"Pick your topic and describe your account",st2h:"Choose a topic or write at least 8 words about your account.",st3:"Set your price",st3h:"We suggest a price for your topic and your views.",fl2h:"The bot looks at the views of your latest videos. Next: you pick your topic.",fl3:"Topic and price",fl3h:"Pick your topic. We suggest a price for it based on your views."});
+ st2:"Pick your topic and describe your account",st2h:"Choose a topic or write at least 3 words about your account.",st3:"Set your price",st3h:"We suggest a price for your topic and your views.",fl2h:"The bot looks at the views of your latest videos. Next: you pick your topic.",fl3:"Topic and price",fl3h:"Pick your topic. We suggest a price for it based on your views."});
 Object.assign(LT.ru,{tp_title:"Ваша тематика",tp_h:"Выберите, о чём ваши видео. Цена, которую мы предложим, зависит от тематики.",tp_err:"Сначала выберите хотя бы одну тематику.",tp_range:"Для «{t}» редакторам обычно платят от ${a} до ${b} за видео.",tp_sug:"Предлагаем вам цену ${p}.",a_prices:"Цены по тематикам",a_prices_h:"Укажите обычный диапазон цены за видео для каждой тематики. Редактор увидит диапазон своей тематики и получит предложенную цену внутри него. Если оставить пустым, цена считается только по просмотрам.",
- st2:"Выберите тематику и опишите аккаунт",st2h:"Выберите тематику или напишите про аккаунт минимум 8 слов.",st3:"Укажите цену",st3h:"Мы предложим цену под вашу тематику и просмотры.",fl2h:"Бот смотрит просмотры ваших последних видео. Дальше: вы выбираете тематику.",fl3:"Тематика и цена",fl3h:"Выберите тематику. Мы предложим цену под неё по вашим просмотрам."});
+ st2:"Выберите тематику и опишите аккаунт",st2h:"Выберите тематику или напишите про аккаунт минимум 3 слова.",st3:"Укажите цену",st3h:"Мы предложим цену под вашу тематику и просмотры.",fl2h:"Бот смотрит просмотры ваших последних видео. Дальше: вы выбираете тематику.",fl3:"Тематика и цена",fl3h:"Выберите тематику. Мы предложим цену под неё по вашим просмотрам."});
 Object.assign(LT.en,{a_chk_ed:"Check the site as an editor (test)",a_chk_pr:"Check the site as a producer (test)"});
 Object.assign(LT.ru,{a_chk_ed:"Проверить сайт как редактор (тест)",a_chk_pr:"Проверить сайт как продюсер (тест)"});
 Object.assign(LT.en,{p_min100:"The minimum budget is $100.",p_where:"Where to send the money",p_where_h:"Send the payment to any of these. Then attach the screenshot under your track.",p_review_wait:"Your track is waiting for approval. After the manager approves it, the payment details appear here."});
@@ -2262,8 +2286,8 @@ function payBar(key,arr){return '<div class="chips" role="group" style="margin-b
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="pFil"]');if(!el)return;LV[el.getAttribute("data-key")]=el.getAttribute("data-f");renderOwner()});
 
 /* ---- editor dashboard: list of accounts, then one account page ---- */
-Object.assign(LT.en,{ad_title:"My accounts",ad_pick:"Tap an account to open its settings.",ad_add:"+ Add another account",ad_back:"← All accounts",ad_set:"Account settings",ad_label:"Account name (only you see it)",ad_label_h:"Call it as you like, for example Vasya or Hex.",ad_tt:"Link to your TikTok account",ad_price:"Price per video",ad_disc:"Bulk deals: discount in percent",ad_disc_h:"Orders with a discount are taken first. 0 means no discount.",ad_about:"About this account",ad_about_h:"At least 8 words. Managers read this.",ad_about_min:"Write at least 8 words about the account. Managers read it.",ad_cats:"Content topics (you can change them any time)",ad_wc:"words",ad_del_t:"Delete this account",ad_del_rule:"You can delete an account only when it has no open orders. If you have open orders, finish them first.",ad_del_open:"This account has {n} open order(s). Finish them first, then you can delete it.",ad_st_approved:"Approved",ad_st_new:"Waiting for the manager",ad_st_rejected:"Not taken",ad_st_banned:"Blocked",ad_saved:"Saved",od_over:"The time is over. The order is cancelled and the money goes back to the track budget.",ref_big:"If an editor does not make the video, the money goes back to your track budget."});
-Object.assign(LT.ru,{ad_title:"Мои аккаунты",ad_pick:"Нажмите на аккаунт, чтобы открыть его настройки.",ad_add:"+ Добавить ещё аккаунт",ad_back:"← Все аккаунты",ad_set:"Настройки аккаунта",ad_label:"Название аккаунта (видите только вы)",ad_label_h:"Назовите как хотите, например Вася или Hex.",ad_tt:"Ссылка на ваш TikTok аккаунт",ad_price:"Цена за видео",ad_disc:"Bulk deals: скидка в процентах",ad_disc_h:"Заказы со скидкой берут в первую очередь. 0 значит без скидки.",ad_about:"Об этом аккаунте",ad_about_h:"Минимум 8 слов. Это читает менеджер.",ad_about_min:"Напишите об аккаунте минимум 8 слов. Это читает менеджер.",ad_cats:"Тематика контента (можно менять в любой момент)",ad_wc:"слов",ad_del_t:"Удалить этот аккаунт",ad_del_rule:"Аккаунт можно удалить, только если по нему нет открытых заказов. Если заказы открыты, сначала завершите их.",ad_del_open:"По этому аккаунту открытых заказов: {n}. Сначала завершите их, потом можно удалить.",ad_st_approved:"Одобрен",ad_st_new:"Ждёт менеджера",ad_st_rejected:"Не взяли",ad_st_banned:"Заблокирован",ad_saved:"Сохранено",od_over:"Время вышло. Заказ отменён, деньги вернулись в бюджет трека.",ref_big:"Если эдитор не сделал видео, деньги возвращаются в бюджет вашего трека."});
+Object.assign(LT.en,{ad_title:"My accounts",ad_pick:"Tap an account to open its settings.",ad_add:"+ Add another account",ad_back:"← All accounts",ad_set:"Account settings",ad_label:"Account name (only you see it)",ad_label_h:"Call it as you like, for example Vasya or Hex.",ad_tt:"Link to your TikTok account",ad_price:"Price per video",ad_disc:"Bulk deals: discount in percent",ad_disc_h:"Orders with a discount are taken first. 0 means no discount.",ad_about:"About this account",ad_about_h:"At least 3 words. Managers read this.",ad_about_min:"Write at least 3 words about the account. Managers read it.",ad_cats:"Content topics (you can change them any time)",ad_wc:"words",ad_del_t:"Delete this account",ad_del_rule:"You can delete an account only when it has no open orders. If you have open orders, finish them first.",ad_del_open:"This account has {n} open order(s). Finish them first, then you can delete it.",ad_st_approved:"Approved",ad_st_new:"Waiting for the manager",ad_st_rejected:"Not taken",ad_st_banned:"Blocked",ad_saved:"Saved",od_over:"The time is over. The order is cancelled and the money goes back to the track budget.",ref_big:"If an editor does not make the video, the money goes back to your track budget."});
+Object.assign(LT.ru,{ad_title:"Мои аккаунты",ad_pick:"Нажмите на аккаунт, чтобы открыть его настройки.",ad_add:"+ Добавить ещё аккаунт",ad_back:"← Все аккаунты",ad_set:"Настройки аккаунта",ad_label:"Название аккаунта (видите только вы)",ad_label_h:"Назовите как хотите, например Вася или Hex.",ad_tt:"Ссылка на ваш TikTok аккаунт",ad_price:"Цена за видео",ad_disc:"Bulk deals: скидка в процентах",ad_disc_h:"Заказы со скидкой берут в первую очередь. 0 значит без скидки.",ad_about:"Об этом аккаунте",ad_about_h:"Минимум 3 слова. Это читает менеджер.",ad_about_min:"Напишите об аккаунте минимум 3 слова. Это читает менеджер.",ad_cats:"Тематика контента (можно менять в любой момент)",ad_wc:"слов",ad_del_t:"Удалить этот аккаунт",ad_del_rule:"Аккаунт можно удалить, только если по нему нет открытых заказов. Если заказы открыты, сначала завершите их.",ad_del_open:"По этому аккаунту открытых заказов: {n}. Сначала завершите их, потом можно удалить.",ad_st_approved:"Одобрен",ad_st_new:"Ждёт менеджера",ad_st_rejected:"Не взяли",ad_st_banned:"Заблокирован",ad_saved:"Сохранено",od_over:"Время вышло. Заказ отменён, деньги вернулись в бюджет трека.",ref_big:"Если эдитор не сделал видео, деньги возвращаются в бюджет вашего трека."});
 LV.acc=LV.acc||null;
 function accAv(a,cls){var ch=esc((a.handle||"@?").charAt(1).toUpperCase());return a.avatar?'<img class="'+cls+'" src="'+esc(a.avatar)+'" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\''+cls+' ph\',textContent:\''+ch+'\'}))">':'<span class="'+cls+' ph">'+ch+'</span>'}
 function openOrdersOf(a){return (LV.reqs||[]).filter(function(q){return q.openId===a.id&&["approved","submitted","returned"].indexOf(q.status)>=0}).length}
@@ -2288,7 +2312,7 @@ function renderDashLive(){
   $("profCard").innerHTML='<button type="button" class="btn sm" data-l="accBack">'+esc(L("ad_back"))+'</button>'+
     '<div class="achd">'+accAv(u,"acav big")+'<div><b>'+esc(u.handle)+'</b><div>'+accStPill(u)+'</div></div></div>'+
     stepsHtml(u)+priceBig(u)+
-    '<div class="blk"><h3>'+esc(L("ad_set"))+'</h3>'+
+    statsHtml(u)+sugBanner(u)+actRow(u)+(LV.edit?'<div class="blk"><h3>'+esc(L("ad_set"))+'</h3>'+
     '<label class="f" for="sName"><span>'+esc(L("ad_label"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"><span class="hint">'+esc(L("ad_label_h"))+'</span></label>'+
     '<div class="f"><span>'+esc(L("ad_tt"))+'</span><a class="ttlink" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">https://www.tiktok.com/'+esc(u.handle)+'</a></div>'+
     '<div class="f"><span>'+esc(L("ad_price"))+'</span><div class="row" style="align-items:center"><b style="font-size:20px">'+(u.price?'$'+u.price:'—')+'</b><button type="button" class="btn sm primary" id="changePrice">'+esc(L("pr_btn"))+'</button></div></div>'+
@@ -2297,7 +2321,7 @@ function renderDashLive(){
     '<label class="f" for="sAbout"><span>'+esc(L("ad_about"))+'</span><textarea id="sAbout" rows="4" maxlength="600" placeholder="'+esc(L("dl_about_ph"))+'">'+esc(u.about||"")+'</textarea><span class="hint" id="sAboutN">'+wc+' '+esc(L("ad_wc"))+' · '+esc(L("ad_about_h"))+'</span></label>'+
     '<b>'+esc(L("ad_cats"))+'</b>'+catChecks("sCats",u.categories)+
     '<label class="f" id="sOtherRow" for="sOther"'+((u.categories||[]).indexOf("other")>=0?'':' hidden')+'><span>'+esc(L("dl_other"))+'</span><input id="sOther" type="text" maxlength="60" value="'+esc(u.otherCategory||"")+'"></label>'+
-    '<div class="row"><button class="btn primary" data-l="saveAcc">'+esc(L("dl_save"))+'</button><span class="hint" id="sOk">'+esc(LV.ok)+'</span></div></div>'+
+    '<div class="row"><button class="btn primary" data-l="saveAcc">'+esc(L("dl_save"))+'</button><button class="btn" data-l="editToggle">'+esc(L("p_cancel"))+'</button><span class="hint" id="sOk">'+esc(LV.ok)+'</span></div></div>':summaryHtml(u))+
     '<div class="row" style="justify-content:space-between;margin:18px 0 10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A,u)+videoTable(u)+
     '<div class="delzone"><h3>'+esc(L("ad_del_t"))+'</h3><p class="delrule">'+esc(L("ad_del_rule"))+'</p>'+(open>0?'<div class="note err">'+esc(L("ad_del_open").replace("{n}",open))+'</div><button class="btn sm danger" disabled>'+esc(t("acc_del"))+' '+esc(u.handle)+'</button>':delBox(u))+'</div>';
   $("consentRow").innerHTML="";
@@ -2305,28 +2329,161 @@ function renderDashLive(){
 function saveAcc(){
   var u=S.user;if(!u)return;
   var about=val("sAbout");
-  if(about.trim()&&wordCount(about)<8){var o0=$("sOk");if(o0){o0.textContent=L("ad_about_min");o0.style.color="var(--bad)"}return}
+  if(about.trim()&&wordCount(about)<3){var o0=$("sOk");if(o0){o0.textContent=L("ad_about_min");o0.style.color="var(--bad)"}return}
   var d=val("sDisc");
   api("/api/account/update",{id:u.id,internalName:val("sName"),categories:checked("sCats"),otherCategory:val("sOther"),about:about,discount:d===""?0:Number(d),discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){
     if(!r.ok){$("sOk").textContent=(r.j&&r.j.error)||L("p_err");return}
-    applyLive(r.j);LV.ok=L("ad_saved");renderDashLive();setTimeout(function(){LV.ok="";var e=$("sOk");if(e)e.textContent=""},2500);
+    applyLive(r.j);LV.edit=false;LV.ok="";renderDashLive();toast("✓ "+L("ad_saved"));
   });
 }
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
-  if(a==="accOpen"){LV.acc=el.getAttribute("data-id");renderDashLive();window.scrollTo(0,0);return}
-  if(a==="accBack"){LV.acc=null;renderDashLive();window.scrollTo(0,0);return}
+  if(a==="accOpen"){LV.acc=el.getAttribute("data-id");LV.edit=false;renderDashLive();window.scrollTo(0,0);return}
+  if(a==="accBack"){LV.acc=null;LV.edit=false;renderDashLive();window.scrollTo(0,0);return}
 });
 document.addEventListener("click",function(e){if(e.target.closest("#delYes"))setTimeout(function(){LV.acc=null},0)},true);
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="sAbout"){var s=$("sAboutN");if(s)s.textContent=wordCount(e.target.value)+" "+L("ad_wc")+" · "+L("ad_about_h")}});
 (function(){var o=drawProd;drawProd=function(){o.apply(this,arguments);var b=$("lprodBody");if(b&&LV.prod&&!b.querySelector(".refbig"))b.insertAdjacentHTML("afterbegin",'<div class="refbig">💸 '+esc(L("ref_big"))+'</div>')}})();
+
+/* ---- account chip (avatar + nickname) on the sign-up steps, verification state ---- */
+Object.assign(LT.en,{an_about:"Describe your account (at least 3 words)",an_about_h:"For example: gaming edits, fast cuts, 3 videos a week. Managers read this.",an_about_err:"Write at least 3 words about your account.",ad_st_need:"Needs a check: finish the setup",ad_st_review:"Under review",ad_st_approved:"Verified",ad_st_rejected:"Rejected",ad_st_banned:"Blocked",ad_st_new:"Under review"});
+Object.assign(LT.ru,{an_about:"Опишите свой аккаунт (минимум 3 слова)",an_about_h:"Например: игровые эдиты, быстрый монтаж, 3 видео в неделю. Это читает менеджер.",an_about_err:"Напишите об аккаунте минимум 3 слова.",ad_st_need:"Нужна проверка: завершите настройку",ad_st_review:"На проверке",ad_st_approved:"Верифицирован",ad_st_rejected:"Отказано",ad_st_banned:"Заблокирован",ad_st_new:"На проверке"});
+function accState(a){var s=a.adminStatus||"new";if(s==="new"){var setup=a.price>0&&((a.categories&&a.categories.length)||wordCount(a.about)>=3);return setup?"review":"need"}return s}
+function accStPill(a){var s=accState(a),cls={approved:"ok",review:"warn",need:"warn",rejected:"bad",banned:"bad"}[s]||"",ic={approved:"✓ ",review:"⏳ ",need:"⚠ ",rejected:"✕ ",banned:"⛔ "}[s]||"";return '<span class="pill '+cls+'">'+ic+esc(L("ad_st_"+s))+'</span>'}
+function putChip(refId){
+  var u=S.user,ref=$(refId);if(!ref||!LIVE)return;var old=$("accChip");if(old)old.remove();if(!u)return;
+  var d=document.createElement("div");d.id="accChip";d.className="accchip";d.innerHTML=accAv(u,"acav")+'<div class="acn"><b>'+esc(u.handle)+'</b>'+(u.internalName?'<small>'+esc(u.internalName)+'</small>':'')+'</div>'+accStPill(u);
+  ref.parentNode.insertBefore(d,ref);
+}
+(function(){var a=renderAnalysis,r=renderReport;renderAnalysis=function(){a.apply(this,arguments);putChip("anTitle")};renderReport=function(){r.apply(this,arguments);var e=document.querySelector("#v-report .eyebrow");if(e&&!e.id)e.id="rpEye";putChip("rpEye")}})();
+
+/* ---- owner: tracks (add, delete, budget), notify about a track, suggest a price, green "saved" ---- */
+Object.assign(LT.en,{tr_del:"Delete track",tr_add:"+ Add a track",tr_add_h:"Add a track yourself. It goes straight to the catalog.",tr_title:"Track title",tr_artist:"Artist",tr_link:"Link (Spotify, SoundCloud…)",tr_budget:"Budget, $ (can be 0)",tr_create:"Add track",tr_del_q:"Delete this track?",tr_del_note:"It disappears from the catalog. Its history stays saved. Remaining budget: {m}.",tr_del_yes:"Yes, delete",tr_added:"Track added.",tr_deleted:"Track deleted.",a_wait_cnt:"Accounts waiting for your decision: {n}",sp_lbl:"Suggest a price to the editor",sp_btn:"Send",sp_sent:"Suggestion sent",sp_clear:"Cancel suggestion",nt_to:"Notify editors about this track",nt_chan:"Where to send",nt_app:"In the app and phone notifications",nt_mail:"By email (to those who added an email)",nt_go:"Send now",nt_type:"Type",nt_t_campaigns:"New campaigns",nt_t_orders:"Orders",nt_t_money:"Money",nt_t_accounts:"Accounts",nt_t_support:"Support",nt_mail_off:"Email is not connected yet, so no emails were sent.",nt_mail_n:"Emails sent: {n}.",saved_ok:"✓ Saved"});
+Object.assign(LT.ru,{tr_del:"Удалить трек",tr_add:"+ Добавить трек",tr_add_h:"Добавьте трек сами. Он сразу попадёт в каталог.",tr_title:"Название трека",tr_artist:"Артист",tr_link:"Ссылка (Spotify, SoundCloud…)",tr_budget:"Бюджет, $ (можно 0)",tr_create:"Добавить трек",tr_del_q:"Удалить этот трек?",tr_del_note:"Он пропадёт из каталога. История сохранится. Остаток бюджета: {m}.",tr_del_yes:"Да, удалить",tr_added:"Трек добавлен.",tr_deleted:"Трек удалён.",a_wait_cnt:"Аккаунтов ждут вашего решения: {n}",sp_lbl:"Предложить эдитору цену",sp_btn:"Отправить",sp_sent:"Предложение отправлено",sp_clear:"Отменить предложение",nt_to:"Сообщить эдиторам об этом треке",nt_chan:"Куда отправить",nt_app:"В приложении и уведомлением на телефон",nt_mail:"На почту (тем, кто добавил почту)",nt_go:"Отправить",nt_type:"Тип",nt_t_campaigns:"Новые кампании",nt_t_orders:"Заказы",nt_t_money:"Деньги",nt_t_accounts:"Аккаунты",nt_t_support:"Поддержка",nt_mail_off:"Почта пока не подключена, письма не отправлены.",nt_mail_n:"Отправлено писем: {n}.",saved_ok:"✓ Сохранено"});
+function addTrackHtml(){
+  if(!LV.addTr)return '<div class="row" style="margin-bottom:12px"><button class="btn primary" data-l="trAddOpen">'+esc(L("tr_add"))+'</button></div>'+(LV.trMsg?'<div class="note okn">'+esc(LV.trMsg)+'</div>':'');
+  return '<div class="card form" style="margin-bottom:14px"><p class="hint">'+esc(L("tr_add_h"))+'</p><label class="f" for="atTitle"><span>'+esc(L("tr_title"))+'</span><input id="atTitle" type="text" maxlength="120"></label><label class="f" for="atArtist"><span>'+esc(L("tr_artist"))+'</span><input id="atArtist" type="text" maxlength="120"></label><label class="f" for="atLink"><span>'+esc(L("tr_link"))+'</span><input id="atLink" type="text" inputmode="url" placeholder="https://"></label><label class="f" for="atBudget"><span>'+esc(L("tr_budget"))+'</span><input id="atBudget" type="number" min="0" step="1" inputmode="decimal" value="0"></label><b>'+esc(L("p_cats"))+'</b>'+catChecks("atCats",[])+'<div class="note err" id="atErr" hidden></div><div class="row"><button class="btn primary" data-l="trAddGo">'+esc(L("tr_create"))+'</button><button class="btn" data-l="trAddOpen">'+esc(L("p_cancel"))+'</button></div></div>';
+}
+function sugRow(a){
+  return '<div class="sugrow"><label class="f" for="sp_'+esc(a.id)+'" style="flex:1 1 180px"><span>'+esc(L("sp_lbl"))+'</span><input id="sp_'+esc(a.id)+'" type="number" min="1" max="200" step="0.5" inputmode="decimal" value="'+(a.suggestedPrice||"")+'" placeholder="$"></label><button class="btn sm primary" data-l="sugPrice" data-id="'+esc(a.id)+'">'+esc(L("sp_btn"))+'</button>'+(a.suggestedPrice?'<button class="btn sm" data-l="sugClear" data-id="'+esc(a.id)+'">'+esc(L("sp_clear"))+'</button>':'')+'</div>';
+}
+function bcModal(){LV.modal={type:"bc"};
+  openModal('<h3>📣 '+esc(L("bc_btn"))+'</h3><label class="f" for="bcAud"><span>'+esc(L("bc_to"))+'</span><select id="bcAud"><option value="editors">'+esc(L("bc_ed"))+'</option><option value="producers">'+esc(L("bc_pr"))+'</option><option value="all">'+esc(L("bc_all"))+'</option></select></label>'+
+    '<label class="f" for="bcType"><span>'+esc(L("nt_type"))+'</span><select id="bcType">'+["campaigns","orders","money","accounts","support"].map(function(k){return '<option value="'+k+'">'+esc(L("nt_t_"+k))+'</option>'}).join("")+'</select></label>'+
+    '<label class="f" for="bcTitle"><span>'+esc(L("bc_title"))+'</span><input id="bcTitle" type="text" maxlength="80" value="Promo Campaign"></label><label class="f" for="bcText"><span>'+esc(L("bc_text"))+'</span><textarea id="bcText" rows="3" maxlength="300"></textarea></label>'+
+    '<label class="chk" for="bcMail"><input type="checkbox" id="bcMail" checked><span>'+esc(L("nt_mail"))+'</span></label>'+
+    '<div class="row"><button class="btn primary" data-l="bcSend">'+esc(L("bc_send"))+'</button><button class="btn" data-l="mclose">'+esc(L("close"))+'</button></div><p class="hint" id="bcRes"></p>');
+}
+function bcResult(r){if(!r.ok)return (r.j&&r.j.error)||L("p_err");var s=L("bc_done").replace("{d}",r.j.delivered).replace("{n}",r.j.subscribers);if(r.j.emails)s+=" "+L("nt_mail_n").replace("{n}",r.j.emails);else if(r.j.mailWanted&&!r.j.mailReady)s+=" "+L("nt_mail_off");return s}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="bcSend"){e.stopImmediatePropagation();var tx=val("bcText");if(!tx)return;var mail=!!($("bcMail")&&$("bcMail").checked);api("/api/admin/broadcast",{text:tx,title:val("bcTitle")||"Promo Campaign",audience:val("bcAud"),type:val("bcType"),email:mail}).then(function(r){if(r.ok)r.j.mailWanted=mail;var o=$("bcRes");if(o){o.textContent=bcResult(r);o.className="hint okg"}});return}
+  if(a==="bcTrack"){e.stopImmediatePropagation();var tt=D0().tracks.filter(function(x){return x.id===id})[0];LV.modal={type:"nt",id:id};
+    openModal('<h3>📣 '+esc(L("nt_to"))+'</h3><p><b>'+esc(tt?tt.title:"")+'</b></p><p class="hint">'+esc(L("nt_chan"))+'</p><label class="chk"><input type="checkbox" checked disabled><span>'+esc(L("nt_app"))+'</span></label><label class="chk" for="ntMail"><input type="checkbox" id="ntMail" checked><span>'+esc(L("nt_mail"))+'</span></label><div class="row"><button class="btn primary" data-l="ntGo" data-id="'+esc(id)+'">'+esc(L("nt_go"))+'</button><button class="btn" data-l="mclose2">'+esc(L("close"))+'</button></div><p class="hint" id="ntRes"></p>');return}
+  if(a==="ntGo"){var t2=D0().tracks.filter(function(x){return x.id===id})[0],mail2=!!($("ntMail")&&$("ntMail").checked);api("/api/admin/broadcast",{text:L("bc_track_text").replace("{t}",t2?t2.title:""),title:L("bc_track_title"),audience:"editors",type:"campaigns",email:mail2}).then(function(r){if(r.ok)r.j.mailWanted=mail2;var o=$("ntRes");if(o){o.textContent=bcResult(r);o.className="hint okg"}});return}
+  if(a==="trAddOpen"){LV.addTr=!LV.addTr;LV.trMsg="";renderOwner();return}
+  if(a==="trAddGo"){var er=$("atErr"),title=val("atTitle");if(!title){er.textContent=L("p_bad");er.hidden=false;return}
+    api("/api/admin/track/create",{title:title,artist:val("atArtist"),link:val("atLink"),budget:Number(val("atBudget"))||0,categories:checked("atCats")}).then(function(r){if(!r.ok){er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false;return}LV.addTr=false;LV.trMsg=L("tr_added");ownerReload()});return}
+  if(a==="trDel"){var t3=D0().tracks.filter(function(x){return x.id===id})[0];if(!t3)return;LV.modal={type:"trdel",id:id};
+    openModal('<h3>'+esc(L("tr_del_q"))+'</h3><p><b>'+esc(t3.title)+'</b></p><p class="hint">'+esc(L("tr_del_note").replace("{m}",money(t3.left)))+'</p><div class="note err" id="trDelErr" hidden></div><div class="row"><button class="btn danger" data-l="trDelYes" data-id="'+esc(id)+'">'+esc(L("tr_del_yes"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
+  if(a==="trDelYes"){el.disabled=true;api("/api/admin/track/delete",{id:id}).then(function(r){if(!r.ok){el.disabled=false;var er2=$("trDelErr");if(er2){er2.textContent=(r.j&&r.j.error)||L("p_err");er2.hidden=false}return}closeModal();LV.trMsg=L("tr_deleted");ownerReload()});return}
+  if(a==="sugPrice"){var pv=val("sp_"+id);api("/api/admin/suggest-price",{id:id,price:pv===""?null:Number(pv)}).then(function(r){toast(r.ok?L("sp_sent"):((r.j&&r.j.error)||L("p_err")));ownerReload()});return}
+  if(a==="sugClear"){api("/api/admin/suggest-price",{id:id,price:null}).then(function(){ownerReload()});return}
+},true);
+document.addEventListener("click",function(e){
+  var el=e.target.closest('[data-l="ctSave"],[data-l="paySave"]');if(!el)return;var out=el.getAttribute("data-l")==="ctSave"?"ctOk":"payOk",old=el.textContent;
+  setTimeout(function(){var o=$(out);if(o&&o.textContent){o.className="hint okg";o.textContent=L("saved_ok");el.classList.add("savedg");el.textContent=L("saved_ok");setTimeout(function(){el.classList.remove("savedg");el.textContent=old;if(o)o.textContent=""},3500)}},900);
+});
+
+/* ---- account page: stats, manager's price suggestion, edit profile, open in TikTok ---- */
+Object.assign(LT.en,{as_price:"Price per video",as_done:"Orders completed",as_days:"Days to deliver",as_appr:"Approved",ad_edit:"Edit profile",ad_open_tt:"Open in TikTok",sg_t:"The manager suggests a new price",sg_acc:"Accept {p}",sg_dec:"Decline",sg_ok:"Your price is now {p}.",ad_sum_label:"Name",ad_sum_disc:"Bulk deals",ad_sum_none:"not set"});
+Object.assign(LT.ru,{as_price:"Цена за видео",as_done:"Заказов выполнено",as_days:"Дней до сдачи",as_appr:"Одобрено",ad_edit:"Изменить профиль",ad_open_tt:"Открыть в TikTok",sg_t:"Менеджер предлагает новую цену",sg_acc:"Принять {p}",sg_dec:"Отклонить",sg_ok:"Ваша цена теперь {p}.",ad_sum_label:"Название",ad_sum_disc:"Bulk deals",ad_sum_none:"не указано"});
+LV.edit=LV.edit||false;
+function accReqs(u){return (LV.reqs||[]).filter(function(q){return q.openId===u.id})}
+function statsHtml(u){
+  var rs=accReqs(u),done=rs.filter(function(q){return q.status==="completed"}).length,appr=rs.filter(function(q){return q.status==="approved"||q.status==="returned"||q.status==="submitted"}).length;
+  var open=rs.filter(function(q){return q.status==="approved"||q.status==="returned"}).map(function(q){return Math.ceil((ordEnd(q)-Date.now())/864e5)}),days=open.length?Math.max(0,Math.min.apply(null,open)):"—";
+  return '<div class="astats">'+[[u.price?'$'+u.price:'—',"as_price"],[done||"—","as_done"],[days,"as_days"],[appr||"—","as_appr"]].map(function(x,i){return '<div class="astat" style="animation-delay:'+i*0.08+'s"><b>'+esc(String(x[0]))+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("")+'</div>';
+}
+function sugBanner(u){
+  if(!u.suggestedPrice)return "";var p="$"+u.suggestedPrice;
+  return '<div class="sugban"><div class="sgi">💡</div><div class="sgt"><b>'+esc(L("sg_t"))+': '+esc(p)+'</b></div><div class="row"><button class="btn primary" data-l="sgAccept" data-id="'+esc(u.id)+'">'+esc(L("sg_acc").replace("{p}",p))+'</button><button class="btn" data-l="sgDecline" data-id="'+esc(u.id)+'">'+esc(L("sg_dec"))+'</button></div></div>';
+}
+function actRow(u){
+  return '<div class="row actrow"><button class="btn primary" data-l="editToggle">✎ '+esc(L("ad_edit"))+'</button><a class="btn" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("ad_open_tt"))+'</a></div>';
+}
+function summaryHtml(u){
+  return '<div class="asum"><div><span>'+esc(L("ad_sum_label"))+'</span><b>'+esc(u.internalName||L("ad_sum_none"))+'</b></div><div><span>'+esc(L("ad_sum_disc"))+'</span><b>'+(u.discount?'−'+u.discount+'%':esc(L("ad_sum_none")))+'</b></div><div><span>'+esc(L("ad_cats"))+'</span>'+(u.categories&&u.categories.length?catPills(u.categories,u.otherCategory):'<b>'+esc(L("ad_sum_none"))+'</b>')+'</div><div><span>'+esc(L("ad_about"))+'</span><p>'+esc(u.about||L("ad_sum_none"))+'</p></div></div>';
+}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="editToggle"){LV.edit=!LV.edit;renderDashLive();return}
+  if(a==="sgAccept"||a==="sgDecline"){el.disabled=true;api("/api/account/suggest",{id:id,action:a==="sgAccept"?"accept":"decline"}).then(function(r){if(r.ok){applyLive(r.j);renderDashLive();if(a==="sgAccept")toast("✓ "+L("sg_ok").replace("{p}","$"+(S.user&&S.user.price)))}else el.disabled=false});return}
+});
+
+/* ---- notifications: panel with two tabs, unread/archive, what to receive, email ---- */
+Object.assign(LT.en,{nt_title:"Notifications",nt_tab_in:"Notifications",nt_tab_set:"Settings",nt_all:"All",nt_unread:"Unread",nt_arch:"Archive",nt_none:"Nothing here yet.",nt_readall:"Mark all as read",nt_archive:"Archive",nt_restore:"Restore",nt_what:"What do you want to receive?",nt_d_money:"Payments and receipts",nt_d_orders:"Your orders and decisions",nt_d_campaigns:"New tracks and campaigns",nt_d_accounts:"Account verification and price offers",nt_d_support:"Messages from the manager",nt_email:"Send to my email too",nt_email_ph:"your@email.com",nt_save:"Save settings",nt_saved:"✓ Saved",nt_snd:"Sound",nt_email_bad:"The email looks wrong.",
+ nt_ord_approved:"Your order for “{t}” was approved. Send your video links within 16 days.",nt_ord_rejected:"Your order for “{t}” was not taken.",nt_ord_completed:"Your videos for “{t}” were accepted. Payment is on the way.",nt_ord_returned:"Your links for “{t}” were returned. Fix them and send again.",nt_ord_cancelled:"The order for “{t}” was cancelled.",nt_money_paid:"Payment sent: {a} for “{t}”. Open My orders for the receipt.",nt_acc_approved:"Your account {h} is verified.",nt_acc_rejected:"Your account {h} was not taken.",nt_acc_banned:"Your account {h} was blocked.",nt_price_suggest:"The manager suggests a new price for {h}: {p}. Open your dashboard to accept."});
+Object.assign(LT.ru,{nt_title:"Уведомления",nt_tab_in:"Уведомления",nt_tab_set:"Настройки",nt_all:"Все",nt_unread:"Непрочитанные",nt_arch:"Архив",nt_none:"Пока ничего нет.",nt_readall:"Прочитать все",nt_archive:"В архив",nt_restore:"Вернуть",nt_what:"Что вы хотите получать?",nt_d_money:"Платежи и счета",nt_d_orders:"Ваши заказы и решения",nt_d_campaigns:"Новые треки и кампании",nt_d_accounts:"Проверка аккаунтов и предложения по цене",nt_d_support:"Сообщения от менеджера",nt_email:"Присылать ещё и на почту",nt_email_ph:"ваша@почта.com",nt_save:"Сохранить настройки",nt_saved:"✓ Сохранено",nt_snd:"Звук",nt_email_bad:"Почта указана неверно.",
+ nt_ord_approved:"Ваш заказ на «{t}» одобрен. Отправьте ссылки на видео в течение 16 дней.",nt_ord_rejected:"Ваш заказ на «{t}» не взяли.",nt_ord_completed:"Ваши видео к «{t}» приняты. Выплата в пути.",nt_ord_returned:"Ссылки к «{t}» вернули. Исправьте и отправьте снова.",nt_ord_cancelled:"Заказ на «{t}» отменён.",nt_money_paid:"Выплата отправлена: {a} за «{t}». Счёт смотрите в «Мои заказы».",nt_acc_approved:"Ваш аккаунт {h} верифицирован.",nt_acc_rejected:"Ваш аккаунт {h} не взяли.",nt_acc_banned:"Ваш аккаунт {h} заблокирован.",nt_price_suggest:"Менеджер предлагает новую цену для {h}: {p}. Откройте кабинет, чтобы принять."});
+LV.inbox=LV.inbox||[];LV.nprefs=LV.nprefs||{types:{},email:""};LV.nTab=LV.nTab||"in";LV.nFil=LV.nFil||"all";
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch(e){return[]}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function nText(m){if(m.key){var s=L("nt_"+m.key),v=m.vars||{};return s.replace(/\{(\w+)\}/g,function(a,k){return v[k]!==undefined?v[k]:""})}return (m.title?m.title+": ":"")+m.text}
+function nOn(type){return (LV.nprefs.types||{})[type]!==false}
+function nUnread(){var r=lsGet("pc_read"),a=lsGet("pc_arch");return LV.inbox.filter(function(m){return nOn(m.type)&&r.indexOf(m.id)<0&&a.indexOf(m.id)<0}).length}
+function nBadge(){var b=$("navBell");if(!b)return;var n=nUnread();b.innerHTML='🔔'+(n?'<span class="bdg">'+(n>9?"9+":n)+'</span>':'')}
+function loadInbox(cb){
+  if(!LIVE||!roleGet())return;
+  fetch("/api/inbox?role="+(roleGet()==="producer"?"producers":"editors"),{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){
+    LV.inbox=(j.items||[]).sort(function(a,b){return b.at-a.at});if(j.prefs)LV.nprefs=j.prefs;LV.inNow=j.now;nBadge();if(cb)cb(j);
+  }).catch(function(){});
+}
+function inboxPoll(){
+  if(!LIVE||/^#admin/.test(location.hash)||!roleGet()||document.hidden)return;
+  var since=0;try{since=Number(localStorage.getItem("pinbox"))||0}catch(e){}
+  loadInbox(function(j){
+    try{localStorage.setItem("pinbox",String(j.now))}catch(e){}
+    if(!since)return;LV.inbox.filter(function(m){return m.at>since&&nOn(m.type)}).slice(0,3).forEach(function(m){gotMessage("",nText(m))});
+    if(LV.modal&&LV.modal.type==="snd")sndModal();
+  });
+}
+function nTime(at){return new Date(at).toLocaleString(lang,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
+function sndModal(){
+  var cur=sndGet(),r=lsGet("pc_read"),ar=lsGet("pc_arch");LV.modal={type:"snd"};
+  var list=LV.inbox.filter(function(m){return nOn(m.type)}).filter(function(m){var isA=ar.indexOf(m.id)>=0,isR=r.indexOf(m.id)>=0;return LV.nFil==="arch"?isA:(!isA&&(LV.nFil==="all"||!isR))});
+  var un=nUnread(),inbox='<div class="chips" role="group">'+["all","unread","arch"].map(function(f){return '<button type="button" class="chip" data-l="nFil" data-f="'+f+'" aria-pressed="'+(LV.nFil===f)+'">'+esc(L(f==="all"?"nt_all":(f==="unread"?"nt_unread":"nt_arch")))+'</button>'}).join("")+'</div>'+
+    (un?'<div class="row" style="margin:8px 0"><button class="btn sm" data-l="nReadAll">'+esc(L("nt_readall"))+'</button></div>':'')+
+    '<div class="nlist">'+(list.length?list.map(function(m){var isR=r.indexOf(m.id)>=0,isA=ar.indexOf(m.id)>=0;return '<div class="nitem'+(isR?'':' unr')+'" data-l="nRead" data-id="'+esc(m.id)+'"><span class="ndot"></span><div class="nb"><div class="nt">'+esc(nText(m))+'</div><small>'+esc(L("nt_t_"+m.type))+' · '+esc(nTime(m.at))+'</small></div><button type="button" class="btn sm" data-l="nArch" data-id="'+esc(m.id)+'">'+esc(L(isA?"nt_restore":"nt_archive"))+'</button></div>'}).join(""):'<div class="empty">'+esc(L("nt_none"))+'</div>')+'</div>';
+  var types=["money","orders","campaigns","accounts","support"].map(function(k){return '<label class="chk" for="np_'+k+'"><input type="checkbox" id="np_'+k+'" data-np="'+k+'"'+(nOn(k)?' checked':'')+'><span><b>'+esc(L("nt_t_"+k))+'</b><br><small>'+esc(L("nt_d_"+k))+'</small></span></label>'}).join("");
+  var set='<h4>'+esc(L("nt_snd"))+'</h4><div class="sndl">'+Object.keys(SNDS).map(function(k){return '<label class="sndo"><input type="radio" name="snd" value="'+k+'"'+(k===cur?' checked':'')+' data-l="sndPick"><span>'+esc(L("snd_"+k))+'</span><button type="button" class="btn sm" data-l="sndTry" data-k="'+k+'">▶</button></label>'}).join("")+'</div><div class="row"><button class="btn" data-l="pushOn">'+esc(L("snd_enable"))+'</button></div><p class="hint" id="pushMsg"></p>'+
+    '<h4>'+esc(L("nt_what"))+'</h4>'+types+'<label class="f" for="npEmail"><span>'+esc(L("nt_email"))+'</span><input id="npEmail" type="email" inputmode="email" autocomplete="email" placeholder="'+esc(L("nt_email_ph"))+'" value="'+esc(LV.nprefs.email||"")+'"></label><div class="note err" id="npErr" hidden></div><div class="row"><button class="btn primary" id="npSave" data-l="npSave">'+esc(L("nt_save"))+'</button></div>';
+  openModal('<div class="ntm"><h3>🔔 '+esc(L("nt_title"))+'</h3><div class="ntabs"><button type="button" class="chip" data-l="nTab" data-t="in" aria-pressed="'+(LV.nTab==="in")+'">'+esc(L("nt_tab_in"))+(un?' ('+un+')':'')+'</button><button type="button" class="chip" data-l="nTab" data-t="set" aria-pressed="'+(LV.nTab==="set")+'">'+esc(L("nt_tab_set"))+'</button></div>'+(LV.nTab==="in"?inbox:set)+'<div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("close"))+'</button></div></div>');
+}
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="sndOpen"){e.stopImmediatePropagation();LV.nTab="in";sndModal();loadInbox(function(){if(LV.modal&&LV.modal.type==="snd")sndModal()});return}
+  if(a==="nTab"){LV.nTab=el.getAttribute("data-t");sndModal();return}
+  if(a==="nFil"){LV.nFil=el.getAttribute("data-f");sndModal();return}
+  if(a==="nRead"){if(e.target.closest('[data-l="nArch"]'))return;var r=lsGet("pc_read");if(r.indexOf(id)<0){r.push(id);lsSet("pc_read",r)}nBadge();sndModal();return}
+  if(a==="nReadAll"){var r2=lsGet("pc_read");LV.inbox.forEach(function(m){if(r2.indexOf(m.id)<0)r2.push(m.id)});lsSet("pc_read",r2);nBadge();sndModal();return}
+  if(a==="nArch"){e.stopPropagation();var ar=lsGet("pc_arch"),i=ar.indexOf(id);if(i>=0)ar.splice(i,1);else{ar.push(id);var rd=lsGet("pc_read");if(rd.indexOf(id)<0){rd.push(id);lsSet("pc_read",rd)}}lsSet("pc_arch",ar);nBadge();sndModal();return}
+  if(a==="npSave"){
+    var types={};document.querySelectorAll("[data-np]").forEach(function(c){types[c.getAttribute("data-np")]=c.checked});var em=($("npEmail")||{}).value||"",er=$("npErr");
+    if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){er.textContent=L("nt_email_bad");er.hidden=false;return}
+    er.hidden=true;LV.nprefs={types:types,email:em.trim()};
+    api("/api/notif/prefs",{role:roleGet()==="producer"?"producers":"editors",types:types,email:em}).then(function(r){
+      if(r.ok||(r.j&&/not signed/i.test(r.j.error||""))){el.classList.add("savedg");el.textContent=L("nt_saved");nBadge();setTimeout(function(){el.classList.remove("savedg");el.textContent=L("nt_save")},2500)}else{er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false}
+    });return}
+},true);
+setTimeout(function(){loadInbox()},1500);
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
 function applyLive(d){
   if(typeof LV!=="undefined")LV.payout=d.payout||{set:false};
   var oldMap={};S.accounts.forEach(function(a){oldMap[a.id]=a});
-  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,avatar:a.avatar||"",internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0}});
+  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,avatar:a.avatar||"",suggestedPrice:a.suggestedPrice||null,internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0}});
   S.active=Math.min(S.active,Math.max(0,S.accounts.length-1));sync();save();
 }
 /* When the page is served by server.js it talks to /api; anywhere else (this preview) it stays in demo mode */
