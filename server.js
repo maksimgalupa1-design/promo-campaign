@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 32;
+const SERVER_VER = 33;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -482,7 +482,7 @@ function overview() {
   return {
     stats: { accounts: accs.length, boughtVideos, purchasedViews, purchasedLinksCounted: matched, views30, byTrack,
       editorsPaidTotal: paidSum(paidReqs), editorsPaid30: paidSum(paidReqs.filter(r => now - (r.paidAt || 0) <= D30)), producersPaidTotal: topSum(okTopups), producersPaid30: topSum(okTopups.filter(t => now - (t.confirmedAt || t.created) <= D30)),
-      pendingPayouts: reqs.filter(r => r.status === "completed" && !r.paid).length,
+      pendingPayouts: reqs.filter(r => ["approved", "returned", "submitted", "completed"].includes(r.status) && !r.paid).length,
       pendingRequests: reqs.filter(r => r.status === "pending" || r.status === "submitted").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
@@ -649,6 +649,12 @@ const server = http.createServer(async (req, res) => {
     }
     if (P === "/api/price-ranges" && M === "GET") return send(res, 200, { ranges: db.settings.ranges || { visual: { min: 3, max: 5 } } });
     if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "", instagram: c.instagram || "", tiktok: c.tiktok || "" }); }
+    if (P === "/api/platform-stats" && M === "GET") {      // public numbers for the editor home widgets
+      if (!sessionUser(req)) return send(res, 401, { error: "not signed in" });
+      const now = Date.now(), rs = Object.values(db.requests).filter(r => !r.demo), paid = rs.filter(r => r.paid);
+      const sum = l => Math.round(l.reduce((x, r) => x + reqCost(r), 0));
+      return send(res, 200, { paid: sum(paid), p7: sum(paid.filter(r => now - (r.paidAt || 0) <= 7 * 86400000)), p30: sum(paid.filter(r => now - (r.paidAt || 0) <= 30 * 86400000)), videos: rs.filter(r => ["approved", "submitted", "completed", "returned"].includes(r.status)).reduce((x, r) => x + (r.videos || 0), 0) });
+    }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
       const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ cover: (ensureCover(t), t.cover || ""), id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, deadline: t.deadline || "", producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
