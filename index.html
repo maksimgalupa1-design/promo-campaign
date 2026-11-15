@@ -439,6 +439,25 @@ textarea{background:var(--bg);color:var(--fg);border:1px solid var(--line);borde
 .rtauto{background:#F5C518;border-color:#F5C518;color:#3a2c00}.rtauto.on{box-shadow:0 0 0 3px rgba(245,197,24,.45)}
 .rtdec{margin-top:10px;padding:10px;border-radius:14px;border:1px dashed var(--line)}.rtdec>div{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 
+.atb{transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease}
+.atb:hover,.atb:focus-visible{transform:translateY(-3px);border-color:#E8445A;box-shadow:0 0 0 2px #E8445A,0 0 18px 4px rgba(232,68,90,.55)}
+.atb:active{transform:translateY(-1px)}
+
+.autosc{display:flex;align-items:center;gap:8px;font-size:13px;opacity:.8;margin:0 0 12px}
+
+/* v12 settings layout */
+.setcard>.f,.setcard>label.f,.setcard>.sect{display:block;margin:0 0 22px;padding:0 0 20px;border-bottom:1px solid var(--line)}
+.setcard .f>span:first-child,.setcard .sh{display:block;font-size:17px;font-weight:800;margin-bottom:8px}
+.setcard input[type=text],.setcard input[type=url],.setcard input[type=number]{font-size:18px;padding:12px 14px;min-height:50px}
+.setcard textarea{font-size:18px;min-height:140px;line-height:1.45}
+.setcard .tieropt{font-size:17px}.setcard .tieropt.cust .tierrow input{width:110px;font-size:22px;text-align:center}
+.setcard .tiers .btn{margin-top:10px}
+.setcard .hint{font-size:14px}
+.setcard .cats,.setcard .catgrid{margin-top:8px}
+.lkset{display:grid;gap:8px}.lkin{font-size:16px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
+.rcrecv{background:#1FA85A;color:#fff;border:0;font-weight:800}.rcpdfb{background:#2F6BFF;color:#fff;border:0}
+.rcproof{margin:12px 0}.rcproof small{display:block;margin-bottom:6px;opacity:.7}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -615,7 +634,7 @@ textarea{background:var(--bg);color:var(--fg);border:1px solid var(--line);borde
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign</span>
+  <span>© Promo Campaign · v12 · 15.11 13:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -1434,13 +1453,13 @@ function openReq(tid){
   if(!S.accounts.length){go("signup");return}
   var t=LV.tracks.filter(function(x){return x.id===tid})[0];if(!t)return;
   LV.modal={type:"req",tid:tid};
-  var okN=S.accounts.filter(function(a){return accReady(a)&&accMatch(a,t)}).length;
+  var okN=S.accounts.filter(function(a){return accReady(a)&&accMatch(a,t)&&!reqSent(t.id,a)}).length;
   openModal('<h3>'+esc(t.title)+' · '+esc(t.artist)+'</h3><div>'+trCats(t)+'</div><b>'+esc(L("rq_acc"))+'</b>'+
     (okN>1?'<label class="accopt all"><input type="checkbox" id="rqAll"><span><b>'+esc(L("rq_all"))+' ('+okN+')</b></span></label>':'')+
     '<div class="accscroll">'+S.accounts.filter(function(a){return accMatch(a,t)}).map(function(a,i){
-      var ready=accReady(a),match=accMatch(a,t),ok=ready&&match;
+      var ready=accReady(a),match=accMatch(a,t),sent=reqSent(t.id,a),ok=ready&&match&&!sent;
       return '<div class="accrow"><label class="accopt'+(ok?'':' dis')+'"><input type="checkbox" data-acc="'+esc(a.id)+'"'+(ok?'':' disabled')+'><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+'<br><span class="hint">'+(a.price?money(a.price)+' · ':'')+catPills(a.categories,a.otherCategory)+'</span>'+
-        (!ok?'<br><span class="hint" style="color:var(--bad)">'+esc(!ready?accWhy(a):L("rq_cat_no"))+'</span>':'')+'</span></label>'+
+        (!ok?'<br><span class="hint" style="color:var(--bad)">'+esc(sent?L("rq_sent"):(!ready?accWhy(a):L("rq_cat_no")))+'</span>':'')+'</span></label>'+
         (ok?'<div class="accdisc hint">★ '+esc(L("rq_disc_acc"))+': '+esc(tiersTxt(a.tiers))+'</div>':'')+'</div>';
     }).join("")+'</div><p class="hint">'+esc(L("rq_disc_h2"))+'</p>'+
     '<div class="note err" id="rqErr" hidden></div><div class="row"><button class="btn primary" data-l="rqSend">'+esc(L("rq_send"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');
@@ -1453,7 +1472,7 @@ function sendReq(){
   ids.forEach(function(id){var i=document.querySelector('#modalRoot input[data-disc="'+id+'"]');if(i&&i.value!=="")body.discounts[id]=Number(i.value)});
   api("/api/request",body).then(function(r){
     if(!r.ok){err.textContent=(r.j&&r.j.error)||L("p_err");err.hidden=false;return}
-    closeModal();loadReqs().then(function(){go("dashboard")});
+    closeModal();loadReqs().then(function(){toast("✓ "+L("rq_done"))});
   });
 }
 function loadReqs(){
@@ -1575,7 +1594,7 @@ function renderOwner(){
   if(!ADM.ok||!D)return false;checkNew(D);
   var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","prices"]],["g-pr","🎵","g_pr",["producers","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -1611,7 +1630,7 @@ function renderOwner(){
     body=payBar("eF",[["all",dl0.length],["pending",dl0.filter(function(q){return !q.paid}).length],["done",dl0.filter(function(q){return q.paid}).length]])+'<div class="list">'+(dl.length?dl.map(function(q){
       var po=q.payout?'<div class="note"><b>'+esc(L("a_pay_payout"))+':</b> '+esc((q.payout.method==="crypto"?coinL(q.payout.coin)+" ":q.payout.method+" ")+q.payout.value+(q.payout.holder?" · "+q.payout.holder:""))+'</div>':'<div class="note err">'+esc(L("a_no_payout"))+'</div>';
       return '<div class="card ord"><div class="t"><div><span>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+'</span><b>'+money(q.cost)+'</b><span>'+esc(q.track)+' · '+esc(q.artist)+'</span></div><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></div>'+po+
-        (q.paid?'':'<label class="f" for="sc_'+esc(q.id)+'"><span>'+esc(L("a_proof_pick"))+'</span><input id="sc_'+esc(q.id)+'" type="file" accept="image/*"></label>')+'<div class="row"><button class="btn sm '+(q.paid?'':'primary')+'" data-l="poAct2" data-id="'+esc(q.id)+'" data-p="'+(q.paid?0:1)+'">'+esc(L(q.paid?"a_unpaid":"a_mark_paid"))+'</button>'+(q.hasProof?'<button class="btn sm" data-l="admProof" data-id="'+esc(q.id)+'">'+esc(L("a_view_proof"))+'</button>':'')+'</div></div>';
+        (q.paid?'':'<label class="f" for="pb_'+esc(q.id)+'"><span>'+esc(L("pb_lbl"))+'</span><input id="pb_'+esc(q.id)+'" type="text" maxlength="60" placeholder="'+esc(L("pb_ph"))+'"></label><label class="f" for="sc_'+esc(q.id)+'"><span>'+esc(L("a_proof_pick"))+'</span><input id="sc_'+esc(q.id)+'" type="file" accept="image/*"></label>')+'<div class="row"><button class="btn sm '+(q.paid?'':'primary')+'" data-l="poAct2" data-id="'+esc(q.id)+'" data-p="'+(q.paid?0:1)+'">'+esc(L(q.paid?"a_unpaid":"a_mark_paid"))+'</button>'+(q.hasProof?'<button class="btn sm" data-l="admProof" data-id="'+esc(q.id)+'">'+esc(L("a_view_proof"))+'</button>':'')+'</div></div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="prices"){
     var RG=LV.ranges||{};
@@ -1924,7 +1943,7 @@ document.addEventListener("click",function(e){
   if(a==="etaSave"){api("/api/admin/eta",{id:id,eta:val("eta_"+id)}).then(function(){ownerReload()});return}
   if(a==="poAct2"){
     var paid=el.getAttribute("data-p")==="1",inp=$("sc_"+id),f=inp&&inp.files&&inp.files[0];
-    function go(img){var body={id:id,paid:paid};if(img)body.image=img;api("/api/admin/payout",body).then(function(){ownerReload()})}
+    function go(img){var body={id:id,paid:paid};if(img)body.image=img;if(paid&&$("pb_"+id))body.paidBy=val("pb_"+id);api("/api/admin/payout",body).then(function(){ownerReload()})}
     if(paid&&f){shrinkImage(f,function(img){go(img)})}else go(null);return}
 });
 
@@ -2172,7 +2191,7 @@ Object.assign(LT.en,{nav_orders:"My orders",od_title:"My orders",od_search:"Find
 Object.assign(LT.ru,{nav_orders:"Мои заказы",od_title:"Мои заказы",od_search:"Найти трек по названию или артисту",od_f_all:"Все",od_f_work:"В работе",od_f_wait:"Ждут решения",od_f_done:"Завершены",od_none:"Здесь пока нет заказов.",od_left:"Осталось времени на ссылки",od_d:"дн.",od_h:"час.",od_m:"мин.",od_s:"сек.",od_over:"Время вышло. Напишите менеджеру.",od_started:"Одобрено",od_wait_t:"Ждёт решения менеджера",od_wait_h:"Менеджер проверяет вашу заявку или ваши ссылки на видео.",od_done_t:"Завершено",od_sub_t:"Видео",od_early:"Сдавайте раньше: ранние заказы поднимают вас в рекомендациях.",rc_btn:"Счёт",rc_title:"Счёт об оплате",rc_no:"Счёт №",rc_paid:"Оплачено",rc_acc:"Принято вами",rc_you:"Получатель",rc_from:"Плательщик",rc_item:"Заказ",rc_qty:"Видео",rc_per:"За видео",rc_disc:"Скидка за объём",rc_total:"Всего оплачено",rc_note:"Этот счёт подтверждает оплату через Promo Campaign. Это не налоговый документ.",rc_accept:"Я получил деньги",rc_pdf:"Сохранить в PDF",rc_proof:"Показать скриншот оплаты",rc_close:"Закрыть",rc_accepted_ok:"Спасибо, счёт принят.",rc_unpaid:"Ещё не оплачено"});
 LV.of=LV.of||"all";LV.oq=LV.oq||"";
 function p2(x){return x<10?"0"+x:""+x}
-function ordGroup(q){return (q.status==="pending"||q.status==="submitted")?"wait":((q.status==="approved"||q.status==="returned")?"work":(q.status==="completed"?"done":"other"))}
+function ordGroup(q){return (q.status==="pending"||q.status==="submitted")?"wait":((q.status==="approved"||q.status==="returned")?"work":(q.status==="completed"?(q.paid?"done":"wait"):"other"))}
 function ordEnd(q){return (q.approvedAt||q.created)+16*86400000}
 function cdHtml(q){
   var end=ordEnd(q);
@@ -2190,9 +2209,9 @@ setInterval(tickCd,1000);
 function ordCard(q,u,i){
   var g=ordGroup(q),body="";
   if(g==="work"){
-    body=cdHtml(q)+'<label class="f" for="lk_'+esc(q.id)+'"><span>'+esc(L("dl_links"))+' ('+q.videos+')</span><textarea id="lk_'+esc(q.id)+'" rows="'+Math.min(4,q.videos)+'" placeholder="https://www.tiktok.com/'+esc((u&&u.handle)||q.handle)+'/video/..."></textarea></label><div class="note err" id="lkErr_'+esc(q.id)+'" hidden></div><div class="hint">'+esc(L("od_early"))+'</div><div><button class="btn sm primary" data-l="sendLinks" data-id="'+esc(q.id)+'" data-n="'+q.videos+'">'+esc(L("dl_send"))+'</button></div>';
+    body=cdHtml(q)+''+lkInputs(q,u)+'<div class="note err" id="lkErr_'+esc(q.id)+'" hidden></div><div class="hint">'+esc(L("od_early"))+'</div><div><button class="btn sm primary" data-l="sendLinks" data-id="'+esc(q.id)+'" data-n="'+q.videos+'">'+esc(L("dl_send"))+'</button></div>';
   }else if(g==="wait"){
-    body='<div class="odwait"><span class="odpulse"></span><div><b>'+esc(L("od_wait_t"))+'</b><div class="hint">'+esc(L("od_wait_h"))+'</div></div></div>';
+    body=q.status==="completed"?'<div class="odwait"><span class="odpulse"></span><div><b>💸 '+esc(L("od_pay_wait"))+'</b><div class="hint">'+esc(L("od_pay_wait_h"))+'</div></div></div>':'<div class="odwait"><span class="odpulse"></span><div><b>'+esc(L("od_wait_t"))+'</b><div class="hint">'+esc(L("od_wait_h"))+'</div></div></div>';
   }
   if(q.links&&q.links.length)body+='<div class="hint" style="overflow-wrap:anywhere">'+q.links.map(function(l){return esc(l.url)+(l.views!=null?' · '+n(l.views):'')}).join("<br>")+'</div>';
   var rc=q.paid?'<div class="row"><button class="btn sm rcb'+(q.accepted?' acc':'')+'" data-l="rcOpen" data-id="'+esc(q.id)+'">🧾 '+esc(L("rc_btn"))+'</button>'+(q.accepted?'<span class="rcok">✓ '+esc(L("rc_acc"))+'</span>':'')+'</div>':'';
@@ -2379,7 +2398,7 @@ function renderDashLive(){
   $("profCard").innerHTML='<button type="button" class="btn sm" data-l="accBack">'+esc(L("ad_back"))+'</button>'+
     '<div class="achd">'+accAv(u,"acav big")+'<div><b>'+esc(u.handle)+'</b><div>'+accStPill(u)+'</div></div></div>'+
     stepsHtml(u)+priceBig(u)+
-    statsHtml(u)+sugBanner(u)+actRow(u)+(LV.edit?'<div class="blk"><h3>'+esc(L("ad_set"))+'</h3>'+
+    statsHtml(u)+sugBanner(u)+(true?'<div class="blk"><h3>'+esc(L("ad_set"))+'</h3>'+
     '<label class="f" for="sName"><span>'+esc(L("ad_label"))+'</span><input id="sName" type="text" maxlength="60" value="'+esc(u.internalName||"")+'"><span class="hint">'+esc(L("ad_label_h"))+'</span></label>'+
     '<div class="f"><span>'+esc(L("ad_tt"))+': </span> <a class="ttlink" href="https://www.tiktok.com/'+esc(u.handle)+'" target="_blank" rel="noopener noreferrer">https://www.tiktok.com/'+esc(u.handle)+'</a></div>'+
     '<div class="f"><span>'+esc(L("ad_price"))+'</span><div class="row" style="align-items:center"><b style="font-size:20px">'+(u.price?'$'+u.price:'—')+'</b><button type="button" class="btn sm primary" id="changePrice">'+esc(L("pr_btn"))+'</button></div></div>'+
@@ -2388,7 +2407,7 @@ function renderDashLive(){
     '<label class="f" for="sAbout"><span>'+esc(L("ad_about"))+'</span><textarea id="sAbout" rows="4" maxlength="600" placeholder="'+esc(L("dl_about_ph"))+'">'+esc(u.about||"")+'</textarea><span class="hint" id="sAboutN">'+wc+' '+esc(L("ad_wc"))+' · '+esc(L("ad_about_h"))+'</span></label>'+
     '<b>'+esc(L("ad_cats"))+'</b>'+catChecks("sCats",u.categories)+
     '<label class="f" id="sOtherRow" for="sOther"'+((u.categories||[]).indexOf("other")>=0?'':' hidden')+'><span>'+esc(L("dl_other"))+'</span><input id="sOther" type="text" maxlength="60" value="'+esc(u.otherCategory||"")+'"></label>'+
-    '<div class="row"><button class="btn primary" data-l="saveAcc">'+esc(L("dl_save"))+'</button><button class="btn" data-l="editToggle">'+esc(L("p_cancel"))+'</button><span class="hint" id="sOk">'+esc(LV.ok)+'</span></div></div>':summaryHtml(u))+
+    '<div class="row"><button class="btn primary" data-l="saveAcc">'+esc(L("dl_save"))+'</button><span class="hint" id="sOk">'+esc(LV.ok)+'</span></div></div>':summaryHtml(u))+
     '<div class="row" style="justify-content:space-between;margin:18px 0 10px"><h3>'+esc(t("d_prof"))+'</h3></div>'+winTable(A,u)+videoTable(u)+
     '<div class="delzone"><h3>'+esc(L("ad_del_t"))+'</h3><p class="delrule">'+esc(L("ad_del_rule"))+'</p>'+(open>0?'<div class="note err">'+esc(L("ad_del_open").replace("{n}",open))+'</div><button class="btn sm danger" disabled>'+esc(t("acc_del"))+' '+esc(u.handle)+'</button>':delBox(u))+'</div>';
   $("consentRow").innerHTML="";
@@ -2571,7 +2590,7 @@ var TIER_OPTS=[[3,5],[6,10],[12,15]];
 function tiersHtml(u){
   var cur=u.tiers||[],pre=function(x){return TIER_OPTS.some(function(o){return o[0]===x.min&&o[1]===x.pct})},cust=cur.filter(function(x){return !pre(x)})[0]||{min:"",pct:""};
   return '<div class="f tiers"><span>'+esc(L("tr_h"))+'</span><span class="hint">'+esc(L("tr_h3"))+'</span>'+TIER_OPTS.map(function(o,i){var on=cur.some(function(x){return x.min===o[0]&&x.pct===o[1]});return '<label class="chk tieropt" for="tOpt'+i+'"><input type="checkbox" id="tOpt'+i+'" data-min="'+o[0]+'" data-pct="'+o[1]+'"'+(on?' checked':'')+'><span><b>'+o[0]+' '+esc(L("tr_vid"))+'</b> → −'+o[1]+'%</span></label>'}).join("")+
-   '<div class="tieropt cust"><b>'+esc(L("tr_own"))+'</b><div class="tierrow"><span>'+esc(L("tr_from"))+'</span><input id="tcMin" type="number" min="2" max="500" inputmode="numeric" value="'+cust.min+'" placeholder="8"><span>'+esc(L("tr_vid"))+'</span><b>−</b><input id="tcPct" type="number" min="1" max="99" inputmode="numeric" value="'+cust.pct+'" placeholder="12"><span>%</span></div></div>'+
+   '<div class="tieropt cust"><b>'+esc(L("tr_own"))+'</b><div class="tierrow"><span>'+esc(L("tr_from"))+'</span><input id="tcMin" type="text" maxlength="3" inputmode="numeric" pattern="[0-9]*" value="'+cust.min+'" placeholder="8"><span>'+esc(L("tr_vid"))+'</span><b>−</b><input id="tcPct" type="text" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="'+cust.pct+'" placeholder="12"><span>%</span></div></div>'+
    '<div class="row"><button type="button" class="btn primary" data-l="saveTiers">'+esc(L("tr_save"))+'</button></div></div>';
 }
 function readTiers(){var o=[];document.querySelectorAll(".tieropt input[data-min]:checked").forEach(function(c){o.push({min:Number(c.getAttribute("data-min")),pct:Number(c.getAttribute("data-pct"))})});var m=Number(val("tcMin")),p=Number(val("tcPct"));if(m>=2&&m<=500&&p>=1&&p<=99)o.push({min:m,pct:p});return o}
@@ -2586,6 +2605,7 @@ function saveAcc(){
   var u=S.user;if(!u)return;var ok=$("sOk");
   var about=val("sAbout");
   if(about.trim()&&wordCount(about)<3){if(ok){ok.textContent=L("ad_about_min");ok.style.color="var(--bad)"}return}
+  if(!checked("sCats").length||wordCount(about)<3){if(ok){ok.textContent=L("ad_need");ok.style.color="var(--bad)"}return}
   var ts=readTiers();if(ts===null){if(ok){ok.textContent=L("p_err");ok.style.color="var(--bad)"}return}
   var id=u.id;
   api("/api/account/update",{id:id,internalName:val("sName"),categories:checked("sCats"),otherCategory:val("sOther"),about:about,tiers:ts,discountAll:!!($("sAll")&&$("sAll").checked),review:true}).then(function(r){
@@ -2717,9 +2737,12 @@ Object.assign(LT.ru,{tr_h:"Скидки за количество",tr_h3:"Выб
 document.addEventListener("click",function(e){var el=e.target.closest('[data-l="saveTiers"]');if(!el||!S.user)return;e.stopImmediatePropagation();
   var ts=readTiers(),id=S.user.id;el.disabled=true;
   api("/api/account/update",{id:id,tiers:ts,review:true,discountAll:!!($("sAll")&&$("sAll").checked)}).then(function(r){el.disabled=false;if(!r.ok){toast((r.j&&r.j.error)||L("p_err"));return}applyLive(r.j);renderDashLive();toast(L("tr_saved"))})},true);
-/* editor: payout details always visible on the account page */
+/* editor: payout details live inside the account settings card */
 (function(){var o=renderDashLive;renderDashLive=function(){o.apply(this,arguments);
-  if(LV.acc&&S.user){var h=$("payH1");if(h){h.hidden=false;h.textContent=L("pay_mine")}$("payBox").innerHTML='<p class="hint">'+esc(L(S.user&&LV.payout&&LV.payout.set?"pay_mine_h":"pay_none"))+'</p>'+payoutBlock();try{refreshPayBox()}catch(e){}}
+  if(LV.acc&&S.user){var h=$("payH1");if(h)h.hidden=true;$("payBox").innerHTML="";
+    var save=document.querySelector('#profCard [data-l="saveAcc"]'),row=save&&save.closest(".row");
+    if(row&&!$("paySec"))row.insertAdjacentHTML("beforebegin",'<div class="f sect" id="paySec"><span class="sh">💳 '+esc(L("pay_mine"))+'</span><p class="hint">'+esc(L(LV.payout&&LV.payout.set?"pay_mine_h":"pay_none"))+'</p>'+payoutBlock()+'</div>');
+    try{refreshPayBox()}catch(e){}}
 }})();
 /* owner: where to pay */
 function payTxt(p){return p?esc((p.method==="crypto"?coinL(p.coin)+" ":p.method+" ")+p.value+(p.holder?" · "+p.holder:"")):""}
@@ -2751,10 +2774,45 @@ document.addEventListener("click",function(e){var el=e.target.closest("[data-l]"
   if(a==="rtWhole"){var box=el.closest(".ratebox"),w=el.getAttribute("data-w");box.querySelectorAll(".rtdec").forEach(function(d){d.hidden=d.getAttribute("data-w")!==w});return}
   if(a==="rate2"){var v=el.getAttribute("data-v");api("/api/admin/rating",{id:el.getAttribute("data-id"),stars:v==="auto"?null:Number(v)}).then(function(){ownerReload()});return}
 });
-/* owner tabs: keep the scroll position */
-document.addEventListener("click",function(e){if(!e.target.closest('[data-l="atab"]'))return;var y=window.scrollY;[0,40,120,300].forEach(function(ms){setTimeout(function(){window.scrollTo(0,y)},ms)})},true);
+/* owner tabs: scroll down to the opened section (can be switched off) */
+Object.assign(LT.en,{as_lbl:"Scroll down to the section when I tap a tab"});Object.assign(LT.ru,{as_lbl:"Прокручивать к разделу, когда нажимаю вкладку"});
+function autoScOn(){try{return localStorage.getItem("pc_autosc")!=="0"}catch(e){return true}}
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="autoSc"){try{localStorage.setItem("pc_autosc",e.target.checked?"1":"0")}catch(x){}}});
+document.addEventListener("click",function(e){if(!e.target.closest('[data-l="atab"]'))return;var y=window.scrollY,on=autoScOn();
+  [60,250].forEach(function(ms){setTimeout(function(){if(on){var g=document.querySelector(".autosc")||document.querySelector(".agroups");if(g)window.scrollTo({top:g.getBoundingClientRect().bottom+window.scrollY+4,behavior:ms>100?"smooth":"auto"})}else window.scrollTo(0,y)},ms)})},true);
 /* the pink "My dashboard" button duplicated the Dashboard tab */
 (function(){var nb=$("navSignup");if(nb)new MutationObserver(function(){if(S.user&&S.user.consent)nb.hidden=true;else nb.hidden=false}).observe(nb,{childList:true,attributes:true,attributeFilter:["data-go"]});if(nb&&S&&S.user&&S.user.consent)nb.hidden=true})();
+
+/* ===== v12 ===== */
+Object.assign(LT.en,{pb_lbl:"Paid by (name on the transfer)",pb_ph:"For example: Dmitry",od_pay_wait:"Payment on the way",od_pay_wait_h:"The manager is sending your money. You will get a receipt.",rq_sent:"Sent",rq_done:"Request sent",ad_need:"Choose at least one topic and write at least 3 words about the account first.",lk_n:"Video {n} link",rc_by:"Paid by",rc_recv:"I received the money",rc_proofh:"Payment proof",rc_head:"Payment receipt",sh_name:"Account name",sh_link:"TikTok account",sh_price:"Price per video",sh_about:"About the account",sh_topics:"Topics"});
+Object.assign(LT.ru,{pb_lbl:"Кто заплатил (имя в переводе)",pb_ph:"Например: Дмитрий",od_pay_wait:"Оплата в пути",od_pay_wait_h:"Менеджер отправляет вам деньги. Потом придёт квитанция.",rq_sent:"Отправлено",rq_done:"Заявка отправлена",ad_need:"Сначала выберите хотя бы одну тему и напишите про аккаунт минимум 3 слова.",lk_n:"Ссылка на видео {n}",rc_by:"Заплатил",rc_recv:"Я получил деньги",rc_proofh:"Подтверждение оплаты",rc_head:"Квитанция об оплате",sh_name:"Название аккаунта",sh_link:"Аккаунт в TikTok",sh_price:"Цена за видео",sh_about:"Об аккаунте",sh_topics:"Темы"});
+function reqSent(tid,a){return (LV.reqs||[]).some(function(q){return q.trackId===tid&&q.openId===a.id&&["pending","approved","submitted","returned","completed"].indexOf(q.status)>=0})}
+(function(){var o=openReq;openReq=function(tid){loadReqs().then(function(){o(tid)})}})();
+/* one input per video */
+function lkInputs(q,u){var have=(q.links||[]).map(function(l){return l.url}),h='<div class="f"><span>'+esc(L("dl_links"))+' ('+q.videos+')</span><div class="lkset" id="lk_'+esc(q.id)+'">';
+  for(var i=0;i<q.videos;i++)h+='<input class="lkin" type="url" inputmode="url" autocomplete="off" placeholder="'+esc(L("lk_n").replace("{n}",i+1))+'" value="'+esc(have[i]||"")+'">';return h+'</div></div>'}
+function sendLinks(id,nmax){
+  var box=$("lk_"+id),err=$("lkErr_"+id),links=[];box.querySelectorAll(".lkin").forEach(function(i){var v=i.value.trim();if(v)links.push(v)});
+  if(!links.length||links.length>nmax){err.textContent=L("dl_bad_link");err.hidden=false;return}
+  api("/api/request/links",{id:id,links:links}).then(function(r){
+    if(!r.ok){err.textContent=(r.j&&r.j.error)||L("dl_bad_link");err.hidden=false;return}
+    loadReqs().then(function(){renderDashLive();ordRefresh()});
+  });
+}
+/* receipt: payer name + the payment screenshot, no site or account names */
+function rcOpen(id){
+  var q=(LV.reqs||[]).filter(function(x){return x.id===id})[0];if(!q)return;
+  if(!q.paid){openModal('<p>'+esc(L("rc_unpaid"))+'</p><div class="row"><button class="btn" data-l="mclose2">'+esc(L("rc_close"))+'</button></div>');return}
+  var per=q.videos?q.cost/q.videos:q.cost;
+  openModal('<div class="rcp" id="rcp"><div class="rchead"><div class="rclogo"><b>'+esc(L("rc_head"))+'</b></div><div class="rcno"><small>№</small><b>'+esc(rcNo(q))+'</b></div></div>'+
+    '<div class="rcbig"><small>'+esc(L("rc_total"))+'</small><b>'+money(q.cost)+'</b><span class="rcpill ok">✓ '+esc(L("rc_paid"))+' · '+esc(fmtFull(q.paidAt))+'</span>'+(q.accepted?'<span class="rcpill blue">✓ '+esc(L("rc_acc"))+' · '+esc(fmtFull(q.acceptedAt))+'</span>':'')+'</div>'+
+    (q.paidBy?'<div class="rcparties"><div><small>'+esc(L("rc_by"))+'</small><b>'+esc(q.paidBy)+'</b></div></div>':'')+
+    '<table class="rct"><thead><tr><th>'+esc(L("rc_item"))+'</th><th>'+esc(L("rc_qty"))+'</th><th>'+esc(L("rc_per"))+'</th><th>'+esc(L("rc_total"))+'</th></tr></thead><tbody><tr><td><b>'+esc(q.track)+'</b><small>'+esc(q.artist)+'</small></td><td>'+q.videos+'</td><td>'+money(per)+'</td><td><b>'+money(q.cost)+'</b></td></tr></tbody></table>'+
+    (q.discount?'<div class="rcdisc">'+esc(L("rc_disc"))+' −'+q.discount+'%</div>':'')+
+    (q.hasProof?'<div class="rcproof"><small>'+esc(L("rc_proofh"))+'</small><img id="rcProofImg" alt="" style="max-width:100%;border-radius:10px;display:none"></div>':'')+
+    '<div class="rcbtns"><div class="note ok" id="rcMsg" hidden></div><div class="row">'+(q.accepted?'':'<button class="btn rcrecv" data-l="rcAccept" data-id="'+esc(q.id)+'">✓ '+esc(L("rc_recv"))+'</button>')+'<button class="btn rcpdfb" data-l="rcPdf">⬇ '+esc(L("rc_pdf"))+'</button><button class="btn" data-l="mclose2">'+esc(L("rc_close"))+'</button></div></div></div>');
+  if(q.hasProof)api("/api/request/proof?id="+encodeURIComponent(q.id)).then(function(r){var im=$("rcProofImg");if(r.ok&&r.j.image&&im&&String(r.j.image).indexOf("data:image")===0){im.src=r.j.image;im.style.display="block"}});
+}
 
 (function(){var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
