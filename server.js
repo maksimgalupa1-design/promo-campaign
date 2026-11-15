@@ -310,6 +310,7 @@ function accAdminView(acc) {
   return v;
 }
 const FEE = 0.2;   // site commission, taken from every confirmed payment
+const RATES = { t: 0, live: false, v: { UAH: 41.5, USDT: 1, SOL: 0.0058, TRX: 3.4, ETH: 0.00032, LTC: 0.0105, TON: 0.42, BTC: 0.0000105 } };
 const METHODS = ["paypal", "usdt", "card", "crypto"];
 const COINS = ["solana", "tron", "ethereum", "litecoin", "ton"];
 const PLATFORMS = ["tiktok", "instagram", "youtube"];
@@ -389,7 +390,7 @@ function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
-    internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, descRule: !!t.descRule, message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
+    internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, tdl: t.deadline || "", descRule: !!t.descRule, message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > 16 * 86400000 };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)), pp = accPayoutRaw(ou, acc); if (pp) o.payout = decObj(pp.enc); }
   if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.tiers = acc.tiers || []; o.bulk = maxTier(acc); o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
@@ -424,7 +425,7 @@ function overview() {
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
     tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
-    topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", deadline: (db.tracks[p.trackId] || {}).deadline || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
+    topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", deadline: (db.tracks[p.trackId] || {}).deadline || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, cur: p.cur || "", orig: p.orig || 0, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
         paid: Math.round(Object.values(db.topups).filter(x => x.producerId === p.id && x.status === "confirmed").reduce((q, x) => q + x.amount, 0) * 100) / 100 }; }),
@@ -515,8 +516,7 @@ const server = http.createServer(async (req, res) => {
       if (!acc) return send(res, 404, { error: "no such account" });
       if (!(price >= 1 && price <= 200)) return send(res, 400, { error: "price 1..200" });
       const np = Math.round(price * 100) / 100;
-      if (acc.demo || !acc.price || acc.adminStatus !== "approved") acc.price = np;
-      else if (np !== acc.price) { acc.priceReq = np; notify("An editor wants a new price for @" + ((acc.profile || {}).username || "") + ": $" + np + ". Open Waiting for your decision."); }
+      acc.price = np; acc.priceReq = null;   // after the first approval the editor changes the price any time
       saveDb(); return send(res, 200, view(u));
     }
     if (P === "/api/account/update" && M === "POST") {   // internal name, categories, bulk discount (one account or all)
@@ -526,14 +526,14 @@ const server = http.createServer(async (req, res) => {
       if (b.internalName !== undefined) acc.internal_name = String(b.internalName).slice(0, 60);
       if (b.categories !== undefined) acc.categories = cleanCats(b.categories);
       if (b.otherCategory !== undefined) acc.other_category = String(b.otherCategory).slice(0, 60);
-      if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 600); if (!need(res, !ab || ab.split(/\s+/).length >= 3, 400, "Describe your account in at least 3 words")) return; acc.about = ab; }
+      if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 300), wn = ab ? ab.split(/\s+/).length : 0; if (!need(res, !ab || (wn >= 3 && wn <= 8), 400, "Describe your account in 3 to 8 words")) return; acc.about = ab; }
       if (b.tiers !== undefined) {
         const ts = cleanTiers(b.tiers);
         (b.discountAll ? u.accounts : [acc]).forEach(a => { a.tiers = ts; a.discount = ts.length ? Math.max(...ts.map(t => t.pct)) : 0; });
       }
-      if ((b.review || before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []])) && !acc.demo && ["approved", "new"].includes(acc.adminStatus || "new")) {
-        acc.adminStatus = "new"; notify("An editor changed account @" + ((acc.profile || {}).username || "") + ". It is waiting for your decision.");   // changes go to the manager for review
-      }
+      if ((b.review || before !== JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []])) && !acc.demo && (acc.adminStatus || "new") === "new") {
+        acc.adminStatus = "new"; notify("An editor sent account @" + ((acc.profile || {}).username || "") + " for review. It is waiting for your decision.");
+      }   // an approved account keeps its status: the editor can change topics, about, deals and price any time
       if (b.discount !== undefined) {
         const d = Math.round(Number(b.discount) || 0);
         if (d < 0 || d > 99) return send(res, 400, { error: "discount 0..99" });
@@ -651,6 +651,18 @@ const server = http.createServer(async (req, res) => {
     }
 
     /* ----- producer ----- */
+    if (P === "/api/rates" && M === "GET") {      // live rates for the budget converter (cached 10 minutes)
+      const now = Date.now();
+      if (!RATES.t || now - RATES.t > 600000) {
+        RATES.t = now;
+        try {
+          const r = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=USD"), j = await r.json(), x = (j && j.data && j.data.rates) || {}, o = {};
+          for (const k of ["UAH", "USDT", "SOL", "TRX", "ETH", "LTC", "TON", "BTC"]) { const v = Number(x[k]); if (v > 0) o[k] = v; }
+          if (o.UAH && o.SOL && o.ETH) { RATES.v = Object.assign({ USDT: 1 }, o); RATES.live = true; RATES.ok = now; }
+        } catch (e) { /* keep the previous rates */ }
+      }
+      return send(res, 200, { rates: RATES.v, live: !!RATES.live && now - (RATES.ok || 0) < 3600000 * 6 });
+    }
     if (P === "/api/producer/register" && M === "POST") {
       const ip = clientIp(req); if (tooMany(ip)) return send(res, 429, { error: "too many attempts" });
       const b = await readBody(req), email = String(b.email || "").trim().toLowerCase();
@@ -708,6 +720,7 @@ const server = http.createServer(async (req, res) => {
           categories: cats, otherCategory: cats.includes("other") ? String(b.otherCategory || "").slice(0, 60) : "", status: "review", created: Date.now() };
         db.tracks[t.id] = t;
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(budget * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", coin: COINS.includes(b.coin) ? b.coin : "", status: "pending", created: Date.now() };
+        if (["UAH", "USDT"].includes(b.cur) && Number(b.orig) > 0) { tp.cur = b.cur; tp.orig = Math.round(Number(b.orig) * 100) / 100; }
         db.topups[tp.id] = tp; saveDb(); notify("new track \""+t.title+"\" waits for your approval ("+tp.amount+" USD)"); return send(res, 200, pview());
       }
       if (P === "/api/producer/track/delete" && M === "POST") {  // track stays hidden but its data stays in the database
@@ -720,6 +733,7 @@ const server = http.createServer(async (req, res) => {
         const b = await readBody(req), t = db.tracks[b.trackId], amount = Number(b.amount);
         if (!need(res, t && t.producerId === p.id && t.status !== "deleted" && amount >= 100 && amount <= 1000000, 400, "minimum budget is $100")) return;
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(amount * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", coin: COINS.includes(b.coin) ? b.coin : "", status: "pending", created: Date.now() };
+        if (["UAH", "USDT"].includes(b.cur) && Number(b.orig) > 0) { tp.cur = b.cur; tp.orig = Math.round(Number(b.orig) * 100) / 100; }
         db.topups[tp.id] = tp; saveDb(); notify("budget top-up "+tp.amount+" USD for track \""+t.title+"\" waits for confirmation"); return send(res, 200, pview());
       }
       return send(res, 404, { error: "not found" });
