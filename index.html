@@ -820,6 +820,35 @@ body.isadmin .wrap{max-width:1320px}
 .cht{overflow-wrap:anywhere;line-height:1.4;margin-top:2px}
 .chform{padding-top:10px;padding-bottom:max(8px,env(safe-area-inset-bottom,0px))}
 .chform .row,.chin{display:flex;gap:8px}.chform input{flex:1;min-width:0}
+.chatbox .chdown{margin:14px 0}
+
+.chatbox{position:relative}
+.chgate{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(10,10,16,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:inherit;animation:chgIn .35s ease both}
+.chcard{width:min(460px,100%);background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:28px 26px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.6),0 0 0 1px rgba(124,92,255,.25);animation:chcPop .55s cubic-bezier(.2,.9,.3,1.25) both}
+.chcard .chic{font-size:46px;display:inline-block;animation:chcBob 2.4s ease-in-out infinite}
+.chcard h3{font-size:22px;margin:8px 0 10px}
+.chcard p{font-size:17px;line-height:1.55;margin:0 0 18px}
+.chcard input{width:100%;box-sizing:border-box;font-size:18px;text-align:center;padding:12px;margin:0 0 12px}
+.chcard .btn{width:100%;font-size:17px;padding:13px 18px}
+.chcard .hint{font-size:15px}
+@keyframes chgIn{from{opacity:0}to{opacity:1}}
+@keyframes chcPop{0%{opacity:0;transform:translateY(30px) scale(.8)}100%{opacity:1;transform:none}}
+@keyframes chcBob{50%{transform:translateY(-6px) rotate(-6deg)}}
+/* v36 */
+#dock{z-index:100!important}
+.chatov .chatbox{height:100%}
+@media (max-width:899px){.chatov{padding-bottom:88px}}
+@media (min-width:900px){.chatov{left:268px;top:60px;padding:16px 28px 18px 0}.chatov .chatbox{max-width:none;width:100%}}
+.chcb{display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:14px;margin:12px 0;cursor:pointer}
+.chcb input{width:20px;height:20px;margin-top:1px;flex:none;accent-color:var(--accent,#7c5cff)}
+.chcb a{text-decoration:underline}
+#chAgreeBtn:disabled{opacity:.45;cursor:not-allowed}
+.pmc,.pmh{margin-top:12px;animation:chgIn .35s ease both}
+.pmc .t,.pmh .t{display:flex;justify-content:space-between;gap:10px}
+.pmc .t span,.pmh .t span{display:block;font-size:13px;color:var(--muted)}
+.pmsum{white-space:nowrap}
+.pmtag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;background:var(--line);margin-top:8px}
+.pmrow{display:flex;gap:10px;align-items:center;margin:10px 0}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -990,6 +1019,7 @@ body.isadmin .wrap{max-width:1320px}
   <div class="chips" id="lchips" role="group"></div>
   <div class="grid" id="lgrid"></div>
 </section>
+<section class="view" id="v-pay"><div id="payPageBody"></div></section>
 <section class="view" id="v-orders"><div id="ordersBody"></div></section>
 <section class="view" id="v-lprod"><div id="lprodBody"></div></section>
 <div id="modalRoot"></div>
@@ -997,7 +1027,7 @@ body.isadmin .wrap{max-width:1320px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v33 · 15.11 23:10</span>
+  <span>© Promo Campaign · v36 · 15.11 22:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -1258,14 +1288,14 @@ privacy:'<p class="eyebrow">Draft</p><h2>Privacy policy</h2><p>Sample text for t
 '<h3>2. Permission to analyze views</h3><p>You connect your account through TikTok’s permission window. You cannot register without it because your approval chance and payment depend on your views. We never receive your TikTok password. You can withdraw the permission in your dashboard and in TikTok settings.</p>'+
 '<h3>3. Why we use this data</h3><p>To evaluate the account, show your approval chance, check campaign terms, calculate payments and prevent fake views.</p>'+
 '<h3>4. Who receives data</h3><p>Payment providers for payouts, and artists or labels as aggregate campaign statistics. We do not sell personal data.</p>'+
-'<h3>5. Retention and deletion</h3><p>Data is kept while the account is active and as long as the law requires. If a creator does not send videos on time, the account is banned and moved to an archive: we no longer order from it, and its data and a record of the ban are kept so the manager can review an appeal and unban the account if needed. Editors chat messages (the last 500) are stored on the server and visible to the manager. Payout details are stored encrypted. You can ask support to delete your account.</p>'+
+'<h3>5. Retention and deletion</h3><p>Data is kept while the account is active and as long as the law requires. If a creator does not send videos on time, the account is banned and moved to an archive: we no longer order from it, and its data and a record of the ban are kept so the manager can review an appeal and unban the account if needed. By using the editors chat you agree to its rules (no swearing, business topics only). Editors chat messages (the last 500) are stored on the server and visible to the manager. Payout details are stored encrypted. You can ask support to delete your account.</p>'+
 '<h3>6. Payout details and responsibility</h3><p>You enter your payout details (PayPal, crypto wallet or card) yourself and confirm that they are correct before saving. If you give a wrong address or make a mistake, the money cannot be recovered and this is not our responsibility. You must still complete the order. If an order is not completed, we stop working with you permanently.</p>'+
 '<h3>7. Contact</h3><p>[support address goes here]</p>',
 terms:'<p class="eyebrow">Draft</p><h2>Terms of use</h2><p>Sample text for the prototype. A lawyer must review it before launch.</p>'+
 '<h3>1. Who can take part</h3><p>Adult creators with their own account that posts regularly. Empty and long-inactive accounts are not accepted.</p>'+
 '<h3>2. How campaigns work</h3><p>The creator requests a track, a manager checks the account and approves the request, then the creator posts a video with the campaign sound. The link is due within 16 days. After a manager checks the link, the campaign is complete and the payout is sent: the dashboard shows “payment on the way”, and once it is paid the creator receives a screenshot of the transfer.</p>'+
 '<h3>3. Price and payment</h3><p>The creator sets their own price per video. Payouts go to the details saved in the dashboard.</p>'+
-'<h3>4. Not allowed</h3><ul><li>Fake views and accounts that are not yours.</li><li>Insults, spam, links and payment details in the editors chat. The manager may delete a message and mute the chat for a violator.</li><li>Content that breaks platform rules or third-party rights.</li></ul>'+
+'<h3>4. Not allowed</h3><ul><li>Fake views and accounts that are not yours.</li><li>Swearing, insults, spam, links and payment details in the editors chat. The chat is for business only: questions about campaigns, orders and payments, and helping other editors when the manager is busy. The manager may delete a message and mute the chat for a violator.</li><li>Content that breaks platform rules or third-party rights.</li></ul>'+
 '<h3>5. Consequences</h3><p>We may reject a video, suspend an account and ask for a refund of payments made for breached terms. If a creator misses deadlines and does not send the video link within 16 days after the request is approved (or within another period the manager set for that order), the account is banned automatically and we never work with that account again. The data of a banned account is not deleted: it is moved to an archive. If you disagree with a ban, write to the manager, who will review the case and may unban the account.</p>'+
 '<h3>6. Bulk discounts</h3><p>A creator may offer a discount from 1% to 99% for several videos (for example 5% from 3 videos). Requests with a discount are reviewed faster and the manager sees the discount. The final amount is calculated with the discount applied.</p>'+
 '<h3>7. Changes</h3><p>We may update these terms and will announce it in your dashboard.</p>'
@@ -1295,7 +1325,7 @@ function genVideos(key,now){
   return out;
 }
 var COINS={USDT:["TRC20","TON","ERC20","BEP20"],TON:["TON"],BTC:["Bitcoin"],ETH:["ERC20"],LTC:["Litecoin"],BNB:["BEP20"],TRX:["TRON"],USDC:["ERC20","BEP20"]};
-var VIEWS=["home","signup","tiktok","analysis","report","campaigns","dashboard","orders","admin","privacy","terms","producer"];
+var VIEWS=["home","signup","tiktok","analysis","report","campaigns","dashboard","orders","pay","admin","privacy","terms","producer"];
 var lang="en",filter="all",runId=0,scn="active",payCoin="USDT",LIVE=false,pendingHandle="",delAsk=false,delMsg="";
 var S={accounts:[],active:0,prof:{},orders:[],history:[],user:null};
 try{var raw=localStorage.getItem("pc_state4");if(raw){var p=JSON.parse(raw);if(p&&typeof p==="object")S=p}}catch(e){}
@@ -1625,9 +1655,9 @@ function route(){
   if(parts[1]&&parts[1].indexOf("taken")>=0){$("linkErr").textContent=t("taken_err");$("linkErr").hidden=false}
   if(parts[1]&&parts[1].indexOf("mismatch")>=0){$("linkErr").textContent=t("mm_err");$("linkErr").hidden=false}
   if(VIEWS.indexOf(v)<0)v="home";
-  if(LIVE){if(v==="producer")roleSet("producer");else if(["signup","dashboard","orders","campaigns","analysis","report","tiktok"].indexOf(v)>=0)roleSet("editor")}
+  if(LIVE){if(v==="producer")roleSet("producer");else if(["signup","dashboard","orders","pay","campaigns","analysis","report","tiktok"].indexOf(v)>=0)roleSet("editor")}
   var g=gate();
-  if((v==="dashboard"||v==="report"||v==="orders")&&g)v=g;
+  if((v==="dashboard"||v==="report"||v==="orders"||v==="pay")&&g)v=g;
   if(v==="tiktok"&&!termsOk())v="signup";
   if(v==="analysis"&&g==="signup")v="signup";
   var sec=v;if(v==="producer")sec="lprod";else if(LIVE&&v==="home")sec="lhome";else if(LIVE&&v==="campaigns")sec="lcamps";
@@ -3939,13 +3969,26 @@ function chRender(j){
     var h;
     if(j.me.banned)h='<div class="note err">'+esc(L("ch_ban"))+'</div>';
     else if(!j.me.canWrite)h='<div class="note">'+esc(L("ch_wait"))+'</div>';
-    else if(!j.me.nick)h='<b>'+esc(L("ch_nick_t"))+'</b><p class="hint">'+esc(L("ch_nick_h"))+'</p><div class="row"><input id="chNick" type="text" maxlength="20" placeholder="'+esc(L("ch_nick_ph"))+'" autocomplete="off"><button class="btn primary" data-l="chNickOk">'+esc(L("ch_nick_ok"))+'</button></div><div class="note err" id="chErr" hidden></div>';
+    else if(!j.me.nick)h='';
     else h='<div class="row chin"><input id="chIn" type="text" maxlength="300" placeholder="'+esc(L("ch_ph"))+'" autocomplete="off"><button class="btn primary" data-l="chSend">'+esc(L("ch_send"))+'</button></div><div class="note err" id="chErr" hidden></div>';
     var keep=$("chIn")?$("chIn").value:"",hadFocus=document.activeElement&&document.activeElement.id==="chIn";
     f.innerHTML=h;if($("chIn")){$("chIn").value=keep;if(hadFocus)$("chIn").focus()}
+    chGate(j.me)
   }
 }
-function chPoll(){fetch("/api/chat",{credentials:"same-origin"}).then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&$("chatOv"))chRender(j)}).catch(function(){})}
+function chDown(code){var f=$("chatForm");if(!f)return;f.innerHTML='<div class="note err chdown">'+esc(L("ch_down"))+(code?' ('+code+')':'')+'</div><div class="row"><button class="btn primary" data-l="chRetry">'+esc(L("ch_retry"))+'</button></div>'}
+function chOk(){try{return localStorage.getItem("pc_chat_ok")==="1"}catch(e){return false}}
+function chGate(me){
+  var box=document.querySelector("#chatOv .chatbox");if(!box)return;var g=$("chGate");
+  var need=me.canWrite&&!me.banned&&(!chOk()||!me.nick),st=!chOk()?"r":"n";
+  if(!need){if(g)g.remove();return}
+  if(g&&g.getAttribute("data-s")===st)return;
+  if(g)g.remove();
+  g=document.createElement("div");g.id="chGate";g.className="chgate";g.setAttribute("data-s",st);
+  g.innerHTML=st==="r"?'<div class="chcard"><div class="chic">💬</div><h3>'+esc(L("ch_rules_t"))+'</h3><p>'+esc(L("ch_rule"))+'</p><button type="button" class="btn primary" data-l="chAgree">'+esc(L("ch_agree"))+'</button></div>':'<div class="chcard"><div class="chic">✏️</div><h3>'+esc(L("ch_nick_t"))+'</h3><p class="hint">'+esc(L("ch_nick_h"))+'</p><input id="chNick" type="text" maxlength="10" placeholder="'+esc(L("ch_nick_ph"))+'" autocomplete="off"><button class="btn primary" data-l="chNickOk">'+esc(L("ch_nick_ok"))+'</button><div class="note err" id="chErr" hidden></div></div>';
+  box.appendChild(g);var i=$("chNick");if(i)setTimeout(function(){i.focus()},300);
+}
+function chPoll(){fetch("/api/chat",{credentials:"same-origin"}).then(function(r){if(!r.ok){chDown(r.status);return null}return r.json()}).then(function(j){if(j&&$("chatOv"))chRender(j)}).catch(function(){chDown("")})}
 function openChat(){
   if($("chatOv"))return;CHT.sig="";CHT.shown=false;
   var o=document.createElement("div");o.id="chatOv";o.className="chatov";
@@ -3958,6 +4001,8 @@ function chSend(){var i=$("chIn");if(!i)return;var t=i.value.trim();if(!t)return
   api("/api/chat",{text:t}).then(function(r){if(!r.ok){chErr((r.j&&r.j.error)||L("p_err"));return}var e=$("chErr");if(e)e.hidden=true;i.value="";CHT.sig="";chPoll()})}
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
   if(a==="chClose"){closeChat();return}
+  if(a==="chRetry"){CHT.sig="";chPoll();return}
+  if(a==="chAgree"){try{localStorage.setItem("pc_chat_ok","1")}catch(e){}CHT.sig="";chPoll();return}
   if(a==="chSend"){chSend();return}
   if(a==="chNickOk"){api("/api/chat/nick",{nick:val("chNick")}).then(function(r){if(!r.ok){chErr((r.j&&r.j.error)||L("p_err"));return}CHT.sig="";chPoll()});return}
   if(a==="chRep"){api("/api/chat/report",{id:el.getAttribute("data-id")}).then(function(){toast(L("ch_rep_ok"))});el.disabled=true;return}
@@ -3975,6 +4020,12 @@ function cmHtml(){
 }
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{
   if(LV.adTab==="chatmod"){var mn=document.querySelector(".ownmain")||$("adApp");if(mn){var keep=$("cmIn")?$("cmIn").value:"";mn.innerHTML=cmHtml();if($("cmIn"))$("cmIn").value=keep}}}catch(e){}return r}})();
+
+Object.assign(LT.en,{ch_down:"The chat cannot load. Reload the page (Ctrl+Shift+R). If it stays like this, tell the manager.",ch_retry:"Try again"});
+Object.assign(LT.ru,{ch_down:"Чат не загрузился. Обновите страницу (Ctrl+Shift+R). Если не помогает, напишите менеджеру.",ch_retry:"Повторить"});
+
+Object.assign(LT.en,{ch_rules_t:"Chat rules",ch_agree:"I read it and I agree",ch_rule:"Be kind and respect the other editors. No insults, no spam, no links and no payment details. The manager can read the chat and remove messages.",ch_nick_t:"Choose a nickname",ch_nick_h:"Any name works, for example Vasya. It does not have to be your TikTok name.",ch_nick_ph:"Nickname (up to 10 characters)"});
+Object.assign(LT.ru,{ch_rules_t:"Правила чата",ch_agree:"Прочитал и согласен",ch_rule:"Будьте добры и уважайте других редакторов. Без оскорблений, спама, ссылок и платёжных данных. Менеджер может читать чат и удалять сообщения.",ch_nick_t:"Придумайте ник",ch_nick_h:"Подойдёт любое имя, например Вася. Это не обязательно ник из TikTok.",ch_nick_ph:"Ник (до 10 символов)"});
 
 /* ---------- support assistant in the other languages ---------- */
 var FAQX={
@@ -4004,6 +4055,76 @@ ans:["Parayı nasıl alırım? Videoları yayınlayıp yönetici kabul ettikten 
   return best>=0?X.ans[best]:L("bot_none");
 }})();
 function botChips(){return lang==="ru"?["Как получить деньги?","Как изменить цену?","Сколько дней на видео?","Как взять трек?"]:(FAQX[lang]?FAQX[lang].chips:["How do I get paid?","How to change my price?","How many days for videos?","How to take a track?"])}
+
+(function(){var P={
+uk:{ch_rules_t:"Правила чату",ch_agree:"Прочитав і погоджуюсь",ch_nick_t:"Придумайте нікнейм",ch_nick_h:"Підійде будь-яке імʼя, наприклад Вася. Це не обовʼязково нік із TikTok.",ch_nick_ph:"Нікнейм (до 10 символів)"},
+de:{ch_rules_t:"Chat-Regeln",ch_agree:"Gelesen und einverstanden",ch_nick_t:"Wähle einen Nicknamen",ch_nick_h:"Jeder Name geht, zum Beispiel Vasya. Es muss nicht dein TikTok-Name sein.",ch_nick_ph:"Nickname (bis zu 10 Zeichen)"},
+es:{ch_rules_t:"Reglas del chat",ch_agree:"Lo leí y estoy de acuerdo",ch_nick_t:"Elige un apodo",ch_nick_h:"Sirve cualquier nombre, por ejemplo Vasya. No tiene que ser tu nombre de TikTok.",ch_nick_ph:"Apodo (hasta 10 caracteres)"},
+pt:{ch_rules_t:"Regras do chat",ch_agree:"Li e concordo",ch_nick_t:"Escolha um apelido",ch_nick_h:"Qualquer nome serve, por exemplo Vasya. Não precisa ser seu nome do TikTok.",ch_nick_ph:"Apelido (até 10 caracteres)"},
+fr:{ch_rules_t:"Règles du chat",ch_agree:"J’ai lu et j’accepte",ch_nick_t:"Choisissez un pseudo",ch_nick_h:"N’importe quel nom convient, par exemple Vasya. Ce n’est pas obligé d’être votre nom TikTok.",ch_nick_ph:"Pseudo (10 caractères maximum)"},
+tr:{ch_rules_t:"Sohbet kuralları",ch_agree:"Okudum, kabul ediyorum",ch_nick_t:"Bir takma ad seç",ch_nick_h:"Herhangi bir ad olur, örneğin Vasya. TikTok adın olması gerekmez.",ch_nick_ph:"Takma ad (en fazla 10 karakter)"}};
+for(var k in P)Object.assign(XLL[k],P[k])})();
+
+/* ===== v36: chat rules checkbox, payments tab, dock/chat fixes ===== */
+(function(){
+var N={
+en:{ch_rule:"Be kind and respect the other editors. No swearing, insults or spam. No links and no payment details. The chat is for business only: ask about campaigns, orders and payments, and help other editors with their questions when the manager is busy. The manager can read the chat and remove messages.",ch_cb:"I agree to the {p} and the {t}",ch_pp:"Privacy Policy",ch_tt:"Terms",
+pm_title:"Payments",pm_way:"On the way",pm_way_h:"The money for an approved order is reserved for you. The status changes by itself.",pm_none:"Nothing on the way yet. Approved orders will appear here.",pm_hist:"Payment history",pm_hist_none:"No payments yet.",pm_s1:"Request approved",pm_s2:"Money reserved for you",pm_s3:"Payout on the way",pm_s3d:"Payout on the way · by {d}",pm_s4:"Payout sent",pm_paid:"Paid",pm_sent:"Sent {d}",pm_inv:"Invoice",pm_proof:"Transfer proof",pm_acc:"Accepted",pm_camp:"Regular campaign",pm_vid:"{n} video(s)"},
+ru:{ch_rule:"Уважайте других эдиторов. Не материтесь, не оскорбляйте и не спамьте. Без ссылок и платёжных данных. Чат только по делу: вопросы по кампаниям, заказам и платежам, а также ответы на вопросы других, когда менеджер занят. Менеджер читает чат и может удалять сообщения.",ch_cb:"Я согласен с {p} и {t}",ch_pp:"Политикой конфиденциальности",ch_tt:"Условиями",
+pm_title:"Платежи",pm_way:"В пути",pm_way_h:"Деньги за одобренный заказ закреплены за вами. Статус меняется сам.",pm_none:"Пока ничего нет в пути. Одобренные заказы появятся здесь.",pm_hist:"История платежей",pm_hist_none:"Платежей пока нет.",pm_s1:"Заявка одобрена",pm_s2:"Деньги зарезервированы для вас",pm_s3:"Выплата в пути",pm_s3d:"Выплата в пути · до {d}",pm_s4:"Выплата отправлена",pm_paid:"Оплачено",pm_sent:"Отправлено {d}",pm_inv:"Счёт",pm_proof:"Подтверждение перевода",pm_acc:"Принят",pm_camp:"Обычная кампания",pm_vid:"Видео: {n}"},
+uk:{ch_rule:"Поважайте інших едиторів. Без лайки, образ і спаму. Без посилань і платіжних даних. Чат лише по справі: питання про кампанії, замовлення й платежі та відповіді іншим, коли менеджер зайнятий. Менеджер читає чат і може видаляти повідомлення.",ch_cb:"Я погоджуюсь з {p} та {t}",ch_pp:"Політикою конфіденційності",ch_tt:"Умовами",pm_title:"Платежі",pm_way:"У дорозі",pm_way_h:"Гроші за схвалене замовлення закріплені за вами. Статус змінюється сам.",pm_none:"Поки нічого в дорозі. Схвалені замовлення зʼявляться тут.",pm_hist:"Історія платежів",pm_hist_none:"Платежів поки немає.",pm_s1:"Заявку схвалено",pm_s2:"Гроші зарезервовано для вас",pm_s3:"Виплата в дорозі",pm_s3d:"Виплата в дорозі · до {d}",pm_s4:"Виплату надіслано",pm_paid:"Оплачено",pm_sent:"Надіслано {d}",pm_inv:"Рахунок",pm_proof:"Підтвердження переказу",pm_acc:"Прийнято",pm_camp:"Звичайна кампанія",pm_vid:"Відео: {n}"},
+de:{ch_rule:"Respektiere die anderen Editoren. Keine Beschimpfungen, Beleidigungen oder Spam. Keine Links und keine Zahlungsdaten. Der Chat ist nur für Geschäftliches: Fragen zu Kampagnen, Aufträgen und Zahlungen, und Antworten für andere, wenn der Manager beschäftigt ist. Der Manager kann den Chat lesen und Nachrichten löschen.",ch_cb:"Ich stimme der {p} und den {t} zu",ch_pp:"Datenschutzerklärung",ch_tt:"Nutzungsbedingungen",pm_title:"Zahlungen",pm_way:"Unterwegs",pm_way_h:"Das Geld für einen genehmigten Auftrag ist für dich reserviert. Der Status ändert sich automatisch.",pm_none:"Noch nichts unterwegs. Genehmigte Aufträge erscheinen hier.",pm_hist:"Zahlungsverlauf",pm_hist_none:"Noch keine Zahlungen.",pm_s1:"Anfrage genehmigt",pm_s2:"Geld für dich reserviert",pm_s3:"Auszahlung unterwegs",pm_s3d:"Auszahlung unterwegs · bis {d}",pm_s4:"Auszahlung gesendet",pm_paid:"Bezahlt",pm_sent:"Gesendet {d}",pm_inv:"Rechnung",pm_proof:"Überweisungsbeleg",pm_acc:"Bestätigt",pm_camp:"Normale Kampagne",pm_vid:"Videos: {n}"},
+es:{ch_rule:"Respeta a los demás editores. Sin insultos, groserías ni spam. Sin enlaces ni datos de pago. El chat es solo para temas de trabajo: preguntas sobre campañas, pedidos y pagos, y responder a otros cuando el gerente está ocupado. El gerente puede leer el chat y borrar mensajes.",ch_cb:"Acepto la {p} y los {t}",ch_pp:"Política de privacidad",ch_tt:"Términos",pm_title:"Pagos",pm_way:"En camino",pm_way_h:"El dinero de un pedido aprobado está reservado para ti. El estado cambia solo.",pm_none:"Aún no hay nada en camino. Los pedidos aprobados aparecerán aquí.",pm_hist:"Historial de pagos",pm_hist_none:"Aún no hay pagos.",pm_s1:"Solicitud aprobada",pm_s2:"Dinero reservado para ti",pm_s3:"Pago en camino",pm_s3d:"Pago en camino · hasta el {d}",pm_s4:"Pago enviado",pm_paid:"Pagado",pm_sent:"Enviado {d}",pm_inv:"Factura",pm_proof:"Comprobante de transferencia",pm_acc:"Aceptado",pm_camp:"Campaña normal",pm_vid:"Vídeos: {n}"},
+pt:{ch_rule:"Respeite os outros editores. Sem xingamentos, insultos ou spam. Sem links e sem dados de pagamento. O chat é só para assuntos de trabalho: dúvidas sobre campanhas, pedidos e pagamentos, e respostas a outros quando o gerente está ocupado. O gerente pode ler o chat e apagar mensagens.",ch_cb:"Concordo com a {p} e os {t}",ch_pp:"Política de Privacidade",ch_tt:"Termos",pm_title:"Pagamentos",pm_way:"A caminho",pm_way_h:"O dinheiro de um pedido aprovado está reservado para você. O status muda sozinho.",pm_none:"Nada a caminho ainda. Pedidos aprovados aparecerão aqui.",pm_hist:"Histórico de pagamentos",pm_hist_none:"Ainda não há pagamentos.",pm_s1:"Solicitação aprovada",pm_s2:"Dinheiro reservado para você",pm_s3:"Pagamento a caminho",pm_s3d:"Pagamento a caminho · até {d}",pm_s4:"Pagamento enviado",pm_paid:"Pago",pm_sent:"Enviado {d}",pm_inv:"Fatura",pm_proof:"Comprovante da transferência",pm_acc:"Aceito",pm_camp:"Campanha comum",pm_vid:"Vídeos: {n}"},
+fr:{ch_rule:"Respectez les autres éditeurs. Pas d’insultes, de gros mots ni de spam. Pas de liens ni de données de paiement. Le chat est réservé au travail : questions sur les campagnes, commandes et paiements, et réponses aux autres quand le manager est occupé. Le manager peut lire le chat et supprimer des messages.",ch_cb:"J’accepte la {p} et les {t}",ch_pp:"Politique de confidentialité",ch_tt:"Conditions",pm_title:"Paiements",pm_way:"En route",pm_way_h:"L’argent d’une commande approuvée est réservé pour vous. Le statut change tout seul.",pm_none:"Rien en route pour l’instant. Les commandes approuvées apparaîtront ici.",pm_hist:"Historique des paiements",pm_hist_none:"Aucun paiement pour l’instant.",pm_s1:"Demande approuvée",pm_s2:"Argent réservé pour vous",pm_s3:"Paiement en route",pm_s3d:"Paiement en route · avant le {d}",pm_s4:"Paiement envoyé",pm_paid:"Payé",pm_sent:"Envoyé le {d}",pm_inv:"Facture",pm_proof:"Preuve de virement",pm_acc:"Accepté",pm_camp:"Campagne classique",pm_vid:"Vidéos : {n}"},
+tr:{ch_rule:"Diğer editörlere saygı göster. Küfür, hakaret ve spam yok. Bağlantı ve ödeme bilgisi yok. Sohbet yalnızca iş içindir: kampanyalar, siparişler ve ödemeler hakkında sorular ve yönetici meşgulken başkalarının sorularına cevaplar. Yönetici sohbeti okuyabilir ve mesajları silebilir.",ch_cb:"{p} ve {t} kabul ediyorum",ch_pp:"Gizlilik Politikasını",ch_tt:"Kullanım Şartlarını",pm_title:"Ödemeler",pm_way:"Yolda",pm_way_h:"Onaylanan siparişin parası senin için ayrıldı. Durum kendiliğinden değişir.",pm_none:"Henüz yolda bir şey yok. Onaylanan siparişler burada görünür.",pm_hist:"Ödeme geçmişi",pm_hist_none:"Henüz ödeme yok.",pm_s1:"Başvuru onaylandı",pm_s2:"Para senin için ayrıldı",pm_s3:"Ödeme yolda",pm_s3d:"Ödeme yolda · {d} tarihine kadar",pm_s4:"Ödeme gönderildi",pm_paid:"Ödendi",pm_sent:"Gönderildi {d}",pm_inv:"Fatura",pm_proof:"Transfer kanıtı",pm_acc:"Kabul edildi",pm_camp:"Normal kampanya",pm_vid:"Video: {n}"}};
+Object.assign(LT.en,N.en);Object.assign(LT.ru,N.ru);
+for(var k in N){if(k==="en"||k==="ru")continue;Object.assign(XLL[k],N[k])}
+})();
+
+/* chat rules card with required checkbox */
+chGate=function(me){
+  var box=document.querySelector("#chatOv .chatbox");if(!box)return;var g=$("chGate");
+  var need=me.canWrite&&!me.banned&&(!chOk()||!me.nick),st=!chOk()?"r":"n";
+  if(!need){if(g)g.remove();return}
+  if(g&&g.getAttribute("data-s")===st)return;
+  if(g)g.remove();
+  g=document.createElement("div");g.id="chGate";g.className="chgate";g.setAttribute("data-s",st);
+  var cb=esc(L("ch_cb")).replace("{p}",'<a href="#privacy" target="_blank" rel="noopener">'+esc(L("ch_pp"))+'</a>').replace("{t}",'<a href="#terms" target="_blank" rel="noopener">'+esc(L("ch_tt"))+'</a>');
+  g.innerHTML=st==="r"?'<div class="chcard"><div class="chic">💬</div><h3>'+esc(L("ch_rules_t"))+'</h3><p>'+esc(L("ch_rule"))+'</p><label class="chcb"><input type="checkbox" id="chCb"><span>'+cb+'</span></label><button type="button" class="btn primary" id="chAgreeBtn" data-l="chAgree" disabled>'+esc(L("ch_agree"))+'</button></div>':'<div class="chcard"><div class="chic">✏️</div><h3>'+esc(L("ch_nick_t"))+'</h3><p class="hint">'+esc(L("ch_nick_h"))+'</p><input id="chNick" type="text" maxlength="10" placeholder="'+esc(L("ch_nick_ph"))+'" autocomplete="off"><button class="btn primary" data-l="chNickOk">'+esc(L("ch_nick_ok"))+'</button><div class="note err" id="chErr" hidden></div></div>';
+  box.appendChild(g);var i=$("chNick");if(i)setTimeout(function(){i.focus()},300);
+};
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="chCb"){var b=$("chAgreeBtn");if(b)b.disabled=!e.target.checked}});
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l=chAgree]");if(el&&el.disabled){e.stopImmediatePropagation();e.preventDefault()}},true);
+
+/* dock: close chat when going anywhere else */
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("#dock [data-dk]");if(b&&b.getAttribute("data-x")!=="chat")closeChat()},true);
+window.addEventListener("hashchange",function(){closeChat()});
+dockItems=(function(o){return function(){var r=o();if(!r||roleGet()==="producer")return r;r.forEach(function(it){if(it[3]==="pay"){it[0]="pay";it[3]=""}});return r}})(dockItems);
+
+/* payments page */
+function pmWay(q){return q.status==="approved"||q.status==="submitted"||q.status==="returned"||(q.status==="completed"&&!q.paid)}
+function pmCard(q,i){
+  var done=q.paid,comp=q.status==="completed";
+  var s3=q.eta?L("pm_s3d").replace("{d}",q.eta):L("pm_s3");
+  var st=[[L("pm_s1"),"done"],[L("pm_s2"),"done"],[s3,comp?"cur":"todo"],[L("pm_s4"),"todo"]];
+  var tl='<ol class="tl">'+st.map(function(x){return '<li class="'+x[1]+'"><span>'+esc(x[0])+'</span></li>'}).join("")+'</ol>';
+  return '<div class="card pmc" style="animation-delay:'+Math.min(i,8)*0.05+'s"><div class="t"><div><b>'+esc(q.track)+' — '+esc(q.artist)+'</b><span>#'+esc(String(q.id).slice(-5))+' · '+esc(L("pm_vid").replace("{n}",q.videos))+' · '+fmtDate(q.approvedAt||q.created)+'</span></div><b class="pmsum">'+money(q.cost)+'</b></div><span class="pmtag">'+esc(L("pm_camp"))+'</span>'+tl+'</div>';
+}
+function pmHist(q,i){
+  return '<div class="card pmh" style="animation-delay:'+Math.min(i,8)*0.05+'s"><div class="t"><div><b>'+esc(q.track)+' — '+esc(q.artist)+'</b><span>#'+esc(String(q.id).slice(-5))+' · '+esc(L("pm_vid").replace("{n}",q.videos))+'</span></div><b class="pmsum">'+money(q.cost)+'</b></div>'+
+    '<div class="pmrow"><span class="rcpill ok">✅ '+esc(L("pm_paid"))+'</span><small>'+esc(L("pm_sent").replace("{d}",fmtDate(q.paidAt||q.created)))+'</small></div>'+
+    '<div class="row"><button type="button" class="btn sm rcb'+(q.accepted?' acc':'')+'" data-l="rcOpen" data-id="'+esc(q.id)+'">🧾 '+esc(L("pm_inv"))+'</button>'+(q.hasProof?'<button type="button" class="btn sm" data-l="showProof" data-id="'+esc(q.id)+'">📎 '+esc(L("pm_proof"))+'</button>':'')+(q.accepted?'<span class="rcok">✓ '+esc(L("pm_acc"))+'</span>':'')+'</div></div>';
+}
+function renderPay(){
+  var host=$("payPageBody");if(!host)return;
+  var all=(LV.reqs||[]).slice().sort(function(a,b){return (b.paidAt||b.created)-(a.paidAt||a.created)});
+  var way=all.filter(pmWay),hist=all.filter(function(q){return q.paid});
+  host.innerHTML='<h2>'+esc(L("pm_title"))+'</h2><h3 class="sub">'+esc(L("pm_way"))+' · '+way.length+'</h3><p class="hint">'+esc(L("pm_way_h"))+'</p>'+
+    (way.length?way.map(pmCard).join(""):'<div class="empty">'+esc(L("pm_none"))+'</div>')+
+    '<h3 class="sub">'+esc(L("pm_hist"))+'</h3>'+(hist.length?hist.map(pmHist).join(""):'<div class="empty">'+esc(L("pm_hist_none"))+'</div>');
+}
+(function(){var o=route;route=function(){o.apply(this,arguments);if(LIVE&&(location.hash||"").replace(/\?.*/,"")==="#pay"){renderPay();refreshMe().then(loadReqs).then(renderPay)}}})();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
