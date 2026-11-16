@@ -1241,6 +1241,28 @@ body.isadmin .ownmain #oSrch.osrch:focus{border-color:#7B6BFF;outline:0;box-shad
 body.isadmin .ownmain .list>.card{background:linear-gradient(160deg,#1d1d25,#16161c);border:1px solid #2a2a34;border-radius:18px;padding:16px 18px}
 body.isadmin .ownmain .list>.card:hover{border-color:#4b43a8;transform:none;box-shadow:0 8px 26px rgba(109,92,255,.15)}
 body.isadmin .ownmain .tbc{background:linear-gradient(160deg,#1d1d25,#16161c);border-radius:16px}
+/* v66 — snappy UI: no re-entry animations on re-render, short transitions */
+.grid>.card,.list>.card,.roles>.card,.tiles>.card,.card,.tile,.tcard,.fdcard{animation:none!important}
+*,*::before,*::after{scroll-behavior:auto!important}
+.card,.btn,.chip,.pill,.atb,.mchip,.acitem,.tile,.ms,.mbrow,.efb,#dock a,#dock button,.logo,.rbdg,.supb,.plink,.fdcard,.tgo{transition-duration:.09s!important}
+.card:hover,.pmcard:hover,.tile:hover,.ms:hover,.acitem:hover,.mbrow:hover,.btn:hover,.chip:hover,.mchip:hover,.efb:hover,.supb:hover,.plink:hover{transform:none!important}
+/* account settings form, laptop */
+@media(min-width:900px){
+.setcard{background:linear-gradient(160deg,#1b1b23,#15151b)!important;border:1px solid #2a2a34!important;padding:26px!important;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.setcard>h3,.setcard>.hint,.setcard>.cats,.setcard>.tiers,.setcard>.row,.setcard>b,.setcard>.sect,.setcard>#sOtherRow{grid-column:1/-1}
+.setcard>h3{font-size:22px;margin:0;color:var(--fg)}
+.setcard>.f,.setcard>label.f{background:#1c1c24;border:1px solid #2a2a34;border-radius:16px;padding:16px 18px;margin:0;border-top:1px solid #2a2a34}
+.setcard .f>b,.setcard .f>span:first-child{font-size:13px;letter-spacing:.03em}
+.setcard input:not([type=checkbox]):not([type=radio]),.setcard textarea,.setcard select{background:#121217;border:1px solid #2e2e3a;border-radius:12px;padding:12px 14px;width:100%}
+.setcard textarea{min-height:96px;resize:vertical}
+.setcard input:focus,.setcard textarea:focus,.setcard select:focus{border-color:#7B6BFF;outline:0;box-shadow:0 0 0 3px rgba(109,92,255,.25)}
+.setcard .cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.setcard .cats label{border-radius:14px;background:#1c1c24;border:1px solid #2a2a34;padding:10px 12px}
+.setcard .cats label:has(input:checked){background:rgba(109,92,255,.2);border-color:#7B6BFF}
+.setcard .tiers label{border-radius:14px}
+.setcard hr,.setcard .f+hr{display:none}
+.setcard .btn.primary{padding:12px 26px}
+}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1419,7 +1441,7 @@ body.isadmin .ownmain .tbc{background:linear-gradient(160deg,#1d1d25,#16161c);bo
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v65 · 16.11 13:25</span>
+  <span>© Promo Campaign · v66 · 16.11 13:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
