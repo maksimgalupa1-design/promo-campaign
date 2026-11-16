@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 57;
+const SERVER_VER = 58;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -738,7 +738,7 @@ const server = http.createServer(async (req, res) => {
     if (P === "/api/platform-stats" && M === "GET") {      // public numbers for the editor home widgets
       if (!sessionUser(req)) return send(res, 401, { error: "not signed in" });
       const now = Date.now(), rs = Object.values(db.requests).filter(r => !r.demo), paid = rs.filter(r => r.paid);
-      const sum = l => Math.round(l.reduce((x, r) => x + reqCost(r), 0));
+      const sum = l => Math.round(l.reduce((x, r) => x + reqCost(r), 0) * 100) / 100;   // keep cents: $2.7 must not become $3
       return send(res, 200, { paid: sum(paid), p7: sum(paid.filter(r => now - (r.paidAt || 0) <= 7 * 86400000)), p30: sum(paid.filter(r => now - (r.paidAt || 0) <= 30 * 86400000)), videos: rs.filter(r => ["approved", "submitted", "completed", "returned"].includes(r.status)).reduce((x, r) => x + (r.videos || 0), 0) });
     }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget

@@ -1889,7 +1889,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v105 · 17.11 02:50</span>
+  <span>© Promo Campaign · v106 · 17.11 03:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -5395,7 +5395,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
 /* ---- editor home widgets ---- */
 var WG_ALL=["money","orders","queue","platform","fresh"];
 function wgSel(){try{var a=JSON.parse(localStorage.getItem("pc_wg"));if(Array.isArray(a))return a.filter(function(k){return WG_ALL.indexOf(k)>=0})}catch(e){}return WG_ALL.slice()}
-function wgLoadPlat(){if(LV.plat&&Date.now()-LV.platAt<300000)return;if(LV._platBusy)return;LV._platBusy=true;
+function wgLoadPlat(f){if(!f&&LV.plat&&Date.now()-LV.platAt<20000)return;if(LV._platBusy)return;LV._platBusy=true;
   fetch("/api/platform-stats",{credentials:"same-origin"}).then(function(r){return r.ok?r.json():null}).then(function(j){LV._platBusy=false;if(j){LV.plat=j;LV.platAt=Date.now();try{wgtInject()}catch(e){}}}).catch(function(){LV._platBusy=false;LV.platAt=Date.now()})}
 function wgLeft(ms){var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);return (d>0?d+"d ":"")+p2(h)+":"+p2(m)}
 wgtHtml=function(){
@@ -6660,6 +6660,11 @@ function badge(t){if(!(t.enrollUntil>0))return "";var d=new Date(t.enrollUntil),
   return '<div class="enbadge'+(open?'':' closed')+'"><span class="encal"><i>'+esc(mon)+'</i><b>'+d.getDate()+'</b></span><span class="entx"><small>'+esc(L(open?"en_until":"en_closed"))+'</small><strong>'+esc(d.toLocaleTimeString(lang==="ru"?"ru-RU":"en-GB",{hour:"2-digit",minute:"2-digit"}))+'</strong>'+(open?'<em>'+esc(L("en_left"))+' '+esc(left(t.enrollUntil))+'</em>':'')+'</span></div>'}
 var o=drawLCamps;drawLCamps=function(){var r=o.apply(this,arguments);try{(LV.tracks||[]).forEach(function(t){var c=document.querySelector('.tcard[data-tid="'+t.id+'"] .tbody');if(!c||c.querySelector(".enbadge"))return;var h=badge(t);if(h)c.insertAdjacentHTML("afterbegin",h)})}catch(e){}return r};
 })();
+
+/* v106: platform numbers stay fresh */
+(function(){var t=function(){try{if(!document.hidden&&LV.plat&&document.querySelector(".wgt.plat"))wgLoadPlat(true)}catch(e){}};
+setInterval(t,30000);document.addEventListener("visibilitychange",t);window.addEventListener("focus",t);
+var o=loadReqs;loadReqs=function(){var r=o.apply(this,arguments);try{Promise.resolve(r).then(function(){LV.platAt=0})}catch(e){}return r}})();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
