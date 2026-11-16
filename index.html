@@ -1386,6 +1386,15 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
  .sli{padding:10px 12px}.sic{width:34px;height:34px;font-size:17px}.sit b{font-size:14px}.sit small{font-size:11.5px}.siv{font-size:13px;flex-basis:34%}
 }
 
+/* v75 — saved payers */
+.payers{margin:6px 0 12px}
+.pyl{font-size:12.5px;opacity:.7;margin-bottom:6px}
+.pyrow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.pychip{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.pychip button{all:unset;cursor:pointer;padding:7px 12px;font-size:13.5px}
+.pychip button[aria-pressed="true"]{background:rgba(124,92,255,.28);font-weight:700}
+.pychip .pyx{padding:7px 10px;opacity:.55;border-left:1px solid var(--line)}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1563,7 +1572,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v74 · 16.11 19:20</span>
+  <span>© Promo Campaign · v75 · 16.11 20:05</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -5176,7 +5185,7 @@ function dmOpen(){
   document.body.appendChild(o);document.body.classList.add("chatopen");
   clearInterval(DM.timer);DM.timer=setInterval(function(){if(!$("dmLog")){clearInterval(DM.timer);return}dmLoad()},4000);dmLoad();
   setTimeout(function(){var i=$("dmIn");if(i)i.focus()},150)}
-window.__dmOpen=dmOpen;window.__dmClose=dmClose;
+window.__tkGo=function(k){TK.kind="producer";TK.open=k;TK.th=null;TK.tsig=""};window.__dmOpen=dmOpen;window.__dmClose=dmClose;
 function dmSend(){var i=$("dmIn");if(!i)return;var t=i.value.trim();if(!t)return;var er=$("dmErr");
   api(dmQ("/api/dm"),{text:t}).then(function(r){if(!r.ok){if(er){er.textContent=r.status===401?L("dm_exp"):((r.j&&r.j.error)||L("p_err"));er.hidden=false}return}
     if(er)er.hidden=true;i.value="";DM.sig="";DM.msgs=r.j.msgs;DM.drawn=false;dmDraw()})}
@@ -5402,7 +5411,7 @@ function ntHtml(){var a=rev();
   return '<h3 style="margin:0 0 12px">🎶 '+esc(L("nt_h"))+'</h3>'+(NT.msg?'<div class="note payok">'+esc(NT.msg)+'</div>':'')+'<div class="tklist">'+(a.length?a.map(function(t){
    var ln=Object.keys(t.links||{}).map(function(k){var u=t.links[k];return '<a class="tkl" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(k)+'</a>'}).join("");
    return '<div class="card mkrow"><div class="mkh"><b>'+esc(t.title)+'</b><span>'+esc(t.artist||"")+'</span></div><div>'+esc(L("nt_by"))+': '+esc(t.producerName||"")+' · '+esc(t.producer||"")+'</div><div>'+esc(L("nt_bud"))+': <b>'+money(amt(t)||t.budget||0)+'</b> · '+esc((t.platforms||[]).join(", "))+'</div><div>'+catPills(t.categories,t.otherCategory)+'</div>'+(ln?'<div class="tklinks">'+ln+'</div>':'')+(t.message?'<div class="hint">'+esc(L("nt_msg"))+': '+esc(t.message)+'</div>':'')+(t.deadline?'<div class="hint">'+esc(t.deadline)+'</div>':'')+
-   (/tiktok\.com\/@[^\/\s]+\/(video|photo)\//i.test((t.links||{}).tiktok||"")?'<div class="note err">⚠ '+esc(L("tt_vid_bad"))+'</div>':'')+'<div class="row"><button type="button" class="btn primary sm" data-l="ntOk" data-id="'+esc(t.id)+'">'+esc(L("nt_ok"))+'</button><button type="button" class="btn sm danger" data-l="ntNo" data-id="'+esc(t.id)+'">'+esc(L("nt_no"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("nt_none"))+'</div>')+'</div>'}
+   (/tiktok\.com\/@[^\/\s]+\/(video|photo)\//i.test((t.links||{}).tiktok||"")?'<div class="note err">⚠ '+esc(L("tt_vid_bad"))+'</div>':'')+'<div class="row">'+(t.producerId?'<button type="button" class="btn sm" data-l="ntWrite" data-pid="'+esc(t.producerId)+'">'+esc(L("nt_wr"))+'</button>':'')+'<button type="button" class="btn primary sm" data-l="ntOk" data-id="'+esc(t.id)+'">'+esc(L("nt_ok"))+'</button><button type="button" class="btn sm danger" data-l="ntNo" data-id="'+esc(t.id)+'">'+esc(L("nt_no"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("nt_none"))+'</div>')+'</div>'}
 var NT={msg:""};
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="newtracks"){var mn=document.querySelector(".ownmain")||$("adApp");if(mn)mn.innerHTML=ntHtml()}}catch(e){}return r}})();
 (function(){var o=ownItems;ownItems=function(){var it=o();rev().forEach(function(t){it.push({id:"nt"+t.id,t:"tracks",tab:"newtracks",txt:L("ow_i_nt").replace("{t}",t.title+(t.artist?" — "+t.artist:""))})});return it}})();
@@ -5679,7 +5688,7 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
       lab.insertAdjacentHTML("afterend",'<label class="f" for="'+p[1]+'"><span>'+esc(L("pp_from"))+'</span><input id="'+p[1]+'" type="text" maxlength="80" autocomplete="off" placeholder="'+esc(L("pp_from_ph"))+'"></label>')})}
   var raf=0;new MutationObserver(function(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;addPayer()})}).observe(document.body,{childList:true,subtree:true});
   window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="pAdd"],[data-l="pTopGo"]');if(!el)return;
-    var i=$(el.getAttribute("data-l")==="pAdd"?"nFrom":"tFrom");if(i&&!i.value.trim()&&minBud()>1){e.stopImmediatePropagation();e.preventDefault();i.focus();toast(L("pp_from_need"))}},true);
+    var i=$(el.getAttribute("data-l")==="pAdd"?"nFrom":"tFrom");var mm=$(el.getAttribute("data-l")==="pAdd"?"nMethod":"tMeth");if(i&&!i.value.trim()&&minBud()>1&&!(mm&&mm.value==="crypto")){e.stopImmediatePropagation();e.preventDefault();i.focus();toast(L("pp_from_need"))}},true);
   var oA=api;api=function(path,body){if(body&&/^\/api\/producer\/(track|topup)$/.test(path)){var v=(($("nFrom")&&$("nFrom").value)||($("tFrom")&&$("tFrom").value)||"").trim();if(v)body.from=v}return oA.apply(this,arguments)};
 })();
 
@@ -5778,6 +5787,44 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="setSave"]');if(!el)return;e.stopImmediatePropagation();
     var er=$("setErr");if(er)er.hidden=true;var ok=$("sOk");if(ok)ok.textContent="";saveAcc();
     var n=0,iv=setInterval(function(){n++;var o=$("sOk"),e2=$("setErr");if(!e2||n>20){clearInterval(iv);return}if(o&&o.textContent){e2.textContent=o.textContent;e2.hidden=false;clearInterval(iv)}},150)},true);
+})();
+
+/* ===== v75: saved "paid by" names, payer field by method, write to producer from a new track ===== */
+(function(){
+  Object.assign(LT.en,{py_saved:"Saved payers",py_add:"+ Save this name",py_none:"Type a name once and press “Save this name”. Next time just tap it.",py_del:"Remove",pp_from_paypal:"Name or email on the PayPal that sends the money",pp_from_card:"Name of the card owner who sends the money",pp_from_ph2:"Name or email",pp_from_ph3:"Name",nt_wr:"✉ Write to producer",
+    ig_l:"Your Instagram, for contact with you (required)",p_msg:"Comment under the track: what you want from editors (optional)",p_msg_ph:"For example: maximum aura, only quality content. Contact: Telegram @name",nt_msg:"Producer's comment"});
+  Object.assign(LT.ru,{py_saved:"Сохранённые плательщики",py_add:"+ Сохранить это имя",py_none:"Впишите имя один раз и нажмите «Сохранить это имя». В следующий раз просто нажмёте на него.",py_del:"Убрать",pp_from_paypal:"Имя или email на PayPal, с которого придут деньги",pp_from_card:"Имя владельца карты, с которой придут деньги",pp_from_ph2:"Имя или email",pp_from_ph3:"Имя",nt_wr:"✉ Написать продюсеру",
+    ig_l:"Ваш Instagram, для связи с вами (обязательно)",p_msg:"Комментарий под треком: что вы хотите от эдиторов (необязательно)",p_msg_ph:"Например: максимум ауры, только качественный контент. Связь: Telegram @name",nt_msg:"Комментарий продюсера"});
+
+  /* ---- saved payers in the payout window ---- */
+  var PY={list:null};
+  function pyLoad(cb){if(PY.list)return cb();api("/api/admin/payers").then(function(r){PY.list=(r.ok&&r.j.list)||[];cb()})}
+  function pySave(){api("/api/admin/payers",{list:PY.list}).then(function(r){if(r.ok&&r.j.list)PY.list=r.j.list})}
+  function pyLast(){try{return localStorage.getItem("pc_lastpayer")||""}catch(e){return ""}}
+  function pyDraw(inp){var h=inp.parentNode.parentNode.querySelector(".payers");if(!h){h=document.createElement("div");h.className="payers";inp.closest("label").insertAdjacentElement("afterend",h)}
+    h.innerHTML='<div class="pyl">'+esc(L("py_saved"))+'</div>'+(PY.list.length?'<div class="pyrow">'+PY.list.map(function(x,i){return '<span class="pychip"><button type="button" data-l="pyPick" data-i="'+i+'" aria-pressed="'+(inp.value.trim()===x)+'">'+esc(x)+'</button><button type="button" class="pyx" data-l="pyDel" data-i="'+i+'" title="'+esc(L("py_del"))+'">×</button></span>'}).join("")+'</div>':'<p class="hint">'+esc(L("py_none"))+'</p>')+'<button type="button" class="btn sm" data-l="pyAdd">'+esc(L("py_add"))+'</button>'}
+  var oPO=poModal;poModal=function(id){oPO.apply(this,arguments);var inp=$("pb_"+id);if(!inp)return;
+    pyLoad(function(){var i2=$("pb_"+id);if(!i2)return;if(!i2.value)i2.value=pyLast()||PY.list[0]||"";pyDraw(i2)})};
+  function curInp(){return document.querySelector('#modalRoot input[id^="pb_"]')}
+  document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l"),inp=curInp();
+    if(a==="pyPick"&&inp){e.stopImmediatePropagation();inp.value=PY.list[Number(el.getAttribute("data-i"))]||"";pyDraw(inp);return}
+    if(a==="pyAdd"&&inp){e.stopImmediatePropagation();var v=inp.value.trim();if(v&&PY.list.indexOf(v)<0){PY.list.push(v);pySave()}pyDraw(inp);return}
+    if(a==="pyDel"&&inp){e.stopImmediatePropagation();PY.list.splice(Number(el.getAttribute("data-i")),1);pySave();pyDraw(inp);return}
+    if(a==="poAct2"&&el.getAttribute("data-p")==="1"&&inp){var v2=inp.value.trim();if(v2){try{localStorage.setItem("pc_lastpayer",v2)}catch(x){}}}
+  },true);
+
+  /* ---- producer: who sends the money depends on the method ---- */
+  function syncFrom(){[["nMethod","nFrom"],["tMeth","tFrom"]].forEach(function(p){var m=$(p[0]),f=$(p[1]);if(!m||!f)return;var lab=f.closest("label"),meth=m.value;
+    lab.hidden=meth==="crypto"||minBud()===1;var sp=lab.querySelector("span");var txt=L(meth==="card"?"pp_from_card":"pp_from_paypal");if(sp&&sp.textContent!==txt)sp.textContent=txt;
+    var ph=L(meth==="card"?"pp_from_ph3":"pp_from_ph2");if(f.placeholder!==ph)f.placeholder=ph})}
+  var r2=0;new MutationObserver(function(){if(r2)return;r2=requestAnimationFrame(function(){r2=0;syncFrom()})}).observe(document.body,{childList:true,subtree:true});
+  document.addEventListener("change",function(e){if(e.target&&/^(nMethod|tMeth)$/.test(e.target.id))syncFrom()});
+  window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="pAdd"],[data-l="pTopGo"]');if(!el)return;var isA=el.getAttribute("data-l")==="pAdd",m=$(isA?"nMethod":"tMeth");
+    if(m&&m.value==="crypto"){var f=$(isA?"nFrom":"tFrom");if(f)f.value=""}},true);
+
+  /* ---- new track: write to the producer ---- */
+  document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="ntWrite"]');if(!el)return;e.stopImmediatePropagation();
+    api("/api/admin/dm/start",{producerId:el.getAttribute("data-pid")}).then(function(r){if(!r.ok)return;window.__tkGo(r.j.key);LV.adTab="tickets";renderOwner();window.scrollTo(0,0)})},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();

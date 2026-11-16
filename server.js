@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 45;
+const SERVER_VER = 46;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -487,7 +487,7 @@ function overview() {
       pendingRequests: reqs.filter(r => r.status === "pending" || r.status === "submitted").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
-    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", enrollUntil: t.enrollUntil || 0, message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
+    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", enrollUntil: t.enrollUntil || 0, message: t.message || "", id: t.id, title: t.title, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, producerId: t.producerId, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
     topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ from: p.from || "", id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", deadline: (db.tracks[p.trackId] || {}).deadline || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, cur: p.cur || "", orig: p.orig || 0, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
@@ -1005,6 +1005,14 @@ const server = http.createServer(async (req, res) => {
         t.budget = 80; t.spent = 0; t.status = "active";
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: 100, fee: 20, method: "paypal", coin: "", status: "confirmed", confirmedAt: Date.now(), created: Date.now(), demo: true };
         db.topups[tp.id] = tp; const sid = newSid(); db.psessions[sid] = { pid: p.id, exp: Date.now() + 12 * 3600000 }; saveDb(); return send(res, 200, { ok: true, track: t.title }, { "Set-Cookie": setCookie("psid", sid, 43200) });
+      }
+      if (P === "/api/admin/payers" && M === "GET") return send(res, 200, { list: db.settings.payers || [] });
+      if (P === "/api/admin/payers" && M === "POST") { const l = (Array.isArray(b.list) ? b.list : []).map(x => String(x).trim().slice(0, 60)).filter(Boolean); db.settings.payers = [...new Set(l)].slice(0, 20); saveDb(); return send(res, 200, { list: db.settings.payers }); }
+      if (P === "/api/admin/dm/start" && M === "POST") {     // the owner opens a chat with a producer who has not written yet
+        const pr = db.producers[b.producerId]; if (!need(res, pr, 404, "no such producer")) return;
+        const D = db.settings.dm = db.settings.dm || { threads: {} }, key = "p:" + pr.id;
+        D.threads[key] = D.threads[key] || { key, kind: "producer", name: pr.name || pr.email, sub: [pr.email, pr.instagram && "IG " + pr.instagram, pr.tiktok && "TikTok " + pr.tiktok, pr.discord && "Discord " + pr.discord].filter(Boolean).join(" · "), tt: pr.tiktok ? [String(pr.tiktok).slice(0, 120)] : [], avatar: "", msgs: [], updated: 0, userSeen: 0, adminSeen: 0 };
+        saveDb(); return send(res, 200, { key });
       }
       if (P === "/api/admin/pay" && M === "GET") return send(res, 200, payInfo());
       if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) cr[k] = c(b.crypto, k); db.settings.pay = { paypal: c(b, "paypal"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), crypto: cr }; saveDb(); return send(res, 200, payInfo()); }
