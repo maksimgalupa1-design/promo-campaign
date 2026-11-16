@@ -1681,6 +1681,26 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .vlbody{padding:0 16px 16px;display:grid;gap:10px;animation:tpxin .25s both}
 @media(max-width:700px){.vlh2{grid-template-columns:1fr auto}.vltrk{grid-column:1/-1;grid-row:2;max-width:100%;align-items:flex-start;text-align:left}.vlr{grid-row:1;grid-column:2}}
 
+/* v98 */
+.lkpill.aiok{border-color:#2fd47a!important;background:rgba(47,212,122,.16)!important;box-shadow:0 0 14px rgba(47,212,122,.35)!important}
+.lkpill.aibad{border-color:#ff5a6a!important;background:rgba(255,90,106,.16)!important;box-shadow:0 0 14px rgba(255,90,106,.35)!important}
+.aiwhy{display:block;color:#ff8a96;font-size:12px;margin:-4px 0 4px 14px}
+.aisum{padding:10px 14px;border-radius:14px;font-size:13px;border:1px solid}.aisum.ok{border-color:#2fd47a;background:rgba(47,212,122,.1)}.aisum.bad{border-color:#ffb020;background:rgba(255,176,32,.1)}
+.aibtn{border-color:#A56BFF!important}
+.vlact .btn{flex:1 1 150px;justify-content:center}
+.cst{transition:opacity .3s,transform .25s,box-shadow .25s,border-color .25s}
+.cst:hover,.cpop:hover{transform:translateY(-4px) scale(1.03);border-color:#A56BFF;box-shadow:0 18px 44px rgba(0,0,0,.5),0 0 40px rgba(139,108,255,.65)}
+.cpop:hover{transform:translate(-50%,-52%) scale(1.03)}
+.cst:hover .csi,.cpop:hover .cpi{animation:csWig .6s ease}
+@keyframes csWig{20%{transform:rotate(-14deg) scale(1.15)}50%{transform:rotate(12deg) scale(1.15)}80%{transform:rotate(-6deg)}}
+.cst:active{transform:scale(.97)}
+.csx{width:34px;height:34px;top:4px!important;right:6px!important;display:grid!important;place-items:center;font-size:22px!important;opacity:.8!important;border-radius:50%;background:rgba(255,255,255,.1)}
+.csx:hover{background:rgba(255,90,106,.4)}
+.cst .cstx{padding-right:34px}
+@media(hover:none){.cst:hover{transform:none}}
+@media(max-width:700px){.cstk{bottom:max(84px,calc(env(safe-area-inset-bottom,0px) + 76px))}.vlh2{padding:12px}.vlbody{padding:0 12px 14px}}
+@media(max-width:700px){.vlh2{grid-template-columns:1fr!important}.vla{grid-row:1}.vla b{white-space:normal}.vltrk{grid-row:2!important;grid-column:1!important}.vlr{grid-row:3!important;grid-column:1!important;justify-content:flex-start}.vlch{margin-left:auto}}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1858,7 +1878,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v97 · 16.11 23:20</span>
+  <span>© Promo Campaign · v98 · 16.11 23:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6549,10 +6569,10 @@ try{enh()}catch(e){}
 
 /* ===== v97: video links tab: only orders with links are "to check", cards open on tap, track in the middle ===== */
 (function(){
-Object.assign(LT.en,{vl_stat_btn:"Account statistics",vl_trk:"Track"});Object.assign(LT.ru,{vl_stat_btn:"Статистика аккаунта",vl_trk:"Трек"});
-["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};XLL[k].vl_stat_btn=XLL[k].vl_stat_btn||"Account statistics";XLL[k].vl_trk=XLL[k].vl_trk||"Track"});
-LV.vlO=LV.vlO||{};
-function pillsV(L2){return '<div class="lkpills">'+L2.map(function(l,i){return '<a class="lkpill" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer" style="animation-delay:'+Math.min(i,10)*0.05+'s"><span>🔗</span><b>'+esc(String(l.url).replace(/^https?:\/\/(www\.)?/,"").slice(0,48))+'</b>'+(l.views!=null?'<i>'+Number(l.views).toLocaleString("en-US")+' 👁</i>':'')+'<em>↗</em></a>'}).join("")+'</div>'}
+Object.assign(LT.en,{vl_ai:"AI check",vl_ai_sum:"{ok} of {n} links look right{m}. Full check of the video content will turn on after TikTok approves our access.",vl_ai_miss:", {k} not sent yet",vl_ai_bad_fmt:"not a TikTok video link",vl_ai_bad_own:"video is from another account",vl_ai_bad_dup:"duplicate link",vl_stat_btn:"Account statistics",vl_trk:"Track"});Object.assign(LT.ru,{vl_ai:"ИИ-проверка",vl_ai_sum:"{ok} из {n} ссылок выглядят правильно{m}. Полная проверка содержания видео включится, когда TikTok одобрит доступ.",vl_ai_miss:", ещё не отправлено: {k}",vl_ai_bad_fmt:"это не ссылка на видео TikTok",vl_ai_bad_own:"видео с другого аккаунта",vl_ai_bad_dup:"повторяющаяся ссылка",vl_stat_btn:"Статистика аккаунта",vl_trk:"Трек"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};XLL[k].vl_stat_btn=XLL[k].vl_stat_btn||"Account statistics";["vl_ai","vl_ai_sum","vl_ai_miss","vl_ai_bad_fmt","vl_ai_bad_own","vl_ai_bad_dup"].forEach(function(q){XLL[k][q]=XLL[k][q]||LT.en[q]});XLL[k].vl_trk=XLL[k].vl_trk||"Track"});
+LV.vlO=LV.vlO||{};LV.vlAi=LV.vlAi||{};
+function pillsV(L2,res){return '<div class="lkpills">'+L2.map(function(l,i){var rs=res&&res[i];return '<a class="lkpill'+(rs?(rs.ok?' aiok':' aibad'):'')+'" title="'+esc(rs&&rs.why||"")+'" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer" style="animation-delay:'+Math.min(i,10)*0.05+'s"><span>🔗</span><b>'+esc(String(l.url).replace(/^https?:\/\/(www\.)?/,"").slice(0,48))+'</b>'+(l.views!=null?'<i>'+Number(l.views).toLocaleString("en-US")+' 👁</i>':'')+'<em>↗</em></a>'+(rs&&!rs.ok?'<small class="aiwhy">⚠ '+esc(rs.why)+'</small>':'')}).join("")+'</div>'}
 window.vlinksHtml=function(D){
   var R=(D.requests||[]).filter(function(r){return ["approved","submitted","returned","completed"].indexOf(r.status)>=0});
   var kind=function(r){var has=(r.links||[]).length>0;return r.status==="completed"?"done":(r.status==="submitted"&&has?"wait":"none")};
@@ -6566,10 +6586,29 @@ window.vlinksHtml=function(D){
       '<div class="vla"><b>'+esc(r.handle||"")+(r.demo?' <em class="testpill">TEST</em>':'')+'</b><span>'+esc(r.internalName||"")+'</span></div>'+
       '<div class="vltrk"><u>'+esc(r.track)+'</u><span>'+esc(r.artist||"")+'</span></div>'+
       '<div class="vlr"><span class="rcpill vlp-'+k+'">'+esc(pill)+'</span><span class="vlcn">🎬 '+L2.length+' / '+(r.videos||0)+' '+esc(L("vl_links"))+(r.overdue?' · <b style="color:#ff6b6b">'+esc(L("vl_over"))+'</b>':'')+'</span><i class="vlch">›</i></div></div>'+
-      (open?'<div class="vlbody">'+(L2.length?pillsV(L2):'<div class="hint">'+esc(L("vl_nopub"))+'</div>')+'<div class="row vlact">'+(k==="wait"?'<button class="btn primary" data-l="vlOk" data-id="'+esc(r.id)+'">✓ '+esc(L("vl_ok"))+'</button><button class="btn danger" data-l="vlNo" data-id="'+esc(r.id)+'">✕ '+esc(L("vl_no"))+'</button>':'')+'<button type="button" class="btn sm" data-l="accOpenH" data-oid="'+esc(r.openId||"")+'">📊 '+esc(L("vl_stat_btn"))+'</button></div></div>':'')+'</div>'
+      (open?'<div class="vlbody">'+(L2.length?pillsV(L2,LV.vlAi[r.id]&&LV.vlAi[r.id].res):'<div class="hint">'+esc(L("vl_nopub"))+'</div>')+'<div class="row vlact">'+(k==="wait"?'<button class="btn primary" data-l="vlOk" data-id="'+esc(r.id)+'">✓ '+esc(L("vl_ok"))+'</button><button class="btn danger" data-l="vlNo" data-id="'+esc(r.id)+'">✕ '+esc(L("vl_no"))+'</button>':'')+'<button type="button" class="btn sm" data-l="accOpenH" data-oid="'+esc(r.openId||"")+'">📊 '+esc(L("vl_stat_btn"))+'</button>'+(L2.length?'<button type="button" class="btn sm aibtn" data-l="vlAi" data-id="'+esc(r.id)+'">🤖 '+esc(L("vl_ai"))+'</button>':'')+'</div>'+(LV.vlAi[r.id]?'<div class="aisum '+(LV.vlAi[r.id].bad?'bad':'ok')+'">'+esc(LV.vlAi[r.id].sum)+'</div>':'')+'</div>':'')+'</div>'
   }).join(""):'<div class="empty">'+esc(L("vl_empty"))+'</div>')+'</div>'};
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="vlTog"]');if(!el)return;e.stopImmediatePropagation();var id=el.getAttribute("data-id");LV.vlO[id]=!LV.vlO[id];renderOwner()},true);
 document.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&e.target.getAttribute&&e.target.getAttribute("data-l")==="vlTog"){e.preventDefault();e.target.click()}});
+})();
+
+/* v98: AI link check, notification fixes */
+(function(){
+function chk(r){var seen={},h=String(r.handle||"").replace(/^@/,"").toLowerCase();
+  var res=(r.links||[]).map(function(l){var u=String(l.url||"").trim(),m=/tiktok\.com\/@([^\/?#]+)\/video\/(\d{8,})/i.exec(u),sh=/^(https?:\/\/)?(vm|vt)\.tiktok\.com\/[\w-]+/i.test(u),key=m?m[2]:u.toLowerCase();
+    if(!m&&!sh)return {ok:false,why:L("vl_ai_bad_fmt")};
+    if(m&&h&&m[1].toLowerCase()!==h)return {ok:false,why:L("vl_ai_bad_own")+" (@"+m[1]+")"};
+    if(seen[key])return {ok:false,why:L("vl_ai_bad_dup")};seen[key]=1;return {ok:true,why:""}});
+  var ok=res.filter(function(x){return x.ok}).length,miss=Math.max(0,(r.videos||0)-res.length);
+  return {res:res,bad:ok<res.length||miss>0,sum:L("vl_ai_sum").replace("{ok}",ok).replace("{n}",r.videos||res.length).replace("{m}",miss?L("vl_ai_miss").replace("{k}",miss):"")}}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="vlAi"]');if(!el)return;e.stopImmediatePropagation();
+  var id=el.getAttribute("data-id"),r=(ADM.data.requests||[]).filter(function(x){return x.id===id})[0];if(!r)return;LV.vlAi[id]=chk(r);renderOwner()},true);
+/* a "links sent" notification leads to the Video links tab */
+var o=ownItems;ownItems=function(){var it=o.apply(this,arguments);it.forEach(function(x){if(/^s/.test(x.id)&&x.t==="orders"&&!x.__vl){x.__vl=1;var id=x.id.slice(1);Object.defineProperty(x,"tab",{configurable:true,enumerable:true,get:function(){LV.vlF="wait";LV.vlO[id]=true;return "vlinks"},set:function(){}})}});return it};
+/* closing on a phone: swipe away */
+var sx=0,sd=null;document.addEventListener("touchstart",function(e){sd=e.target.closest&&e.target.closest(".cst,.cpop");sx=sd?e.touches[0].clientX:0},{passive:true});
+document.addEventListener("touchend",function(e){if(!sd)return;var dx=e.changedTouches[0].clientX-sx,d=sd;sd=null;if(Math.abs(dx)>60){d.classList.add("out");setTimeout(function(){if(d.parentNode)d.remove()},300);window.__swiped=Date.now()}},{passive:true});
+document.addEventListener("click",function(e){if(window.__swiped&&Date.now()-window.__swiped<400&&e.target.closest&&e.target.closest(".cst,.cpop")){e.stopImmediatePropagation();e.preventDefault()}},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
