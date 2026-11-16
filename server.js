@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 49;
+const SERVER_VER = 50;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -1013,7 +1013,7 @@ const server = http.createServer(async (req, res) => {
         p.salt = salt; p.hash = hashPw(pw, salt);
         let t = Object.values(db.tracks).find(x => x.producerId === p.id && x.demo);
         if (!t) {
-          t = { id: uid8(), producerId: p.id, title: "TEST track (demo)", artist: "Demo artist", link: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", links: { spotify: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", soundcloud: "https://soundcloud.com/discover", mp3: "https://example.com/demo.mp3" }, budget: 0, spent: 0, platforms: ["tiktok"], descRule: true, message: "Demo track for owner tests", categories: cleanCats(["anime", "gaming", "gym"]), otherCategory: "", status: "active", demo: true, created: Date.now() };
+          t = { id: uid8(), producerId: p.id, title: "TEST track (demo)", artist: "Demo artist", link: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", links: { spotify: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT", soundcloud: "https://soundcloud.com/discover", mp3: "https://example.com/demo.mp3" }, budget: 0, spent: 0, platforms: ["tiktok"], descRule: true, message: "", categories: cleanCats(["anime", "gaming", "gym"]), otherCategory: "", status: "active", demo: true, created: Date.now() };
           db.tracks[t.id] = t;
         }
         t.budget = 80; t.spent = 0; t.status = "active";

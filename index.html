@@ -1445,6 +1445,23 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .nzk{gap:8px;flex-wrap:wrap;margin:10px 0}
 .nzpulse{animation:bellPulse .8s ease-in-out 3!important}
 
+/* v81 — centered notification, calm comment pill, clip icon */
+.cpop{position:fixed;left:50%;top:50%;z-index:10000;width:min(360px,calc(100vw - 32px));transform:translate(-50%,-50%);display:flex;gap:14px;align-items:center;padding:20px 22px;border-radius:28px;background:#171523;color:#fff;border:1px solid rgba(139,108,255,.45);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(139,108,255,.35);cursor:pointer;animation:cpIn .6s cubic-bezier(.2,1.25,.4,1);overflow:hidden}
+.cpop.out{opacity:0;transform:translate(-50%,-46%) scale(.94);transition:.35s}
+.cpglow{position:absolute;inset:-60%;background:conic-gradient(from 0deg,rgba(139,108,255,.0),rgba(139,108,255,.35),rgba(34,184,207,.3),rgba(139,108,255,0));animation:cpSpin 6s linear infinite;pointer-events:none}
+.cpop>*:not(.cpglow){position:relative}
+.cpi{flex:0 0 auto;width:54px;height:54px;border-radius:18px;display:grid;place-items:center;font-size:28px;background:linear-gradient(135deg,rgba(139,108,255,.4),rgba(34,184,207,.3));animation:cpBob 2.4s ease-in-out infinite}
+.cpt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cpt b{font-size:17px}.cpt span{font-size:14px;opacity:.85;overflow-wrap:anywhere}
+.cpt em{font-style:normal;font-size:12.5px;color:#a897ff;margin-top:2px}
+.cpx{all:unset;cursor:pointer;position:absolute!important;top:8px;right:12px;font-size:20px;opacity:.5;line-height:1}
+@keyframes cpIn{0%{opacity:0;transform:translate(-50%,-40%) scale(.8)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes cpSpin{to{transform:rotate(360deg)}}
+@keyframes cpBob{50%{transform:translateY(-4px) rotate(-4deg)}}
+.tkmsg{display:inline-block;margin-top:6px;padding:8px 12px;border-radius:12px;background:rgba(124,92,255,.14);border:1px solid rgba(124,92,255,.35);font-weight:500;font-size:13.5px;line-height:1.35}
+.ownside .atb[data-k=vlinks]::before{content:"📎"}
+.cpglow{filter:blur(28px);opacity:.55}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1622,7 +1639,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v80 · 16.11 23:50</span>
+  <span>© Promo Campaign · v81 · 17.11 00:20</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2682,7 +2699,7 @@ function renderOwner(){
       var act=t.status==="review"?'<div class="row"><button class="btn sm primary" data-l="trAct" data-id="'+esc(t.id)+'" data-s="approved">'+esc(L("a_approve_t"))+'</button><button class="btn sm danger" data-l="trAct" data-id="'+esc(t.id)+'" data-s="rejected">'+esc(L("a_reject_t"))+'</button></div>':(t.status==="active"?'<div class="row"><button class="btn sm primary" data-l="bcTrack" data-id="'+esc(t.id)+'">📣 '+esc(L("bc_track"))+'</button></div>':'');
       act+=(t.status==="active"&&(t.left||0)<=0?'<div class="row"><button class="btn sm primary" data-l="arcMove" data-id="'+esc(t.id)+'">🗄 '+esc(L("ar_move"))+'</button></div>':'');
       act+='<div class="row"><button class="btn sm danger" data-l="trDel" data-id="'+esc(t.id)+'">🗑 '+esc(L("tr_del"))+'</button></div>';
-      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="hotnote">'+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+trCats(t)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · '+esc(t.descText||('Song: '+t.title)):'')+'</div>'+act+'</div>';
+      return '<div class="card ord"><div class="t"><div><span>'+esc(t.producerName?t.producerName+" · ":"")+esc(t.producer||"")+'</span><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span>'+(t.message?'<span class="tkmsg">💬 '+esc(L("nt_msg"))+': '+esc(t.message)+'</span>':'')+(t.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(t.deadline)+'</span>':'')+'</div><span class="pill '+(t.status==="review"?"warn":(t.status==="active"?"ok":"bad"))+'">'+esc(t.status)+'</span></div><div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div><div>'+trCats(t)+'</div><div class="row">'+lk+'</div><div class="hint">'+esc(L("a_plat"))+': '+esc((t.platforms||[]).join(", "))+(t.descRule?' · '+esc(t.descText||('Song: '+t.title)):'')+'</div>'+act+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_tr"))+'</div>')+'</div>';
   }
   if(LV.adTab==="tracks"){if(LV.trArch)body=archHtml(D);else body=arcBtn(D)+body}
@@ -5954,21 +5971,32 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   var oC=api;api=function(path,body){var isT=path==="/api/producer/track";if(isT&&body&&LV.nCoverData)body.cover=LV.nCoverData;var pr=oC.apply(this,arguments);if(isT&&pr&&pr.then)pr.then(function(r){if(r&&r.ok)LV.nCoverData=null});return pr};
 })();
 
-/* ===== v80: owner test of notifications ===== */
+/* ===== v80: centered notifications, owner test ===== */
 (function(){
-  Object.assign(LT.en,{nz_t:"Test notifications",nz_h:"Pick what to show and press the button. You will see the same pop-up editors and producers get.",nz_track:"New track",nz_order:"New order",nz_money:"Payment",nz_msg:"New message",nz_go:"Show notification",nz_txt:"Your text (optional)",nz_d_track:"MONTAGEM ASSOMBRADA — CHAXZER is waiting for editors",nz_d_order:"A new order is waiting for your decision",nz_d_money:"Payment received, the budget is updated",nz_d_msg:"You have a new message"});
-  Object.assign(LT.ru,{nz_t:"Тест уведомлений",nz_h:"Выберите, что показать, и нажмите кнопку. Вы увидите такое же всплывающее уведомление, как получают эдиторы и продюсеры.",nz_track:"Новый трек",nz_order:"Новый заказ",nz_money:"Оплата",nz_msg:"Новое сообщение",nz_go:"Показать уведомление",nz_txt:"Ваш текст (необязательно)",nz_d_track:"MONTAGEM ASSOMBRADA — CHAXZER ждёт эдиторов",nz_d_order:"Новый заказ ждёт вашего решения",nz_d_money:"Оплата пришла, бюджет обновлён",nz_d_msg:"У вас новое сообщение"});
-  var IC={track:"🎵",order:"🎬",money:"💸",msg:"💬"};
-  function add(){if(LV.adTab!=="overview")return;var mn=document.querySelector(".ownmain");if(!mn||$("nzBox"))return;LV.nzK=LV.nzK||"track";
-    mn.insertAdjacentHTML("beforeend",'<div class="card form nzbox" id="nzBox"><h3>🔔 '+esc(L("nz_t"))+'</h3><p class="hint">'+esc(L("nz_h"))+'</p><div class="row nzk">'+["track","order","money","msg"].map(function(k){return '<button type="button" class="chip" data-l="nzK" data-k="'+k+'" aria-pressed="'+(LV.nzK===k)+'">'+IC[k]+' '+esc(L("nz_"+k))+'</button>'}).join("")+'</div><label class="f" for="nzTxt"><span>'+esc(L("nz_txt"))+'</span><input id="nzTxt" type="text" maxlength="120" placeholder="'+esc(L("nz_d_"+LV.nzK))+'"></label><div class="row"><button type="button" class="btn primary" data-l="nzGo">▶ '+esc(L("nz_go"))+'</button></div></div>')}
+  Object.assign(LT.en,{nz_t:"Test notifications",nz_h:"Pick what to show and press the button. You will see the same pop-up editors and producers get.",nz_track:"New track",nz_msg:"New message",nz_go:"Show notification",nz_txt:"Your text (optional)",nz_pick:"Pick a track",nz_d_msg:"You have a new message",nz_open:"Tap to open the track",nz_none:"No tracks yet"});
+  Object.assign(LT.ru,{nz_t:"Тест уведомлений",nz_h:"Выберите, что показать, и нажмите кнопку. Вы увидите такое же всплывающее уведомление, как получают эдиторы и продюсеры.",nz_track:"Новый трек",nz_msg:"Новое сообщение",nz_go:"Показать уведомление",nz_txt:"Ваш текст (необязательно)",nz_pick:"Выберите трек",nz_d_msg:"У вас новое сообщение",nz_open:"Нажмите, чтобы открыть трек",nz_none:"Треков пока нет"});
+  /* the pop-up in the middle of the screen */
+  window.cpop=function(o){var old=$("cpop");if(old)old.remove();var d=document.createElement("div");d.id="cpop";d.className="cpop";d.setAttribute("role","alert");
+    d.innerHTML='<div class="cpglow"></div><button type="button" class="cpx" data-cp="x" aria-label="×">×</button><div class="cpi">'+(o.icon||"🔔")+'</div><div class="cpt"><b>'+esc(o.title||"")+'</b><span>'+esc(o.text||"")+'</span>'+(o.trackId?'<em>'+esc(L("nz_open"))+' ›</em>':'')+'</div>';
+    if(o.trackId)d.setAttribute("data-tid",o.trackId);document.body.appendChild(d);
+    clearTimeout(window.__cpT);window.__cpT=setTimeout(function(){cpClose()},9000)};
+  function cpClose(){var d=$("cpop");if(!d)return;d.classList.add("out");setTimeout(function(){if(d.parentNode)d.remove()},350)}
+  document.addEventListener("click",function(e){var d=e.target.closest&&e.target.closest("#cpop");if(!d)return;e.stopImmediatePropagation();var x=e.target.closest("[data-cp=x]"),tid=d.getAttribute("data-tid");cpClose();if(!x&&tid){try{campGo(tid)}catch(er){}}},true);
+  var oGM=gotMessage;gotMessage=function(title,body,m){var k=title+"|"+body;if(k===LASTMSG)return;LASTMSG=k;setTimeout(function(){LASTMSG=""},30000);playSound();
+    var tr=!!(m&&m.trackId);cpop({icon:tr?"🎵":"💬",title:title||L(tr?"nz_track":"nz_msg"),text:body,trackId:tr?m.trackId:null})};
+  /* owner test */
+  function tracksList(){var D=ADM&&ADM.data;return D?(D.tracks||[]).filter(function(t){return t.status==="active"||t.status==="archived"}):[]}
+  function add(){if(LV.adTab!=="overview")return;var mn=document.querySelector(".ownmain");if(!mn||$("nzBox"))return;LV.nzK=LV.nzK||"track";var tl=tracksList();
+    mn.insertAdjacentHTML("beforeend",'<div class="card form nzbox" id="nzBox"><h3>🔔 '+esc(L("nz_t"))+'</h3><p class="hint">'+esc(L("nz_h"))+'</p><div class="row nzk"><button type="button" class="chip" data-l="nzK" data-k="track" aria-pressed="'+(LV.nzK==="track")+'">🎵 '+esc(L("nz_track"))+'</button><button type="button" class="chip" data-l="nzK" data-k="msg" aria-pressed="'+(LV.nzK==="msg")+'">💬 '+esc(L("nz_msg"))+'</button></div>'+
+      '<label class="f" id="nzTrRow" for="nzTr"'+(LV.nzK==="track"?'':' hidden')+'><span>'+esc(L("nz_pick"))+'</span><select id="nzTr">'+(tl.length?tl.map(function(t){return '<option value="'+esc(t.id)+'">'+esc(t.title+(t.artist?" — "+t.artist:""))+'</option>'}).join(""):'<option value="">'+esc(L("nz_none"))+'</option>')+'</select></label>'+
+      '<label class="f" id="nzTxRow" for="nzTxt"'+(LV.nzK==="msg"?'':' hidden')+'><span>'+esc(L("nz_txt"))+'</span><input id="nzTxt" type="text" maxlength="120" placeholder="'+esc(L("nz_d_msg"))+'"></label><div class="row"><button type="button" class="btn primary" data-l="nzGo">▶ '+esc(L("nz_go"))+'</button></div></div>')}
   var oR=renderOwner;renderOwner=function(){var r=oR.apply(this,arguments);try{add()}catch(e){}return r};
-  window.addEventListener("click",function(e){var tt=e.target.closest&&e.target.closest('.tktoast[data-test]');if(tt){e.stopImmediatePropagation();tt.classList.add("out");setTimeout(function(){tt.remove()},450);return}
-    var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
-    if(a==="nzK"){e.stopImmediatePropagation();LV.nzK=el.getAttribute("data-k");document.querySelectorAll('[data-l="nzK"]').forEach(function(b){b.setAttribute("aria-pressed",String(b===el))});var i=$("nzTxt");if(i)i.placeholder=L("nz_d_"+LV.nzK);return}
-    if(a==="nzGo"){e.stopImmediatePropagation();var k=LV.nzK||"track",txt=(($("nzTxt")||{}).value||"").trim()||L("nz_d_"+k),b=$("tkToasts");if(!b){b=document.createElement("div");b.id="tkToasts";document.body.appendChild(b)}
-      var t=document.createElement("button");t.type="button";t.className="tktoast";t.setAttribute("data-test","1");t.innerHTML='<i>'+IC[k]+'</i><span><b>'+esc(L("nz_"+k))+'</b><small style="white-space:normal;max-width:240px">'+esc(txt)+'</small></span>';b.appendChild(t);while(b.children.length>3)b.firstChild.remove();
-      document.querySelectorAll(".agb .cnt,#bellBtn,.bellb").forEach(function(x){x.classList.add("nzpulse");setTimeout(function(){x.classList.remove("nzpulse")},3000)});
-      setTimeout(function(){t.classList.add("out");setTimeout(function(){t.remove()},450)},6000);return}
+  window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+    if(a==="nzK"){e.stopImmediatePropagation();LV.nzK=el.getAttribute("data-k");document.querySelectorAll('[data-l="nzK"]').forEach(function(b){b.setAttribute("aria-pressed",String(b===el))});$("nzTrRow").hidden=LV.nzK!=="track";$("nzTxRow").hidden=LV.nzK!=="msg";return}
+    if(a==="nzGo"){e.stopImmediatePropagation();playSound();
+      if((LV.nzK||"track")==="track"){var sel=$("nzTr"),opt=sel&&sel.options[sel.selectedIndex];cpop({icon:"🎵",title:L("nz_track"),text:opt?opt.textContent:L("nz_none")})}
+      else cpop({icon:"💬",title:L("nz_msg"),text:(($("nzTxt")||{}).value||"").trim()||L("nz_d_msg")});
+      document.querySelectorAll(".agb .cnt,#bellBtn,.bellb").forEach(function(x){x.classList.add("nzpulse");setTimeout(function(){x.classList.remove("nzpulse")},3000)})}
   },true);
 })();
 
