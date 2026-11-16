@@ -1306,6 +1306,9 @@ body.noanim,body.noanim *,body.noanim *::before,body.noanim *::after{animation:n
 .setcard .tierrow input{width:72px;text-align:center}
 .setcard .btn.primary{width:100%;min-height:50px}
 }
+/* v69 — owner cabinet: no entrance animations at all (they made the screen go dark on every switch / refresh) */
+body.isadmin .view,body.isadmin .view.on,body.isadmin #adApp,body.isadmin #adApp *,body.isadmin #adApp *::before,body.isadmin #adApp *::after{animation:none!important;opacity:1}
+body.isadmin #adApp .ownmain>*{animation:none!important}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1484,7 +1487,7 @@ body.noanim,body.noanim *,body.noanim *::before,body.noanim *::after{animation:n
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v68 · 16.11 16:50</span>
+  <span>© Promo Campaign · v69 · 16.11 17:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
