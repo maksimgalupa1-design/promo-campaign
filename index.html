@@ -1212,6 +1212,21 @@ input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px!impo
 table{display:block;overflow-x:auto;max-width:100%}
 img,video{max-width:100%}
 }
+/* v64 — owner cabinet, launcher-style (own look), desktop only */
+@media(min-width:900px){
+body.isadmin{--bg:#111114;--surface:#18181d;--soft:#202027;--line:#26262e}
+body.isadmin .ownlay{gap:18px}
+body.isadmin .ownside{background:#15151a;border:1px solid var(--line);border-radius:20px;padding:12px;align-self:start;position:sticky;top:74px;max-height:calc(100vh - 92px);overflow:auto}
+body.isadmin .ownside .atb{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;font-size:14px;font-weight:600;border:0;background:transparent;box-shadow:none;margin:1px 0;min-height:0}
+body.isadmin .ownside .atb:hover{background:var(--soft);transform:none;box-shadow:none}
+body.isadmin .ownside .atb.on,body.isadmin .ownside .atb[aria-current],body.isadmin .ownside .atb.active{background:linear-gradient(135deg,#6D5CFF,#A56BFF);color:#fff}
+body.isadmin .ownside .atb .rbdg,body.isadmin .ownside .atb .bdg,body.isadmin .ownside .atb b{margin-left:auto;min-width:22px;text-align:center;border-radius:99px;font-size:11px;padding:2px 7px}
+body.isadmin .ownside .pcsrch{white-space:nowrap;font-size:13px;background:var(--soft);border:1px solid var(--line);border-radius:12px;margin-bottom:6px}
+body.isadmin .ovhero{background:radial-gradient(120% 140% at 100% 0,rgba(255,106,61,.30),transparent 55%),linear-gradient(135deg,#2a1d63,#171322 70%);border:1px solid #34304a}
+body.isadmin .ovhero .ovh-s{display:none}
+body.isadmin .ownmain .tile{background:linear-gradient(160deg,#1d1d24,#16161b);border-radius:16px}
+body.isadmin .ownmain .card{border-radius:18px}
+}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1390,7 +1405,7 @@ img,video{max-width:100%}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v63 · 16.11 12:55</span>
+  <span>© Promo Campaign · v64 · 16.11 13:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
