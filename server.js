@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 52;
+const SERVER_VER = 53;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -353,7 +353,7 @@ function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
     avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", tiktokUrl: acc.tiktok_url || "", linkChange: acc.linkChange || null, about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
-    analysis: A, price: acc.price || null, evaluation: (() => { const e = PC.evaluate(A, acc.price); if (!A.accepted) e.chance = A.status === "abandoned" ? 3 : 2; return e; })(), adminStatus: acc.adminStatus || "new", banInfo: acc.adminStatus === "banned" ? (acc.banInfo || { reason: "manager" }) : null, recommended: PC.recommend(A), analysisAt: acc.analysisAt,
+    analysis: A, aiPrice: (() => { const a = aiPrice(acc); return a.price ? { price: a.price, rpm: a.rpm, conf: a.conf } : null; })(), price: acc.price || null, evaluation: (() => { const e = PC.evaluate(A, acc.price); if (!A.accepted) e.chance = A.status === "abandoned" ? 3 : 2; return e; })(), adminStatus: acc.adminStatus || "new", banInfo: acc.adminStatus === "banned" ? (acc.banInfo || { reason: "manager" }) : null, recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
 function accPayoutRaw(user, acc) { return (acc && acc.payout) || (user && user.payout) || null; }   // every TikTok account can have its own payout details; the user-level ones are the fallback
@@ -365,7 +365,68 @@ function accAdminView(acc) {
   v.cpm = r.cpm;
   { const ou = Object.values(db.users).find(x => (x.accounts || []).some(z => z.open_id === acc.open_id)), pp = accPayoutRaw(ou, acc); v.payout = pp ? decObj(pp.enc) : null; }
   v.videos = v.videos.slice(0, 40);
+  v.ai = aiPrice(acc);
   return v;
+}
+
+/* ===== v53: AI pricing, ROI per account, topic demand ===== */
+const AIM = { BASE_RPM: 0.12, REF_VIEWS: 50000, REF_PRICE: 12 };   // $0.12 per 1000 views at 10k; scales up so ~50k views = ~$12
+const aiClamp = (x, a, b) => Math.max(a, Math.min(b, x));
+let _aiCtx = null;
+function aiCtx() {
+  if (_aiCtx && Date.now() - _aiCtx.t < 20000) return _aiCtx;
+  const now = Date.now(), D90 = 90 * 86400000, cnt = {}; let total = 0; const byOpen = {};
+  Object.values(db.requests).filter(r => !r.demo).forEach(r => {
+    (byOpen[r.openId] = byOpen[r.openId] || []).push(r);
+    if (now - r.created > D90 || ["cancelled", "rejected"].includes(r.status)) return;
+    const t = db.tracks[r.trackId]; (t && t.categories || []).forEach(c => { cnt[c] = (cnt[c] || 0) + (r.videos || 1); total += (r.videos || 1); });
+  });
+  const demand = {};
+  CATEGORIES.forEach(c => { const share = total ? (cnt[c] || 0) / total : 0, idx = total ? share * CATEGORIES.length : 1;
+    demand[c] = { orders: cnt[c] || 0, idx: Math.round(idx * 100) / 100, factor: total >= 5 ? Math.round(aiClamp(1 + (idx - 1) * 0.15, 0.9, 1.2) * 100) / 100 : 1 }; });
+  _aiCtx = { t: now, demand, byOpen, total }; return _aiCtx;
+}
+/* expected vs actual views for one order (only the videos the editor already delivered) */
+function reqPerf(r, acc) {
+  const vids = (acc && acc.videos) || []; let actual = 0, n = 0;
+  (r.links || []).forEach(l => { const p = videoIdOf(l), v = p && vids.find(x => x.id === p.id); if (v) { actual += v.views; n++; } });
+  const refAvg = r.expAvg || (acc ? PC.analyze(vids, Date.now()).refAvg : 0), exp = n * refAvg;
+  const ratio = n && exp ? actual / exp : null, cost = reqCost(r);
+  const verdict = !n ? "waiting" : (ratio === null ? "waiting" : (ratio >= 1 ? "paid_off" : (ratio >= 0.7 ? "on_target" : "under")));
+  return { id: r.id, track: (db.tracks[r.trackId] || {}).title || "", status: r.status, videos: r.videos, delivered: n, expected: Math.round(exp), actual, ratio: ratio === null ? null : Math.round(ratio * 100) / 100, verdict, cost, price: r.price,
+    rpm: actual ? Math.round(cost * (n / Math.max(1, r.videos)) / actual * 1000 * 1000) / 1000 : null, created: r.created };
+}
+function aiPrice(acc, ctx) {
+  ctx = ctx || aiCtx();
+  const A = PC.analyze(acc.videos || [], Date.now()), vids = (acc.videos || []).filter(v => Date.now() - v.created <= 30 * 86400000);
+  const v = A.refAvg || 0, mv = (A.month && A.month.views) || 0;
+  const tier = aiClamp(1 + 0.43 * Math.log2(Math.max(v, 5000) / 10000), 0.5, 3);
+  const rpm = AIM.BASE_RPM * tier;
+  let likes = 0, vw = 0; vids.forEach(x => { likes += x.likes || 0; vw += x.views || 0; });
+  const er = vw > 0 && likes > 0 ? likes / vw : null, eng = er === null ? 1 : Math.round(aiClamp(1 + (er - 0.06) * 3, 0.85, 1.2) * 100) / 100;
+  const cats = (acc.categories || []).filter(c => ctx.demand[c]), topic = cats.length ? Math.round(cats.reduce((x, c) => x + ctx.demand[c].factor, 0) / cats.length * 100) / 100 : 1;
+  const perf = (ctx.byOpen[acc.open_id] || []).filter(r => ["approved", "submitted", "completed"].includes(r.status)).sort((a, b) => b.created - a.created).slice(0, 8).map(r => reqPerf(r, acc));
+  const ev = perf.filter(p => p.ratio !== null), avgRatio = ev.length ? ev.reduce((x, p) => x + p.ratio, 0) / ev.length : null;
+  const conf = Math.min(1, ev.length / 4), hist = avgRatio === null ? 1 : Math.round((1 + (aiClamp(1 + (avgRatio - 1) * 0.25, 0.85, 1.15) - 1) * conf) * 100) / 100;
+  let price = A.accepted && v > 0 ? v / 1000 * rpm * eng * topic * hist : 0;
+  price = price ? Math.round(aiClamp(price, 1, 60) * 2) / 2 : 0;
+  const paid = ev.filter(p => p.verdict === "paid_off" || p.verdict === "on_target").length;
+  const cost = perf.reduce((x, p) => x + p.cost, 0), act = perf.reduce((x, p) => x + p.actual, 0);
+  const fol = acc.profile && acc.profile.follower_count || 0;
+  return { price, rpm: Math.round(rpm * eng * topic * hist * 1000) / 1000, parts: { views: v, tier: Math.round(tier * 100) / 100, eng, topic, hist }, conf: A.month.videos >= 6 ? "high" : (A.month.videos >= 3 ? "mid" : "low"),
+    followers: fol, ratio: fol && v ? Math.round(v / fol * 100) / 100 : null, views30: mv, videos30: A.month.videos, er: er === null ? null : Math.round(er * 1000) / 1000,
+    roi: { orders: perf.length, evaluated: ev.length, ok: paid, under: ev.length - paid, avgRatio: avgRatio === null ? null : Math.round(avgRatio * 100) / 100, spent: Math.round(cost * 100) / 100, views: act }, perf: perf.slice(0, 5) };
+}
+function topicStats() {
+  const ctx = aiCtx(), accs = allAccounts().filter(a => !a.demo && a.adminStatus !== "banned"), out = [];
+  CATEGORIES.forEach(c => {
+    const list = accs.filter(a => (a.categories || []).includes(c)), act = list.filter(a => PC.analyze(a.videos || [], Date.now()).accepted);
+    const pr = act.filter(a => a.price > 0), ai = act.map(a => aiPrice(a, ctx)), aip = ai.filter(x => x.price > 0), ev = ai.filter(x => x.roi.avgRatio !== null);
+    const avg = (arr, f) => arr.length ? Math.round(arr.reduce((x, y) => x + f(y), 0) / arr.length * 100) / 100 : null;
+    out.push({ id: c, accounts: list.length, active: act.length, avgPrice: avg(pr, a => a.price), avgAi: avg(aip, x => x.price), avgViews: avg(ai, x => x.parts.views), views30: ai.reduce((x, y) => x + y.views30, 0),
+      orders: ctx.demand[c].orders, demand: ctx.demand[c].idx, factor: ctx.demand[c].factor, avgRatio: avg(ev, x => x.roi.avgRatio) });
+  });
+  return out;
 }
 const FEE = 0.2;   // site commission, taken from every confirmed payment
 const RATES = { t: 0, live: false, v: { UAH: 41.5, USDT: 1, SOL: 0.0058, TRX: 3.4, ETH: 0.00032, LTC: 0.0105, TON: 0.42, BTC: 0.0000105 } };
@@ -498,7 +559,7 @@ function overview() {
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
         paid: Math.round(Object.values(db.topups).filter(x => x.producerId === p.id && x.status === "confirmed").reduce((q, x) => q + x.amount, 0) * 100) / 100 }; }),
-    archive: Object.values(db.archive || {}).map(e => ({ id: e.id, handle: e.handle, internalName: e.internalName, by: e.by, at: e.at })),     accounts: accs.map(accAdminView), categories: CATEGORIES
+    archive: Object.values(db.archive || {}).map(e => ({ id: e.id, handle: e.handle, internalName: e.internalName, by: e.by, at: e.at })),     accounts: accs.map(accAdminView), categories: CATEGORIES, topics: topicStats()
   };
 }
 
@@ -760,7 +821,7 @@ const server = http.createServer(async (req, res) => {
         if (Object.values(db.requests).some(r => r.trackId === t.id && r.openId === acc.open_id && ["pending", "approved", "submitted"].includes(r.status))) continue;
         const disc = discountFor(acc, videos);
         if (!need(res, disc >= 0 && disc <= 99, 400, "discount 0..99")) return;
-        const r = { id: uid8(), trackId: t.id, openId: acc.open_id, price: acc.price, videos, discount: disc, priority: maxTier(acc) > 0 ? 5 : 0, status: "pending", links: [], created: Date.now(), updated: Date.now() };
+        const r = { id: uid8(), trackId: t.id, openId: acc.open_id, price: acc.price, videos, discount: disc, priority: maxTier(acc) > 0 ? 5 : 0, status: "pending", links: [], created: Date.now(), updated: Date.now(), expAvg: PC.analyze(acc.videos || [], Date.now()).refAvg || 0 };
         db.requests[r.id] = r; out.push(reqView(r, false));
       }
       saveDb(); notify(out.length + " new request(s) from an editor"); return send(res, 200, { requests: out });

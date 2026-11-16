@@ -1565,6 +1565,61 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 @keyframes cstIn{from{opacity:0;transform:translateX(40px) scale(.9)}}
 :root[data-theme=light] .cst{background:#fff;color:#1c1830}
 
+/* v92: topics explorer + AI price */
+.tpx{display:grid;gap:14px}
+.tpxcats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+@media(min-width:700px){.tpxcats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1100px){.tpxcats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tpxcat{position:relative;text-align:left;display:flex;flex-direction:column;gap:3px;padding:13px 14px;border-radius:18px;background:var(--surface);border:1.5px solid var(--line);color:var(--fg);font:inherit;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s,background .18s}
+.tpxcat b{font-size:14px;line-height:1.25}.tpxcat span{font-size:12px;color:var(--muted)}
+.tpxcat .hot{position:absolute;right:10px;bottom:8px;font-style:normal;font-size:15px}
+.tpxcat:hover{transform:translateY(-2px);border-color:#8B6CFF;box-shadow:0 8px 24px rgba(139,108,255,.28)}
+.tpxcat[aria-pressed=true]{border-color:#A56BFF;background:linear-gradient(135deg,rgba(139,108,255,.28),rgba(109,92,255,.12));box-shadow:0 0 0 1px #A56BFF,0 10px 28px rgba(139,108,255,.38)}
+.tpxstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:900px){.tpxstats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tpxs{padding:14px;display:flex;flex-direction:column;gap:4px;animation:tpxin .3s both}
+.tpxs b{font-size:20px;letter-spacing:-.3px}.tpxs span{font-size:12px;color:var(--muted)}
+.tpxt{margin:2px 0 -4px;font-size:18px}
+.tpxbar{display:flex;gap:10px;flex-wrap:wrap}
+.tpxsrch{flex:1 1 240px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:999px;background:#18181b;border:1.5px solid rgba(139,108,255,.45);box-shadow:0 0 0 0 rgba(139,108,255,0),inset 0 0 18px rgba(139,108,255,.06);transition:box-shadow .2s,border-color .2s}
+.tpxsrch:focus-within{border-color:#A56BFF;box-shadow:0 0 0 3px rgba(165,107,255,.25),0 0 26px rgba(139,108,255,.45)}
+.tpxsrch input{flex:1;min-width:0;height:46px;background:transparent;border:0;outline:0;color:#F3F5F9;font:inherit;font-size:15px}
+.tpxsrch input::placeholder{color:#8a8fa3}
+#tpxSort{border-radius:999px;border:1.5px solid rgba(139,108,255,.45);background:#18181b;color:#F3F5F9;padding:0 16px;height:48px;font:inherit}
+.tpxlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:900px){.tpxlist{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1300px){.tpxlist{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tpxlist .empty{grid-column:1/-1}
+.tpxc{text-align:left;padding:12px;display:flex;flex-direction:column;gap:10px;color:var(--fg);font:inherit;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;animation:tpxin .3s both}
+.tpxc:hover{transform:translateY(-3px);border-color:#8B6CFF;box-shadow:0 10px 28px rgba(139,108,255,.3)}
+.tpxh{display:flex;align-items:center;gap:10px;min-width:0}
+.tpxav{width:38px;height:38px;border-radius:50%;object-fit:cover;flex:none;background:linear-gradient(135deg,#8B6CFF,#6D5CFF)}
+.tpxav.ph{display:grid;place-items:center;font-weight:800;color:#fff}.tpxav.big{width:54px;height:54px;font-size:22px}
+.tpxn{display:flex;flex-direction:column;min-width:0;flex:1}.tpxn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.tpxn span{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpxst{font-style:normal;font-size:12px;font-weight:700;color:#F6B84B;flex:none}
+.tpxg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.tpxg.four{grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 0}
+@media(min-width:700px){.tpxg.four{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tpxg div{background:rgba(139,108,255,.08);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:1px}
+.tpxg b{font-size:15px}.tpxg span{font-size:10.5px;color:var(--muted)}
+.tpxf{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.aip{font-weight:800;font-size:13px;padding:4px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(139,108,255,.35),rgba(109,92,255,.2));border:1px solid rgba(165,107,255,.6)}
+.aid{font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px}
+.aid.hi{background:rgba(255,107,122,.15);color:#FF8794}.aid.lo{background:rgba(246,184,75,.15);color:#F6B84B}.aid.eq{background:rgba(61,214,140,.15);color:#3DD68C}
+.aipanel{border:1.5px solid rgba(139,108,255,.4);border-radius:18px;padding:14px;margin:12px 0;background:linear-gradient(160deg,rgba(139,108,255,.14),rgba(24,24,27,.4));display:grid;gap:10px}
+.aibig{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.aibig span{font-size:13px;font-weight:700;color:#C8B8FF}.aibig b{font-size:32px;letter-spacing:-1px}.aibig small{color:var(--muted);font-size:12px}
+.aiwhy{display:grid;gap:6px}.aiw{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-top:1px solid var(--line)}.aiw span{color:var(--muted)}
+.aisum{font-size:13px;font-weight:600}
+.airo{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}.airo div{display:flex;flex-direction:column;min-width:0}.airo b{font-size:13px}.airo span{font-size:11.5px;color:var(--muted)}
+.aiv{font-style:normal;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.aiv.paid_off{background:rgba(61,214,140,.18);color:#3DD68C;box-shadow:0 0 14px rgba(61,214,140,.25)}.aiv.on_target{background:rgba(109,140,255,.2);color:#8FB0FF}.aiv.under{background:rgba(255,107,122,.18);color:#FF8794}.aiv.waiting{background:rgba(246,184,75,.16);color:#F6B84B}
+.aicur{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}.aicur>span{color:var(--muted)}.aicur b{font-size:18px}
+.aiown{display:grid;gap:8px;margin-top:6px}
+.aiinp{display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;background:#18181b;border:1.5px solid rgba(139,108,255,.45);max-width:220px}.aiinp:focus-within{border-color:#A56BFF;box-shadow:0 0 22px rgba(139,108,255,.4)}.aiinp span{font-weight:800}.aiinp input{width:100%;height:46px;background:transparent;border:0;outline:0;color:#F3F5F9;font:inherit;font-size:18px;font-weight:700}
+.aipanel.ed{margin:0 0 12px}
+@keyframes tpxin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#tpxSort{flex:0 0 auto;width:auto!important;min-width:190px}
+@media(max-width:700px){#tpxSort{flex:1 1 100%}}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1742,7 +1797,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v91 · 17.11 05:20</span>
+  <span>© Promo Campaign · v92 · 16.11 22:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2717,7 +2772,7 @@ function renderOwner(){
   if(!ADM.ok||!D)return false;checkNew(D);
   var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="vlinks"&&D.requests.filter(function(q){return q.status==="submitted"}).length?' <i class="cnt">'+D.requests.filter(function(q){return q.status==="submitted"}).length+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')+(k==="newtracks"&&window.__NTn&&window.__NTn()?' <i class="cnt">'+window.__NTn()+'</i>':'')+(k==="tickets"&&window.__TK&&window.__TK.unread?' <i class="cnt">'+(window.__TK.unread>99?"99+":window.__TK.unread)+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","vlinks","accounts","editorpay","accarch","chatmod","prices"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","vlinks","accounts","editorpay","accarch","chatmod","prices","topics"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -4612,7 +4667,7 @@ Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Ос
   var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
 
 /* ===== v29: phone owner cabinet with bottom menu ===== */
-var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
+var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices","topics"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
 function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
 function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
   if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
@@ -6284,12 +6339,73 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   var pl=function(){try{inboxPoll()}catch(e){}};setInterval(pl,10000);document.addEventListener("visibilitychange",function(){if(!document.hidden)pl()});
 })();
 
+/* ===== v92: AI pricing, ROI and the Topics explorer ===== */
+(function(){
+var T={en:{a_topics:"🧭 Topics",tpx_h:"Topics explorer",tpx_sub:"Pick a topic to see its accounts, prices and results.",tpx_acc:"Accounts",tpx_active:"Active accounts",tpx_avgp:"Average price",tpx_avgai:"AI average price",tpx_avgv:"Average views per video",tpx_v30:"Views, 30 days",tpx_ord:"Videos ordered (90 days)",tpx_dem:"Demand",tpx_res:"Results vs expected",tpx_search:"Search accounts…",tpx_all:"All topics",tpx_none:"No accounts found.",tpx_sort:"Sort",tpx_s_views:"Most views",tpx_s_price:"Highest price",tpx_s_roi:"Best results",tpx_s_ai:"Price vs AI",tpx_fol:"Followers",tpx_ratio:"Views / followers",tpx_v30a:"Views, 30 days",tpx_price:"Price",tpx_ai:"AI price",tpx_vid:"videos in 30 days",tpx_hot:"In demand",tpx_cool:"Quiet",tpx_back:"← All topics",tpx_close:"Close",
+ai_t:"AI price",ai_per:"per video",ai_rpm:"per 1000 views",ai_why:"How we calculated it",ai_views:"Average views per video (30 days)",ai_tier:"Reach multiplier",ai_eng:"Engagement (likes)",ai_topic:"Topic demand",ai_hist:"Past results",ai_conf_high:"High confidence",ai_conf_mid:"Medium confidence",ai_conf_low:"Low confidence — few videos",ai_nodata:"Not enough views to suggest a price yet.",ai_roi:"ROI of past orders",ai_roi_none:"No finished orders with videos yet.",ai_exp:"expected",ai_act:"actual",ai_v_paid_off:"Paid off",ai_v_on_target:"On target",ai_v_under:"Underperformed",ai_v_waiting:"Waiting for videos",ai_sum:"{ok} of {n} orders paid off, average {r}% of expected views",ai_own:"Your own price",ai_use:"Use AI price",ai_send:"Send my price",ai_sent:"Price sent to the editor",ai_hint_admin:"The editor gets your price and can accept or decline it.",ai_hint_ed:"This is only a suggestion. You can enter your own price below.",ai_bad:"Price must be $1 to $60",ai_cur:"Current price",ai_none:"not set",ai_diff_hi:"above AI",ai_diff_lo:"below AI",ai_diff_eq:"matches AI"},
+ru:{a_topics:"🧭 Тематики",tpx_h:"Обзор тематик",tpx_sub:"Выберите тематику, чтобы увидеть аккаунты, цены и результаты.",tpx_acc:"Аккаунтов",tpx_active:"Активных аккаунтов",tpx_avgp:"Средняя цена",tpx_avgai:"Средняя цена от ИИ",tpx_avgv:"Средние просмотры видео",tpx_v30:"Просмотры за 30 дней",tpx_ord:"Заказано видео (90 дней)",tpx_dem:"Спрос",tpx_res:"Результат к ожидаемому",tpx_search:"Поиск аккаунтов…",tpx_all:"Все тематики",tpx_none:"Аккаунты не найдены.",tpx_sort:"Сортировка",tpx_s_views:"Больше просмотров",tpx_s_price:"Дороже",tpx_s_roi:"Лучший результат",tpx_s_ai:"Цена к ИИ",tpx_fol:"Подписчики",tpx_ratio:"Просмотры / подписчики",tpx_v30a:"Просмотры за 30 дней",tpx_price:"Цена",tpx_ai:"Цена ИИ",tpx_vid:"видео за 30 дней",tpx_hot:"В спросе",tpx_cool:"Тихо",tpx_back:"← Все тематики",tpx_close:"Закрыть",
+ai_t:"Цена от ИИ",ai_per:"за видео",ai_rpm:"за 1000 просмотров",ai_why:"Как посчитано",ai_views:"Средние просмотры видео (30 дней)",ai_tier:"Множитель охвата",ai_eng:"Вовлечённость (лайки)",ai_topic:"Спрос на тематику",ai_hist:"Прошлые результаты",ai_conf_high:"Высокая уверенность",ai_conf_mid:"Средняя уверенность",ai_conf_low:"Низкая уверенность — мало видео",ai_nodata:"Пока мало просмотров, чтобы предложить цену.",ai_roi:"Окупаемость прошлых заказов",ai_roi_none:"Пока нет завершённых заказов с видео.",ai_exp:"ожидали",ai_act:"получили",ai_v_paid_off:"Окупилось",ai_v_on_target:"В цель",ai_v_under:"Не добрало",ai_v_waiting:"Ждём видео",ai_sum:"{ok} из {n} заказов окупились, в среднем {r}% от ожидаемых просмотров",ai_own:"Ваша цена",ai_use:"Взять цену ИИ",ai_send:"Отправить мою цену",ai_sent:"Цена отправлена эдитору",ai_hint_admin:"Эдитор получит вашу цену и сможет принять или отклонить её.",ai_hint_ed:"Это только подсказка. Ниже можно ввести свою цену.",ai_bad:"Цена от $1 до $60",ai_cur:"Текущая цена",ai_none:"не задана",ai_diff_hi:"выше ИИ",ai_diff_lo:"ниже ИИ",ai_diff_eq:"как у ИИ"}};
+Object.assign(LT.en,T.en);Object.assign(LT.ru,T.ru);
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in T.en)if(!XLL[k][x])XLL[k][x]=T.en[x]});
+var TP={cat:"",q:"",sort:"views"};
+function D(){return ADM&&ADM.data}
+function fm(x){return x===null||x===undefined?"—":Math.round(x).toLocaleString("en-US")}
+function fk(x){x=+x||0;return x>=1e6?(x/1e6).toFixed(1).replace(/\.0$/,"")+"M":(x>=1e3?(x/1e3).toFixed(x>=1e4?0:1).replace(/\.0$/,"")+"K":String(Math.round(x)))}
+function pr(x){return x?"$"+(Math.round(x*100)/100):"—"}
+function accList(){var d=D();return d?(d.accounts||[]).filter(function(a){return a.adminStatus!=="banned"&&a.analysis&&a.analysis.accepted}):[]}
+function letter(a){return esc(((a.handle||"@?").replace("@","")[0]||"?").toUpperCase())}
+function ava(a,cls){return a.avatar?'<img class="'+cls+'" src="'+esc(a.avatar)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'<span class="'+cls+' ph">'+letter(a)+'</span>'}
+function diffChip(a){var ai=a.ai&&a.ai.price;if(!ai)return"";if(!a.price)return'<span class="aid eq">'+esc(L("ai_cur"))+': '+esc(L("ai_none"))+'</span>';var d=a.price-ai;if(Math.abs(d)<0.5)return'<span class="aid eq">'+esc(L("ai_diff_eq"))+'</span>';return'<span class="aid '+(d>0?"hi":"lo")+'">'+(d>0?"+":"−")+"$"+Math.abs(Math.round(d*100)/100)+" "+esc(L(d>0?"ai_diff_hi":"ai_diff_lo"))+'</span>'}
+function cards(){
+  var q=TP.q.trim().toLowerCase(),list=accList().filter(function(a){return !TP.cat||(a.categories||[]).indexOf(TP.cat)>=0}).filter(function(a){return !q||((a.handle||"")+" "+(a.name||"")+" "+(a.internalName||"")).toLowerCase().indexOf(q)>=0});
+  var key={views:function(a){return -(a.ai?a.ai.views30:0)},price:function(a){return -(a.price||0)},roi:function(a){return -((a.ai&&a.ai.roi.avgRatio)||0)},ai:function(a){return -(((a.price||0)-((a.ai&&a.ai.price)||0)))}}[TP.sort]||function(){return 0};
+  list.sort(function(x,y){return key(x)-key(y)});
+  if(!list.length)return'<div class="empty">'+esc(L("tpx_none"))+'</div>';
+  return list.slice(0,120).map(function(a){var ai=a.ai||{};
+    return '<button type="button" class="card tpxc" data-l="tpxAcc" data-id="'+esc(a.id)+'"><div class="tpxh">'+ava(a,"tpxav")+'<div class="tpxn"><b>'+esc(a.handle)+'</b><span>'+esc(a.name||a.internalName||"")+'</span></div><i class="tpxst">★ '+(a.stars?a.stars.final:"—")+'</i></div>'+
+    '<div class="tpxg"><div><b>'+fk(ai.views30)+'</b><span>'+esc(L("tpx_v30a"))+'</span></div><div><b>'+(ai.followers?fk(ai.followers):"—")+'</b><span>'+esc(L("tpx_fol"))+'</span></div><div><b>'+(ai.ratio!==null&&ai.ratio!==undefined?ai.ratio+"×":"—")+'</b><span>'+esc(L("tpx_ratio"))+'</span></div><div><b>'+pr(a.price)+'</b><span>'+esc(L("tpx_price"))+'</span></div></div>'+
+    '<div class="tpxf"><span class="aip">🤖 '+(ai.price?pr(ai.price):"—")+'</span>'+diffChip(a)+'</div></button>'}).join("")}
+function topicHtml(){
+  var d=D(),tp=(d.topics||[]),by={};tp.forEach(function(x){by[x.id]=x});
+  var grid='<div class="tpxcats">'+tp.map(function(x){return '<button type="button" class="tpxcat" data-l="tpxCat" data-c="'+x.id+'" aria-pressed="'+(TP.cat===x.id)+'"><b>'+esc(L("c_"+x.id))+'</b><span>'+esc(L("tpx_acc"))+': '+x.active+'</span>'+(x.demand>=1.25&&x.orders?'<i class="hot">🔥</i>':'')+'</button>'}).join("")+'</div>';
+  var st="",cur=by[TP.cat];
+  if(cur){var dm=cur.demand>=1.25?L("tpx_hot"):(cur.demand<0.75?L("tpx_cool"):"×"+cur.demand);
+    st='<div class="tpxstats">'+[[cur.active,"tpx_active"],[pr(cur.avgPrice),"tpx_avgp"],[pr(cur.avgAi),"tpx_avgai"],[fk(cur.avgViews),"tpx_avgv"],[fk(cur.views30),"tpx_v30"],[cur.orders,"tpx_ord"],[dm+(cur.demand>=1.25||cur.demand<0.75?" · ×"+cur.demand:""),"tpx_dem"],[cur.avgRatio===null?"—":Math.round(cur.avgRatio*100)+"%","tpx_res"]].map(function(x){return '<div class="card tpxs"><b>'+x[0]+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("")+'</div>'}
+  var bar='<div class="tpxbar"><label class="tpxsrch"><span aria-hidden="true">🔎</span><input id="tpxQ" type="search" autocomplete="off" placeholder="'+esc(L("tpx_search"))+'" value="'+esc(TP.q)+'"></label><select id="tpxSort" aria-label="'+esc(L("tpx_sort"))+'">'+["views","price","roi","ai"].map(function(k){return '<option value="'+k+'"'+(TP.sort===k?' selected':'')+'>'+esc(L("tpx_s_"+(k==="ai"?"ai":k)))+'</option>'}).join("")+'</select></div>';
+  return '<div class="tpx"><div class="card form"><h3>'+esc(L("tpx_h"))+'</h3><p class="hint">'+esc(L("tpx_sub"))+'</p>'+grid+'</div>'+st+(cur?'<h4 class="tpxt">'+esc(L("c_"+cur.id))+'</h4>':'')+bar+'<div class="tpxlist" id="tpxList">'+cards()+'</div></div>'}
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="topics"&&D()){var mn=document.querySelector(".ownmain")||$("adApp");if(mn){var f=document.activeElement&&document.activeElement.id==="tpxQ",p=f?document.activeElement.selectionStart:0,y=window.scrollY;mn.innerHTML=topicHtml();if(f){var i=$("tpxQ");i.focus();try{i.setSelectionRange(p,p)}catch(e){}}window.scrollTo(0,y)}}}catch(e){}return r}})();
+/* AI panel (used in the owner's account window) */
+function aiHtml(a){var ai=a.ai||{},p=ai.parts||{},ro=ai.roi||{};
+  var head=ai.price?'<div class="aibig"><span>🤖 '+esc(L("ai_t"))+'</span><b>$'+ai.price+'</b><small>'+esc(L("ai_per"))+' · $'+ai.rpm+' '+esc(L("ai_rpm"))+'</small></div><div class="hint">'+esc(L("ai_conf_"+ai.conf))+'</div>':'<div class="note">'+esc(L("ai_nodata"))+'</div>';
+  var why=ai.price?'<div class="aiwhy"><div class="hint"><b>'+esc(L("ai_why"))+'</b></div>'+[["ai_views",fm(p.views)],["ai_tier","×"+p.tier],["ai_eng","×"+p.eng+(ai.er!==null&&ai.er!==undefined?" ("+(ai.er*100).toFixed(1)+"%)":"")],["ai_topic","×"+p.topic],["ai_hist","×"+p.hist]].map(function(x){return '<div class="aiw"><span>'+esc(L(x[0]))+'</span><b>'+x[1]+'</b></div>'}).join("")+'</div>':'';
+  var roi='<div class="aiwhy"><div class="hint"><b>'+esc(L("ai_roi"))+'</b></div>'+(ro.evaluated?'<div class="aisum">'+esc(L("ai_sum").replace("{ok}",ro.ok).replace("{n}",ro.evaluated).replace("{r}",Math.round(ro.avgRatio*100)))+'</div>':'<div class="hint">'+esc(L("ai_roi_none"))+'</div>')+(ai.perf||[]).map(function(x){return '<div class="airo"><div><b>'+esc(x.track||"—")+'</b><span>'+x.delivered+'/'+x.videos+' · '+esc(L("ai_exp"))+' '+fk(x.expected)+' → '+esc(L("ai_act"))+' '+fk(x.actual)+'</span></div><i class="aiv '+x.verdict+'">'+esc(L("ai_v_"+x.verdict))+'</i></div>'}).join("")+'</div>';
+  return '<div class="aipanel">'+head+why+roi+'</div>'}
+function openAcc(id){var a=accList().filter(function(x){return x.id===id})[0];if(!a)return;var ai=a.ai||{};
+  openModal('<div class="tpxm"><div class="tpxh">'+ava(a,"tpxav big")+'<div class="tpxn"><b>'+esc(a.handle)+'</b><span>'+esc(a.name||"")+'</span><span>'+catPills(a.categories,a.otherCategory)+'</span></div></div>'+
+   '<div class="tpxg four"><div><b>'+fk(ai.views30)+'</b><span>'+esc(L("tpx_v30a"))+'</span></div><div><b>'+(ai.followers?fk(ai.followers):"—")+'</b><span>'+esc(L("tpx_fol"))+'</span></div><div><b>'+(ai.ratio!==null&&ai.ratio!==undefined?ai.ratio+"×":"—")+'</b><span>'+esc(L("tpx_ratio"))+'</span></div><div><b>'+ai.videos30+'</b><span>'+esc(L("tpx_vid"))+'</span></div></div>'+
+   '<div class="aicur"><span>'+esc(L("ai_cur"))+'</span><b>'+(a.price?pr(a.price):esc(L("ai_none")))+'</b>'+diffChip(a)+'</div>'+aiHtml(a)+
+   '<div class="aiown"><label for="tpxP"><b>'+esc(L("ai_own"))+'</b></label><div class="aiinp"><span>$</span><input id="tpxP" type="number" min="1" max="60" step="0.5" inputmode="decimal" value="'+(a.suggestedPrice||"")+'" placeholder="'+(ai.price||"")+'"></div><div class="row">'+(ai.price?'<button type="button" class="btn sm" data-l="tpxUse" data-v="'+ai.price+'">'+esc(L("ai_use"))+' $'+ai.price+'</button>':'')+'<button type="button" class="btn primary sm" data-l="tpxSend" data-id="'+esc(a.id)+'">'+esc(L("ai_send"))+'</button></div><div class="hint">'+esc(L("ai_hint_admin"))+'</div><div class="note err" id="tpxE" hidden></div></div>'+
+   '<div class="row"><button type="button" class="btn sm" data-l="mclose">'+esc(L("tpx_close"))+'</button></div></div>')}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="tpxCat"],[data-l="tpxAcc"],[data-l="tpxUse"],[data-l="tpxSend"]');if(!el)return;e.stopImmediatePropagation();var a=el.getAttribute("data-l");
+  if(a==="tpxCat"){var c=el.getAttribute("data-c");TP.cat=TP.cat===c?"":c;renderOwner();if(TP.cat){var st=document.querySelector(".tpxstats");if(st)setTimeout(function(){st.scrollIntoView({behavior:"smooth",block:"start"})},60)}return}
+  if(a==="tpxAcc"){openAcc(el.getAttribute("data-id"));return}
+  if(a==="tpxUse"){var i=$("tpxP");if(i)i.value=el.getAttribute("data-v");return}
+  if(a==="tpxSend"){var v=Number(($("tpxP")||{}).value),er=$("tpxE");if(!(v>=1&&v<=60)){er.textContent=L("ai_bad");er.hidden=false;return}el.disabled=true;
+    api("/api/admin/suggest-price",{id:el.getAttribute("data-id"),price:v}).then(function(r){el.disabled=false;if(!r.ok){er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false;return}closeModal();toast(L("ai_sent")+": $"+v);ownerReload()})}
+},true);
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="tpxQ"){TP.q=e.target.value;var l=$("tpxList");if(l)l.innerHTML=cards()}});
+document.addEventListener("change",function(e){if(e.target&&e.target.id==="tpxSort"){TP.sort=e.target.value;var l=$("tpxList");if(l)l.innerHTML=cards()}});
+/* editor: AI suggestion in the price window */
+var oP=prOpen;prOpen=function(id){oP.apply(this,arguments);try{var a=S.accounts.filter(function(x){return x.id===(LV.modal&&LV.modal.id)})[0],ai=a&&a.aiPrice;var bg=document.querySelector(".prm .prbig");if(!bg||!ai)return;
+  bg.insertAdjacentHTML("beforebegin",'<div class="aipanel ed"><div class="aibig"><span>🤖 '+esc(L("ai_t"))+'</span><b>$'+ai.price+'</b><small>'+esc(L("ai_per"))+' · $'+ai.rpm+' '+esc(L("ai_rpm"))+'</small></div><div class="hint">'+esc(L("ai_hint_ed"))+' · '+esc(L("ai_conf_"+ai.conf))+'</div><button type="button" class="btn sm" data-l="prUse" data-v="'+ai.price+'">'+esc(L("ai_use"))+' $'+ai.price+'</button></div>')}catch(e){}};
+})();
+
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
 function applyLive(d){
   if(typeof LV!=="undefined")LV.payout=d.payout||{set:false};
   var oldMap={};S.accounts.forEach(function(a){oldMap[a.id]=a});
-  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,banInfo:a.banInfo||null,avatar:a.avatar||"",suggestedPrice:a.suggestedPrice||null,tiktokUrl:a.tiktokUrl||"",internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0,tiers:a.tiers||[],priceReq:a.priceReq||null}});
+  S.accounts=(d.accounts||[]).map(function(a){var o=oldMap[a.id]||{};return {id:a.id,aiPrice:a.aiPrice||null,handle:a.handle,scenario:"live",consent:true,videos:a.videos||[],analyzed:o.analyzed||false,reviewed:!!a.price,price:a.price||null,adminStatus:a.adminStatus,banInfo:a.banInfo||null,avatar:a.avatar||"",suggestedPrice:a.suggestedPrice||null,tiktokUrl:a.tiktokUrl||"",internalName:a.internalName||"",about:a.about||"",categories:a.categories||[],otherCategory:a.otherCategory||"",discount:a.discount||0,tiers:a.tiers||[],priceReq:a.priceReq||null}});
   S.accounts.forEach(function(x,i){x.payout=((d.accounts||[])[i]||{}).payout||{set:false}});S.active=Math.min(S.active,Math.max(0,S.accounts.length-1));sync();save();
 }
 /* When the page is served by server.js it talks to /api; anywhere else (this preview) it stays in demo mode */
