@@ -1881,7 +1881,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v100 · 17.11 00:50</span>
+  <span>© Promo Campaign · v101 · 17.11 01:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6624,6 +6624,19 @@ window.addEventListener("click",function(e){var el=e.target.closest&&e.target.cl
   if(a==="rjDelNo"){box.innerHTML='<button type="button" class="btn danger" data-l="rjDel">🗑 '+esc(L("rj_del"))+'</button>';return}
   if(a==="rjDelYes"){el.disabled=true;var acc=S.accounts[S.active];if(!acc)return;api("/api/account/delete",{id:acc.id}).then(function(r){if(!r.ok){el.disabled=false;box.insertAdjacentHTML("beforeend",'<p class="hint" style="color:#ff8a96">'+esc(L("rj_del_err")+((r.j&&r.j.error)||""))+'</p>');return}applyLive(r.j);S.active=0;save();go("dashboard")})}
 },true);
+})();
+
+/* ===== v101: the page updates itself when a newer site version is published (some phone browsers keep an old copy) ===== */
+(function(){
+var MY=0;try{var m=/Promo Campaign · v(\d+)/.exec(document.body.textContent);MY=m?Number(m[1]):0}catch(e){}
+if(!MY||!/^https?:$/.test(location.protocol))return;
+function chk(){if(document.hidden)return;
+  fetch("/version?t="+Date.now(),{cache:"no-store",credentials:"same-origin"}).then(function(r){return r.text()}).then(function(t){
+    var s=/site v(\d+)/.exec(t),n=s?Number(s[1]):0;if(!n||n<=MY)return;
+    var key="pc_upd";try{if(sessionStorage.getItem(key)===String(n))return;sessionStorage.setItem(key,String(n))}catch(e){}
+    var u=location.pathname+"?v="+n+location.hash;location.replace(u)}).catch(function(){})}
+setTimeout(chk,3000);setInterval(chk,60000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden)chk()});window.addEventListener("focus",chk);window.addEventListener("pageshow",chk);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
