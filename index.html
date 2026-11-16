@@ -38,7 +38,7 @@
 (function(){var s=Date.now(),bad=false,H=false;
 function hide(){if(H||bad)return;H=true;var e=document.getElementById("pcSplash");if(!e)return;e.classList.add("off");setTimeout(function(){e.remove()},700)}
 window.__pcReady=function(){var w=Math.max(0,1100-(Date.now()-s));setTimeout(hide,w)};
-setTimeout(function(){if(!bad)hide()},7000);
+setTimeout(function(){if(!bad)hide()},25000);
 function fail(){if(H)return;bad=true;var e=document.getElementById("pcSplash"),m=document.getElementById("pcMsg");if(!e||!m)return;e.classList.remove("off");m.hidden=false;
  var ru=/^ru/i.test(navigator.language||"");m.innerHTML=(ru?"Что-то пошло не так. Сейчас попробуем ещё раз.":"Something went wrong. Trying again.")+'<br><button type="button" onclick="location.reload()">'+(ru?"Обновить":"Reload")+"</button>";
  try{if(!sessionStorage.getItem("pcRetry")){sessionStorage.setItem("pcRetry","1");setTimeout(function(){location.reload()},3500)}}catch(x){}}
@@ -1881,7 +1881,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v103 · 17.11 01:55</span>
+  <span>© Promo Campaign · v104 · 17.11 02:20</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -5847,7 +5847,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   el.closest(".chath").appendChild(p)},true);
 })();
 
-try{if(window.__pcReady)window.__pcReady()}catch(e){}
+/* the logo screen is closed by template.html when the page is really ready */
 
 /* ===== v58: owner always sees the editor's CURRENT payout details ===== */
 (function(){
@@ -6666,7 +6666,10 @@ function probeLive(){
   return once(0).then(function(){if(!LIVE)setTimeout(function(){probeLive().then(function(){if(LIVE){applyStatic();route()}})},4000)});
 }
 applyStatic();$("openTT").disabled=!termsOk();
-probeLive().then(function(){applyStatic();route()},function(){applyStatic();route()});
+/* keep the logo screen until the real page is on screen (the manager screen: until it is drawn), but never longer than 25 s */
+function splashWhenReady(){var t0=Date.now();(function w(){var adm=/^#admin/.test(location.hash),ready=adm?!!document.querySelector(".ownmain,.ownside,#admLogin,.admlogin,form"):true;
+  if(ready||Date.now()-t0>25000){requestAnimationFrame(function(){requestAnimationFrame(function(){try{if(window.__pcReady)window.__pcReady()}catch(e){}})})}else setTimeout(w,120)})()}
+probeLive().then(function(){applyStatic();route();splashWhenReady()},function(){applyStatic();route();splashWhenReady()});
 })();
 </script>
 
