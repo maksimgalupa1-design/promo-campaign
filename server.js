@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 53;
+const SERVER_VER = 54;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -572,7 +572,7 @@ const server = http.createServer(async (req, res) => {
     if (P === "/auth/tiktok") {                       // "Open in TikTok" button points here
       const state = crypto.randomBytes(16).toString("hex");
       const cu = sessionUser(req);
-      pending.set(state, { exp: Date.now() + 10 * 60000, handle: (url.searchParams.get("u") || "").toLowerCase().replace(/^@/, ""), uid: cu ? cu.id : null });
+      pending.set(state, { exp: Date.now() + 10 * 60000, handle: (url.searchParams.get("u") || "").toLowerCase().replace(/^@/, ""), uid: cu ? cu.id : null, relink: url.searchParams.get("relink") === "1" });
       const q = new URLSearchParams({ client_key: KEY, scope: SCOPES, response_type: "code", redirect_uri: REDIRECT, state });
       res.writeHead(302, { Location: "https://www.tiktok.com/v2/auth/authorize/?" + q }); return res.end();
     }
@@ -580,7 +580,7 @@ const server = http.createServer(async (req, res) => {
       const state = url.searchParams.get("state"), code = url.searchParams.get("code");
       if (url.searchParams.get("error")) { res.writeHead(302, { Location: "/#signup?denied=1" }); return res.end(); }
       if (!code || !pending.has(state) || pending.get(state).exp < Date.now()) return send(res, 400, { error: "bad state" });
-      const want = pending.get(state).handle, uid0 = pending.get(state).uid;
+      const want = pending.get(state).handle, uid0 = pending.get(state).uid, relink = !!pending.get(state).relink;
       pending.delete(state);
       const tok = await tokenRequest({ code, grant_type: "authorization_code", redirect_uri: REDIRECT });
       const owner = db.byOpen[tok.open_id];
@@ -592,6 +592,11 @@ const server = http.createServer(async (req, res) => {
       if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now(), categories: [], discount: 0 }; const ar = db.archive && db.archive[tok.open_id]; if (ar && ar.acc) { for (const k of ["categories", "other_category", "about", "tiers", "discount", "internal_name", "price", "adminStatus", "tiktok_url"]) if (ar.acc[k] !== undefined) acc[k] = ar.acc[k]; delete db.archive[tok.open_id]; } user.accounts.push(acc); notify("new editor account connected, check Waiting for your decision"); }
       Object.assign(acc, { access_token: tok.access_token, refresh_token: tok.refresh_token, expires_at: Date.now() + tok.expires_in * 1000 });
       await refreshAnalysis(acc);
+      if (relink && !isNew) {   // the editor changed the profile link and verified it through TikTok: no manager check needed
+        const un = (acc.profile && acc.profile.username) || ""; acc.tiktok_url = un ? "https://www.tiktok.com/@" + un : acc.tiktok_url; delete acc.linkChange; acc.relinkedAt = Date.now(); saveDb();
+        notify("@" + un + " verified the TikTok link through TikTok");
+        res.writeHead(302, { Location: "/#dashboard?relinked=1" }); return res.end();
+      }
       if (want && (acc.profile.username || "").toLowerCase() !== want) {
         user.accounts = user.accounts.filter(x => x !== acc); saveDb();
         res.writeHead(302, { Location: "/#signup?mismatch=1" }); return res.end();

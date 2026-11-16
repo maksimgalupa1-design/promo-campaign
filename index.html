@@ -1639,6 +1639,20 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .vlam{display:grid;gap:12px}.vlaco{border-top:1px solid var(--line);padding-top:10px}.vlaoh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.vlaoh span{margin-left:auto;font-size:12px;color:var(--muted)}
 .vllist{display:none}
 
+/* v94: tiktok link change + payout pills */
+.ttwarn{border:1.5px solid rgba(246,184,75,.6);background:rgba(246,184,75,.1);border-radius:18px;padding:12px 14px;margin:10px 0;display:grid;gap:8px;animation:tpxin .25s both}.ttwarn p{margin:0;font-size:13px;color:var(--muted)}
+.ttacts{display:grid;gap:8px;margin:12px 0}.ttacts .btn{justify-content:center;text-align:center}
+.ttver{box-shadow:0 0 22px rgba(139,108,255,.45);animation:mpglow 2.6s ease-in-out infinite}
+@keyframes mpglow{0%,100%{box-shadow:0 0 14px rgba(139,108,255,.35)}50%{box-shadow:0 0 28px rgba(165,107,255,.7)}}
+.mpills{display:flex;flex-wrap:wrap;gap:10px;margin:2px 0 12px}
+.mpill{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;background:var(--surface);border:1.5px solid rgba(139,108,255,.4);color:var(--fg);font:inherit;font-weight:700;cursor:pointer;transition:transform .18s,box-shadow .2s,border-color .2s,background .2s}
+.mpill i{font-style:normal;font-size:18px;transition:transform .25s}
+.mpill:hover{transform:translateY(-2px) scale(1.04);border-color:#A56BFF;box-shadow:0 0 0 2px rgba(139,108,255,.4),0 8px 22px rgba(139,108,255,.35)}.mpill:hover i{transform:rotate(-12deg) scale(1.2)}
+.mpill:active{transform:scale(.96)}
+.mpill.on{background:linear-gradient(135deg,#6D5CFF,#A56BFF);border-color:transparent;color:#fff;box-shadow:0 0 22px rgba(139,108,255,.6);animation:mppop .35s both}
+@keyframes mppop{0%{transform:scale(.92)}60%{transform:scale(1.07)}100%{transform:scale(1)}}
+@media(max-width:480px){.mpills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.mpill{justify-content:center}}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1816,7 +1830,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v93 · 16.11 22:20</span>
+  <span>© Promo Campaign · v94 · 16.11 22:40</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6035,7 +6049,10 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
     e.stopImmediatePropagation();
     if(k==="price"){prOpen();return}
     if(k==="tt"){LV.modal={type:"tt"};var cur=u0().tiktokUrl||("https://www.tiktok.com/@"+String(u0().handle||"").replace(/^@/,""));
-      openModal('<h3>'+esc(L("sl_tt"))+'</h3><p class="hint">'+esc(L("tt_h"))+'</p><label class="f" for="ttUrl"><span>'+esc(L("tt_lbl"))+'</span><input id="ttUrl" type="url" inputmode="url" autocapitalize="off" maxlength="200" value="'+esc(cur)+'"></label><div class="note err" id="ttErr" hidden></div><div class="row"><button class="btn primary" data-l="ttSave">'+esc(L("sl_save"))+'</button><a class="btn" href="'+esc(cur)+'" target="_blank" rel="noopener noreferrer">'+esc(L("tk_open"))+'</a><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div>');return}
+      openModal('<h3>'+esc(L("sl_tt"))+'</h3><p class="hint">'+esc(L("tt_h"))+'</p><label class="f" for="ttUrl"><span>'+esc(L("tt_lbl"))+'</span><input id="ttUrl" type="url" inputmode="url" autocapitalize="off" maxlength="200" data-orig="'+esc(cur)+'" value="'+esc(cur)+'"></label>'+
+       '<div class="ttwarn" id="ttWarn" hidden><b>⚠ '+esc(L("tt_changed"))+'</b><p>'+esc(L("tt_warn"))+'</p><button type="button" class="btn sm" data-l="ttRestore">↩ '+esc(L("tt_restore"))+'</button></div><div class="note err" id="ttErr" hidden></div>'+
+       '<div class="ttacts"><a class="btn primary ttver" href="/auth/tiktok?relink=1">🔐 '+esc(L("tt_verify"))+'</a><div class="hint">'+esc(L("tt_verify_h"))+'</div><button type="button" class="btn" data-l="ttSave" id="ttSend" hidden>📨 '+esc(L("tt_send"))+'</button></div>'+
+       '<div class="row"><a class="btn" href="'+esc(cur)+'" target="_blank" rel="noopener noreferrer">'+esc(L("tk_open"))+'</a><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div>');return}
     var nodes=HOLD[k]?HOLD[k]():[];if(!nodes.length)return;
     LV.setOpen=true;
     openModal('<h3>'+esc(L("sl_"+k))+'</h3><p class="hint">'+esc(L("sl_"+k+"_h"))+'</p><div id="setHost" class="sethost"></div><div class="note err" id="setErr" hidden></div><div class="row">'+(k==="bulk"?'':'<button class="btn primary" data-l="setSave">'+esc(L("sl_save"))+'</button>')+'<button class="btn" data-l="mclose2">'+esc(k==="bulk"?L("close"):L("sl_cancel"))+'</button></div>');
@@ -6469,6 +6486,28 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
     (all.length?'<div class="aisum">'+esc(L("vl_acc_sum").replace("{a}",gave).replace("{b}",all.length))+'</div>':'')+
     (all.length?all.map(function(r){var L2=r.links||[];return '<div class="vlaco"><div class="vlaoh"><b>'+esc(r.track)+'</b>'+stL(r.status)+'<span>🔗 '+L2.length+' / '+(r.videos||0)+'</span></div>'+(L2.length?pills(L2):'<div class="hint">'+esc(L("vl_acc_none"))+'</div>')+(r.status==="submitted"?'<div class="row vlact"><button class="btn primary sm" data-l="vlOk" data-id="'+esc(r.id)+'">✓ '+esc(L("vl_ok"))+'</button><button class="btn danger sm" data-l="vlNo" data-id="'+esc(r.id)+'">✕ '+esc(L("vl_no"))+'</button></div>':'')+'</div>'}).join(""):'<div class="empty">'+esc(L("vl_acc_none"))+'</div>')+
     '<div class="row"><button type="button" class="btn sm" data-l="mclose">'+esc(L("tpx_close"))+'</button></div></div>')},true);
+})();
+
+/* ===== v94: TikTok link change must be verified, round payout method pills ===== */
+(function(){
+var T={en:{tt_changed:"The link is different",tt_warn:"A changed link cannot be saved by itself. Verify it through TikTok (fastest), or send it to the manager to check. Or put the old link back.",tt_restore:"Put the old link back",tt_verify:"Verify through TikTok",tt_verify_h:"You go to TikTok, allow us to see your views, and the account is verified again. The manager is not needed.",tt_send:"Send to manager to check",tt_relinked:"Verified through TikTok. The link is updated.",pm_paypal:"PayPal",pm_crypto:"Crypto",pm_card:"Card"},
+ru:{tt_changed:"Ссылка отличается",tt_warn:"Изменённую ссылку нельзя просто сохранить. Подтвердите её через TikTok (быстрее всего) или отправьте менеджеру на проверку. Либо верните старую ссылку.",tt_restore:"Вернуть старую ссылку",tt_verify:"Проверить через TikTok",tt_verify_h:"Вы перейдёте в TikTok, разрешите смотреть просмотры, и аккаунт верифицируется заново. Менеджер не нужен.",tt_send:"Отправить менеджеру на проверку",tt_relinked:"Подтверждено через TikTok. Ссылка обновлена.",pm_paypal:"PayPal",pm_crypto:"Крипта",pm_card:"Карта"}};
+Object.assign(LT.en,T.en);Object.assign(LT.ru,T.ru);
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in T.en)if(!XLL[k][x])XLL[k][x]=T.en[x]});
+function norm(v){return String(v||"").trim().toLowerCase().replace(/\/+$/,"")}
+function ttSync(){var i=$("ttUrl");if(!i)return;var ch=norm(i.value)!==norm(i.getAttribute("data-orig"));var w=$("ttWarn"),s=$("ttSend"),v=document.querySelector(".ttver");if(w)w.hidden=!ch;if(s)s.hidden=!ch;if(v)v.classList.toggle("dim",ch&&false)}
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="ttUrl")ttSync()});
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="ttRestore"]');if(!el)return;e.stopImmediatePropagation();var i=$("ttUrl");if(i){i.value=i.getAttribute("data-orig");ttSync()}},true);
+if(/relinked=1/.test(location.hash||"")){setTimeout(function(){try{toast(L("tt_relinked"))}catch(e){}},1200)}
+/* payout method as round pills */
+var IC={paypal:"🅿️",crypto:"🪙",card:"💳"};
+function enh(){document.querySelectorAll("#pyMethod,#tMeth,#nMethod").forEach(function(sel){if(sel.getAttribute("data-mp"))return;sel.setAttribute("data-mp","1");sel.classList.add("cs-hid");
+  var lb=sel.closest("label"),w=document.createElement("div");w.className="mpills";w.setAttribute("role","radiogroup");
+  w.innerHTML=Array.prototype.map.call(sel.options,function(o){return '<button type="button" class="mpill'+(o.selected?' on':'')+'" role="radio" aria-checked="'+o.selected+'" data-v="'+esc(o.value)+'"><i>'+(IC[o.value]||"💠")+'</i><span>'+esc(o.textContent)+'</span></button>'}).join("");
+  w.addEventListener("click",function(ev){var b=ev.target.closest(".mpill");if(!b)return;ev.preventDefault();ev.stopPropagation();sel.value=b.getAttribute("data-v");w.querySelectorAll(".mpill").forEach(function(x){var on=x===b;x.classList.toggle("on",on);x.setAttribute("aria-checked",on)});sel.dispatchEvent(new Event("change",{bubbles:true}))});
+  (lb||sel).insertAdjacentElement("afterend",w)})}
+var raf=0;new MutationObserver(function(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;try{enh()}catch(e){}})}).observe(document.body,{childList:true,subtree:true});
+try{enh()}catch(e){}
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
