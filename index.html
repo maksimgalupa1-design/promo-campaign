@@ -1881,7 +1881,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v99 · 17.11 00:20</span>
+  <span>© Promo Campaign · v100 · 17.11 00:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6482,7 +6482,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="tpxQ"){TP.q=e.target.value;var l=$("tpxList");if(l)l.innerHTML=cards()}});
 document.addEventListener("change",function(e){if(e.target&&e.target.id==="tpxSort"){TP.sort=e.target.value;var l=$("tpxList");if(l)l.innerHTML=cards()}});
 /* editor: AI suggestion in the price window */
-var oP=prOpen;prOpen=function(id){oP.apply(this,arguments);try{var a=S.accounts.filter(function(x){return x.id===(LV.modal&&LV.modal.id)})[0],ai=a&&a.aiPrice;var bg=document.querySelector(".prm .prbig");if(!bg||!ai)return;
+var oP=prOpen;prOpen=function(id){oP.apply(this,arguments);return;try{var a=S.accounts.filter(function(x){return x.id===(LV.modal&&LV.modal.id)})[0],ai=a&&a.aiPrice;var bg=document.querySelector(".prm .prbig");if(!bg||!ai)return;
   bg.insertAdjacentHTML("beforebegin",'<div class="aipanel ed"><div class="aibig"><span>🤖 '+esc(L("ai_t"))+'</span><b>$'+ai.price+'</b><small>'+esc(L("ai_per"))+' · $'+ai.rpm+' '+esc(L("ai_rpm"))+'</small></div><div class="hint">'+esc(L("ai_hint_ed"))+' · '+esc(L("ai_conf_"+ai.conf))+'</div><button type="button" class="btn sm" data-l="prUse" data-v="'+ai.price+'">'+esc(L("ai_use"))+' $'+ai.price+'</button></div>')}catch(e){}};
 })();
 
@@ -6495,11 +6495,11 @@ ru:{mk_links:"Ссылки",lk_h:"Ваши ссылки на видео",lk_none
 Object.assign(LT.en,T.en);Object.assign(LT.ru,T.ru);
 ["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in T.en)if(!XLL[k][x])XLL[k][x]=T.en[x]});
 LV.lkO=LV.lkO||{};
-var KIND=function(q){return q.status==="submitted"?"wait":(q.status==="completed"?"done":(q.status==="returned"?"back":"need"))};
+var KIND=function(q){return q.status==="submitted"&&(q.links||[]).length?"wait":(q.status==="completed"?"done":(q.status==="returned"?"back":"need"))};
 var KL={wait:"lk_wait",done:"lk_ok",back:"lk_back",need:"lk_need"};
 function short(u){return esc(String(u).replace(/^https?:\/\/(www\.)?/,"").slice(0,44))}
 function pills(L2){return '<div class="lkpills">'+L2.map(function(l,i){return '<a class="lkpill" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer" style="animation-delay:'+Math.min(i,10)*0.05+'s"><span>🔗</span><b>'+short(l.url)+'</b>'+(l.views!=null?'<i>'+Number(l.views).toLocaleString("en-US")+' 👁</i>':'')+'<em>↗</em></a>'}).join("")+'</div>'}
-function reqsWithLinks(){return (LV.reqs||[]).filter(function(q){return ["approved","submitted","returned","completed"].indexOf(q.status)>=0})}
+function reqsWithLinks(){return (LV.reqs||[]).filter(function(q){return ["approved","submitted","returned"].indexOf(q.status)>=0})}
 function drawLinks(){
   var el=$("ordList");if(!el)return;
   var qq=(LV.oq||"").toLowerCase().trim(),list=reqsWithLinks().filter(function(q){return !qq||((q.track||"")+" "+(q.artist||"")+" "+(q.handle||"")).toLowerCase().indexOf(qq)>=0}).sort(function(a,b){var o={wait:0,back:1,need:2,done:3};return o[KIND(a)]-o[KIND(b)]||(b.created||0)-(a.created||0)});
@@ -6511,7 +6511,7 @@ function drawLinks(){
 (function(){var o=ordList;ordList=function(){if(LV.mk==="links"){drawLinks();return}o.apply(this,arguments)}})();
 (function(){var o=renderOrders;renderOrders=function(){o.apply(this,arguments);
   var bar=document.querySelector("#ordersBody .mktabs");if(!bar)return;
-  if(!bar.querySelector(".mkt.lkb")){var n=reqsWithLinks().filter(function(q){return (q.links||[]).length}).length;bar.insertAdjacentHTML("beforeend",'<button type="button" class="mkt lkb'+(LV.mk==="links"?' on':'')+'" data-l="mkF" data-f="links"><i>🔗</i><span>'+esc(L("mk_links"))+'</span><b>'+n+'</b></button>')}
+  if(!bar.querySelector(".mkt.lkb")){var n=reqsWithLinks().length;bar.insertAdjacentHTML("beforeend",'<button type="button" class="mkt lkb'+(LV.mk==="links"?' on':'')+'" data-l="mkF" data-f="links"><i>🔗</i><span>'+esc(L("mk_links"))+'</span><b>'+n+'</b></button>')}
   var q=$("ordQ");if(q&&LV.mk==="links")q.placeholder=L("od_search")}})();
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="lkTog"]');if(!el)return;e.stopImmediatePropagation();var id=el.getAttribute("data-id");LV.lkO[id]=!LV.lkO[id];var y=window.scrollY;drawLinks();window.scrollTo(0,y)},true);
 /* owner: video links tab with a clickable account */
