@@ -1241,11 +1241,6 @@ body.isadmin .ownmain #oSrch.osrch:focus{border-color:#7B6BFF;outline:0;box-shad
 body.isadmin .ownmain .list>.card{background:linear-gradient(160deg,#1d1d25,#16161c);border:1px solid #2a2a34;border-radius:18px;padding:16px 18px}
 body.isadmin .ownmain .list>.card:hover{border-color:#4b43a8;transform:none;box-shadow:0 8px 26px rgba(109,92,255,.15)}
 body.isadmin .ownmain .tbc{background:linear-gradient(160deg,#1d1d25,#16161c);border-radius:16px}
-/* v66 — snappy UI: no re-entry animations on re-render, short transitions */
-.grid>.card,.list>.card,.roles>.card,.tiles>.card,.card,.tile,.tcard,.fdcard{animation:none!important}
-*,*::before,*::after{scroll-behavior:auto!important}
-.card,.btn,.chip,.pill,.atb,.mchip,.acitem,.tile,.ms,.mbrow,.efb,#dock a,#dock button,.logo,.rbdg,.supb,.plink,.fdcard,.tgo{transition-duration:.09s!important}
-.card:hover,.pmcard:hover,.tile:hover,.ms:hover,.acitem:hover,.mbrow:hover,.btn:hover,.chip:hover,.mchip:hover,.efb:hover,.supb:hover,.plink:hover{transform:none!important}
 /* account settings form, laptop */
 @media(min-width:900px){
 .setcard{background:linear-gradient(160deg,#1b1b23,#15151b)!important;border:1px solid #2a2a34!important;padding:26px!important;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
@@ -1262,6 +1257,28 @@ body.isadmin .ownmain .tbc{background:linear-gradient(160deg,#1d1d25,#16161c);bo
 .setcard .tiers label{border-radius:14px}
 .setcard hr,.setcard .f+hr{display:none}
 .setcard .btn.primary{padding:12px 26px}
+}
+
+/* v67 — owner: gentle fade on tab switch, none on background refresh; swipeable tab strip; compact phone */
+@keyframes ownIn{from{opacity:0}to{opacity:1}}
+body.isadmin .ownmain>*{animation:ownIn .22s ease both}
+body.isadmin .ownmain .card,body.isadmin .ownmain .tile,body.isadmin .ownmain .tcard,body.isadmin .ownmain .tbc{animation:none}
+body.noanim,body.noanim *,body.noanim *::before,body.noanim *::after{animation:none!important}
+@media(max-width:899px){
+.ownside .agroups{grid-template-columns:minmax(0,1fr)!important}
+.ownside .agrp,.ownside .agroups>*,.ownside>.row>div{min-width:0;max-width:100%}
+.ownside .agb{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;max-width:100%;gap:8px;padding:2px 2px 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;scrollbar-width:none}
+.ownside .agb::-webkit-scrollbar{display:none}
+.ownside .agb .atb{flex:0 0 auto;scroll-snap-align:start;white-space:nowrap;min-height:44px}
+/* compact forms */
+.cats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.cats label,.cats .mchip{min-height:40px;padding:8px 10px;font-size:13px;border-radius:12px}
+.hint{font-size:12.5px;line-height:1.35;margin:4px 0}
+.card,.setcard{padding:14px}
+.setcard .f,.f{margin:8px 0}
+.list,.grid{gap:10px}
+.tiles{margin:10px 0}
+.wrap h1,.wrap h2{margin:10px 0 8px}
 }
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
@@ -1441,7 +1458,7 @@ body.isadmin .ownmain .tbc{background:linear-gradient(160deg,#1d1d25,#16161c);bo
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v66 · 16.11 13:50</span>
+  <span>© Promo Campaign · v67 · 16.11 14:20</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -5473,6 +5490,21 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
     if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();sel=(sel+(e.key==="ArrowDown"?1:-1)+rows.length)%Math.max(rows.length,1);draw();var on=pal.querySelector(".pali.on");if(on&&on.scrollIntoView)on.scrollIntoView({block:"nearest"});return}
     if(e.key==="Enter"&&rows[sel]){e.preventDefault();go(rows[sel].k)}
   },true);
+})();
+
+/* ===== v67: owner refresh without flicker ===== */
+(function(){
+  var prev="",orig=ownerReload;
+  ownerReload=function(){
+    return admLoad().then(function(){
+      var s="";try{s=JSON.stringify(ADM.data)}catch(e){}
+      if(s&&s===prev&&$("adApp")&&$("adApp").firstChild)return;
+      prev=s;
+      document.body.classList.add("noanim");
+      renderAdminLive();
+      setTimeout(function(){document.body.classList.remove("noanim")},120)
+    })
+  };
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
