@@ -1198,6 +1198,20 @@ body.hasdock .card,body.hasdock .setcard{border-radius:22px}
 body.hasdock h1,body.hasdock h2{letter-spacing:-.3px}
 body.hasdock #tkToasts{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 }
+/* v62 — more space between filters and the account search */
+#oSrch.osrch{margin-top:22px!important;margin-bottom:18px!important}
+/* v63 — phone comfort: 16px inputs (no iOS zoom), big tap targets, no sideways scroll */
+@media(max-width:899px){
+html,body{max-width:100%;overflow-x:hidden}
+input:not([type=checkbox]):not([type=radio]),select,textarea{font-size:16px!important;min-height:48px}
+.btn,button.btn,.mchip,.chip{min-height:46px}
+.btn.primary{min-height:50px;font-size:16px}
+.grid,.list,.roles,.setgrid,.fdgrid{grid-template-columns:1fr!important}
+.card,.setcard,.ownmain,.ownlay>*{min-width:0;max-width:100%}
+.ownlay{grid-template-columns:1fr!important}
+table{display:block;overflow-x:auto;max-width:100%}
+img,video{max-width:100%}
+}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1376,7 +1390,7 @@ body.hasdock #tkToasts{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v61 · 16.11 15:40</span>
+  <span>© Promo Campaign · v63 · 16.11 12:55</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
