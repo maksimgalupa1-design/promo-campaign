@@ -1316,6 +1316,26 @@ body.isadmin .ownside .atb:hover{transform:translateX(5px)!important;background:
 body.isadmin .ownside .atb[aria-pressed="true"]:hover{transform:translateX(3px)!important;background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important}
 body.isadmin .ownside .g-tk .atb[aria-pressed="true"]{background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important;border-color:transparent!important}
 
+/* v71 — video links tab, compact phone */
+.vlbar{gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.vllist{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.vlk{display:block;padding:9px 12px;border-radius:12px;background:#1c1c24;border:1px solid #2a2a34;color:inherit;text-decoration:none;font-size:13.5px;word-break:break-all}
+.vlk i{opacity:.7;font-style:normal}
+@media(max-width:899px){
+body.hasdock{font-size:15px}
+body.hasdock h1{font-size:26px!important}
+body.hasdock h2{font-size:21px!important}
+body.hasdock h3{font-size:17px!important}
+body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4}
+.steps{grid-template-columns:1fr 1fr!important;gap:8px}
+.steps li{padding:10px;border-radius:12px}
+.steps li h3{font-size:14px!important}
+.steps li p{font-size:12.5px!important;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ring{width:96px;height:96px}
+.cats label{min-height:38px;padding:6px 10px;font-size:13px}
+.big{font-size:44px!important}
+}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1493,7 +1513,7 @@ body.isadmin .ownside .g-tk .atb[aria-pressed="true"]{background:linear-gradient
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v70 · 16.11 17:25</span>
+  <span>© Promo Campaign · v71 · 16.11 17:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2436,6 +2456,7 @@ function drawProd(){
     (LV.prodErr?'<div class="note err">'+esc(LV.prodErr)+'</div>':'')+
     '<div><button class="btn primary" data-l="pAdd">'+esc(L("p_save"))+'</button></div></div>';
 }
+function minBud(){return LV.prod&&LV.prod.email==="demo-producer@promo.test"?1:100}
 function prodCall(path,body){
   return api(path,body).then(function(r){
     if(r.ok){LV.prodErr="";if(r.j&&r.j.tracks)LV.prod=r.j;else return api("/api/producer/me").then(function(m){LV.prod=m.ok?m.j:null});}
@@ -2467,7 +2488,7 @@ function renderOwner(){
   if(!ADM.ok||!D)return false;checkNew(D);
   var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')+(k==="newtracks"&&window.__NTn&&window.__NTn()?' <i class="cnt">'+window.__NTn()+'</i>':'')+(k==="tickets"&&window.__TK&&window.__TK.unread?' <i class="cnt">'+(window.__TK.unread>99?"99+":window.__TK.unread)+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","vlinks","accounts","editorpay","accarch","chatmod","prices"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -2489,10 +2510,12 @@ function renderOwner(){
       '<p class="hint">'+n(S2.purchasedLinksCounted)+' '+esc(L("a_links"))+' · '+esc(L("a_upd"))+': '+(S2.refreshedAt?new Date(S2.refreshedAt).toLocaleString(lang):"—")+'</p><p class="hint">'+esc(L("a_refresh_note"))+'</p>';
   }else if(LV.adTab==="requests"){
     body=reqTabHtml(D);
+  }else if(LV.adTab==="vlinks"){
+    body=vlinksHtml(D)
   }else if(LV.adTab==="payments"){
     var tps=D.topups.filter(function(p){return !LV.pF||LV.pF==="all"||(LV.pF==="done"?p.status!=="pending":p.status==="pending")});
     body=payBar("pF",[["all",D.topups.length],["pending",D.topups.filter(function(p){return p.status==="pending"}).length],["done",D.topups.filter(function(p){return p.status!=="pending"}).length]])+'<div class="list">'+(tps.length?tps.map(function(p){
-      return '<div class="card ord"><div class="t"><div><span>'+esc(L("a_from"))+': '+esc(p.producerName?p.producerName+" · ":"")+esc(p.producer||"")+'</span><b>'+(p.orig?esc(p.orig+' '+(p.cur==='UAH'?'₴':p.cur))+' ≈ ':'')+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' 20%: '+money(Math.round(p.amount*20)/100)+'</span><span>'+esc(p.track||"")+'</span>'+(p.message?'<span class="hotnote">'+esc(p.message)+'</span>':'')+(p.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(p.deadline)+'</span>':'')+'</div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
+      return '<div class="card ord"><div class="t"><div><span>'+esc(L("a_from"))+': '+esc(p.producerName?p.producerName+" · ":"")+esc(p.producer||"")+'</span><b>'+(p.orig?esc(p.orig+' '+(p.cur==='UAH'?'₴':p.cur))+' ≈ ':'')+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' 20%: '+money(Math.round(p.amount*20)/100)+'</span>'+(p.from?'<span class="hotnote">👤 '+esc(L("pp_payer"))+': <b>'+esc(p.from)+'</b></span>':'')+'<span>'+esc(p.track||"")+'</span>'+(p.message?'<span class="hotnote">'+esc(p.message)+'</span>':'')+(p.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(p.deadline)+'</span>':'')+'</div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
         (p.hasProof?'<div class="row"><button class="btn sm" data-l="admProofT" data-id="'+esc(p.id)+'">'+esc(L("a_view_proof"))+'</button></div>':'')+(p.status==="pending"?'<div class="row"><button class="btn sm primary" data-l="tAct" data-id="'+esc(p.id)+'" data-s="confirmed">'+esc(L("a_confirm"))+'</button><button class="btn sm danger" data-l="tAct" data-id="'+esc(p.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>':'')+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="producers"){
@@ -2584,7 +2607,7 @@ document.addEventListener("click",function(e){
   if(a==="pDel"){LV.modal={type:"del",id:id};openModal('<h3>'+esc(L("p_del_q"))+'</h3><p class="hint">'+esc(L("p_del_note"))+'</p><div class="row"><button class="btn danger" data-l="pDelYes" data-id="'+esc(id)+'">'+esc(L("p_yes"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
   if(a==="pDelYes"){closeModal();prodCall("/api/producer/track/delete",{id:id}).then(drawProd);return}
   if(a==="pTopOld"){LV.modal={type:"top",id:id};openModal('<h3>'+esc(L("p_addb"))+'</h3><label class="f" for="tAmt"><span>'+esc(L("p_amount"))+'</span><input id="tAmt" type="number" min="100" inputmode="decimal" placeholder="100"></label><label class="f" for="tMeth"><span>'+esc(L("p_method"))+'</span><select id="tMeth">'+methodOpts("paypal")+'</select></label><div id="payBoxM">'+payBoxHtml("paypal",0)+'</div><div class="row"><button class="btn primary" data-l="pTopGo" data-id="'+esc(id)+'">'+esc(L("p_topup"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
-  if(a==="pTopGo"){var amt=Number(val("tAmt"));if(!(amt>=100)){var te=$("tErr");if(te){te.textContent=L("p_min100");te.hidden=false}return}var tm=val("tMeth"),tc=val("tCoin");closeModal();prodCall("/api/producer/topup",{trackId:id,amount:amt,method:tm,coin:tc}).then(drawProd);return}
+  if(a==="pTopGo"){var amt=Number(val("tAmt"));if(!(amt>=minBud())){var te=$("tErr");if(te){te.textContent=L("p_min100");te.hidden=false}return}var tm=val("tMeth"),tc=val("tCoin");closeModal();prodCall("/api/producer/topup",{trackId:id,amount:amt,method:tm,coin:tc}).then(drawProd);return}
   if(a==="atab"){LV.adTab=el.getAttribute("data-k");if(LV.adTab==="prices"){fetch("/api/price-ranges").then(function(r){return r.json()}).then(function(j){LV.ranges=j.ranges||{};renderOwner()});return}if(LV.adTab==="pay"){api("/api/admin/pay").then(function(r){LV.payInfo=r.j||{};renderOwner()})}else renderOwner();return}
   if(a==="planGo"){var ptr=val("planTrack");LV.planTrack=ptr;LV.planErr="";api("/api/admin/plan",{trackId:ptr}).then(function(r){if(r.ok){LV.plan=r.j}else{LV.plan=null;LV.planErr=(r.j&&r.j.error)||L("p_err")}renderOwner()});return}
   if(a==="chkEd"){chkOpen("/api/admin/demo-editor","/#dashboard",el);return}
@@ -2662,7 +2685,7 @@ function refreshPayBox(){
   var o=$("nOtherRow");if(o){var on=checked("nCats").indexOf("other")>=0;o.hidden=!on}
   var b=$("payBoxM");if(b)b.innerHTML=payBoxHtml(val("tMeth"),val("tAmt"),val("tCoin"));
   var np=$("nPayBox");if(np)np.innerHTML=payBoxHtml(val("nMethod"),Number(val("nBudget"))||0,val("nCoin"),true);
-  var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;if(a>0&&a<100){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=a>0?L("p_fee_line").replace("{f}",money(a*0.2)).replace("{n}",money(a*0.8)):L("p_fee");q.className=a>0?"hotnote":"hint"}}
+  var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;if(a>0&&a<minBud()){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=a>0?L("p_fee_line").replace("{f}",money(a*0.2)).replace("{n}",money(a*0.8)):L("p_fee");q.className=a>0?"hotnote":"hint"}}
   var so=$("sOtherRow");if(so&&$("sCats"))so.hidden=checked("sCats").indexOf("other")<0;
   var pc=$("pyCoinRow");if(pc)pc.hidden=val("pyMethod")!=="crypto";var ph=$("pyHolderRow");if(ph)ph.hidden=val("pyMethod")!=="card";
   var pv=$("pyValueL");if(pv)pv.textContent=L("py_value_"+val("pyMethod"));
@@ -2750,7 +2773,7 @@ document.addEventListener("click",function(e){
     if(!b.title){bad(L("p_bad"));return}
     if(!b.instagram.trim()){bad(L("ig_need"));return}
     if(b.descRule&&!b.descText.trim()){bad(L("desc_txt_need"));return}
-    if(!(b.budget>=100)){bad(L("p_min100"));return}
+    if(!(b.budget>=minBud())){bad(L("p_min100"));return}
     var badL=Object.keys(links).some(function(k){return !/^https?:\/\/\S+\.\S+/i.test(links[k])});
     var mf=$("nMp3")&&$("nMp3").files&&$("nMp3").files[0];
     var pl=b.platforms.length?b.platforms:["tiktok"];
@@ -4294,7 +4317,7 @@ document.addEventListener("click",function(e){
   if(a==="pAdd"&&!window.__cfm&&$("nTitle")){
     var bud=Number(val("nBudget"))||0,dOk=!($("nDesc")&&$("nDesc").checked)||val("nDescText").trim();
     var pf=$("nProof")&&$("nProof").files&&$("nProof").files[0];
-    if(!val("nTitle")||bud<100||!dOk||!pf)return;
+    if(!val("nTitle")||bud<minBud()||!dOk||!pf)return;
     e.stopImmediatePropagation();e.preventDefault();
     openModal('<h3>'+esc(L("cf_t"))+'</h3><p class="hint">'+esc(L("cf_h"))+'</p><div class="row"><button class="btn primary" data-l="cfYes">'+esc(L("cf_yes"))+'</button><button class="btn" data-l="cfNo">'+esc(L("cf_no"))+'</button></div>');
   }
@@ -5311,7 +5334,7 @@ window.addEventListener("click",function(e){var el=e.target.closest&&e.target.cl
   if(/tiktok\.com\/@[^\/\s]+\/(video|photo)\//i.test(val("nl_tiktok")||""))return stop("nl_tiktok",L("tt_vid_bad"));
   if(pt.indexOf("instagram")>=0&&!val("nl_instagram"))return stop("nl_instagram",L("p_ig_need"));
   if(pt.indexOf("youtube")>=0&&!val("nl_youtube"))return stop("nl_youtube",L("p_yt_need"));
-  if(!(Number(val("nBudget"))>=100))return stop("nBudget",L("p_min100"));
+  if(!(Number(val("nBudget"))>=minBud()))return stop("nBudget",L("p_min100"));
   var f=$("nProof");if(!(f&&f.files&&f.files[0]))return stop("nProof",L("p_attach_need"));
   var ne=$("nErr");if(ne)ne.hidden=true;document.querySelectorAll(".badf").forEach(function(x){x.classList.remove("badf")})},true);
 document.addEventListener("input",function(e){var l=e.target&&e.target.closest&&e.target.closest(".badf");if(l)l.classList.remove("badf")});
@@ -5580,6 +5603,34 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   var lastTab=null,oRO=renderOwner;
   renderOwner=function(){var same=lastTab===LV.adTab;lastTab=LV.adTab;if(same)document.body.classList.add("noanim");
     var r;try{r=oRO.apply(this,arguments)}finally{if(same)setTimeout(function(){document.body.classList.remove("noanim")},200)}return r};
+})();
+
+/* ===== v71: owner "video links" tab, payer field ===== */
+(function(){
+  Object.assign(LT.en,{a_vlinks:"Video links",vl_all:"All",vl_none:"Not sent yet",vl_sent:"Sent",vl_empty:"No approved orders yet",vl_links:"links",vl_pub:"published",vl_nopub:"no links yet",vl_over:"overdue",pp_payer:"Payer",pp_from:"Who sends the money (name on the PayPal / card / wallet)",pp_from_ph:"Name or email of the sender",pp_from_need:"Write who is sending the money"});
+  Object.assign(LT.ru,{a_vlinks:"Ссылки на видео",vl_all:"Все",vl_none:"Ещё не отправили",vl_sent:"Отправили",vl_empty:"Одобренных заказов пока нет",vl_links:"ссылок",vl_pub:"опубликовано",vl_nopub:"ссылок пока нет",vl_over:"просрочено",pp_payer:"Плательщик",pp_from:"От кого придут деньги (имя на PayPal / карте / кошельке)",pp_from_ph:"Имя или email отправителя",pp_from_need:"Напишите, от кого придут деньги"});
+  LV.vlF=LV.vlF||"all";
+  window.vlinksHtml=function(D){
+    var R=(D.requests||[]).filter(function(r){return ["pending","rejected"].indexOf(r.status)<0});
+    var has=function(r){return (r.links||[]).length>0};
+    var n0=R.filter(function(r){return !has(r)}).length,n1=R.length-n0;
+    var F=LV.vlF,list=R.filter(function(r){return F==="all"||(F==="none"?!has(r):has(r))});
+    list.sort(function(a,b){return (has(a)?1:0)-(has(b)?1:0)||(b.created||0)-(a.created||0)});
+    var chip=function(k,l,c){return '<button type="button" class="chip" data-l="vlF" data-k="'+k+'" aria-pressed="'+(F===k)+'">'+esc(L(l))+' · '+c+'</button>'};
+    return '<div class="row vlbar">'+chip("all","vl_all",R.length)+chip("none","vl_none",n0)+chip("sent","vl_sent",n1)+'</div><div class="list">'+(list.length?list.map(function(r){
+      var L2=(r.links||[]);
+      return '<div class="card ord vlc"><div class="t"><div><b>'+esc(r.handle||"")+(r.internalName?' · '+esc(r.internalName):'')+'</b><span>'+esc(r.track)+' — '+esc(r.artist||"")+'</span><span>🎬 '+L2.length+' / '+(r.videos||0)+' '+esc(L("vl_links"))+(r.overdue?' · <b style="color:#ff6b6b">'+esc(L("vl_over"))+'</b>':'')+'</span></div><span class="rcpill '+(L2.length?'ok':'')+'">'+(L2.length?'✅ '+esc(L("vl_pub")):'⏳ '+esc(L("vl_nopub")))+'</span></div>'+
+        (L2.length?'<div class="vllist">'+L2.map(function(l){return '<a class="vlk" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">🔗 '+esc(String(l.url).replace(/^https?:\/\/(www\.)?/,"").slice(0,48))+(l.views!=null?' <i>· '+n(l.views)+' 👁</i>':'')+'</a>'}).join("")+'</div>':'')+'</div>'
+    }).join(""):'<div class="empty">'+esc(L("vl_empty"))+'</div>')+'</div>'};
+  document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="vlF"]');if(!el)return;e.stopImmediatePropagation();LV.vlF=el.getAttribute("data-k");renderOwner()},true);
+  function addPayer(){
+    [["nMethod","nFrom"],["tMeth","tFrom"]].forEach(function(p){
+      var m=$(p[0]);if(!m||$(p[1]))return;var lab=m.closest("label")||m.parentNode;
+      lab.insertAdjacentHTML("afterend",'<label class="f" for="'+p[1]+'"><span>'+esc(L("pp_from"))+'</span><input id="'+p[1]+'" type="text" maxlength="80" autocomplete="off" placeholder="'+esc(L("pp_from_ph"))+'"></label>')})}
+  var raf=0;new MutationObserver(function(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;addPayer()})}).observe(document.body,{childList:true,subtree:true});
+  window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="pAdd"],[data-l="pTopGo"]');if(!el)return;
+    var i=$(el.getAttribute("data-l")==="pAdd"?"nFrom":"tFrom");if(i&&!i.value.trim()&&minBud()>1){e.stopImmediatePropagation();e.preventDefault();i.focus();toast(L("pp_from_need"))}},true);
+  var oA=api;api=function(path,body){if(body&&/^\/api\/producer\/(track|topup)$/.test(path)){var v=(($("nFrom")&&$("nFrom").value)||($("tFrom")&&$("tFrom").value)||"").trim();if(v)body.from=v}return oA.apply(this,arguments)};
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
