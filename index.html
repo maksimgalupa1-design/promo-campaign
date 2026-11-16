@@ -1281,6 +1281,32 @@ body.noanim,body.noanim *,body.noanim *::before,body.noanim *::after{animation:n
 .wrap h1,.wrap h2{margin:10px 0 8px}
 }
 
+/* v68 — payments picker, search, own-deal fields, editor account form on phone */
+.paypick{background:linear-gradient(160deg,#1d1d25,#16161c);border:1px solid #2a2a34;border-radius:18px;padding:12px;margin:10px 0 14px}
+.ppH{display:flex;justify-content:space-between;align-items:center;margin:0 4px 8px}
+.ppAll{border:0;background:rgba(109,92,255,.2);color:#cfc8ff;border-radius:99px;padding:7px 14px;font-weight:700;font-size:13px;cursor:pointer}
+.ppL{max-height:268px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
+.ppr{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:48px;padding:8px 14px;border-radius:14px;border:1px solid #2a2a34;background:#1c1c24;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.ppr.on{border-color:#7B6BFF;background:rgba(109,92,255,.18)}
+.ppc{width:22px;height:22px;border-radius:50%;border:2px solid #5b5b6b;flex:none;display:inline-block}
+.ppr.on .ppc{border-color:#A56BFF;background:radial-gradient(circle,#A56BFF 45%,transparent 50%)}
+.payq{width:100%;min-height:48px;font-size:16px;margin:6px 0 12px;background:#1c1c24;border:1px solid #2a2a34;border-radius:14px;padding:12px 14px;color:inherit}
+.pmaccl{font-size:13px;opacity:.85;margin:6px 0}
+@media(max-width:899px){
+.setcard{background:linear-gradient(160deg,#1b1b23,#15151b)!important;border:1px solid #2a2a34!important;padding:14px!important}
+.setcard{display:block!important;min-width:0;max-width:100%;overflow:hidden}.setcard *{box-sizing:border-box;min-width:0}.setcard>h3{font-size:19px;margin:0 0 4px}
+.setcard>.f,.setcard>label.f{background:#1c1c24;border:1px solid #2a2a34;border-radius:16px;padding:12px 14px;margin:10px 0;border-top:1px solid #2a2a34}
+.setcard input:not([type=checkbox]):not([type=radio]),.setcard textarea,.setcard select{background:#121217;border:1px solid #2e2e3a;border-radius:12px;padding:12px 14px;width:100%}
+.setcard textarea{min-height:88px}
+.setcard input:focus,.setcard textarea:focus{border-color:#7B6BFF;outline:0;box-shadow:0 0 0 3px rgba(109,92,255,.25)}
+.setcard .cats label{border-radius:12px;background:#1c1c24;border:1px solid #2a2a34}
+.setcard .cats label:has(input:checked){background:rgba(109,92,255,.2);border-color:#7B6BFF}
+.setcard hr{display:none}
+.setcard .tierrow{display:flex;flex-wrap:nowrap;align-items:center;gap:8px}
+.setcard .tierrow input{width:72px;text-align:center}
+.setcard .btn.primary{width:100%;min-height:50px}
+}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1458,7 +1484,7 @@ body.noanim,body.noanim *,body.noanim *::before,body.noanim *::after{animation:n
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v67 · 16.11 14:20</span>
+  <span>© Promo Campaign · v68 · 16.11 16:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -3450,7 +3476,7 @@ var TIER_OPTS=[[3,5],[6,10],[12,15]];
 function tiersHtml(u){
   var cur=u.tiers||[],pre=function(x){return TIER_OPTS.some(function(o){return o[0]===x.min&&o[1]===x.pct})},cust=cur.filter(function(x){return !pre(x)})[0]||{min:"",pct:""};
   return '<div class="f tiers"><span>'+esc(L("tr_h"))+'</span><div id="tiersAllHost"></div><span class="hint">'+esc(L("tr_h3"))+'</span>'+TIER_OPTS.map(function(o,i){var on=cur.some(function(x){return x.min===o[0]&&x.pct===o[1]});return '<label class="chk tieropt" for="tOpt'+i+'"><input type="checkbox" id="tOpt'+i+'" data-min="'+o[0]+'" data-pct="'+o[1]+'"'+(on?' checked':'')+'><span><b>'+o[0]+' '+esc(L("tr_vid"))+'</b> → −'+o[1]+'%</span></label>'}).join("")+
-   '<div class="tieropt cust"><b>'+esc(L("tr_own"))+'</b><div class="tierrow"><span>'+esc(L("tr_from"))+'</span><input id="tcMin" type="text" maxlength="3" inputmode="numeric" pattern="[0-9]*" value="'+cust.min+'" placeholder="8"><span>'+esc(L("tr_vid"))+'</span><b>−</b><input id="tcPct" type="text" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="'+cust.pct+'" placeholder="12"><span>%</span></div></div>'+
+   '<div class="tieropt cust"><b>'+esc(L("tr_own"))+'</b><div class="tierrow"><span>'+esc(L("tr_from"))+'</span><input id="tcMin" type="text" maxlength="3" inputmode="numeric" pattern="[0-9]*" value="'+cust.min+'" placeholder=""><span>'+esc(L("tr_vid"))+'</span><b>−</b><input id="tcPct" type="text" maxlength="2" inputmode="numeric" pattern="[0-9]*" value="'+cust.pct+'" placeholder=""><span>%</span></div></div>'+
    '<div class="row"><button type="button" class="btn primary" data-l="saveTiers">'+esc(L("tr_save"))+'</button></div></div>';
 }
 function readTiers(){var o=[];document.querySelectorAll(".tieropt input[data-min]:checked").forEach(function(c){o.push({min:Number(c.getAttribute("data-min")),pct:Number(c.getAttribute("data-pct"))})});var m=Number(val("tcMin")),p=Number(val("tcPct"));if(m>=2&&m<=500&&p>=1&&p<=99)o.push({min:m,pct:p});return o}
@@ -4837,7 +4863,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   var ac=S.accounts[S.active],c=(ac&&ac.payout)||LV.payout||{set:false};
   if(c.set&&!LV._pyInit){LV._pyInit=true;if(c.method)LV.pyM=c.method==="crypto"?"crypto":c.method}
   var h=o();
-  if(c.set&&c.method==="paypal"&&c.value&&(LV.pyM||"paypal")==="paypal"&&h.indexOf('id="pyValue" type="text" autocomplete="off">')>=0)h=h.replace('id="pyValue" type="text" autocomplete="off">','id="pyValue" type="text" autocomplete="off" value="'+esc(c.value)+'">');
+  if(c.set&&c.method==="paypal"&&c.value&&c.label)h=h.replace(esc(c.label),esc(c.value));
   return h}})();
 /* ===== v40: owner request cards: compact, video count ===== */
 Object.assign(LT.en,{rq_pick_h:"Usually up to 7 videos per order, up to 10 for a really strong account.",rq_open_tt:"Open TikTok",rq_vid_saved:"Saved",rq_avg:"avg views"});
@@ -5505,6 +5531,46 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
       setTimeout(function(){document.body.classList.remove("noanim")},120)
     })
   };
+})();
+
+/* ===== v68: payments account picker + history search; admin refresh without flash ===== */
+(function(){
+  Object.assign(LT.en,{pp_acc:"Accounts",pp_all:"Select all",pp_one:"Only current",pp_srch:"Search payment history",pp_for:"For account",pp_nores:"Nothing found"});
+  Object.assign(LT.ru,{pp_acc:"Аккаунты",pp_all:"Выбрать все",pp_one:"Только текущий",pp_srch:"Поиск по истории платежей",pp_for:"За аккаунт",pp_nores:"Ничего не найдено"});
+  LV.paySel=null;LV.paySrch="";
+  function hnd(a){return String(a.handle||"").toLowerCase()}
+  function selNow(){var A=S.accounts||[];if(!LV.paySel){var a=A[S.active];return a?[hnd(a)]:A.map(hnd)}return LV.paySel}
+  function histList(all){
+    var q=(LV.paySrch||"").trim().toLowerCase();
+    var hist=all.filter(function(r){return r.paid});
+    if(q)hist=hist.filter(function(r){return [r.track,r.artist,r.handle,r.id,String(r.id||"").slice(-5),r.videos,r.amount,r.sum,r.price].join(" ").toLowerCase().indexOf(q)>=0});
+    return hist.length?hist.map(pmHist).join(""):'<div class="empty">'+esc(L(q?"pp_nores":"pm_hist_none"))+'</div>'}
+  var oH=pmHist;pmHist=function(q,i){var h=oH(q,i);return q.handle?h.replace('<div class="pmrow">','<div class="pmaccl">👤 '+esc(L("pp_for"))+' <b>'+esc(q.handle)+'</b></div><div class="pmrow">'):h};
+  var oC=pmCard;pmCard=function(q,i){var h=oC(q,i);return q.handle?h.replace('<ol class="tl">','<div class="pmaccl">👤 <b>'+esc(q.handle)+'</b></div><ol class="tl">'):h};
+  renderPay=function(){
+    var host=$("payPageBody");if(!host)return;
+    var A=S.accounts||[];
+    if(LV._payAct!==S.active){LV._payAct=S.active;LV.paySel=null}
+    var sel=selNow(),all=(LV.reqs||[]).slice().sort(function(a,b){return (b.paidAt||b.created)-(a.paidAt||a.created)});
+    var way=all.filter(pmWay).filter(function(q){return sel.indexOf(String(q.handle||"").toLowerCase())>=0});
+    var allOn=A.length>0&&A.every(function(a){return sel.indexOf(hnd(a))>=0});
+    var pick=A.length>1?'<div class="paypick"><div class="ppH"><b>'+esc(L("pp_acc"))+'</b><button type="button" class="ppAll" data-l="ppAll">'+esc(L(allOn?"pp_one":"pp_all"))+'</button></div><div class="ppL">'+A.map(function(a){var on=sel.indexOf(hnd(a))>=0;return '<button type="button" class="ppr'+(on?' on':'')+'" data-l="ppTog" data-h="'+esc(hnd(a))+'" aria-pressed="'+on+'"><span class="ppn"><b>'+esc(a.handle)+'</b></span><i class="ppc"></i></button>'}).join("")+'</div></div>':"";
+    host.innerHTML='<h2>'+esc(L("pm_title"))+'</h2>'+pick+'<h3 class="sub">'+esc(L("pm_way"))+' · '+way.length+'</h3><p class="hint">'+esc(L("pm_way_h"))+'</p>'+
+      (way.length?way.map(pmCard).join(""):'<div class="empty">'+esc(L("pm_none"))+'</div>')+
+      '<h3 class="sub">'+esc(L("pm_hist"))+'</h3><input id="payQ" class="payq" type="search" autocomplete="off" placeholder="🔎 '+esc(L("pp_srch"))+'" value="'+esc(LV.paySrch||"")+'"><div id="payHistL">'+histList(all)+'</div>';
+  };
+  document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l=ppTog],[data-l=ppAll]");if(!el)return;e.stopImmediatePropagation();
+    var A=S.accounts||[],sel=selNow().slice(),a=el.getAttribute("data-l");
+    if(a==="ppAll"){var allOn=A.every(function(x){return sel.indexOf(hnd(x))>=0});LV.paySel=allOn?null:A.map(hnd)}
+    else{var h=el.getAttribute("data-h"),i=sel.indexOf(h);if(i>=0){if(sel.length>1)sel.splice(i,1)}else sel.push(h);LV.paySel=sel}
+    renderPay()},true);
+  document.addEventListener("input",function(e){var t=e.target;if(!t||t.id!=="payQ")return;LV.paySrch=t.value;
+    var all=(LV.reqs||[]).slice().sort(function(a,b){return (b.paidAt||b.created)-(a.paidAt||a.created)});var l=$("payHistL");if(l)l.innerHTML=histList(all)});
+  setInterval(function(){if(!LIVE||document.hidden||(location.hash||"").replace(/\?.*/,"")!=="#pay"||!$("payPageBody")||!S.accounts)return;if(LV._payAct!==S.active&&!(document.activeElement&&document.activeElement.id==="payQ"))renderPay()},500);
+  /* owner: re-renders of the same tab never replay the entrance animation */
+  var lastTab=null,oRO=renderOwner;
+  renderOwner=function(){var same=lastTab===LV.adTab;lastTab=LV.adTab;if(same)document.body.classList.add("noanim");
+    var r;try{r=oRO.apply(this,arguments)}finally{if(same)setTimeout(function(){document.body.classList.remove("noanim")},200)}return r};
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
