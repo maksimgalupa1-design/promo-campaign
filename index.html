@@ -1899,7 +1899,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v108 · 17.11 03:50</span>
+  <span>© Promo Campaign · v109 · 17.11 04:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2714,7 +2714,7 @@ function renderLHome(){
 /* ---- tracks catalog for editors ---- */
 function renderLCamps(){
   $("lcampsT").textContent=L("t_title");$("lcampsSub").textContent=L("t_sub");
-  api("/api/tracks").then(function(r){LV.tracks=(r.j&&r.j.tracks)||[];drawLCamps()});drawLCamps();
+  api("/api/tracks").then(function(r){if(r.ok&&r.j&&r.j.tracks)LV.tracks=r.j.tracks;else if(!LV.tracks)LV.tracks=[];drawLCamps()});drawLCamps();
 }
 function drawLCamps(){
   var chips=['all'].concat(CATS).map(function(c){return '<button type="button" class="chip" data-l="tcat" data-c="'+c+'" aria-pressed="'+(LV.tCat===c)+'">'+esc(c==="all"?L("t_all"):L("c_"+c))+'</button>'}).join("");
@@ -4230,7 +4230,10 @@ document.addEventListener("input",function(e){
 });
 
 /* inline Find inside Marketplace */
-function fdLoad(){if(LV.fdBusy)return;LV.fdBusy=true;api("/api/tracks").then(function(r){LV.fdBusy=false;LV.tracks=(r.j&&r.j.tracks)||[];LV.fdLoaded=true;if(LV.mk==="find")ordList()})}
+function fdLoad(){if(LV.fdBusy)return;LV.fdBusy=true;api("/api/tracks").then(function(r){LV.fdBusy=false;
+    if(r.ok&&r.j&&r.j.tracks){LV.tracks=r.j.tracks;LV.fdLoaded=true;LV.fdTry=0;if(LV.mk==="find")ordList();return}
+    /* the server was still waking up: do not show "no tracks", try again */
+    LV.fdTry=(LV.fdTry||0)+1;if(LV.fdTry<8)setTimeout(function(){if(LV.mk==="find"&&!LV.fdLoaded)fdLoad()},1500);else{LV.tracks=LV.tracks||[];LV.fdLoaded=true;if(LV.mk==="find")ordList()}})}
 function fdCard(t){
   var accs=(S.accounts||[]).filter(function(a){return accMatch(a,t)}),ok=accs.filter(function(a){return accReady(a)&&!reqSent(t.id,a)}),sent=accs.filter(function(a){return reqSent(t.id,a)});
   var chips=ok.map(function(a){return '<span class="fdchip ok">✓ '+esc(a.handle)+'</span>'}).concat(sent.map(function(a){return '<span class="fdchip sent">⏱ '+esc(a.handle)+' · '+esc(L("fd_sent"))+'</span>'})).join("");
