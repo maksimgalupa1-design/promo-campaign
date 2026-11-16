@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 54;
+const SERVER_VER = 55;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -351,7 +351,7 @@ function autoStars(acc) {   // automatic rating: 2.0 .. 5.0 in steps of 0.1
 }
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
-  return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
+  return { demo: !!acc.demo, id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
     avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", tiktokUrl: acc.tiktok_url || "", linkChange: acc.linkChange || null, about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
     analysis: A, aiPrice: (() => { const a = aiPrice(acc); return a.price ? { price: a.price, rpm: a.rpm, conf: a.conf } : null; })(), price: acc.price || null, evaluation: (() => { const e = PC.evaluate(A, acc.price); if (!A.accepted) e.chance = A.status === "abandoned" ? 3 : 2; return e; })(), adminStatus: acc.adminStatus || "new", banInfo: acc.adminStatus === "banned" ? (acc.banInfo || { reason: "manager" }) : null, recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
@@ -519,7 +519,7 @@ function videoIdOf(link) { const m = String(link || "").match(/tiktok\.com\/@([A
 function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
-  const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
+  const o = { demo: !!r.demo || !!(acc && acc.demo), id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
     retReason: r.retReason || "", paidBy: r.paidBy || "", paidTo: r.paidTo || null, cryptoAmt: r.cryptoAmt || "", internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, tdl: t.deadline || "", descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     days: Number(r.days) > 0 ? Number(r.days) : 16, overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > dlMs(r) };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)), pp = accPayoutRaw(ou, acc); if (pp) o.payout = decObj(pp.enc); }
@@ -535,7 +535,8 @@ async function refreshStale(max) {
   }
 }
 function overview() {
-  const accs = allAccounts().filter(a => !a.demo), reqs = Object.values(db.requests).filter(r => !r.demo);
+  const accsAll = allAccounts(), reqsAll = Object.values(db.requests);   // lists show test (demo) data too, marked TEST; money and stats do not
+  const accs = accsAll.filter(a => !a.demo), reqs = reqsAll.filter(r => !r.demo);
   const live = reqs.filter(r => ["approved", "submitted", "completed"].includes(r.status));
   const now = Date.now(), D30 = 30 * 86400000;
   let views30 = 0; accs.forEach(a => { views30 += PC.analyze(a.videos || [], now).month.views; });
@@ -551,15 +552,15 @@ function overview() {
     stats: { accounts: accs.length, boughtVideos, purchasedViews, purchasedLinksCounted: matched, views30, byTrack,
       editorsPaidTotal: paidSum(paidReqs), editorsPaid30: paidSum(paidReqs.filter(r => now - (r.paidAt || 0) <= D30)), producersPaidTotal: topSum(okTopups), producersPaid30: topSum(okTopups.filter(t => now - (t.confirmedAt || t.created) <= D30)),
       pendingPayouts: reqs.filter(r => ["approved", "returned", "submitted", "completed"].includes(r.status) && !r.paid).length,
-      pendingRequests: reqs.filter(r => r.status === "pending" || r.status === "submitted").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
+      pendingRequests: reqsAll.filter(r => r.status === "pending" || r.status === "submitted").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
-    requests: reqs.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
+    requests: reqsAll.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
     tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", enrollUntil: t.enrollUntil || 0, message: t.message || "", id: t.id, title: t.title, edit: t.pendingEdit ? Object.assign({}, t.pendingEdit, { cover: "", hasCover: !!t.pendingEdit.cover }) : null, hasCover: !!t.cover, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, producerId: t.producerId, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
     topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ from: p.from || "", id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", deadline: (db.tracks[p.trackId] || {}).deadline || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, cur: p.cur || "", orig: p.orig || 0, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
         paid: Math.round(Object.values(db.topups).filter(x => x.producerId === p.id && x.status === "confirmed").reduce((q, x) => q + x.amount, 0) * 100) / 100 }; }),
-    archive: Object.values(db.archive || {}).map(e => ({ id: e.id, handle: e.handle, internalName: e.internalName, by: e.by, at: e.at })),     accounts: accs.map(accAdminView), categories: CATEGORIES, topics: topicStats()
+    archive: Object.values(db.archive || {}).map(e => ({ id: e.id, handle: e.handle, internalName: e.internalName, by: e.by, at: e.at })),     accounts: accsAll.map(accAdminView), categories: CATEGORIES, topics: topicStats()
   };
 }
 
@@ -592,6 +593,10 @@ const server = http.createServer(async (req, res) => {
       if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now(), categories: [], discount: 0 }; const ar = db.archive && db.archive[tok.open_id]; if (ar && ar.acc) { for (const k of ["categories", "other_category", "about", "tiers", "discount", "internal_name", "price", "adminStatus", "tiktok_url"]) if (ar.acc[k] !== undefined) acc[k] = ar.acc[k]; delete db.archive[tok.open_id]; } user.accounts.push(acc); notify("new editor account connected, check Waiting for your decision"); }
       Object.assign(acc, { access_token: tok.access_token, refresh_token: tok.refresh_token, expires_at: Date.now() + tok.expires_in * 1000 });
       await refreshAnalysis(acc);
+      if (relink && want && ((acc.profile && acc.profile.username) || "").toLowerCase() !== want) {   // the pasted link does not belong to the TikTok account that was verified
+        if (isNew) { user.accounts = user.accounts.filter(x => x !== acc); }
+        saveDb(); res.writeHead(302, { Location: "/#dashboard?relinkfail=1" }); return res.end();
+      }
       if (relink && !isNew) {   // the editor changed the profile link and verified it through TikTok: no manager check needed
         const un = (acc.profile && acc.profile.username) || ""; acc.tiktok_url = un ? "https://www.tiktok.com/@" + un : acc.tiktok_url; delete acc.linkChange; acc.relinkedAt = Date.now(); saveDb();
         notify("@" + un + " verified the TikTok link through TikTok");
@@ -659,7 +664,10 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
       const before = JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []]);
       if (b.internalName !== undefined) acc.internal_name = String(b.internalName).slice(0, 60);
-      if (b.tiktokUrl !== undefined) { const tu = String(b.tiktokUrl).trim().slice(0, 200); if (!need(res, !tu || /^https?:\/\/([a-z0-9-]+\.)?tiktok\.com\/\S+$/i.test(tu), 400, "Write a tiktok.com link")) return; if (tu !== (acc.tiktok_url || "") && !acc.demo && acc.adminStatus !== "banned") { acc.linkChange = { from: acc.tiktok_url || ("https://www.tiktok.com/@" + ((acc.profile || {}).username || "")), to: tu || ("https://www.tiktok.com/@" + ((acc.profile || {}).username || "")), at: Date.now() }; acc.adminStatus = "new"; notify("An editor changed the TikTok link of @" + ((acc.profile || {}).username || "") + ". It is waiting for your decision."); } acc.tiktok_url = tu; }
+      if (b.tiktokUrl !== undefined) { const tu = String(b.tiktokUrl).trim().slice(0, 200); if (!need(res, !tu || /^https?:\/\/([a-z0-9-]+\.)?tiktok\.com\/\S+$/i.test(tu), 400, "Write a tiktok.com link")) return;
+        const same = tu === (acc.tiktok_url || "") || (!acc.tiktok_url && !tu);
+        if (!same && !need(res, acc.demo, 403, "A changed link must be verified through TikTok")) return;   // only the TikTok check can change a real account's link
+        acc.tiktok_url = tu; }
       if (b.categories !== undefined) acc.categories = cleanCats(b.categories);
       if (b.otherCategory !== undefined) acc.other_category = String(b.otherCategory).slice(0, 60);
       if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 300), wn = ab ? ab.split(/\s+/).length : 0; if (!need(res, !ab || wn >= 3, 400, "Describe your account in at least 3 words")) return; acc.about = ab; }

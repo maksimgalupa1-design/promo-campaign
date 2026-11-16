@@ -1653,6 +1653,25 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 @keyframes mppop{0%{transform:scale(.92)}60%{transform:scale(1.07)}100%{transform:scale(1)}}
 @media(max-width:480px){.mpills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.mpill{justify-content:center}}
 
+/* v95 */
+.ttcur{display:flex;flex-direction:column;gap:2px;margin:8px 0 14px;font-size:13px}.ttcur span{color:var(--muted)}.ttcur a{color:#C8B8FF;font-weight:700;word-break:break-all}
+.ttq{font-weight:800;font-size:17px;margin:6px 0 14px;text-align:center}
+.ynrow{display:flex;gap:14px;justify-content:center;margin-bottom:6px}
+.yn{position:relative;flex:1 1 0;max-width:180px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 10px;border-radius:999px;border:2px solid;font:inherit;font-weight:800;cursor:pointer;color:#fff;transition:transform .18s,box-shadow .2s}
+.yn i{font-style:normal;font-size:26px;line-height:1}.yn span{font-size:14px}
+.yn.yes{background:linear-gradient(135deg,#1f9d5b,#3DD68C);border-color:#3DD68C;box-shadow:0 0 22px rgba(61,214,140,.45);animation:ynp 2.2s ease-in-out infinite}
+.yn.no{background:linear-gradient(135deg,#c2283d,#FF6B7A);border-color:#FF6B7A;box-shadow:0 0 22px rgba(255,107,122,.4)}
+.yn:hover{transform:scale(1.06)}.yn:active{transform:scale(.94)}
+.yn.yes:hover i{animation:ynb .5s}.yn.no:hover i{animation:ynx .4s}
+@keyframes ynp{0%,100%{box-shadow:0 0 14px rgba(61,214,140,.35)}50%{box-shadow:0 0 0 8px rgba(61,214,140,.12),0 0 30px rgba(61,214,140,.7)}}
+@keyframes ynb{0%{transform:scale(1)}50%{transform:scale(1.4) rotate(-10deg)}100%{transform:scale(1)}}
+@keyframes ynx{0%,100%{transform:rotate(0)}30%{transform:rotate(-18deg)}70%{transform:rotate(18deg)}}
+#ttGo{display:flex;justify-content:center;margin:12px 0 8px}#ttGo.dis{opacity:.5;animation:none}
+.vlhd{cursor:pointer;border-radius:16px;transition:background .18s;margin:-6px;padding:6px}.vlhd:hover{background:rgba(139,108,255,.12)}
+.vlmore{color:#C8B8FF;font-size:12px;font-weight:700}
+.testpill{font-style:normal;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:rgba(246,184,75,.2);color:#F6B84B;vertical-align:middle}
+.vlhd>div>span{display:block}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1830,7 +1849,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v94 · 16.11 22:40</span>
+  <span>© Promo Campaign · v96 · 16.11 23:05</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6049,10 +6068,9 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
     e.stopImmediatePropagation();
     if(k==="price"){prOpen();return}
     if(k==="tt"){LV.modal={type:"tt"};var cur=u0().tiktokUrl||("https://www.tiktok.com/@"+String(u0().handle||"").replace(/^@/,""));
-      openModal('<h3>'+esc(L("sl_tt"))+'</h3><p class="hint">'+esc(L("tt_h"))+'</p><label class="f" for="ttUrl"><span>'+esc(L("tt_lbl"))+'</span><input id="ttUrl" type="url" inputmode="url" autocapitalize="off" maxlength="200" data-orig="'+esc(cur)+'" value="'+esc(cur)+'"></label>'+
-       '<div class="ttwarn" id="ttWarn" hidden><b>⚠ '+esc(L("tt_changed"))+'</b><p>'+esc(L("tt_warn"))+'</p><button type="button" class="btn sm" data-l="ttRestore">↩ '+esc(L("tt_restore"))+'</button></div><div class="note err" id="ttErr" hidden></div>'+
-       '<div class="ttacts"><a class="btn primary ttver" href="/auth/tiktok?relink=1">🔐 '+esc(L("tt_verify"))+'</a><div class="hint">'+esc(L("tt_verify_h"))+'</div><button type="button" class="btn" data-l="ttSave" id="ttSend" hidden>📨 '+esc(L("tt_send"))+'</button></div>'+
-       '<div class="row"><a class="btn" href="'+esc(cur)+'" target="_blank" rel="noopener noreferrer">'+esc(L("tk_open"))+'</a><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div>');return}
+      openModal('<div class="ttm" id="ttBox"><h3>'+esc(L("sl_tt"))+'</h3><p class="hint">'+esc(L("tt_h"))+'</p><div class="ttcur"><span>'+esc(L("tt_cur"))+'</span><a href="'+esc(cur)+'" target="_blank" rel="noopener noreferrer">'+esc(cur.replace(/^https?:\/\/(www\.)?/,""))+'</a></div>'+
+       '<div id="ttAsk"><div class="ttq">'+esc(L("tt_sure"))+'</div><div class="ynrow"><button type="button" class="yn yes" data-l="ttYes"><i>✓</i><span>'+esc(L("tt_yes"))+'</span></button><button type="button" class="yn no" data-l="mclose2"><i>✕</i><span>'+esc(L("tt_no"))+'</span></button></div></div>'+
+       '<div id="ttNew" hidden><label class="f" for="ttUrl"><span>'+esc(L("tt_new"))+'</span><input id="ttUrl" type="url" inputmode="url" autocapitalize="off" maxlength="200" placeholder="https://www.tiktok.com/@name"></label><div class="note err" id="ttErr" hidden></div><a class="btn primary ttver dis" id="ttGo" href="#">🔐 '+esc(L("tt_verify"))+'</a><div class="hint">'+esc(L("tt_verify_h"))+'</div><div class="row"><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div></div></div>');return}
     var nodes=HOLD[k]?HOLD[k]():[];if(!nodes.length)return;
     LV.setOpen=true;
     openModal('<h3>'+esc(L("sl_"+k))+'</h3><p class="hint">'+esc(L("sl_"+k+"_h"))+'</p><div id="setHost" class="sethost"></div><div class="note err" id="setErr" hidden></div><div class="row">'+(k==="bulk"?'':'<button class="btn primary" data-l="setSave">'+esc(L("sl_save"))+'</button>')+'<button class="btn" data-l="mclose2">'+esc(k==="bulk"?L("close"):L("sl_cancel"))+'</button></div>');
@@ -6388,7 +6406,7 @@ function D(){return ADM&&ADM.data}
 function fm(x){return x===null||x===undefined?"—":Math.round(x).toLocaleString("en-US")}
 function fk(x){x=+x||0;return x>=1e6?(x/1e6).toFixed(1).replace(/\.0$/,"")+"M":(x>=1e3?(x/1e3).toFixed(x>=1e4?0:1).replace(/\.0$/,"")+"K":String(Math.round(x)))}
 function pr(x){return x?"$"+(Math.round(x*100)/100):"—"}
-function accList(){var d=D();return d?(d.accounts||[]).filter(function(a){return a.adminStatus!=="banned"&&a.analysis&&a.analysis.accepted}):[]}
+function accList(){var d=D();return d?(d.accounts||[]).filter(function(a){return !a.demo&&a.adminStatus!=="banned"&&a.analysis&&a.analysis.accepted}):[]}
 function letter(a){return esc(((a.handle||"@?").replace("@","")[0]||"?").toUpperCase())}
 function ava(a,cls){return a.avatar?'<img class="'+cls+'" src="'+esc(a.avatar)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':'<span class="'+cls+' ph">'+letter(a)+'</span>'}
 function diffChip(a){var ai=a.ai&&a.ai.price;if(!ai)return"";if(!a.price)return'<span class="aid eq">'+esc(L("ai_cur"))+': '+esc(L("ai_none"))+'</span>';var d=a.price-ai;if(Math.abs(d)<0.5)return'<span class="aid eq">'+esc(L("ai_diff_eq"))+'</span>';return'<span class="aid '+(d>0?"hi":"lo")+'">'+(d>0?"+":"−")+"$"+Math.abs(Math.round(d*100)/100)+" "+esc(L(d>0?"ai_diff_hi":"ai_diff_lo"))+'</span>'}
@@ -6439,9 +6457,9 @@ var oP=prOpen;prOpen=function(id){oP.apply(this,arguments);try{var a=S.accounts.
 /* ===== v93: "Links" tab in the editor's Marketplace + owner can open an account's links ===== */
 (function(){
 var T={en:{mk_links:"Links",lk_h:"Your video links",lk_none:"No orders with links yet.",lk_none_o:"You have not sent links for this order yet.",lk_of:"links",lk_open_btn:"Add links in Approved",lk_wait:"Waiting for the manager's check",lk_ok:"Approved",lk_back:"Returned. Fix the links and send again",lk_need:"Links needed",lk_reason:"Manager's note",lk_tap:"Tap to see links",
- vl_acc_t:"Links from this account",vl_acc_none:"This account has not sent any links yet.",vl_acc_sum:"Sent links for {a} of {b} orders",vl_acc_open:"Open account links",vl_ord:"order"},
+ vl_acc_t:"Links from this account",vl_acc_none:"This account has not sent any links yet.",vl_acc_sum:"Sent links for {a} of {b} orders",vl_acc_open:"Open account links",vl_stats:"Tap to see full stats",vl_ord:"order"},
 ru:{mk_links:"Ссылки",lk_h:"Ваши ссылки на видео",lk_none:"Пока нет заказов со ссылками.",lk_none_o:"Вы ещё не отправили ссылки по этому заказу.",lk_of:"ссылок",lk_open_btn:"Добавить ссылки в «Одобрено»",lk_wait:"Ждёт проверки менеджера",lk_ok:"Одобрено",lk_back:"Возвращено. Исправьте ссылки и отправьте снова",lk_need:"Нужны ссылки",lk_reason:"Комментарий менеджера",lk_tap:"Нажмите, чтобы увидеть ссылки",
- vl_acc_t:"Ссылки этого аккаунта",vl_acc_none:"Этот аккаунт ещё не отправлял ссылки.",vl_acc_sum:"Ссылки отправлены по {a} из {b} заказов",vl_acc_open:"Открыть ссылки аккаунта",vl_ord:"заказ"}};
+ vl_acc_t:"Ссылки этого аккаунта",vl_acc_none:"Этот аккаунт ещё не отправлял ссылки.",vl_acc_sum:"Ссылки отправлены по {a} из {b} заказов",vl_acc_open:"Открыть ссылки аккаунта",vl_stats:"Нажмите, чтобы увидеть всю статистику",vl_ord:"заказ"}};
 Object.assign(LT.en,T.en);Object.assign(LT.ru,T.ru);
 ["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in T.en)if(!XLL[k][x])XLL[k][x]=T.en[x]});
 LV.lkO=LV.lkO||{};
@@ -6474,7 +6492,7 @@ window.vlinksHtml=function(D){
   var chip=function(k,l){return '<button type="button" class="chip" data-l="vlF" data-k="'+k+'" aria-pressed="'+(F===k)+'">'+esc(L(l))+' · '+cnt[k]+'</button>'};
   return '<div class="row vlbar">'+chip("all","vl_all")+chip("wait","vl_filter_w")+chip("none","vl_none")+chip("done","vl_filter_d")+'</div><div class="list">'+(list.length?list.map(function(r){
     var k=kind(r),L2=r.links||[],pill=k==="wait"?'🔎 '+L("vl_await"):(k==="done"?'✅ '+L("vl_done"):'⏳ '+L("vl_nopub"));
-    return '<div class="card ord vlc vl-'+k+'"><div class="t"><div><button type="button" class="vlacc" data-l="vlAcc" data-id="'+esc(r.openId||"")+'">'+esc(r.handle||"")+(r.internalName?' · '+esc(r.internalName):'')+' ›</button><span>'+esc(r.track)+' — '+esc(r.artist||"")+'</span><span>🎬 '+L2.length+' / '+(r.videos||0)+' '+esc(L("vl_links"))+(r.overdue?' · <b style="color:#ff6b6b">'+esc(L("vl_over"))+'</b>':'')+'</span></div><span class="rcpill vlp-'+k+'">'+esc(pill)+'</span></div>'+
+    return '<div class="card ord vlc vl-'+k+'"><div class="t vlhd" data-l="accOpenH" data-oid="'+esc(r.openId||"")+'" role="button" tabindex="0"><div><b>'+esc(r.handle||"")+(r.internalName?' · '+esc(r.internalName):'')+(r.demo?' <em class="testpill">TEST</em>':'')+'</b><span>'+esc(r.track)+' — '+esc(r.artist||"")+'</span><span>🎬 '+L2.length+' / '+(r.videos||0)+' '+esc(L("vl_links"))+(r.overdue?' · <b style="color:#ff6b6b">'+esc(L("vl_over"))+'</b>':'')+'</span><span class="vlmore">'+esc(L("vl_stats"))+' ›</span></div><span class="rcpill vlp-'+k+'">'+esc(pill)+'</span></div>'+
       (L2.length?pills(L2):'')+
       (k==="wait"?'<div class="row vlact"><button class="btn primary" data-l="vlOk" data-id="'+esc(r.id)+'">✓ '+esc(L("vl_ok"))+'</button><button class="btn danger" data-l="vlNo" data-id="'+esc(r.id)+'">✕ '+esc(L("vl_no"))+'</button></div>':'')+'</div>'
   }).join(""):'<div class="empty">'+esc(L("vl_empty"))+'</div>')+'</div>'};
@@ -6490,15 +6508,17 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
 
 /* ===== v94: TikTok link change must be verified, round payout method pills ===== */
 (function(){
-var T={en:{tt_changed:"The link is different",tt_warn:"A changed link cannot be saved by itself. Verify it through TikTok (fastest), or send it to the manager to check. Or put the old link back.",tt_restore:"Put the old link back",tt_verify:"Verify through TikTok",tt_verify_h:"You go to TikTok, allow us to see your views, and the account is verified again. The manager is not needed.",tt_send:"Send to manager to check",tt_relinked:"Verified through TikTok. The link is updated.",pm_paypal:"PayPal",pm_crypto:"Crypto",pm_card:"Card"},
-ru:{tt_changed:"Ссылка отличается",tt_warn:"Изменённую ссылку нельзя просто сохранить. Подтвердите её через TikTok (быстрее всего) или отправьте менеджеру на проверку. Либо верните старую ссылку.",tt_restore:"Вернуть старую ссылку",tt_verify:"Проверить через TikTok",tt_verify_h:"Вы перейдёте в TikTok, разрешите смотреть просмотры, и аккаунт верифицируется заново. Менеджер не нужен.",tt_send:"Отправить менеджеру на проверку",tt_relinked:"Подтверждено через TikTok. Ссылка обновлена.",pm_paypal:"PayPal",pm_crypto:"Крипта",pm_card:"Карта"}};
+var T={en:{tt_changed:"The link is different",tt_warn:"A changed link cannot be saved by itself. Verify it through TikTok (fastest), or send it to the manager to check. Or put the old link back.",tt_restore:"Put the old link back",tt_verify:"Verify through TikTok",tt_verify_h:"You go to TikTok and allow us to see your views. The account is verified again, no manager needed.",tt_send:"Send to manager to check",tt_relinked:"Verified through TikTok. The link is updated.",pm_paypal:"PayPal",pm_crypto:"Crypto",pm_card:"Card",tt_cur:"Current link",tt_sure:"Are you sure you want to change the link?",tt_yes:"Yes, change",tt_no:"No",tt_new:"New TikTok profile link",tt_bad:"Paste a link like https://www.tiktok.com/@name",tt_fail:"This TikTok account does not match the link you pasted. Nothing was changed."},
+ru:{tt_changed:"Ссылка отличается",tt_warn:"Изменённую ссылку нельзя просто сохранить. Подтвердите её через TikTok (быстрее всего) или отправьте менеджеру на проверку. Либо верните старую ссылку.",tt_restore:"Вернуть старую ссылку",tt_verify:"Проверить через TikTok",tt_verify_h:"Вы перейдёте в TikTok, разрешите смотреть просмотры, и аккаунт верифицируется заново. Менеджер не нужен.",tt_send:"Отправить менеджеру на проверку",tt_relinked:"Подтверждено через TikTok. Ссылка обновлена.",pm_paypal:"PayPal",pm_crypto:"Крипта",pm_card:"Карта",tt_cur:"Текущая ссылка",tt_sure:"Вы уверены, что хотите поменять ссылку?",tt_yes:"Да, изменить",tt_no:"Нет",tt_new:"Новая ссылка на профиль TikTok",tt_bad:"Вставьте ссылку вида https://www.tiktok.com/@name",tt_fail:"Этот аккаунт TikTok не совпадает со ссылкой, которую вы вставили. Ничего не изменено."}};
 Object.assign(LT.en,T.en);Object.assign(LT.ru,T.ru);
 ["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in T.en)if(!XLL[k][x])XLL[k][x]=T.en[x]});
-function norm(v){return String(v||"").trim().toLowerCase().replace(/\/+$/,"")}
-function ttSync(){var i=$("ttUrl");if(!i)return;var ch=norm(i.value)!==norm(i.getAttribute("data-orig"));var w=$("ttWarn"),s=$("ttSend"),v=document.querySelector(".ttver");if(w)w.hidden=!ch;if(s)s.hidden=!ch;if(v)v.classList.toggle("dim",ch&&false)}
+function ttHandle(v){var m=String(v||"").trim().match(/^https?:\/\/([a-z0-9-]+\.)?tiktok\.com\/@([A-Za-z0-9._]{2,24})(?:[\/?#].*)?$/i);return m?m[2]:""}
+function ttSync(){var i=$("ttUrl"),g=$("ttGo");if(!i||!g)return;var h=ttHandle(i.value);g.classList.toggle("dis",!h);g.setAttribute("href",h?"/auth/tiktok?relink=1&u="+encodeURIComponent(h):"#")}
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="ttUrl")ttSync()});
-document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="ttRestore"]');if(!el)return;e.stopImmediatePropagation();var i=$("ttUrl");if(i){i.value=i.getAttribute("data-orig");ttSync()}},true);
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="ttYes"]');if(el){e.stopImmediatePropagation();$("ttAsk").hidden=true;$("ttNew").hidden=false;var i=$("ttUrl");if(i)i.focus();return}
+  var g=e.target.closest&&e.target.closest("#ttGo");if(g&&g.classList.contains("dis")){e.preventDefault();var er=$("ttErr");er.textContent=L("tt_bad");er.hidden=false}},true);
 if(/relinked=1/.test(location.hash||"")){setTimeout(function(){try{toast(L("tt_relinked"))}catch(e){}},1200)}
+if(/relinkfail=1/.test(location.hash||"")){setTimeout(function(){try{toast(L("tt_fail"))}catch(e){}},1200)}
 /* payout method as round pills */
 var IC={paypal:"🅿️",crypto:"🪙",card:"💳"};
 function enh(){document.querySelectorAll("#pyMethod,#tMeth,#nMethod").forEach(function(sel){if(sel.getAttribute("data-mp"))return;sel.setAttribute("data-mp","1");sel.classList.add("cs-hid");
@@ -6509,6 +6529,14 @@ function enh(){document.querySelectorAll("#pyMethod,#tMeth,#nMethod").forEach(fu
 var raf=0;new MutationObserver(function(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;try{enh()}catch(e){}})}).observe(document.body,{childList:true,subtree:true});
 try{enh()}catch(e){}
 })();
+
+/* ===== v96: the left menu keeps its scroll position when a tab is clicked ===== */
+(function(){var o=renderOwner;renderOwner=function(){
+  var sd=document.querySelector(".ownside"),st=sd?sd.scrollTop:0,y=window.scrollY;
+  var r=o.apply(this,arguments);
+  try{var restore=function(){var n=document.querySelector(".ownside");if(n&&st&&Math.abs(n.scrollTop-st)>1)n.scrollTop=st;if(y>0&&Math.abs(window.scrollY-y)>1&&document.documentElement.scrollHeight>=y+window.innerHeight)window.scrollTo(0,y)};
+    restore();requestAnimationFrame(restore)}catch(e){}
+  return r}})();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
