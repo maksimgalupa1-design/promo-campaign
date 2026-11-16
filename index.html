@@ -1309,6 +1309,12 @@ body.noanim,body.noanim *,body.noanim *::before,body.noanim *::after{animation:n
 /* v69 — owner cabinet: no entrance animations at all (they made the screen go dark on every switch / refresh) */
 body.isadmin .view,body.isadmin .view.on,body.isadmin #adApp,body.isadmin #adApp *,body.isadmin #adApp *::before,body.isadmin #adApp *::after{animation:none!important;opacity:1}
 body.isadmin #adApp .ownmain>*{animation:none!important}
+/* v70 — owner sidebar: all groups neutral grey (Tickets no longer purple), hover motion back */
+body.isadmin .ownside .agrp,body.isadmin .ownside .agrp.g-tk,body.isadmin .ownside .agrp.g-ov,body.isadmin .ownside .agrp.g-ed,body.isadmin .ownside .agrp.g-pr,body.isadmin .ownside .agrp.g-st{background:#1b1b22!important;border:1px solid #26262e!important;box-shadow:none!important}
+body.isadmin .ownside .atb{transition:background .16s ease,transform .16s ease,box-shadow .16s ease!important}
+body.isadmin .ownside .atb:hover{transform:translateX(5px)!important;background:rgba(123,107,255,.16)!important}
+body.isadmin .ownside .atb[aria-pressed="true"]:hover{transform:translateX(3px)!important;background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important}
+body.isadmin .ownside .g-tk .atb[aria-pressed="true"]{background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important;border-color:transparent!important}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1487,7 +1493,7 @@ body.isadmin #adApp .ownmain>*{animation:none!important}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v69 · 16.11 17:10</span>
+  <span>© Promo Campaign · v70 · 16.11 17:25</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
