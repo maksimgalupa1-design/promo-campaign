@@ -1672,6 +1672,15 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .testpill{font-style:normal;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:rgba(246,184,75,.2);color:#F6B84B;vertical-align:middle}
 .vlhd>div>span{display:block}
 
+/* v97: video link cards */
+.vlc{padding:0;overflow:hidden;transition:border-color .2s,box-shadow .2s}.vlc.open{border-color:#A56BFF;box-shadow:0 0 0 1px rgba(165,107,255,.5),0 10px 26px rgba(139,108,255,.22)}
+.vlh2{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:14px 16px;cursor:pointer;transition:background .18s}.vlh2:hover{background:rgba(139,108,255,.1)}
+.vla{display:flex;flex-direction:column;min-width:0}.vla b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vla span{font-size:12px;color:var(--muted)}
+.vltrk{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;max-width:44vw}.vltrk u{font-weight:800;font-size:15px;text-decoration-color:#A56BFF;text-decoration-thickness:2px;text-underline-offset:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}.vltrk span{font-size:12px;color:var(--muted)}
+.vlr{display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}.vlcn{font-size:12px;color:var(--muted)}.vlch{font-style:normal;font-size:20px;color:#C8B8FF;transition:transform .2s}.vlc.open .vlch{transform:rotate(90deg)}
+.vlbody{padding:0 16px 16px;display:grid;gap:10px;animation:tpxin .25s both}
+@media(max-width:700px){.vlh2{grid-template-columns:1fr auto}.vltrk{grid-column:1/-1;grid-row:2;max-width:100%;align-items:flex-start;text-align:left}.vlr{grid-row:1;grid-column:2}}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1849,7 +1858,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v96 · 16.11 23:05</span>
+  <span>© Promo Campaign · v97 · 16.11 23:20</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6537,6 +6546,31 @@ try{enh()}catch(e){}
   try{var restore=function(){var n=document.querySelector(".ownside");if(n&&st&&Math.abs(n.scrollTop-st)>1)n.scrollTop=st;if(y>0&&Math.abs(window.scrollY-y)>1&&document.documentElement.scrollHeight>=y+window.innerHeight)window.scrollTo(0,y)};
     restore();requestAnimationFrame(restore)}catch(e){}
   return r}})();
+
+/* ===== v97: video links tab: only orders with links are "to check", cards open on tap, track in the middle ===== */
+(function(){
+Object.assign(LT.en,{vl_stat_btn:"Account statistics",vl_trk:"Track"});Object.assign(LT.ru,{vl_stat_btn:"Статистика аккаунта",vl_trk:"Трек"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};XLL[k].vl_stat_btn=XLL[k].vl_stat_btn||"Account statistics";XLL[k].vl_trk=XLL[k].vl_trk||"Track"});
+LV.vlO=LV.vlO||{};
+function pillsV(L2){return '<div class="lkpills">'+L2.map(function(l,i){return '<a class="lkpill" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer" style="animation-delay:'+Math.min(i,10)*0.05+'s"><span>🔗</span><b>'+esc(String(l.url).replace(/^https?:\/\/(www\.)?/,"").slice(0,48))+'</b>'+(l.views!=null?'<i>'+Number(l.views).toLocaleString("en-US")+' 👁</i>':'')+'<em>↗</em></a>'}).join("")+'</div>'}
+window.vlinksHtml=function(D){
+  var R=(D.requests||[]).filter(function(r){return ["approved","submitted","returned","completed"].indexOf(r.status)>=0});
+  var kind=function(r){var has=(r.links||[]).length>0;return r.status==="completed"?"done":(r.status==="submitted"&&has?"wait":"none")};
+  var cnt={all:R.length,none:0,wait:0,done:0};R.forEach(function(r){cnt[kind(r)]++});
+  var F=LV.vlF,order={wait:0,none:1,done:2};
+  var list=R.filter(function(r){return F==="all"||kind(r)===F}).sort(function(a,b){return order[kind(a)]-order[kind(b)]||(b.updated||b.created||0)-(a.updated||a.created||0)});
+  var chip=function(k,l){return '<button type="button" class="chip" data-l="vlF" data-k="'+k+'" aria-pressed="'+(F===k)+'">'+esc(L(l))+' · '+cnt[k]+'</button>'};
+  return '<div class="row vlbar">'+chip("all","vl_all")+chip("wait","vl_filter_w")+chip("none","vl_none")+chip("done","vl_filter_d")+'</div><div class="list">'+(list.length?list.map(function(r){
+    var k=kind(r),L2=r.links||[],open=!!LV.vlO[r.id],pill=k==="wait"?'🔎 '+L("vl_await"):(k==="done"?'✅ '+L("vl_done"):'⏳ '+L("vl_nopub"));
+    return '<div class="card ord vlc vl-'+k+(open?' open':'')+'"><div class="vlh2" data-l="vlTog" data-id="'+esc(r.id)+'" role="button" tabindex="0" aria-expanded="'+open+'">'+
+      '<div class="vla"><b>'+esc(r.handle||"")+(r.demo?' <em class="testpill">TEST</em>':'')+'</b><span>'+esc(r.internalName||"")+'</span></div>'+
+      '<div class="vltrk"><u>'+esc(r.track)+'</u><span>'+esc(r.artist||"")+'</span></div>'+
+      '<div class="vlr"><span class="rcpill vlp-'+k+'">'+esc(pill)+'</span><span class="vlcn">🎬 '+L2.length+' / '+(r.videos||0)+' '+esc(L("vl_links"))+(r.overdue?' · <b style="color:#ff6b6b">'+esc(L("vl_over"))+'</b>':'')+'</span><i class="vlch">›</i></div></div>'+
+      (open?'<div class="vlbody">'+(L2.length?pillsV(L2):'<div class="hint">'+esc(L("vl_nopub"))+'</div>')+'<div class="row vlact">'+(k==="wait"?'<button class="btn primary" data-l="vlOk" data-id="'+esc(r.id)+'">✓ '+esc(L("vl_ok"))+'</button><button class="btn danger" data-l="vlNo" data-id="'+esc(r.id)+'">✕ '+esc(L("vl_no"))+'</button>':'')+'<button type="button" class="btn sm" data-l="accOpenH" data-oid="'+esc(r.openId||"")+'">📊 '+esc(L("vl_stat_btn"))+'</button></div></div>':'')+'</div>'
+  }).join(""):'<div class="empty">'+esc(L("vl_empty"))+'</div>')+'</div>'};
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="vlTog"]');if(!el)return;e.stopImmediatePropagation();var id=el.getAttribute("data-id");LV.vlO[id]=!LV.vlO[id];renderOwner()},true);
+document.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&e.target.getAttribute&&e.target.getAttribute("data-l")==="vlTog"){e.preventDefault();e.target.click()}});
+})();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
