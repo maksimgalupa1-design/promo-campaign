@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 50;
+const SERVER_VER = 51;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -165,7 +165,7 @@ const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
 const HISTORY_DAYS = 200;           // how far back we load videos
 const MAX_PAGES = 15;               // 20 videos per page
 const REFRESH_EVERY = 30 * 60000;   // background refresh of views
-const CATEGORIES = ["movies", "sports", "anime", "gym", "cars", "lyrics", "visual", "gaming", "cartoons", "celeb", "memes", "dancing", "kpop", "kdrama", "motivation", "irl", "beauty", "nature", "other"];
+const CATEGORIES = ["movies", "sports", "anime", "gym", "cars", "lyrics", "visual", "gaming", "cartoons", "celeb", "memes", "dancing", "kpop", "motivation", "irl", "beauty", "nature", "other"];
 
 if (!KEY || !SECRET || !ADMIN_TOKEN) { console.error("Set TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET and ADMIN_TOKEN"); process.exit(1); }
 
@@ -1044,7 +1044,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) cr[k] = c(b.crypto, k); db.settings.pay = { paypal: c(b, "paypal"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), crypto: cr }; saveDb(); return send(res, 200, payInfo()); }
       if (P === "/api/admin/track" && M === "POST") {   // owner approves a track before the producer pays
         const t = db.tracks[b.id]; if (!need(res, t && t.status === "review", 404, "no track waiting for review")) return;
-        if (b.status === "approved") t.status = "active"; else if (b.status === "rejected") t.status = "rejected"; else return send(res, 400, { error: "bad status" });
+        if (b.status === "approved") { const eu = Number(b.enrollUntil); if (!need(res, eu > Date.now() && eu < Date.now() + 3.2e10, 400, "set the enrolment deadline")) return; t.enrollUntil = Math.round(eu); t.status = "active"; } else if (b.status === "rejected") t.status = "rejected"; else return send(res, 400, { error: "bad status" });
         saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/decision" && M === "POST") {
@@ -1231,6 +1231,10 @@ const server = http.createServer(async (req, res) => {
   } catch (e) { console.error(e); send(res, 500, { error: "server error" }); }
 });
 loadDb().then(() => {
+  try {   // the old "K-drama" topic is merged into "K-Pop & K-Drama"
+    const fix = (o, d) => { if (!o || typeof o !== "object" || d > 8) return; for (const k of Object.keys(o)) { const x = o[k]; if (k === "categories" && Array.isArray(x) && x.includes("kdrama")) o[k] = [...new Set(x.map(c => c === "kdrama" ? "kpop" : c))]; else if (x && typeof x === "object") fix(x, d + 1); } };
+    fix(db, 0); if (db.settings && db.settings.ranges && db.settings.ranges.kdrama) { const r = db.settings.ranges; if (!r.kpop) r.kpop = r.kdrama; delete r.kdrama; } saveDb();
+  } catch (e) { console.error("topic migration", e); }
   server.listen(PORT, () => console.log("Promo Campaign on " + PUBLIC_URL));
   setInterval(() => refreshStale(30).catch(e => console.error(e)), REFRESH_EVERY);
   setInterval(() => { try { remindEditors(); } catch (e) { console.error(e); } }, 3600e3);
