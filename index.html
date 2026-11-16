@@ -1227,6 +1227,20 @@ body.isadmin .ovhero .ovh-s{display:none}
 body.isadmin .ownmain .tile{background:linear-gradient(160deg,#1d1d24,#16161b);border-radius:16px}
 body.isadmin .ownmain .card{border-radius:18px}
 }
+/* v65 — owner widgets: topic chips, filters, account cards */
+body.isadmin .ownmain .mcrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+body.isadmin .ownmain .mchip{background:#1c1c23;border:1px solid var(--line);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--fg);display:inline-flex;align-items:center;gap:8px;min-height:0;transition:background .15s,border-color .15s}
+body.isadmin .ownmain .mchip:hover{border-color:#6D5CFF;transform:none;box-shadow:none}
+body.isadmin .ownmain .mchip:has(input:checked){background:rgba(109,92,255,.22);border-color:#7B6BFF;color:#fff}
+body.isadmin .ownmain .mchip i{width:14px;height:14px;border-radius:50%;border:2px solid #5b5b6b;display:inline-block;flex:none}
+body.isadmin .ownmain .mchip:has(input:checked) i{border-color:#A56BFF;background:radial-gradient(circle,#A56BFF 45%,transparent 50%)}
+body.isadmin .ownmain .f>span{font-size:12px;font-weight:700;letter-spacing:.04em;opacity:.8}
+body.isadmin .ownmain select{background-color:#1c1c23;border:1px solid var(--line);border-radius:12px;padding:10px 34px 10px 14px;font-weight:600}
+body.isadmin .ownmain #oSrch.osrch{background:#1c1c23;border:1px solid var(--line);border-radius:14px;padding:13px 16px}
+body.isadmin .ownmain #oSrch.osrch:focus{border-color:#7B6BFF;outline:0;box-shadow:0 0 0 3px rgba(109,92,255,.25)}
+body.isadmin .ownmain .list>.card{background:linear-gradient(160deg,#1d1d25,#16161c);border:1px solid #2a2a34;border-radius:18px;padding:16px 18px}
+body.isadmin .ownmain .list>.card:hover{border-color:#4b43a8;transform:none;box-shadow:0 8px 26px rgba(109,92,255,.15)}
+body.isadmin .ownmain .tbc{background:linear-gradient(160deg,#1d1d25,#16161c);border-radius:16px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1405,7 +1419,7 @@ body.isadmin .ownmain .card{border-radius:18px}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v64 · 16.11 13:10</span>
+  <span>© Promo Campaign · v65 · 16.11 13:25</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
