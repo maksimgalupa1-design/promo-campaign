@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 56;
+const SERVER_VER = 57;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -743,7 +743,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
-      const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ cover: (ensureCover(t), t.cover || ""), id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", hasMp3: !!t.mp3, deadline: t.deadline || "", producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
+      const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ cover: (ensureCover(t), t.cover || ""), id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", hasMp3: !!t.mp3, deadline: t.deadline || "", enrollUntil: t.enrollUntil || 0, producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
       return send(res, 200, { tracks: list, signedIn: !!u });
     }
     if (P === "/api/requests" && M === "GET") {          // editor's own requests
@@ -1244,7 +1244,15 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/track-enroll" && M === "POST") {
         const t = db.tracks[b.id]; if (!need(res, t, 404, "no such track")) return;
-        const v = Number(b.until) || 0; t.enrollUntil = v > 0 ? v : 0; saveDb(); return send(res, 200, { ok: true, until: t.enrollUntil });
+        const v = Number(b.until) || 0, was = t.enrollUntil || 0; t.enrollUntil = v > 0 ? v : 0; saveDb();
+        if (t.enrollUntil > Date.now() && t.enrollUntil !== was) {   // tell every editor that the enrolment window is set
+          const when = new Date(t.enrollUntil).toISOString().slice(0, 16).replace("T", " ") + " UTC";
+          inboxAdd({ audience: "editors", type: "campaigns", key: "enroll_set", vars: { t: t.title, d: t.enrollUntil }, trackId: t.id, title: "", text: "", url: "/#campaigns" });
+          const subs = db.settings.push || {};
+          for (const [k, sb] of Object.entries(subs)) { if (sb.role !== "editors") continue; try { const code = await pushSend(sb.sub, { title: "Promo Campaign", body: 'Enrolment for "' + t.title + '" is open until ' + when, url: "/#campaigns" }); if (code === 404 || code === 410) delete subs[k]; } catch (e) {} }
+          saveDb();
+        }
+        return send(res, 200, { ok: true, until: t.enrollUntil });
       }
       if (P === "/api/admin/dm/delete" && M === "POST") {
         const D = db.settings.dm = db.settings.dm || { threads: {} }, t = D.threads[b.key]; if (!need(res, t, 404, "no such chat")) return;
