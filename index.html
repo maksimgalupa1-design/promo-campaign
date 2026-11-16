@@ -1336,6 +1336,16 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .big{font-size:44px!important}
 }
 
+/* v72 — receipt rows */
+.rcrows{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:12px 0}
+.rcr{display:grid;grid-template-columns:minmax(110px,40%) 1fr;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
+.rcr:last-child{border-bottom:0}
+.rcr span{opacity:.7}
+.rcr b{text-align:right;word-break:break-word}
+.rcr a{color:#8ea2ff}
+.rcp .rcrows{border-color:#e4e6ee}.rcp .rcr{border-bottom-color:#eceef4}.rcp .rcr span{color:#6b7280;opacity:1}
+.rcaddr{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;word-break:break-all}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1513,7 +1523,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v71 · 16.11 17:50</span>
+  <span>© Promo Campaign · v73 · 16.11 18:40</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2861,7 +2871,7 @@ document.addEventListener("click",function(e){
   if(a==="etaSave"){api("/api/admin/eta",{id:id,eta:val("eta_"+id)}).then(function(){ownerReload()});return}
   if(a==="poAct2"){
     var paid=el.getAttribute("data-p")==="1",inp=$("sc_"+id),f=inp&&inp.files&&inp.files[0];
-    function go(img){var body={id:id,paid:paid};if(img)body.image=img;if(paid&&$("pb_"+id))body.paidBy=val("pb_"+id);api("/api/admin/payout",body).then(function(){ownerReload()})}
+    function go(img){var body={id:id,paid:paid};if(img)body.image=img;if(paid&&$("pb_"+id))body.paidBy=val("pb_"+id);if(paid&&$("ca_"+id))body.cryptoAmt=val("ca_"+id);api("/api/admin/payout",body).then(function(){ownerReload()})}
     if(paid&&f){shrinkImage(f,function(img){go(img)})}else go(null);return}
 });
 
@@ -3259,7 +3269,7 @@ function dayRow(q){
 }
 function reqTabHtml(D){
   var all=D.requests.filter(function(q){return q.status!=="approved"&&q.status!=="returned"}),sorts=["smart","stars","disc","price","new"];
-  var list=all.filter(function(q){return LV._onlyAct?rGroup(q)==="act":(LV.rFilter==="all"||rGroup(q)===LV.rFilter)});
+  var list=all.filter(function(q){return LV._onlyAct?rGroup(q)==="act":(LV.rFilter==="paid"?!!q.paid:LV.rFilter==="acc"?!!q.accepted:(LV.rFilter==="all"||rGroup(q)===LV.rFilter))});
   var st=function(q){return q.stars==null?0:q.stars};
   var CMP={stars:function(a,b){return st(b)-st(a)},disc:function(a,b){return (b.bulk||0)-(a.bulk||0)},price:function(a,b){return (a.price||0)-(b.price||0)},"new":function(a,b){return b.created-a.created},smart:function(a,b){return (b.bulk||0)-(a.bulk||0)||st(b)-st(a)||(a.price||0)-(b.price||0)}},ks=(LV.rSorts&&LV.rSorts.length?LV.rSorts:["smart"]);
   list.sort(function(a,b){for(var i=0;i<ks.length;i++){var r=CMP[ks[i]](a,b);if(r)return r}return b.created-a.created});
@@ -4413,7 +4423,7 @@ function poModal(id){
   var h='<h3>'+esc(q.handle)+(q.internalName?' · '+esc(q.internalName):'')+'</h3><div class="msum"><div class="ms"><b>'+money(q.cost)+'</b><span>'+esc(L("po_amt"))+'</span></div><div class="ms"><b>'+n(av)+'</b><span>'+esc(L("po_avg"))+'</span></div></div><p class="hint">'+esc(q.track||"")+' · '+esc(q.artist||"")+'</p>'+
    (p?'<div class="note payto"><b>💳 '+esc(L("po_where"))+':</b> <span id="poVal">'+esc(val2)+'</span> <button type="button" class="btn sm" data-l="poCopy" data-v="'+esc(p.value)+'">'+esc(L("po_copy"))+'</button></div>':'<div class="note err">'+esc(L("a_no_payout"))+'</div>');
   if(q.paid){h+='<div class="note payok">✅ '+esc(L("po_done"))+'</div><div class="row">'+(q.hasProof?'<button class="btn sm" data-l="admProof" data-id="'+esc(id)+'">'+esc(L("a_view_proof"))+'</button>':'')+'<button class="btn sm" data-l="poAct2" data-id="'+esc(id)+'" data-p="0">'+esc(L("po_undo"))+'</button></div>'}
-  else{h+='<label class="chk"><input type="checkbox" id="poChk"> '+esc(L("po_sent"))+'</label><div id="poSend" hidden><label class="f" for="pb_'+esc(id)+'"><span>'+esc(L("pb_lbl"))+'</span><input id="pb_'+esc(id)+'" type="text" maxlength="60" placeholder="'+esc(L("pb_ph"))+'"></label><label class="f" for="sc_'+esc(id)+'"><span>'+esc(L("po_attach"))+'</span><input id="sc_'+esc(id)+'" type="file" accept="image/*"></label><div class="row"><button class="btn primary" data-l="poAct2" data-id="'+esc(id)+'" data-p="1">'+esc(L("po_confirm"))+'</button></div></div>'}
+  else{h+='<label class="chk"><input type="checkbox" id="poChk"> '+esc(L("po_sent"))+'</label><div id="poSend" hidden><label class="f" for="pb_'+esc(id)+'"><span>'+esc(L("pb_lbl"))+'</span><input id="pb_'+esc(id)+'" type="text" maxlength="60" placeholder="'+esc(L("pb_ph"))+'"></label>'+(p&&p.method==="crypto"?'<label class="f" for="ca_'+esc(id)+'"><span>'+esc(L("pb_crypto"))+' ('+esc(coinL(p.coin))+')</span><input id="ca_'+esc(id)+'" type="text" maxlength="40" placeholder="0.05"></label>':'')+'<label class="f" for="sc_'+esc(id)+'"><span>'+esc(L("po_attach"))+'</span><input id="sc_'+esc(id)+'" type="file" accept="image/*"></label><div class="row"><button class="btn primary" data-l="poAct2" data-id="'+esc(id)+'" data-p="1">'+esc(L("po_confirm"))+'</button></div></div>'}
   h+='<div class="row" style="margin-top:12px"><button class="btn" data-l="mclose2">'+esc(L("a_close"))+'</button></div>';
   openModal(h);
 }
@@ -4762,7 +4772,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   var act=(D.requests||[]).filter(function(q){return rGroup(q)==="act"}).length;
   if(!LV._rUser&&act&&LV.rFilter==="work")LV.rFilter="act";
   var h=o(D);if(LV._onlyAct)return h;
-  return h.replace('<div class="chips" role="group">','<div class="chips" role="group"><button type="button" class="chip" data-l="rFil" data-f="act" aria-pressed="'+(LV.rFilter==="act")+'">'+esc(L("rf_act"))+' ('+act+')</button>')}})();
+  return h.replace('<div class="chips" role="group">','<div class="chips" role="group"><button type="button" class="chip" data-l="rFil" data-f="act" aria-pressed="'+(LV.rFilter==="act")+'">'+esc(L("rf_act"))+' ('+act+')</button>'+[["paid",L("rf_paid"),(D.requests||[]).filter(function(q){return q.paid}).length],["acc",L("rf_acc"),(D.requests||[]).filter(function(q){return q.accepted}).length]].map(function(x){return '<button type="button" class="chip" data-l="rFil" data-f="'+x[0]+'" aria-pressed="'+(LV.rFilter===x[0])+'">'+esc(x[1])+' ('+x[2]+')</button>'}).join(""))}})();
 document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest('[data-l="rFil"]'))LV._rUser=true},true);
 /* accounts tab: summary line so nothing is "lost" */
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{
@@ -5631,6 +5641,28 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="pAdd"],[data-l="pTopGo"]');if(!el)return;
     var i=$(el.getAttribute("data-l")==="pAdd"?"nFrom":"tFrom");if(i&&!i.value.trim()&&minBud()>1){e.stopImmediatePropagation();e.preventDefault();i.focus();toast(L("pp_from_need"))}},true);
   var oA=api;api=function(path,body){if(body&&/^\/api\/producer\/(track|topup)$/.test(path)){var v=(($("nFrom")&&$("nFrom").value)||($("tFrom")&&$("tFrom").value)||"").trim();if(v)body.from=v}return oA.apply(this,arguments)};
+})();
+
+/* ===== v72: receipt as clear rows, red Close, owner filters Paid / Confirmed ===== */
+(function(){
+  Object.assign(LT.en,{rf_paid:"Paid",rf_acc:"Confirmed receipt",rc_order:"Order",rc_vids:"Videos",rc_perv:"Price per video",rc_totp:"Total paid",rc_paidon:"Paid on",rc_appr:"Approved on",rc_got:"I received the money",rc_trk:"Open track",rc_by:"Paid by",rc_method:"Method",rc_addr:"Sent to address",rc_sentamt:"Amount sent",rc_sentto:"Sent to",pb_crypto:"Amount of crypto sent"});
+  Object.assign(LT.ru,{rf_paid:"Оплачены",rf_acc:"Подтвердили получение",rc_order:"Заказ",rc_vids:"Видео",rc_perv:"Цена за видео",rc_totp:"Всего оплачено",rc_paidon:"Оплачено",rc_appr:"Подтверждено",rc_got:"Я получил деньги",rc_trk:"Открыть трек",rc_by:"Кто заплатил",rc_method:"Способ",rc_addr:"Отправлено на адрес",rc_sentamt:"Отправлено",rc_sentto:"Отправлено на",pb_crypto:"Сколько отправлено криптой"});
+  function payRows(q){var t=q.paidTo;if(!t)return "";var m=t.method==="crypto"?L("m_crypto")+(t.coin?" · "+coinL(t.coin):""):L("m_"+t.method);var h=row0("rc_method",esc(m));
+    if(t.method==="crypto"){if(q.cryptoAmt)h+=row0("rc_sentamt",esc(q.cryptoAmt)+" "+esc(coinL(t.coin)));if(t.value)h+=row0("rc_addr",'<span class="rcaddr">'+esc(t.value)+'</span>')}
+    else if(t.value)h+=row0("rc_sentto",esc(t.value));else if(t.label)h+=row0("rc_sentto",esc(t.label));return h}
+  function row0(k,v){return '<div class="rcr"><span>'+esc(L(k))+':</span><b>'+v+'</b></div>'}
+  rcOpen=function(id){
+    var q=(LV.reqs||[]).filter(function(x){return x.id===id})[0],u=S.user;if(!q)return;
+    if(!q.paid){openModal('<p>'+esc(L("rc_unpaid"))+'</p><div class="row"><button class="btn danger" data-l="mclose2">'+esc(L("rc_close"))+'</button></div>');return}
+    var per=q.videos?q.cost/q.videos:q.cost,tl=q.tlink||(q.tlinks&&Object.keys(q.tlinks).length?q.tlinks[Object.keys(q.tlinks)[0]]:"");
+    var row=function(k,v){return '<div class="rcr"><span>'+esc(L(k))+':</span><b>'+v+'</b></div>'};
+    var tname=esc(q.track)+' — '+esc(q.artist||"");
+    openModal('<div class="rcp" id="rcp"><div class="rchead"><div class="rclogo"><span class="mark"></span><b>Promo Campaign</b></div><div class="rcno"><small>'+esc(L("rc_title"))+'</small><b>'+esc(rcNo(q))+'</b></div></div>'+
+      '<div class="rcbig"><small>'+esc(L("rc_totp"))+'</small><b>'+money(q.cost)+'</b><span class="rcpill ok">✓ '+esc(L("rc_paid"))+' · '+esc(fmtFull(q.paidAt))+'</span>'+(q.accepted?'<span class="rcpill blue">✓ '+esc(L("rc_acc"))+' · '+esc(fmtFull(q.acceptedAt))+'</span>':'')+'</div>'+
+      '<div class="rcparties"><div><small>'+esc(L("rc_by"))+'</small><b>'+esc(q.paidBy||"—")+'</b></div><div class="rcarrow">→</div><div><small>'+esc(L("rc_you"))+'</small><b>'+esc(q.handle)+'</b>'+(u&&u.internalName?'<em>'+esc(u.internalName)+'</em>':'')+'</div></div>'+
+      '<div class="rcrows">'+row("rc_order",tl?'<a href="'+esc(tl)+'" target="_blank" rel="noopener noreferrer">'+tname+' ↗</a>':tname)+row("rc_vids",String(q.videos))+row("rc_perv",money(per))+(q.discount?row("rc_disc","−"+q.discount+"%"):"")+row("rc_totp",money(q.cost))+row("rc_paidon",esc(fmtFull(q.paidAt)))+payRows(q)+(q.acceptedAt?row("rc_appr",esc(fmtFull(q.acceptedAt))):"")+'</div>'+
+      '<p class="rcnote">'+esc(L("rc_note"))+'</p>'+
+      '<div class="rcbtns"><div class="note ok" id="rcMsg" hidden></div><div class="row">'+(q.accepted?'':'<button class="btn primary" data-l="rcAccept" data-id="'+esc(q.id)+'">✓ '+esc(L("rc_got"))+'</button>')+'<button class="btn" data-l="rcPdf">⬇ '+esc(L("rc_pdf"))+'</button>'+(q.hasProof?'<button class="btn" data-l="showProof" data-id="'+esc(q.id)+'">'+esc(L("rc_proof"))+'</button>':'')+'<button class="btn danger" data-l="mclose2">'+esc(L("rc_close"))+'</button></div></div></div>')};
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
