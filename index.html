@@ -1400,6 +1400,33 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .tierrow input,.setcard .tierrow input,.sethost .tierrow input{width:96px!important;min-width:96px;height:56px;box-sizing:border-box;padding:6px 10px!important;border-radius:14px!important;font-size:24px!important;text-align:center;-webkit-appearance:none}
 .tieropt.cust{padding:14px!important}
 
+/* v77 — drafts, archive, phone chat + top bar */
+.dfbox{margin:6px 0 14px}
+.dflist{display:flex;flex-direction:column;gap:8px}
+.dfrow{display:flex;align-items:center;gap:6px;padding:8px 10px!important}
+.dfrow.on{border-color:#8B6CFF}
+.dfmain{all:unset;box-sizing:border-box;flex:1;min-width:0;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:4px 2px}
+.dfmain b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dfmain small{opacity:.6;font-size:12px}
+.dfb{all:unset;cursor:pointer;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;font-size:16px}
+.dfb:hover{background:rgba(124,92,255,.15)}
+.arcback{background:linear-gradient(135deg,#1FA85A,#2FBF71)!important;color:#fff!important;border:0!important}
+@media(max-width:899px){
+ .lang select{max-width:98px!important;width:auto;font-size:12.5px;padding:4px 18px 4px 8px;min-height:34px}
+ .lang .themesel{max-width:70px!important;font-size:12.5px;padding:4px 16px 4px 6px}
+ .chath b{font-size:16px;white-space:nowrap}
+ .chath .btn,.chath button:not(.chr){height:32px!important;min-height:32px!important;width:auto!important;padding:0 9px!important;font-size:12.5px!important;border-radius:10px!important;line-height:1}
+ .chath{gap:5px;flex-wrap:nowrap}
+ .chform input[type=text],.chform input:not([type]){height:40px!important;min-height:40px!important;font-size:16px!important;padding:0 12px!important;border-radius:12px!important}
+ .chform .btn{height:40px!important;min-height:40px!important;padding:0 14px!important;font-size:14px!important;border-radius:12px!important}
+ .chform .chatt{width:40px!important;padding:0!important;font-size:16px!important}
+ .chm{font-size:14px;padding:6px 10px}
+ .chcard{padding:16px 14px!important;border-radius:18px!important}
+ .chcard h3{font-size:16px!important}.chcard p,.chcard label{font-size:13px!important}
+ .chcard .chic{font-size:30px!important}
+ .chatbox{padding:8px 10px!important}
+}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1577,7 +1604,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v76 · 16.11 20:40</span>
+  <span>© Promo Campaign · v77 · 16.11 22:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2607,15 +2634,18 @@ function renderOwner(){
       '<div class="list">'+(list.length?list.map(function(a){
         var sel=['<option value="auto">'+esc(L("a_auto"))+(a.stars.auto!=null?' ('+a.stars.auto+')':'')+'</option>'].concat([1,1.5,2,2.5,3,3.5,4,4.5,5].map(function(s){return '<option value="'+s+'"'+(a.stars.manual===s?' selected':'')+'>'+s+' ★</option>'})).join("");
         return '<details class="card arow v-'+verdictOf(a).k+'"><summary><span><b>'+esc(a.handle)+'</b>'+(a.internalName?' · '+esc(a.internalName):'')+' <span class="stars">'+esc(starsTxt(a.stars.final))+'</span> '+discBadge(a.discount)+'</span><span class="hint">'+(a.price?money(a.price):"—")+(a.cpm?' · '+money(a.cpm)+' '+esc(L("a_per1k")):'')+' · '+n(a.analysis.refAvg||0)+'</span></summary>'+
-          '<div style="margin-top:10px">'+catPills(a.categories,a.otherCategory)+'</div>'+
+          (a.linkChange?'<div class="note err">🔗 '+esc(L("lc_note"))+': <a href="'+esc(a.linkChange.from)+'" target="_blank" rel="noopener noreferrer">'+esc(String(a.linkChange.from).replace(/^https?:\/\/(www\.)?/,""))+'</a> → <a href="'+esc(a.linkChange.to)+'" target="_blank" rel="noopener noreferrer">'+esc(String(a.linkChange.to).replace(/^https?:\/\/(www\.)?/,""))+'</a></div>':'')+          '<div style="margin-top:10px">'+catPills(a.categories,a.otherCategory)+'</div>'+
           '<div class="row" style="margin:12px 0"><a class="btn sm" href="'+esc(a.tiktokUrl||("https://www.tiktok.com/"+(a.handle.charAt(0)==="@"?a.handle:"@"+a.handle)))+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("a_open_tt"))+'</a>'+ratingHtml(a)+
-          '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
+          '<button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm" data-l="admDelAcc" data-id="'+esc(a.id)+'" data-h="'+esc(a.handle)+'">🗑</button><button class="btn sm danger" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button><span class="pill">'+esc(a.adminStatus)+'</span></div>'+
           winTable(a.analysis,{videos:a.videos,price:a.price})+videoTable({videos:a.videos})+'</details>';
       }).join(""):'<div class="empty">'+esc(L("a_no_acc"))+'</div>')+'</div>';
   }else if(LV.adTab==="accarch"){
-    var bl=D.accounts.filter(function(a){return a.adminStatus==="banned"});
-    body='<p class="hint">'+esc(L("arc_h"))+'</p><div class="list">'+(bl.length?bl.map(function(a){var bi=a.banInfo||{};
-      return '<div class="card ord"><div class="t"><div><b>'+esc(a.handle)+'</b><span>'+esc(a.internalName||"")+'</span><span class="hotnote">'+esc(bi.reason==="order"?L("arc_why_order").replace("{t}",bi.track||""):L("arc_why_mgr"))+'</span>'+(bi.at?'<span>'+esc(fmtDate(bi.at))+'</span>':'')+'</div><span class="pill bad">'+esc(L("arc_banned"))+'</span></div><div class="row"><a class="btn sm" href="https://www.tiktok.com/'+esc(a.handle.charAt(0)==="@"?a.handle:"@"+a.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("a_open_tt"))+'</a><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("arc_unban"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("arc_none"))+'</div>')+'</div>';
+    var bl=D.accounts.filter(function(a){return a.adminStatus==="banned"}),ar=D.archive||[],AF=LV.arcF||"del";
+    var dU=ar.filter(function(e){return e.by!=="admin"}),dA=ar.filter(function(e){return e.by==="admin"});
+    var ac=function(k,l,c){return '<button type="button" class="chip" data-l="arcF" data-k="'+k+'" aria-pressed="'+(AF===k)+'">'+esc(L(l))+' · '+c+'</button>'};
+    var delList=function(a){return a.length?a.map(function(e){return '<div class="card ord"><div class="t"><div><b>'+esc(e.handle)+'</b><span>'+esc(e.internalName||"")+'</span><span>'+esc(fmtDate(e.at))+'</span></div><button class="btn sm primary arcback" data-l="arcBack" data-id="'+esc(e.id)+'">↩ '+esc(L("arc_back"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("arc_none"))+'</div>'};
+    body='<div class="row vlbar">'+ac("del","arc_f_del",dU.length)+ac("adm","arc_f_adm",dA.length)+ac("ban","arc_f_ban",bl.length)+'</div>'+(AF==="ban"?'<p class="hint">'+esc(L("arc_h"))+'</p><div class="list">'+(bl.length?bl.map(function(a){var bi=a.banInfo||{};
+      return '<div class="card ord"><div class="t"><div><b>'+esc(a.handle)+'</b><span>'+esc(a.internalName||"")+'</span><span class="hotnote">'+esc(bi.reason==="order"?L("arc_why_order").replace("{t}",bi.track||""):L("arc_why_mgr"))+'</span>'+(bi.at?'<span>'+esc(fmtDate(bi.at))+'</span>':'')+'</div><span class="pill bad">'+esc(L("arc_banned"))+'</span></div><div class="row"><a class="btn sm" href="https://www.tiktok.com/'+esc(a.handle.charAt(0)==="@"?a.handle:"@"+a.handle)+'" target="_blank" rel="noopener noreferrer">↗ '+esc(L("a_open_tt"))+'</a><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("arc_unban"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("arc_none"))+'</div>')+'</div>':'<div class="list">'+delList(AF==="adm"?dA:dU)+'</div>');
   }else if(LV.adTab==="contacts"){
     body='<div class="card form">'+'<p class="hint">'+esc(L("a_ct_h"))+'</p><label class="f" for="ct_tg"><span>Telegram (link)</span><input id="ct_tg" type="text" maxlength="200" placeholder="https://t.me/yourname" value="'+esc((CONTACTS||{}).telegram||"")+'"></label><label class="f" for="ct_dc"><span>Discord ('+esc(L("a_dc_h"))+')</span><input id="ct_dc" type="text" maxlength="200" placeholder="https://discord.gg/..." value="'+esc((CONTACTS||{}).discord||"")+'"></label><label class="f" for="ct_ig"><span>Instagram (link)</span><input id="ct_ig" type="text" maxlength="200" placeholder="https://instagram.com/yourname" value="'+esc((CONTACTS||{}).instagram||"")+'"></label><label class="f" for="ct_tk"><span>TikTok (link)</span><input id="ct_tk" type="text" maxlength="200" placeholder="https://www.tiktok.com/@yourname" value="'+esc((CONTACTS||{}).tiktok||"")+'"></label><div class="row"><button class="btn" data-l="ctSave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="ctOk"></span></div>'+'</div>';
   }else if(LV.adTab==="pay"){
@@ -2966,7 +2996,8 @@ function verdictOf(a){
 }
 function accCardHtml(a){
   var V=verdictOf(a),A=a.analysis||{},link="https://www.tiktok.com/"+(a.handle.charAt(0)==="@"?a.handle:"@"+a.handle);
-  var why=V.E?'<div class="blk">'+reasonList(V.E.good,"g")+reasonList(V.E.bad,"b")+'</div>':'';
+  if(a.tiktokUrl)link=a.tiktokUrl;var short=function(u){return esc(String(u).replace(/^https?:\/\/(www\.)?/,""))};
+  var why=(a.linkChange?'<div class="note err">🔗 '+esc(L("lc_note"))+': <a href="'+esc(a.linkChange.from)+'" target="_blank" rel="noopener noreferrer">'+short(a.linkChange.from)+'</a> → <a href="'+esc(a.linkChange.to)+'" target="_blank" rel="noopener noreferrer">'+short(a.linkChange.to)+'</a></div>':'')+(V.E?'<div class="blk">'+reasonList(V.E.good,"g")+reasonList(V.E.bad,"b")+'</div>':'');
   return '<div class="card arow v-'+V.k+'"><div class="row" style="justify-content:space-between"><span><b><a href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">'+esc(a.handle)+' ↗</a></b>'+(a.internalName?' · '+esc(a.internalName):'')+'</span><span class="vbadge v-'+V.k+'">'+esc(L(V.t))+'</span></div>'+
     '<div class="row" style="gap:18px;margin:8px 0"><span><b>'+(A.refAvg||0).toLocaleString()+'</b> '+esc(L("a_avg"))+'</span><span><b>'+(A.month?A.month.views:0).toLocaleString()+'</b> '+esc(L("a_m_views"))+'</span><span><b>'+(A.month?A.month.videos:0)+'</b> '+esc(L("a_m_videos"))+'</span><span><b>'+(a.price?'$'+a.price:'—')+'</b>'+(a.price?'':' ('+esc(L("a_price_none"))+')')+'</span></div>'+why+
     '<div class="row"><a class="btn sm" href="'+esc(link)+'" target="_blank" rel="noopener noreferrer">'+esc(L("a_open_tt"))+'</a><button class="btn sm primary" data-l="decide" data-id="'+esc(a.id)+'" data-s="approved">'+esc(L("a_taken"))+'</button><button class="btn sm" data-l="decide" data-id="'+esc(a.id)+'" data-s="rejected">'+esc(L("a_skip"))+'</button></div>'+sugRow(a)+'</div>';
@@ -3262,7 +3293,7 @@ function priceBig(u){
 function prAcc(){return S.accounts[S.active]||S.accounts[0]}
 function prOpen(accId){
   var a=S.accounts.filter(function(x){return x.id===accId})[0]||prAcc();if(!a)return;
-  var A=PC.analyze(a.videos||[],Date.now()),rec=PC.recommend(A),avg=A.refAvg||0,cats=a.categories||[],mn=null,mx=null;
+  var A=PC.analyze(a.videos||[],Date.now()),recRaw=PC.recommend(A)||0,rec=Math.max(1,Math.min(60,recRaw)),avg=A.refAvg||0,cats=a.categories||[],mn=null,mx=null;
   cats.forEach(function(c){var r=PRANGES&&PRANGES[c];if(r){mn=mn===null?r.min:Math.min(mn,r.min);mx=mx===null?r.max:Math.max(mx,r.max)}});
   var cur=a.price||(mn!==null?Math.max(mn,Math.min(mx,rec)):rec);
   LV.modal={type:"price",id:a.id,avg:avg};
@@ -3271,7 +3302,7 @@ function prOpen(accId){
     '<div class="prbig"><button type="button" class="prstep" data-l="prStep" data-d="-0.5" aria-label="-">−</button><div class="prnum"><span>$</span><input id="prVal" type="number" min="1" max="60" step="0.5" inputmode="decimal" value="'+cur+'"><small>'+esc(L("pr_per"))+'</small></div><button type="button" class="prstep" data-l="prStep" data-d="0.5" aria-label="+">+</button></div>'+
     '<input id="prSlide" class="prslide" type="range" min="1" max="60" step="0.5" value="'+Math.min(60,cur)+'">'+
     '<div class="prverd" id="prVerd"></div>'+
-    '<div class="prhints"><button type="button" class="prhint" data-l="prUse" data-v="'+rec+'"><small>'+esc(L("pr_rec"))+'</small><b>$'+rec+'</b><em>'+esc(L("pr_use"))+'</em></button>'+(mn!==null?'<button type="button" class="prhint" data-l="prUse" data-v="'+Math.max(mn,Math.min(mx,rec))+'"><small>'+esc(L("pr_range"))+'</small><b>$'+mn+'–$'+mx+'</b><em>'+esc(L("pr_use"))+'</em></button>':'')+'</div>'+
+    '<div class="prhints">'+(recRaw>=1?'<button type="button" class="prhint" data-l="prUse" data-v="'+rec+'"><small>'+esc(L("pr_rec"))+'</small><b>$'+rec+'</b><em>'+esc(L("pr_use"))+'</em></button>':'')+(mn!==null?'<button type="button" class="prhint" data-l="prUse" data-v="'+Math.max(mn,Math.min(mx,rec))+'"><small>'+esc(L("pr_range"))+'</small><b>$'+mn+'–$'+mx+'</b><em>'+esc(L("pr_use"))+'</em></button>':'')+'</div>'+
     '<div class="note err" id="prErr" hidden></div><div class="row"><button class="btn primary prsave" data-l="prSave">'+esc(L("pr_save"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div></div>');
   prVerd();
 }
@@ -5837,6 +5868,54 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   /* ---- new track: write to the producer ---- */
   document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="ntWrite"]');if(!el)return;e.stopImmediatePropagation();
     api("/api/admin/dm/start",{producerId:el.getAttribute("data-pid")}).then(function(r){if(!r.ok)return;window.__tkGo(r.j.key);LV.adTab="tickets";renderOwner();window.scrollTo(0,0)})},true);
+})();
+
+/* ===== v77: archive of deleted accounts, link-change review, discount minimum, producer drafts ===== */
+(function(){
+  Object.assign(LT.en,{lc_note:"The editor changed the TikTok profile link",arc_f_del:"Deleted by authors",arc_f_adm:"Deleted by me",arc_f_ban:"Banned",arc_back:"Bring back",arc_none:"Nothing here yet.",ad_del_q:"Remove this account from the base? It goes to the archive and you can bring it back.",ad_del_yes:"Yes, remove",tr_min:"The discount must be at least 1%, from 2 videos.",
+    df_h:"Drafts",df_none:"No drafts yet. Fill in the form and press “Save as draft”.",df_save:"💾 Save as draft",df_saved:"Draft saved",df_name:"Draft name",df_del_q:"Delete this draft?",df_yes:"Yes, delete",df_loaded:"Draft loaded into the form",df_def:"Draft",df_pin:"Pin",df_ren:"Rename",df_ok:"Save",df_upd:"💾 Update this draft"});
+  Object.assign(LT.ru,{lc_note:"Эдитор сменил ссылку на профиль TikTok",arc_f_del:"Удалены авторами",arc_f_adm:"Удалены мной",arc_f_ban:"В бане",arc_back:"Вернуть",arc_none:"Здесь пока пусто.",ad_del_q:"Убрать этот аккаунт из базы? Он уйдёт в архив, его можно вернуть.",ad_del_yes:"Да, убрать",tr_min:"Скидка должна быть минимум 1%, от 2 видео.",
+    df_h:"Черновики",df_none:"Черновиков пока нет. Заполните форму и нажмите «Сохранить в черновики».",df_save:"💾 Сохранить в черновики",df_saved:"Черновик сохранён",df_name:"Название черновика",df_del_q:"Удалить этот черновик?",df_yes:"Да, удалить",df_loaded:"Черновик загружен в форму",df_def:"Черновик",df_pin:"Закрепить",df_ren:"Переименовать",df_ok:"Сохранить",df_upd:"💾 Обновить этот черновик"});
+
+  /* archive + owner delete */
+  window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+    if(a==="arcF"){e.stopImmediatePropagation();LV.arcF=el.getAttribute("data-k");renderOwner();return}
+    if(a==="arcBack"){e.stopImmediatePropagation();el.disabled=true;api("/api/admin/archive/restore",{id:el.getAttribute("data-id")}).then(function(r){if(!r.ok){el.disabled=false;toast((r.j&&r.j.error)||L("p_err"));return}ownerReload()});return}
+    if(a==="admDelAcc"){e.stopImmediatePropagation();var id=el.getAttribute("data-id");openModal('<h3>🗑 '+esc(el.getAttribute("data-h")||"")+'</h3><p>'+esc(L("ad_del_q"))+'</p><div class="note err" id="adErr" hidden></div><div class="row"><button class="btn danger" data-l="admDelGo" data-id="'+esc(id)+'">'+esc(L("ad_del_yes"))+'</button><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div>');return}
+    if(a==="admDelGo"){e.stopImmediatePropagation();el.disabled=true;api("/api/admin/account/delete",{id:el.getAttribute("data-id")}).then(function(r){if(!r.ok){el.disabled=false;var er=$("adErr");er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false;return}closeModal();ownerReload()});return}
+    if(a==="saveTiers"){var m=(($("tcMin")||{}).value||"").trim(),p=(($("tcPct")||{}).value||"").trim();if(m!==""||p!==""){if(!(Number(p)>=1)||!(Number(m)>=2)){e.stopImmediatePropagation();e.preventDefault();toast(L("tr_min"));var bad=Number(p)>=1?$("tcMin"):$("tcPct");if(bad)bad.focus();return}}}
+  },true);
+
+  /* producer drafts */
+  var DF={list:null,cur:null,loading:false};
+  function dfSave(){api("/api/producer/drafts",{drafts:DF.list}).then(function(r){if(r.ok&&r.j.drafts)DF.list=r.j.drafts})}
+  function dfLoad(cb){if(DF.list)return cb();if(DF.loading)return;DF.loading=true;api("/api/producer/drafts").then(function(r){DF.loading=false;DF.list=(r.ok&&r.j.drafts)||[];cb()})}
+  function dfRead(){var root=$("lprodBody"),d={f:{},k:{},c:{}};if(!root)return d;
+    root.querySelectorAll("input[id^=n],textarea[id^=n],select[id^=n]").forEach(function(e){if(e.type==="file"||e.id==="nFrom")return;if(e.type==="checkbox")d.k[e.id]=e.checked;else d.f[e.id]=e.value});
+    ["nCats","nPlat"].forEach(function(id){var c=$(id);if(c)d.c[id]=Array.prototype.map.call(c.querySelectorAll("input:checked"),function(x){return x.value})});return d}
+  function dfApply(d){var root=$("lprodBody");if(!root||!d)return;var fire=function(e){e.dispatchEvent(new Event("input",{bubbles:true}));e.dispatchEvent(new Event("change",{bubbles:true}))};
+    Object.keys(d.c||{}).forEach(function(id){var c=$(id);if(c)c.querySelectorAll("input[type=checkbox]").forEach(function(x){x.checked=d.c[id].indexOf(x.value)>=0;fire(x)})});
+    Object.keys(d.k||{}).forEach(function(id){var e=$(id);if(e){e.checked=!!d.k[id];fire(e)}});
+    Object.keys(d.f||{}).forEach(function(id){var e=$(id);if(e){e.value=d.f[id];fire(e)}})}
+  function dfRows(){var l=(DF.list||[]).slice().sort(function(a,b){return (b.pinned?1:0)-(a.pinned?1:0)||(b.updated||0)-(a.updated||0)});
+    return l.length?l.map(function(d){return '<div class="card ord dfrow'+(DF.cur===d.id?' on':'')+'"><button type="button" class="dfmain" data-l="dfOpen" data-id="'+esc(d.id)+'"><b>'+(d.pinned?'📌 ':'')+esc(d.name)+'</b><small>'+esc(new Date(d.updated).toLocaleString())+'</small></button><button type="button" class="dfb" data-l="dfRen" data-id="'+esc(d.id)+'" title="'+esc(L("df_ren"))+'">✏️</button><button type="button" class="dfb" data-l="dfPin" data-id="'+esc(d.id)+'" title="'+esc(L("df_pin"))+'">'+(d.pinned?'📍':'📌')+'</button><button type="button" class="dfb" data-l="dfDel" data-id="'+esc(d.id)+'">🗑</button></div>'}).join(""):'<p class="hint">'+esc(L("df_none"))+'</p>'}
+  function dfDraw(){var root=$("lprodBody");if(!root||!$("nTitle"))return;var box=$("dfBox");
+    if(!box){var hs=root.querySelectorAll("h3.sub")[0];if(!hs)return;box=document.createElement("div");box.id="dfBox";box.className="dfbox";hs.parentNode.insertBefore(box,hs)}
+    box.innerHTML='<h3 class="sub">📝 '+esc(L("df_h"))+(DF.list?' · '+DF.list.length:'')+'</h3><div class="dflist">'+dfRows()+'</div>';
+    var sb=root.querySelector('[data-l="pAdd"]');if(sb&&!$("dfSaveBtn")){sb.insertAdjacentHTML("afterend",' <button type="button" class="btn" id="dfSaveBtn" data-l="dfSave"></button>')}
+    var b2=$("dfSaveBtn");if(b2)b2.textContent=L(DF.cur&&DF.list&&DF.list.some(function(d){return d.id===DF.cur})?"df_upd":"df_save")}
+  var oDP=drawProd;drawProd=function(){var keepD=null;try{keepD=$("nTitle")?dfRead():null}catch(e){}oDP.apply(this,arguments);try{if(keepD&&LV.dfKeep){dfApply(keepD);LV.dfKeep=false}}catch(e){}dfLoad(dfDraw);dfDraw()};
+  window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");if(a.indexOf("df")!==0)return;e.stopImmediatePropagation();var id=el.getAttribute("data-id"),d=(DF.list||[]).filter(function(x){return x.id===id})[0];
+    if(a==="dfSave"){var cur=DF.cur&&(DF.list||[]).filter(function(x){return x.id===DF.cur})[0],data=dfRead();
+      if(cur){cur.data=data;cur.updated=Date.now()}else{var t=(data.f.nTitle||"").trim(),nd={id:Math.random().toString(16).slice(2,14),name:L("df_def")+(t?" — "+t:""),pinned:false,updated:Date.now(),data:data};DF.list=(DF.list||[]).concat([nd]);DF.cur=nd.id}
+      dfSave();dfDraw();toast(L("df_saved"));return}
+    if(a==="dfOpen"&&d){dfApply(d.data);DF.cur=d.id;dfDraw();toast(L("df_loaded"));var f=$("nTitle");if(f)f.scrollIntoView({behavior:"smooth",block:"center"});return}
+    if(a==="dfPin"&&d){d.pinned=!d.pinned;d.updated=Date.now();dfSave();dfDraw();return}
+    if(a==="dfRen"&&d){openModal('<h3>✏️ '+esc(L("df_name"))+'</h3><label class="f" for="dfName"><input id="dfName" type="text" maxlength="80" value="'+esc(d.name)+'"></label><div class="row"><button class="btn primary" data-l="dfRenGo" data-id="'+esc(id)+'">'+esc(L("df_ok"))+'</button><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div>');return}
+    if(a==="dfRenGo"&&d){var v=(($("dfName")||{}).value||"").trim();if(v){d.name=v.slice(0,80);d.updated=Date.now();dfSave()}closeModal();dfDraw();return}
+    if(a==="dfDel"&&d){openModal('<h3>🗑 '+esc(d.name)+'</h3><p>'+esc(L("df_del_q"))+'</p><div class="row"><button class="btn danger" data-l="dfDelGo" data-id="'+esc(id)+'">'+esc(L("df_yes"))+'</button><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div>');return}
+    if(a==="dfDelGo"){DF.list=(DF.list||[]).filter(function(x){return x.id!==id});if(DF.cur===id)DF.cur=null;dfSave();closeModal();dfDraw();return}
+  },true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();

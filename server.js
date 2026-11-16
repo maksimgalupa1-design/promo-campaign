@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 47;
+const SERVER_VER = 48;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -352,11 +352,12 @@ function autoStars(acc) {   // automatic rating: 2.0 .. 5.0 in steps of 0.1
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
-    avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", tiktokUrl: acc.tiktok_url || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
+    avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", tiktokUrl: acc.tiktok_url || "", linkChange: acc.linkChange || null, about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
     analysis: A, price: acc.price || null, evaluation: (() => { const e = PC.evaluate(A, acc.price); if (!A.accepted) e.chance = A.status === "abandoned" ? 3 : 2; return e; })(), adminStatus: acc.adminStatus || "new", banInfo: acc.adminStatus === "banned" ? (acc.banInfo || { reason: "manager" }) : null, recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
 function accPayoutRaw(user, acc) { return (acc && acc.payout) || (user && user.payout) || null; }   // every TikTok account can have its own payout details; the user-level ones are the fallback
+function archiveAcc(u, acc, by) { db.archive = db.archive || {}; db.archive[acc.open_id] = { id: acc.open_id, userId: u.id, by, at: Date.now(), handle: "@" + ((acc.profile || {}).username || ""), internalName: acc.internal_name || "", acc: JSON.parse(JSON.stringify(acc)) }; }
 function view(user) { return { accounts: (user.accounts || []).map(a => { const x = accView(a), p = accPayoutRaw(user, a); x.payout = p ? { set: true, method: p.method, coin: p.coin || "", label: p.label, own: !!a.payout, value: p.method === "paypal" && p.enc ? String((decObj(p.enc) || {}).value || "") : "" } : { set: false }; return x; }), categories: CATEGORIES, payout: payoutLabel(user), coins: COINS }; }
 function accAdminView(acc) {
   const v = accView(acc), r = autoStars(acc);
@@ -492,7 +493,7 @@ function overview() {
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
         paid: Math.round(Object.values(db.topups).filter(x => x.producerId === p.id && x.status === "confirmed").reduce((q, x) => q + x.amount, 0) * 100) / 100 }; }),
-    accounts: accs.map(accAdminView), categories: CATEGORIES
+    archive: Object.values(db.archive || {}).map(e => ({ id: e.id, handle: e.handle, internalName: e.internalName, by: e.by, at: e.at })),     accounts: accs.map(accAdminView), categories: CATEGORIES
   };
 }
 
@@ -522,7 +523,7 @@ const server = http.createServer(async (req, res) => {
       const user = db.users[uid] || (db.users[uid] = { id: uid, createdAt: Date.now(), accounts: [] });
       let acc = findAcc(user, tok.open_id);
       const isNew = !acc;
-      if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now(), categories: [], discount: 0 }; user.accounts.push(acc); notify("new editor account connected, check Waiting for your decision"); }
+      if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now(), categories: [], discount: 0 }; const ar = db.archive && db.archive[tok.open_id]; if (ar && ar.acc) { for (const k of ["categories", "other_category", "about", "tiers", "discount", "internal_name", "price", "adminStatus", "tiktok_url"]) if (ar.acc[k] !== undefined) acc[k] = ar.acc[k]; delete db.archive[tok.open_id]; } user.accounts.push(acc); notify("new editor account connected, check Waiting for your decision"); }
       Object.assign(acc, { access_token: tok.access_token, refresh_token: tok.refresh_token, expires_at: Date.now() + tok.expires_in * 1000 });
       await refreshAnalysis(acc);
       if (want && (acc.profile.username || "").toLowerCase() !== want) {
@@ -587,7 +588,7 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
       const before = JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []]);
       if (b.internalName !== undefined) acc.internal_name = String(b.internalName).slice(0, 60);
-      if (b.tiktokUrl !== undefined) { const tu = String(b.tiktokUrl).trim().slice(0, 200); if (!need(res, !tu || /^https?:\/\/([a-z0-9-]+\.)?tiktok\.com\/\S+$/i.test(tu), 400, "Write a tiktok.com link")) return; acc.tiktok_url = tu; }
+      if (b.tiktokUrl !== undefined) { const tu = String(b.tiktokUrl).trim().slice(0, 200); if (!need(res, !tu || /^https?:\/\/([a-z0-9-]+\.)?tiktok\.com\/\S+$/i.test(tu), 400, "Write a tiktok.com link")) return; if (tu !== (acc.tiktok_url || "") && !acc.demo && acc.adminStatus !== "banned") { acc.linkChange = { from: acc.tiktok_url || ("https://www.tiktok.com/@" + ((acc.profile || {}).username || "")), to: tu || ("https://www.tiktok.com/@" + ((acc.profile || {}).username || "")), at: Date.now() }; acc.adminStatus = "new"; notify("An editor changed the TikTok link of @" + ((acc.profile || {}).username || "") + ". It is waiting for your decision."); } acc.tiktok_url = tu; }
       if (b.categories !== undefined) acc.categories = cleanCats(b.categories);
       if (b.otherCategory !== undefined) acc.other_category = String(b.otherCategory).slice(0, 60);
       if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 300), wn = ab ? ab.split(/\s+/).length : 0; if (!need(res, !ab || wn >= 3, 400, "Describe your account in at least 3 words")) return; acc.about = ab; }
@@ -622,6 +623,7 @@ const server = http.createServer(async (req, res) => {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
       if (!need(res, !Object.values(db.requests).some(r => r.openId === acc.open_id && ["approved", "submitted", "returned"].includes(r.status)), 409, "You have open orders on this account. Finish them first.")) return;
+      archiveAcc(u, acc, "user");
       u.accounts = u.accounts.filter(x => x !== acc); delete db.byOpen[acc.open_id];
       Object.values(db.requests).forEach(r => { if (r.openId === acc.open_id && r.status === "pending") r.status = "cancelled"; });
       saveDb(); return send(res, 200, view(u));
@@ -868,6 +870,12 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, /^data:(image\/(jpeg|png|webp)|application\/pdf);base64,[A-Za-z0-9+\/=]+$/.test(b.image || "") && b.image.length < 1500000, 400, "bad file (image or PDF, max 1 MB)")) return;
         await putProof("t" + tp.id, b.image); tp.proof = true; saveDb(); notify("producer sent a payment screenshot, please check Payments"); return send(res, 200, pview());
       }
+      if (P === "/api/producer/drafts" && M === "GET") return send(res, 200, { drafts: p.drafts || [] });
+      if (P === "/api/producer/drafts" && M === "POST") {   // saved drafts of new tracks: unlimited count, each up to 8 KB
+        const b = await readBody(req), out = [];
+        for (const d of (Array.isArray(b.drafts) ? b.drafts : []).slice(0, 200)) { if (!d || typeof d !== "object") continue; const data = d.data && typeof d.data === "object" ? d.data : {}; if (JSON.stringify(data).length > 8000) continue; out.push({ id: String(d.id || uid8()).slice(0, 24), name: String(d.name || "").slice(0, 80), pinned: !!d.pinned, updated: Number(d.updated) || Date.now(), data }); }
+        p.drafts = out; saveDb(); return send(res, 200, { drafts: p.drafts });
+      }
       if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
         const b = await readBody(req), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
         if (!need(res, title && budget >= minBud(p) && budget <= 1000000, 400, "minimum budget is $" + minBud(p))) return;
@@ -1007,6 +1015,18 @@ const server = http.createServer(async (req, res) => {
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: 100, fee: 20, method: "paypal", coin: "", status: "confirmed", confirmedAt: Date.now(), created: Date.now(), demo: true };
         db.topups[tp.id] = tp; const sid = newSid(); db.psessions[sid] = { pid: p.id, exp: Date.now() + 12 * 3600000 }; saveDb(); return send(res, 200, { ok: true, track: t.title }, { "Set-Cookie": setCookie("psid", sid, 43200) });
       }
+      if (P === "/api/admin/archive/restore" && M === "POST") {   // bring a deleted account back
+        const e = (db.archive || {})[b.id]; if (!need(res, e && e.acc, 404, "not in the archive")) return;
+        const u = db.users[e.userId] || (db.users[e.userId] = { id: e.userId, createdAt: Date.now(), accounts: [] });
+        if (!findAcc(u, e.id)) u.accounts.push(e.acc); db.byOpen[e.id] = u.id; delete db.archive[b.id]; saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/account/delete" && M === "POST") {   // the owner removes an account from the base (it goes to the archive)
+        const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
+        const u = db.users[db.byOpen[a.open_id]]; if (!need(res, u, 404, "no owner")) return;
+        if (!need(res, !Object.values(db.requests).some(r => r.openId === a.open_id && ["approved", "submitted", "returned"].includes(r.status)), 409, "The account has open orders")) return;
+        archiveAcc(u, a, "admin"); u.accounts = u.accounts.filter(x => x !== a); delete db.byOpen[a.open_id];
+        Object.values(db.requests).forEach(r => { if (r.openId === a.open_id && r.status === "pending") r.status = "cancelled"; }); saveDb(); return send(res, 200, { ok: true });
+      }
       if (P === "/api/admin/payers" && M === "GET") return send(res, 200, { list: db.settings.payers || [] });
       if (P === "/api/admin/payers" && M === "POST") { const l = (Array.isArray(b.list) ? b.list : []).map(x => String(x).trim().slice(0, 60)).filter(Boolean); db.settings.payers = [...new Set(l)].slice(0, 20); saveDb(); return send(res, 200, { list: db.settings.payers }); }
       if (P === "/api/admin/dm/start" && M === "POST") {     // the owner opens a chat with a producer who has not written yet
@@ -1025,7 +1045,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/decision" && M === "POST") {
         if (!need(res, ["approved", "rejected", "new", "banned"].includes(b.status), 400, "bad status")) return;
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
-        a.adminStatus = b.status; if (b.status !== "banned") delete a.banInfo; saveDb();
+        a.adminStatus = b.status; if (b.status !== "banned") delete a.banInfo; if (b.status === "approved" || b.status === "rejected") delete a.linkChange; saveDb();
         if (["approved", "rejected", "banned"].includes(b.status)) notifyUser("editors", edUserOfOpen(a.open_id), "accounts", "acc_" + b.status, { h: "@" + ((a.profile || {}).username || "") });
         return send(res, 200, { ok: true });
       }
