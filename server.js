@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 41;
+const SERVER_VER = 42;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -625,6 +625,8 @@ const server = http.createServer(async (req, res) => {
       saveDb(); return send(res, 200, view(u));
     }
     if (/^\/google[0-9a-f]{8,32}\.html$/.test(P) && M === "GET") { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); return res.end("google-site-verification: " + P.slice(1)); }   // any Google Search Console verification file name
+    if (/^\/yandex_[0-9a-f]{8,32}\.html$/.test(P) && M === "GET") { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); return res.end('<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>Verification: ' + P.slice(8, -5) + '</body></html>'); }   // Yandex Webmaster verification file
+    if (/^\/tiktok[A-Za-z0-9]{8,64}\.txt$/.test(P) && M === "GET") { res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("tiktok-developers-site-verification=" + P.slice(7, -4)); }   // TikTok URL-prefix verification file
     if (P === "/robots.txt" && M === "GET") { res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: " + (PUBLIC_URL || "") + "/sitemap.xml\n"); }
     if (P === "/sitemap.xml" && M === "GET") { res.writeHead(200, { "Content-Type": "application/xml; charset=utf-8" }); return res.end('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>' + (PUBLIC_URL || "") + '/</loc></url></urlset>\n'); }
     if ((P === "/icon.png" || P === "/favicon.ico") && M === "GET") { res.writeHead(200, { "Content-Type": "image/png", "Cache-Control": "public, max-age=86400" }); return res.end(ICON_PNG); }
