@@ -1461,6 +1461,32 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .tkmsg{display:inline-block;margin-top:6px;padding:8px 12px;border-radius:12px;background:rgba(124,92,255,.14);border:1px solid rgba(124,92,255,.35);font-weight:500;font-size:13.5px;line-height:1.35}
 .ownside .atb[data-k=vlinks]::before{content:"📎"}
 .cpglow{filter:blur(28px);opacity:.55}
+/* v82 — rounded date-time picker */
+.dtf{display:inline-flex}.dtb{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:16px;background:rgba(139,108,255,.12);border:1px solid rgba(139,108,255,.35);font-weight:600;transition:.2s}
+.dtb:hover,.dtb:focus-visible{background:rgba(139,108,255,.22);box-shadow:0 0 0 3px rgba(139,108,255,.25)}
+.dpop{position:fixed;inset:0;z-index:10001;display:grid;place-items:center;background:rgba(8,6,20,.6);backdrop-filter:blur(6px);animation:dpFade .2s}
+.dpop.out{opacity:0;transition:.2s}
+.dpbox{width:min(380px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:20px;border-radius:28px;background:#171523;color:#fff;border:1px solid rgba(139,108,255,.45);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(139,108,255,.3);animation:cpPop .35s cubic-bezier(.2,1.25,.4,1)}
+:root[data-theme=light] .dpbox{background:#fff;color:#1c1830}
+.dph{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.dph b{font-size:17px;text-transform:capitalize}
+.dpn{all:unset;cursor:pointer;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:rgba(139,108,255,.18);transition:.2s}.dpn:hover{background:rgba(139,108,255,.4);transform:scale(1.08)}
+.dpw,.dpg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.dpw i{font-style:normal;font-size:12px;opacity:.55;padding:4px 0}
+.dpd{all:unset;cursor:pointer;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:14.5px;transition:.15s}.dpd:hover{background:rgba(139,108,255,.25)}
+.dpd.td{box-shadow:inset 0 0 0 1.5px #22b8cf}.dpd.on{background:linear-gradient(135deg,#8b6cff,#22b8cf);font-weight:700;box-shadow:0 0 18px rgba(139,108,255,.7);transform:scale(1.06)}
+.dps{margin:16px 0 8px;font-size:13px;font-weight:700;opacity:.7}
+.dpc{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.dpt{all:unset;cursor:pointer;text-align:center;padding:8px 0;border-radius:999px;font-size:13.5px;background:rgba(139,108,255,.12);transition:.15s}.dpt:hover{background:rgba(139,108,255,.3)}
+.dpt.on{background:linear-gradient(135deg,#8b6cff,#22b8cf);font-weight:700;box-shadow:0 0 14px rgba(139,108,255,.65)}
+.dpsum{margin:16px 0 12px;padding:10px 14px;border-radius:14px;background:rgba(139,108,255,.12);font-size:13.5px}
+.dpf{display:flex;gap:8px}.dpf .btn{flex:1;border-radius:999px}
+@keyframes dpFade{from{opacity:0}}@keyframes cpPop{from{opacity:0;transform:scale(.85) translateY(16px)}}
+.dpd{aspect-ratio:auto;height:38px;width:38px;justify-self:center}.dpbox{padding:16px}.dps{margin:12px 0 6px}
+@media (max-width:520px),(max-height:760px){
+.dpbox{padding:12px 12px 0;border-radius:24px}.dph{margin-bottom:6px}.dph b{font-size:16px}.dpn{width:34px;height:34px;font-size:22px}
+.dpw i{padding:2px 0;font-size:11px}.dpw,.dpg{gap:2px}.dpd{height:32px;width:32px;font-size:13.5px}
+.dps{margin:8px 0 4px;font-size:12px}.dpc{gap:5px}.dpc:not(.dpm){grid-template-columns:repeat(8,1fr)}.dpt{padding:6px 0;font-size:13px}
+.dpsum{margin:10px 0 0;padding:8px 12px;font-size:13px}
+.dpf{position:sticky;bottom:0;padding:10px 0 12px;background:inherit;margin-top:0}.dpf .btn{padding:10px 0;font-size:14px}}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1639,7 +1665,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v81 · 17.11 00:20</span>
+  <span>© Promo Campaign · v82 · 17.11 00:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -5423,7 +5449,7 @@ function enrVal(ms){if(!(ms>0))return "";var d=new Date(ms-new Date().getTimezon
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{
   if(LV.adTab==="promos"&&ADM.data){var T={};(ADM.data.tracks||[]).forEach(function(t){T[t.title+"|"+(t.artist||"")]=t});
     document.querySelectorAll(".trkbud .tbc").forEach(function(c,i){if(c.querySelector(".enrow"))return;var t=(ADM.data.tracks||[]).filter(function(x){return x.status==="active"&&!x.demo})[i];if(!t)return;
-      var w=document.createElement("div");w.className="enrow";w.innerHTML='<label>'+esc(L("en_lbl"))+'<input type="datetime-local" class="enin" value="'+enrVal(t.enrollUntil)+'"></label><button type="button" class="btn sm" data-l="enSave" data-id="'+esc(t.id)+'">'+esc(L("en_save"))+'</button>';c.appendChild(w)})}
+      var w=document.createElement("div");w.className="enrow";w.innerHTML='<label>'+esc(L("en_lbl"))+'</label>'+dtField("enin",enrVal(t.enrollUntil))+'<button type="button" class="btn sm" data-l="enSave" data-id="'+esc(t.id)+'">'+esc(L("en_save"))+'</button>';c.appendChild(w)})}
   }catch(e){}return r}})();
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="enSave"]');if(!el)return;e.stopImmediatePropagation();
   var inp=el.parentNode.querySelector(".enin"),v=inp&&inp.value?new Date(inp.value).getTime():0;
@@ -5998,6 +6024,53 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
       else cpop({icon:"💬",title:L("nz_msg"),text:(($("nzTxt")||{}).value||"").trim()||L("nz_d_msg")});
       document.querySelectorAll(".agb .cnt,#bellBtn,.bellb").forEach(function(x){x.classList.add("nzpulse");setTimeout(function(){x.classList.remove("nzpulse")},3000)})}
   },true);
+})();
+
+/* ===== v82: rounded date-time picker for the enrolment deadline ===== */
+(function(){
+  Object.assign(LT.en,{dp_t:"Pick date and time",dp_d:"Day",dp_h:"Hour",dp_m:"Minutes",dp_today:"Today",dp_clear:"Clear",dp_ok:"Done",dp_none:"Not set",dp_prev:"Previous month",dp_next:"Next month",dp_sel:"Selected"});
+  Object.assign(LT.ru,{dp_t:"Выберите дату и время",dp_d:"День",dp_h:"Час",dp_m:"Минуты",dp_today:"Сегодня",dp_clear:"Очистить",dp_ok:"Готово",dp_none:"Не задано",dp_prev:"Предыдущий месяц",dp_next:"Следующий месяц",dp_sel:"Выбрано"});
+  var ru=function(){return L("dp_today")==="Сегодня"};
+  function p2(n){return (n<10?"0":"")+n}
+  function fmt(v){if(!v)return L("dp_none");var d=new Date(v);if(isNaN(d))return L("dp_none");try{return d.toLocaleString(ru()?"ru-RU":"en-GB",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch(e){return v.replace("T"," ")}}
+  window.dtField=function(cls,val){return '<span class="dtf"><input type="hidden" class="'+cls+'" value="'+esc(val||"")+'"><button type="button" class="dtb" data-l="dpOpen"><span class="dtbi">📅</span><span class="dtv">'+esc(fmt(val))+'</span></button></span>'};
+  var ST=null;
+  function draw(){var o=$("dpop");if(!o||!ST)return;var s=ST,mn=[];try{mn=Array.from({length:12},function(_,i){return new Date(2026,i,1).toLocaleString(ru()?"ru-RU":"en-US",{month:"long"})})}catch(e){}
+    var first=new Date(s.y,s.m,1),off=(first.getDay()+6)%7,days=new Date(s.y,s.m+1,0).getDate(),now=new Date(),h='';
+    var wd=ru()?["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]:["Mo","Tu","We","Th","Fr","Sa","Su"];
+    h+='<div class="dph"><button type="button" class="dpn" data-dp="prev" aria-label="'+esc(L("dp_prev"))+'">‹</button><b>'+esc(mn[s.m]||"")+' '+s.y+'</b><button type="button" class="dpn" data-dp="next" aria-label="'+esc(L("dp_next"))+'">›</button></div>';
+    h+='<div class="dpw">'+wd.map(function(x){return '<i>'+x+'</i>'}).join("")+'</div><div class="dpg">';
+    for(var i=0;i<off;i++)h+='<span></span>';
+    for(var d=1;d<=days;d++){var sel=s.d===d&&s.sy===s.y&&s.sm===s.m,td=now.getFullYear()===s.y&&now.getMonth()===s.m&&now.getDate()===d;
+      h+='<button type="button" class="dpd'+(sel?' on':'')+(td?' td':'')+'" data-dp="day" data-v="'+d+'">'+d+'</button>'}
+    h+='</div><div class="dps">'+esc(L("dp_h"))+'</div><div class="dpc">';
+    for(var k=0;k<24;k++)h+='<button type="button" class="dpt'+(s.h===k?' on':'')+'" data-dp="h" data-v="'+k+'">'+p2(k)+'</button>';
+    h+='</div><div class="dps">'+esc(L("dp_m"))+'</div><div class="dpc dpm">';
+    var ms=[];for(var j=0;j<60;j+=5)ms.push(j);if(ms.indexOf(s.mi)<0)ms.push(s.mi),ms.sort(function(a,b){return a-b});
+    ms.forEach(function(j){h+='<button type="button" class="dpt'+(s.mi===j?' on':'')+'" data-dp="mi" data-v="'+j+'">'+p2(j)+'</button>'});
+    h+='</div><div class="dpsum">'+esc(L("dp_sel"))+': <b>'+esc(s.d?fmt(s.sy+"-"+p2(s.sm+1)+"-"+p2(s.d)+"T"+p2(s.h)+":"+p2(s.mi)):L("dp_none"))+'</b></div>'+
+      '<div class="dpf"><button type="button" class="btn" data-dp="clear">'+esc(L("dp_clear"))+'</button><button type="button" class="btn" data-dp="today">'+esc(L("dp_today"))+'</button><button type="button" class="btn primary" data-dp="ok">✓ '+esc(L("dp_ok"))+'</button></div>';
+    o.querySelector(".dpbox").innerHTML=h}
+  function open(inp){var v=inp.value,d=v?new Date(v):null;if(d&&isNaN(d))d=null;var b=d||new Date();
+    ST={inp:inp,y:b.getFullYear(),m:b.getMonth(),d:d?d.getDate():0,sy:b.getFullYear(),sm:b.getMonth(),h:d?d.getHours():12,mi:d?d.getMinutes():0};
+    var o=document.createElement("div");o.id="dpop";o.className="dpop";o.innerHTML='<div class="dpbox" role="dialog" aria-label="'+esc(L("dp_t"))+'"></div>';document.body.appendChild(o);draw()}
+  function close(){var o=$("dpop");if(o){o.classList.add("out");setTimeout(function(){o.remove()},200)}ST=null}
+  function commit(){var s=ST;if(!s)return;var v=s.d?s.sy+"-"+p2(s.sm+1)+"-"+p2(s.d)+"T"+p2(s.h)+":"+p2(s.mi):"";s.inp.value=v;var vv=s.inp.parentNode.querySelector(".dtv");if(vv)vv.textContent=fmt(v)}
+  document.addEventListener("click",function(e){var t=e.target;
+    var ob=t.closest&&t.closest('[data-l="dpOpen"]');if(ob){e.stopImmediatePropagation();e.preventDefault();open(ob.parentNode.querySelector("input"));return}
+    var o=$("dpop");if(!o)return;if(t===o){e.stopImmediatePropagation();close();return}
+    var b=t.closest&&t.closest("[data-dp]");if(!b||!o.contains(b))return;e.stopImmediatePropagation();
+    var a=b.getAttribute("data-dp"),v=+b.getAttribute("data-v"),s=ST;if(!s)return;
+    if(a==="prev"){s.m--;if(s.m<0){s.m=11;s.y--}}
+    else if(a==="next"){s.m++;if(s.m>11){s.m=0;s.y++}}
+    else if(a==="day"){s.d=v;s.sy=s.y;s.sm=s.m}
+    else if(a==="h")s.h=v;else if(a==="mi")s.mi=v;
+    else if(a==="today"){var n=new Date();s.y=s.sy=n.getFullYear();s.m=s.sm=n.getMonth();s.d=n.getDate()}
+    else if(a==="clear"){s.d=0;commit();close();return}
+    else if(a==="ok"){if(!s.d){s.d=1;s.sy=s.y;s.sm=s.m}commit();close();return}
+    if(!s.d&&(a==="h"||a==="mi")){var n2=new Date();s.d=n2.getDate();s.sy=n2.getFullYear();s.sm=n2.getMonth();s.y=s.sy;s.m=s.sm}
+    draw()},true);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("dpop")){e.stopImmediatePropagation();close()}},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
