@@ -1712,6 +1712,16 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .entx{display:flex;flex-direction:column;min-width:0}.entx small{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:.4px}.entx strong{font-size:17px}.entx em{font-style:normal;font-size:12px;color:#7ee0b0}
 .enbadge.closed{opacity:.6;filter:grayscale(.6)}
 
+/* v107 */
+.enbadge{cursor:pointer;transition:transform .2s,box-shadow .2s}.enbadge:hover{transform:translateY(-2px);box-shadow:0 0 28px rgba(139,108,255,.55)}
+.entm{display:grid;gap:12px;text-align:center}
+.entimer{display:flex;gap:10px;justify-content:center}
+.entc{min-width:62px;padding:12px 6px;border-radius:16px;background:linear-gradient(160deg,rgba(109,92,255,.28),rgba(34,184,207,.16));border:1px solid rgba(139,108,255,.5);box-shadow:0 0 20px rgba(139,108,255,.3)}
+.entc b{display:block;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}.entc small{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:.4px}
+.entover{padding:14px;border-radius:14px;border:1px solid #ff5a6a;background:rgba(255,90,106,.12)}
+.entend{font-size:14px}
+.entm .row{justify-content:center}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1889,7 +1899,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v106 · 17.11 03:10</span>
+  <span>© Promo Campaign · v107 · 17.11 03:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6255,8 +6265,8 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
 
 /* ===== v82: rounded date-time picker for the enrolment deadline ===== */
 (function(){
-  Object.assign(LT.en,{dp_t:"Pick date and time",dp_d:"Day",dp_h:"Hour",dp_m:"Minutes",dp_today:"Today",dp_clear:"Clear",dp_ok:"Done",dp_none:"Not set",dp_prev:"Previous month",dp_next:"Next month",dp_sel:"Selected"});
-  Object.assign(LT.ru,{dp_t:"Выберите дату и время",dp_d:"День",dp_h:"Час",dp_m:"Минуты",dp_today:"Сегодня",dp_clear:"Очистить",dp_ok:"Готово",dp_none:"Не задано",dp_prev:"Предыдущий месяц",dp_next:"Следующий месяц",dp_sel:"Выбрано"});
+  Object.assign(LT.en,{dp_t:"Pick date and time",dp_d:"Day",dp_h:"Hour",dp_m:"Minutes",dp_today:"Today",dp_clear:"Clear",dp_ok:"Done",dp_save:"Save",dp_none:"Not set",dp_prev:"Previous month",dp_next:"Next month",dp_sel:"Selected"});
+  Object.assign(LT.ru,{dp_t:"Выберите дату и время",dp_d:"День",dp_h:"Час",dp_m:"Минуты",dp_today:"Сегодня",dp_clear:"Очистить",dp_ok:"Готово",dp_save:"Сохранить",dp_none:"Не задано",dp_prev:"Предыдущий месяц",dp_next:"Следующий месяц",dp_sel:"Выбрано"});
   var ru=function(){return L("dp_today")==="Сегодня"};
   function p2(n){return (n<10?"0":"")+n}
   function fmt(v){if(!v)return L("dp_none");var d=new Date(v);if(isNaN(d))return L("dp_none");try{return d.toLocaleString(ru()?"ru-RU":"en-GB",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch(e){return v.replace("T"," ")}}
@@ -6276,7 +6286,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
     var ms=[];for(var j=0;j<60;j+=5)ms.push(j);if(ms.indexOf(s.mi)<0)ms.push(s.mi),ms.sort(function(a,b){return a-b});
     ms.forEach(function(j){h+='<button type="button" class="dpt'+(s.mi===j?' on':'')+'" data-dp="mi" data-v="'+j+'">'+p2(j)+'</button>'});
     h+='</div><div class="dpsum">'+esc(L("dp_sel"))+': <b>'+esc(s.d?fmt(s.sy+"-"+p2(s.sm+1)+"-"+p2(s.d)+"T"+p2(s.h)+":"+p2(s.mi)):L("dp_none"))+'</b></div>'+
-      '<div class="dpf"><button type="button" class="btn" data-dp="clear">'+esc(L("dp_clear"))+'</button><button type="button" class="btn" data-dp="today">'+esc(L("dp_today"))+'</button><button type="button" class="btn primary" data-dp="ok">✓ '+esc(L("dp_ok"))+'</button></div>';
+      '<div class="dpf"><button type="button" class="btn" data-dp="clear">'+esc(L("dp_clear"))+'</button><button type="button" class="btn" data-dp="today">'+esc(L("dp_today"))+'</button><button type="button" class="btn primary" data-dp="ok">✓ '+esc(L(ST&&ST.inp&&ST.inp.classList.contains("enin")?"dp_save":"dp_ok"))+'</button></div>';
     o.querySelector(".dpbox").innerHTML=h}
   function open(inp){var v=inp.value,d=v?new Date(v):null;if(d&&isNaN(d))d=null;var b=d||new Date();
     ST={inp:inp,y:b.getFullYear(),m:b.getMonth(),d:d?d.getDate():0,sy:b.getFullYear(),sm:b.getMonth(),h:d?d.getHours():12,mi:d?d.getMinutes():0};
@@ -6294,7 +6304,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
     else if(a==="h")s.h=v;else if(a==="mi")s.mi=v;
     else if(a==="today"){var n=new Date();s.y=s.sy=n.getFullYear();s.m=s.sm=n.getMonth();s.d=n.getDate()}
     else if(a==="clear"){s.d=0;commit();close();return}
-    else if(a==="ok"){if(!s.d){s.d=1;s.sy=s.y;s.sm=s.m}commit();close();return}
+    else if(a==="ok"){if(!s.d){s.d=1;s.sy=s.y;s.sm=s.m}commit();var en=s.inp.classList.contains("enin")&&s.inp.parentNode.parentNode.querySelector('[data-l="enSave"]');close();if(en)en.click();return}
     if(!s.d&&(a==="h"||a==="mi")){var n2=new Date();s.d=n2.getDate();s.sy=n2.getFullYear();s.sm=n2.getMonth();s.y=s.sy;s.m=s.sm}
     draw()},true);
   document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("dpop")){e.stopImmediatePropagation();close()}},true);
@@ -6665,6 +6675,23 @@ var o=drawLCamps;drawLCamps=function(){var r=o.apply(this,arguments);try{(LV.tra
 (function(){var t=function(){try{if(!document.hidden&&LV.plat&&document.querySelector(".wgt.plat"))wgLoadPlat(true)}catch(e){}};
 setInterval(t,30000);document.addEventListener("visibilitychange",t);window.addEventListener("focus",t);
 var o=loadReqs;loadReqs=function(){var r=o.apply(this,arguments);try{Promise.resolve(r).then(function(){LV.platAt=0})}catch(e){}return r}})();
+
+/* ===== v107: tap the calendar on a track -> small window with a live countdown ===== */
+(function(){
+Object.assign(LT.en,{en_tm_t:"Time left to apply",en_tm_d:"days",en_tm_h:"hours",en_tm_m:"min",en_tm_s:"sec",en_tm_end:"Enrolment ends",en_tm_over:"Enrolment is closed. You can no longer send a request for this track.",en_tm_hint:"Send your request before the time runs out.",en_tm_go:"Send request"});
+Object.assign(LT.ru,{en_tm_t:"Осталось времени на заявку",en_tm_d:"дн",en_tm_h:"час",en_tm_m:"мин",en_tm_s:"сек",en_tm_end:"Набор до",en_tm_over:"Набор закрыт. Подать заявку на этот трек уже нельзя.",en_tm_hint:"Подайте заявку, пока не закончилось время.",en_tm_go:"Подать заявку"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};["en_tm_t","en_tm_d","en_tm_h","en_tm_m","en_tm_s","en_tm_end","en_tm_over","en_tm_hint","en_tm_go"].forEach(function(q){XLL[k][q]=XLL[k][q]||LT.en[q]})});
+var TM=null;
+function parts(ms){var d=Math.max(0,ms);return [Math.floor(d/864e5),Math.floor(d%864e5/36e5),Math.floor(d%36e5/6e4),Math.floor(d%6e4/1e3)]}
+function cell(v,k){return '<div class="entc"><b>'+(k==="d"?v:String(v).padStart(2,"0"))+'</b><small>'+esc(L("en_tm_"+k))+'</small></div>'}
+function tick(){var t=TM;if(!t||!$("enTimer")){clearInterval(TM&&TM.iv);TM=null;return}var ms=t.until-Date.now(),p=parts(ms);
+  $("enTimer").innerHTML=ms>0?cell(p[0],"d")+cell(p[1],"h")+cell(p[2],"m")+cell(p[3],"s"):'<div class="entover">'+esc(L("en_tm_over"))+'</div>'}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest(".tcard .enbadge");if(!el)return;e.stopImmediatePropagation();e.preventDefault();
+  var card=el.closest(".tcard"),tid=card&&card.getAttribute("data-tid"),t=(LV.tracks||[]).filter(function(x){return x.id===tid})[0];if(!t||!(t.enrollUntil>0))return;
+  var end=new Date(t.enrollUntil);
+  openModal('<div class="entm"><h3>⏳ '+esc(L("en_tm_t"))+'</h3><p class="hint"><b>'+esc(t.title)+'</b></p><div class="entimer" id="enTimer"></div><div class="entend">📅 '+esc(L("en_tm_end"))+': <b>'+esc(end.toLocaleString(lang==="ru"?"ru-RU":undefined,{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}))+'</b></div><p class="hint">'+esc(L("en_tm_hint"))+'</p><div class="row">'+(t.enrollUntil>Date.now()?'<button type="button" class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(L("en_tm_go"))+'</button>':'')+'<button type="button" class="btn" data-l="mclose2">'+"✕"+'</button></div></div>');
+  if(TM)clearInterval(TM.iv);TM={until:t.enrollUntil};tick();TM.iv=setInterval(tick,1000)},true);
+})();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
