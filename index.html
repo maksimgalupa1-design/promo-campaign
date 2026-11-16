@@ -1620,6 +1620,25 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 #tpxSort{flex:0 0 auto;width:auto!important;min-width:190px}
 @media(max-width:700px){#tpxSort{flex:1 1 100%}}
 
+/* v93: links tab, glowing link pills */
+.mkt.lkb{background:rgba(139,108,255,.14)}
+.lkh{margin:4px 0 10px;font-size:17px}
+.lkcard{padding:0;overflow:hidden;transition:border-color .2s,box-shadow .2s}.lkcard.open{border-color:#A56BFF;box-shadow:0 0 0 1px rgba(165,107,255,.5),0 10px 26px rgba(139,108,255,.25)}
+.lkhead{width:100%;display:grid;grid-template-columns:1fr auto;grid-template-areas:"t c" "t s";gap:4px 10px;align-items:center;text-align:left;padding:14px 16px;background:transparent;border:0;color:var(--fg);font:inherit;cursor:pointer}
+.lkt{grid-area:t;display:flex;flex-direction:column;min-width:0}.lkt b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lkt small{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lkc{grid-area:c;justify-self:end;font-weight:800;font-size:13px}.lkst{grid-area:s;justify-self:end;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(246,184,75,.16);color:#F6B84B;text-align:right}
+.lk-done .lkst{background:rgba(61,214,140,.16);color:#3DD68C}.lk-back .lkst{background:rgba(255,107,122,.16);color:#FF8794}.lk-need .lkst{background:rgba(139,108,255,.18);color:#C8B8FF}
+.lkar{display:none}
+.lkbody{padding:0 14px 14px;display:grid;gap:10px;animation:tpxin .25s both}
+.lkpills{display:grid;gap:8px;margin-top:8px}
+.lkpill{display:flex;align-items:center;gap:10px;min-width:0;padding:11px 16px;border-radius:999px;background:linear-gradient(135deg,rgba(139,108,255,.22),rgba(109,92,255,.1));border:1.5px solid rgba(165,107,255,.55);box-shadow:0 0 16px rgba(139,108,255,.3);color:var(--fg);text-decoration:none;transition:transform .18s,box-shadow .18s,border-color .18s;animation:tpxin .3s both}
+.lkpill:hover{transform:translateY(-2px);border-color:#C8B8FF;box-shadow:0 0 26px rgba(165,107,255,.6)}
+.lkpill b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:600}.lkpill i{font-style:normal;font-size:11.5px;color:#C8B8FF;flex:none}.lkpill em{font-style:normal;color:#C8B8FF;flex:none}
+.vlacc{background:transparent;border:0;padding:0;color:var(--fg);font:inherit;font-weight:800;font-size:15px;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(165,107,255,.6);text-underline-offset:3px}
+.vlacc:hover{color:#C8B8FF}
+.vlam{display:grid;gap:12px}.vlaco{border-top:1px solid var(--line);padding-top:10px}.vlaoh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.vlaoh span{margin-left:auto;font-size:12px;color:var(--muted)}
+.vllist{display:none}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1797,7 +1816,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v92 · 16.11 22:30</span>
+  <span>© Promo Campaign · v93 · 16.11 22:20</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6398,6 +6417,58 @@ document.addEventListener("change",function(e){if(e.target&&e.target.id==="tpxSo
 /* editor: AI suggestion in the price window */
 var oP=prOpen;prOpen=function(id){oP.apply(this,arguments);try{var a=S.accounts.filter(function(x){return x.id===(LV.modal&&LV.modal.id)})[0],ai=a&&a.aiPrice;var bg=document.querySelector(".prm .prbig");if(!bg||!ai)return;
   bg.insertAdjacentHTML("beforebegin",'<div class="aipanel ed"><div class="aibig"><span>🤖 '+esc(L("ai_t"))+'</span><b>$'+ai.price+'</b><small>'+esc(L("ai_per"))+' · $'+ai.rpm+' '+esc(L("ai_rpm"))+'</small></div><div class="hint">'+esc(L("ai_hint_ed"))+' · '+esc(L("ai_conf_"+ai.conf))+'</div><button type="button" class="btn sm" data-l="prUse" data-v="'+ai.price+'">'+esc(L("ai_use"))+' $'+ai.price+'</button></div>')}catch(e){}};
+})();
+
+/* ===== v93: "Links" tab in the editor's Marketplace + owner can open an account's links ===== */
+(function(){
+var T={en:{mk_links:"Links",lk_h:"Your video links",lk_none:"No orders with links yet.",lk_none_o:"You have not sent links for this order yet.",lk_of:"links",lk_open_btn:"Add links in Approved",lk_wait:"Waiting for the manager's check",lk_ok:"Approved",lk_back:"Returned. Fix the links and send again",lk_need:"Links needed",lk_reason:"Manager's note",lk_tap:"Tap to see links",
+ vl_acc_t:"Links from this account",vl_acc_none:"This account has not sent any links yet.",vl_acc_sum:"Sent links for {a} of {b} orders",vl_acc_open:"Open account links",vl_ord:"order"},
+ru:{mk_links:"Ссылки",lk_h:"Ваши ссылки на видео",lk_none:"Пока нет заказов со ссылками.",lk_none_o:"Вы ещё не отправили ссылки по этому заказу.",lk_of:"ссылок",lk_open_btn:"Добавить ссылки в «Одобрено»",lk_wait:"Ждёт проверки менеджера",lk_ok:"Одобрено",lk_back:"Возвращено. Исправьте ссылки и отправьте снова",lk_need:"Нужны ссылки",lk_reason:"Комментарий менеджера",lk_tap:"Нажмите, чтобы увидеть ссылки",
+ vl_acc_t:"Ссылки этого аккаунта",vl_acc_none:"Этот аккаунт ещё не отправлял ссылки.",vl_acc_sum:"Ссылки отправлены по {a} из {b} заказов",vl_acc_open:"Открыть ссылки аккаунта",vl_ord:"заказ"}};
+Object.assign(LT.en,T.en);Object.assign(LT.ru,T.ru);
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in T.en)if(!XLL[k][x])XLL[k][x]=T.en[x]});
+LV.lkO=LV.lkO||{};
+var KIND=function(q){return q.status==="submitted"?"wait":(q.status==="completed"?"done":(q.status==="returned"?"back":"need"))};
+var KL={wait:"lk_wait",done:"lk_ok",back:"lk_back",need:"lk_need"};
+function short(u){return esc(String(u).replace(/^https?:\/\/(www\.)?/,"").slice(0,44))}
+function pills(L2){return '<div class="lkpills">'+L2.map(function(l,i){return '<a class="lkpill" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer" style="animation-delay:'+Math.min(i,10)*0.05+'s"><span>🔗</span><b>'+short(l.url)+'</b>'+(l.views!=null?'<i>'+Number(l.views).toLocaleString("en-US")+' 👁</i>':'')+'<em>↗</em></a>'}).join("")+'</div>'}
+function reqsWithLinks(){return (LV.reqs||[]).filter(function(q){return ["approved","submitted","returned","completed"].indexOf(q.status)>=0})}
+function drawLinks(){
+  var el=$("ordList");if(!el)return;
+  var qq=(LV.oq||"").toLowerCase().trim(),list=reqsWithLinks().filter(function(q){return !qq||((q.track||"")+" "+(q.artist||"")+" "+(q.handle||"")).toLowerCase().indexOf(qq)>=0}).sort(function(a,b){var o={wait:0,back:1,need:2,done:3};return o[KIND(a)]-o[KIND(b)]||(b.created||0)-(a.created||0)});
+  el.innerHTML='<h3 class="lkh">'+esc(L("lk_h"))+'</h3>'+(list.length?list.map(function(q){
+    var k=KIND(q),L2=q.links||[],open=!!LV.lkO[q.id];
+    return '<div class="card lkcard lk-'+k+(open?' open':'')+'"><button type="button" class="lkhead" data-l="lkTog" data-id="'+esc(q.id)+'" aria-expanded="'+open+'"><span class="lkt"><b>'+esc(q.track)+'</b><small>'+esc(q.handle||"")+(q.artist?' · '+esc(q.artist):'')+'</small></span><span class="lkc">🔗 '+L2.length+' / '+(q.videos||0)+'</span><span class="lkst">'+esc(L(KL[k]))+'</span><i class="lkar">›</i></button>'+
+      (open?'<div class="lkbody">'+(q.retReason&&k==="back"?'<div class="note err">'+esc(L("lk_reason"))+': '+esc(q.retReason)+'</div>':'')+(L2.length?pills(L2):'<div class="hint">'+esc(L("lk_none_o"))+'</div><button type="button" class="btn sm" data-l="mkF" data-f="approved">'+esc(L("lk_open_btn"))+'</button>')+'</div>':'')+'</div>'}).join(""):'<div class="empty">'+esc(L("lk_none"))+'</div>');
+}
+(function(){var o=ordList;ordList=function(){if(LV.mk==="links"){drawLinks();return}o.apply(this,arguments)}})();
+(function(){var o=renderOrders;renderOrders=function(){o.apply(this,arguments);
+  var bar=document.querySelector("#ordersBody .mktabs");if(!bar)return;
+  if(!bar.querySelector(".mkt.lkb")){var n=reqsWithLinks().filter(function(q){return (q.links||[]).length}).length;bar.insertAdjacentHTML("beforeend",'<button type="button" class="mkt lkb'+(LV.mk==="links"?' on':'')+'" data-l="mkF" data-f="links"><i>🔗</i><span>'+esc(L("mk_links"))+'</span><b>'+n+'</b></button>')}
+  var q=$("ordQ");if(q&&LV.mk==="links")q.placeholder=L("od_search")}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="lkTog"]');if(!el)return;e.stopImmediatePropagation();var id=el.getAttribute("data-id");LV.lkO[id]=!LV.lkO[id];var y=window.scrollY;drawLinks();window.scrollTo(0,y)},true);
+/* owner: video links tab with a clickable account */
+window.vlinksHtml=function(D){
+  var R=(D.requests||[]).filter(function(r){return ["approved","submitted","completed"].indexOf(r.status)>=0});
+  var kind=function(r){return r.status==="submitted"?"wait":(r.status==="completed"?"done":"none")};
+  var cnt={all:R.length,none:0,wait:0,done:0};R.forEach(function(r){cnt[kind(r)]++});
+  var F=LV.vlF,order={wait:0,none:1,done:2};
+  var list=R.filter(function(r){return F==="all"||kind(r)===F}).sort(function(a,b){return order[kind(a)]-order[kind(b)]||(b.updated||b.created||0)-(a.updated||a.created||0)});
+  var chip=function(k,l){return '<button type="button" class="chip" data-l="vlF" data-k="'+k+'" aria-pressed="'+(F===k)+'">'+esc(L(l))+' · '+cnt[k]+'</button>'};
+  return '<div class="row vlbar">'+chip("all","vl_all")+chip("wait","vl_filter_w")+chip("none","vl_none")+chip("done","vl_filter_d")+'</div><div class="list">'+(list.length?list.map(function(r){
+    var k=kind(r),L2=r.links||[],pill=k==="wait"?'🔎 '+L("vl_await"):(k==="done"?'✅ '+L("vl_done"):'⏳ '+L("vl_nopub"));
+    return '<div class="card ord vlc vl-'+k+'"><div class="t"><div><button type="button" class="vlacc" data-l="vlAcc" data-id="'+esc(r.openId||"")+'">'+esc(r.handle||"")+(r.internalName?' · '+esc(r.internalName):'')+' ›</button><span>'+esc(r.track)+' — '+esc(r.artist||"")+'</span><span>🎬 '+L2.length+' / '+(r.videos||0)+' '+esc(L("vl_links"))+(r.overdue?' · <b style="color:#ff6b6b">'+esc(L("vl_over"))+'</b>':'')+'</span></div><span class="rcpill vlp-'+k+'">'+esc(pill)+'</span></div>'+
+      (L2.length?pills(L2):'')+
+      (k==="wait"?'<div class="row vlact"><button class="btn primary" data-l="vlOk" data-id="'+esc(r.id)+'">✓ '+esc(L("vl_ok"))+'</button><button class="btn danger" data-l="vlNo" data-id="'+esc(r.id)+'">✕ '+esc(L("vl_no"))+'</button></div>':'')+'</div>'
+  }).join(""):'<div class="empty">'+esc(L("vl_empty"))+'</div>')+'</div>'};
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="vlAcc"]');if(!el)return;e.stopImmediatePropagation();
+  var id=el.getAttribute("data-id"),D=ADM&&ADM.data;if(!D)return;
+  var all=(D.requests||[]).filter(function(r){return r.openId===id&&["rejected","cancelled"].indexOf(r.status)<0}).sort(function(a,b){return (b.created||0)-(a.created||0)}),a0=all[0]||{};
+  var gave=all.filter(function(r){return (r.links||[]).length}).length;
+  openModal('<div class="vlam"><h3>🔗 '+esc(L("vl_acc_t"))+'</h3><div class="hint"><b>'+esc(a0.handle||"")+'</b>'+(a0.internalName?' · '+esc(a0.internalName):'')+'</div>'+
+    (all.length?'<div class="aisum">'+esc(L("vl_acc_sum").replace("{a}",gave).replace("{b}",all.length))+'</div>':'')+
+    (all.length?all.map(function(r){var L2=r.links||[];return '<div class="vlaco"><div class="vlaoh"><b>'+esc(r.track)+'</b>'+stL(r.status)+'<span>🔗 '+L2.length+' / '+(r.videos||0)+'</span></div>'+(L2.length?pills(L2):'<div class="hint">'+esc(L("vl_acc_none"))+'</div>')+(r.status==="submitted"?'<div class="row vlact"><button class="btn primary sm" data-l="vlOk" data-id="'+esc(r.id)+'">✓ '+esc(L("vl_ok"))+'</button><button class="btn danger sm" data-l="vlNo" data-id="'+esc(r.id)+'">✕ '+esc(L("vl_no"))+'</button></div>':'')+'</div>'}).join(""):'<div class="empty">'+esc(L("vl_acc_none"))+'</div>')+
+    '<div class="row"><button type="button" class="btn sm" data-l="mclose">'+esc(L("tpx_close"))+'</button></div></div>')},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
