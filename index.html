@@ -1881,7 +1881,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v101 · 17.11 01:10</span>
+  <span>© Promo Campaign · v102 · 17.11 01:35</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6654,7 +6654,7 @@ function probeLive(){
   function once(n){
     var ctl=("AbortController" in window)?new AbortController():null;
     var to=setTimeout(function(){if(ctl)ctl.abort()},tries[n]);
-    return fetch("/api/me",{credentials:"same-origin",signal:ctl?ctl.signal:undefined}).then(function(r){
+    return fetch("/api/me",{credentials:"same-origin",headers:{"X-Pc":"1"},signal:ctl?ctl.signal:undefined}).then(function(r){
       clearTimeout(to);
       if((r.headers.get("content-type")||"").indexOf("application/json")<0||(r.status!==200&&r.status!==401))return;
       LIVE=true;admLoad().then(admNav);admNav();

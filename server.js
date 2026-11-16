@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 55;
+const SERVER_VER = 56;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -625,8 +625,9 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { "Content-Type": "audio/mpeg", "Content-Length": buf.length, "Content-Disposition": 'attachment; filename="' + name + '.mp3"', "Cache-Control": "private, no-store" }); return res.end(buf);
     }
     if (P === "/api/me" && M === "GET") {
-      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
-      return send(res, 200, view(u), { "Set-Cookie": setCookie("sid", cookie(req, "sid"), 2592000) });   // signed in for 30 days after the last visit
+      const csd = req.headers["x-pc"] ? {} : { "Clear-Site-Data": '"cache"' };   // an old copy of the page that is stuck in a phone browser (it does not send X-Pc) is told to drop its cache
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" }, csd);
+      return send(res, 200, view(u), Object.assign({ "Set-Cookie": setCookie("sid", cookie(req, "sid"), 2592000) }, csd));   // signed in for 30 days after the last visit
     }
     if (P === "/api/payout" && M === "GET") { const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" }); return send(res, 200, payoutLabel(u)); }
     if (P === "/api/payout" && M === "POST") {
@@ -1324,7 +1325,8 @@ const server = http.createServer(async (req, res) => {
       return best;
     }
     if (P === "/version" && M === "GET") { const b = pickIndex(); res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" }); return res.end("server v" + SERVER_VER + "\nsite v" + (b ? b.v : "?") + "\nfile " + (b ? path.relative(__dirname, b.f) : "none")); }
-    if ((P === "/" || P === "/index.html") && M === "GET") { const b = pickIndex(); if (b) { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }); return res.end(b.h); } }
+    if ((P === "/" || P === "/index.html") && M === "GET") { const b = pickIndex(); if (b) { if (url.searchParams.get("v") !== String(b.v)) { res.writeHead(302, { "Location": "/?v=" + b.v, "Cache-Control": "no-store" }); return res.end(); }   // the address carries the version, so a phone browser cannot reuse an older copy
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" }); return res.end(b.h); } }
     /* static site */
     const file = path.join(__dirname, "public", P === "/" ? "index.html" : P);
     if (file.startsWith(path.join(__dirname, "public")) && fs.existsSync(file) && fs.statSync(file).isFile()) {
