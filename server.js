@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 44;
+const SERVER_VER = 45;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -453,7 +453,7 @@ function reqView(r, withAdmin) {
   const t = db.tracks[r.trackId] || {}, acc = findAccAny(r.openId);
   const links = (r.links || []).map(l => { const p = videoIdOf(l), v = p && acc && (acc.videos || []).find(x => x.id === p.id); return { url: l, views: v ? v.views : null }; });
   const o = { id: r.id, trackId: r.trackId, track: t.title || "(deleted)", artist: t.artist || "", openId: r.openId, handle: acc ? "@" + (acc.profile && acc.profile.username || "") : "",
-    paidBy: r.paidBy || "", paidTo: r.paidTo || null, cryptoAmt: r.cryptoAmt || "", internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, tdl: t.deadline || "", descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
+    retReason: r.retReason || "", paidBy: r.paidBy || "", paidTo: r.paidTo || null, cryptoAmt: r.cryptoAmt || "", internalName: acc ? acc.internal_name || "" : "", ack: r.ack === undefined ? null : !!r.ack, tdl: t.deadline || "", descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", tcats: t.categories || [], tother: t.otherCategory || "", tlinks: t.links || {}, tlink: t.link || "", tcover: t.cover || "", tmp3: !!t.mp3, price: r.price, videos: r.videos, discount: r.discount || 0, priority: r.priority || 0, cost: reqCost(r), status: r.status, links, created: r.created, completedAt: r.completedAt || 0, paid: !!r.paid, paidBy: r.paidBy || "", paidAt: r.paidAt || 0, accepted: !!r.accepted, acceptedAt: r.acceptedAt || 0, eta: r.eta || "", hasProof: !!r.proof, approvedAt: r.approvedAt || 0,
     days: Number(r.days) > 0 ? Number(r.days) : 16, overdue: ["approved", "returned"].includes(r.status) && !!r.approvedAt && Date.now() - r.approvedAt > dlMs(r) };
   if (withAdmin) { const ou = Object.values(db.users).find(x => (x.accounts || []).some(a => a.open_id === r.openId)), pp = accPayoutRaw(ou, acc); if (pp) o.payout = decObj(pp.enc); }
   if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.tiers = acc.tiers || []; o.bulk = maxTier(acc); o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
@@ -781,7 +781,7 @@ const server = http.createServer(async (req, res) => {
       for (const l of links) { const p = videoIdOf(l); if (!need(res, p && p.user === me, 400, "link must be a tiktok.com/@" + me + "/video/... link")) return; }
       if (!need(res, b.ack === true, 400, "Confirm the sound and description steps first")) return;
       r.ack = true; r.ackAt = Date.now();
-      r.links = links; r.status = "submitted"; r.updated = Date.now(); saveDb(); notify("an editor sent video links to check");
+      r.links = links; r.retReason = ""; r.status = "submitted"; r.updated = Date.now(); saveDb(); notify("an editor sent video links to check");
       return send(res, 200, { request: reqView(r, false) });
     }
 
@@ -1139,6 +1139,7 @@ const server = http.createServer(async (req, res) => {
           const dd = Math.round(Number(b.days)); r.days = dd >= 1 && dd <= 180 ? dd : 16;
         }
         if (st === "cancelled") refundReq(r);
+        if (st === "returned") r.retReason = String(b.reason || "").trim().slice(0, 300); else if (st === "completed") r.retReason = "";
         r.status = st; r.updated = Date.now(); if (st === "completed") r.completedAt = Date.now(); saveDb();
         notifyUser("editors", edUserOfOpen(r.openId), "orders", "ord_" + st, { t: (db.tracks[r.trackId] || {}).title || "" });
         return send(res, 200, { ok: true });
