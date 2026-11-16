@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 46;
+const SERVER_VER = 47;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -352,7 +352,7 @@ function autoStars(acc) {   // automatic rating: 2.0 .. 5.0 in steps of 0.1
 function accView(acc) {
   const A = PC.analyze(acc.videos || [], Date.now());
   return { id: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.profile && acc.profile.display_name,
-    avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
+    avatar: (acc.profile && acc.profile.avatar_url) || "", suggestedPrice: acc.suggested || null, priceReq: acc.priceReq || null, tiers: acc.tiers || [], internalName: acc.internal_name || "", tiktokUrl: acc.tiktok_url || "", about: acc.about || "", categories: acc.categories || [], otherCategory: acc.other_category || "", discount: acc.discount || 0,
     analysis: A, price: acc.price || null, evaluation: (() => { const e = PC.evaluate(A, acc.price); if (!A.accepted) e.chance = A.status === "abandoned" ? 3 : 2; return e; })(), adminStatus: acc.adminStatus || "new", banInfo: acc.adminStatus === "banned" ? (acc.banInfo || { reason: "manager" }) : null, recommended: PC.recommend(A), analysisAt: acc.analysisAt,
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
@@ -577,7 +577,7 @@ const server = http.createServer(async (req, res) => {
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
       const b = await readBody(req), price = Number(b.price), acc = findAcc(u, b.id);
       if (!acc) return send(res, 404, { error: "no such account" });
-      if (!(price >= 1 && price <= 200)) return send(res, 400, { error: "price 1..200" });
+      if (!(price >= 1 && price <= 60)) return send(res, 400, { error: "price 1..60" });
       const np = Math.round(price * 100) / 100;
       acc.price = np; acc.priceReq = null;   // after the first approval the editor changes the price any time
       saveDb(); return send(res, 200, view(u));
@@ -587,9 +587,10 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
       const before = JSON.stringify([acc.categories || [], acc.other_category || "", acc.about || "", acc.tiers || []]);
       if (b.internalName !== undefined) acc.internal_name = String(b.internalName).slice(0, 60);
+      if (b.tiktokUrl !== undefined) { const tu = String(b.tiktokUrl).trim().slice(0, 200); if (!need(res, !tu || /^https?:\/\/([a-z0-9-]+\.)?tiktok\.com\/\S+$/i.test(tu), 400, "Write a tiktok.com link")) return; acc.tiktok_url = tu; }
       if (b.categories !== undefined) acc.categories = cleanCats(b.categories);
       if (b.otherCategory !== undefined) acc.other_category = String(b.otherCategory).slice(0, 60);
-      if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 300), wn = ab ? ab.split(/\s+/).length : 0; if (!need(res, !ab || (wn >= 3 && wn <= 8), 400, "Describe your account in 3 to 8 words")) return; acc.about = ab; }
+      if (b.about !== undefined) { const ab = String(b.about).trim().slice(0, 300), wn = ab ? ab.split(/\s+/).length : 0; if (!need(res, !ab || wn >= 3, 400, "Describe your account in at least 3 words")) return; acc.about = ab; }
       if (b.tiers !== undefined) {
         const ts = cleanTiers(b.tiers);
         (b.discountAll ? u.accounts : [acc]).forEach(a => { a.tiers = ts; a.discount = ts.length ? Math.max(...ts.map(t => t.pct)) : 0; });
@@ -1039,7 +1040,7 @@ const server = http.createServer(async (req, res) => {
         const a = findAccAny(b.id); if (!need(res, a, 404, "no such account")) return;
         const pr = Number(b.price);
         if (b.price === null || b.price === "" || b.price === undefined) { delete a.suggested; saveDb(); return send(res, 200, { ok: true }); }
-        if (!need(res, pr >= 1 && pr <= 200, 400, "price 1..200")) return;
+        if (!need(res, pr >= 1 && pr <= 60, 400, "price 1..60")) return;
         a.suggested = Math.round(pr * 100) / 100; saveDb();
         notifyUser("editors", edUserOfOpen(a.open_id), "accounts", "price_suggest", { h: "@" + ((a.profile || {}).username || ""), p: "$" + a.suggested });
         return send(res, 200, { ok: true });
