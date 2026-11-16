@@ -1427,6 +1427,24 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
  .chatbox{padding:8px 10px!important}
 }
 
+/* v78 — track photo preview, livelier rounded notifications */
+.covprev{display:block;margin-top:8px;width:96px;height:96px;object-fit:cover;border-radius:18px;border:1px solid var(--line)}
+.tktoast{border-radius:22px!important;padding:14px 18px!important;border:1px solid transparent!important;background:linear-gradient(#1c1830,#1c1830) padding-box,linear-gradient(120deg,#8B6CFF,#22B8CF,#F06A9B,#8B6CFF) border-box!important;background-size:100% 100%,300% 300%!important;box-shadow:0 14px 40px rgba(0,0,0,.55),0 0 26px rgba(139,108,255,.55)!important;animation:tkSpring .55s cubic-bezier(.2,1.3,.4,1),tkGlow 3s linear infinite!important}
+.tktoast i{display:grid;place-items:center;width:38px;height:38px;border-radius:14px;background:rgba(139,108,255,.25);font-size:19px}
+.tktoast b{font-weight:800}
+@keyframes tkSpring{0%{opacity:0;transform:translateY(24px) scale(.88)}100%{opacity:1;transform:none}}
+@keyframes tkGlow{0%{background-position:0 0,0% 50%}100%{background-position:0 0,300% 50%}}
+.toast{border-radius:20px!important;padding:14px 20px!important;box-shadow:0 14px 40px rgba(0,0,0,.35),0 0 22px rgba(139,108,255,.4)!important;border:1px solid rgba(139,108,255,.5)}
+.toast.show{animation:toastIn .55s cubic-bezier(.2,1.3,.4,1)!important}
+.rbdg,#bell .cnt,.nbadge{animation:bellPulse 2.2s ease-in-out infinite}
+@keyframes bellPulse{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,.55)}60%{box-shadow:0 0 0 8px rgba(244,63,94,0)}}
+
+/* v80 — drafts bar, notification test */
+.dfbar{gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.nzbox{margin-top:16px}
+.nzk{gap:8px;flex-wrap:wrap;margin:10px 0}
+.nzpulse{animation:bellPulse .8s ease-in-out 3!important}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1604,7 +1622,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v77 · 16.11 22:10</span>
+  <span>© Promo Campaign · v80 · 16.11 23:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2801,8 +2819,8 @@ function drawProd(){
   $("lprodBody").innerHTML='<div class="row" style="justify-content:space-between"><h2>'+esc(L("p_tracks"))+'</h2><div class="row"><span class="hint">'+esc(P.name?P.name+" · ":"")+esc(P.email)+'</span><button class="btn sm" data-l="pOut">'+esc(L("p_logout"))+'</button></div></div>'+
     '<div class="list" style="margin-top:14px">'+(P.tracks.length?P.tracks.map(function(t){
       var stc={review:"warn",active:"ok",rejected:"bad"}[t.status]||"";
-      var pays=(t.status==="active"&&t.topups&&t.topups.length)?t.topups.map(function(tp){return '<div><b>'+esc(L("p_pay_now"))+': '+money(tp.amount)+'</b>'+payBoxHtml(tp.method,tp.amount,tp.coin)+(tp.proof?'<div class="note">'+esc(L("p_proof_sent"))+'</div>':'')+'<label class="f" for="ps_'+esc(tp.id)+'"><span>'+esc(L("p_proof_pick"))+'</span><input id="ps_'+esc(tp.id)+'" type="file" accept="image/*,application/pdf,.pdf"></label><div class="note err" id="pe_'+esc(tp.id)+'" hidden></div><button class="btn sm primary" data-l="proofSend" data-id="'+esc(tp.id)+'">'+esc(L("p_proof_send"))+'</button></div>'}).join(""):'';
-      return '<div class="card ord"><div class="t"><div><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span><span class="pill '+stc+'">'+esc(L("p_st_"+t.status))+'</span></div><div class="row">'+(t.status==="active"?'<button class="btn sm" data-l="pTop" data-id="'+esc(t.id)+'">'+esc(L("p_addb"))+'</button>':'')+'<button class="btn sm danger" data-l="pDel" data-id="'+esc(t.id)+'">'+esc(L("p_del"))+'</button></div></div>'+
+      var pays=((t.status==="active"||t.status==="archived")&&t.topups&&t.topups.length)?t.topups.map(function(tp){return '<div><b>'+esc(L("p_pay_now"))+': '+money(tp.amount)+'</b>'+payBoxHtml(tp.method,tp.amount,tp.coin)+(tp.proof?'<div class="note">'+esc(L("p_proof_sent"))+'</div>':'')+'<label class="f" for="ps_'+esc(tp.id)+'"><span>'+esc(L("p_proof_pick"))+'</span><input id="ps_'+esc(tp.id)+'" type="file" accept="image/*,application/pdf,.pdf"></label><div class="note err" id="pe_'+esc(tp.id)+'" hidden></div><button class="btn sm primary" data-l="proofSend" data-id="'+esc(tp.id)+'">'+esc(L("p_proof_send"))+'</button></div>'}).join(""):'';
+      return '<div class="card ord"><div class="t"><div><b>'+esc(t.title)+'</b><span>'+esc(t.artist)+'</span><span class="pill '+stc+'">'+esc(L("p_st_"+t.status))+'</span></div><div class="row">'+((t.status==="active"||t.status==="archived")?'<button class="btn sm" data-l="pTop" data-id="'+esc(t.id)+'">'+esc(L("p_addb"))+'</button>':'')+'<button class="btn sm danger" data-l="pDel" data-id="'+esc(t.id)+'">'+esc(L("p_del"))+'</button></div></div>'+
         '<div class="kv"><div><b>'+money(t.budget)+'</b><span>'+esc(L("p_total"))+'</span></div><div><b>'+money(t.spent)+'</b><span>'+esc(L("p_spent"))+'</span></div><div><b>'+money(t.left)+'</b><span>'+esc(L("p_left"))+'</span></div></div>'+
         '<div>'+catPills(t.categories,t.otherCategory)+(t.hasMp3?' <span class="pill ok">MP3</span>':'')+'</div>'+pays+'</div>';
     }).join(""):'<div class="empty">'+esc(L("p_none"))+'</div>')+'</div>'+
@@ -2828,6 +2846,7 @@ function drawProd(){
     ["tiktok","spotify","soundcloud","mp3"].map(function(k){return '<label class="f" for="nl_'+k+'"><span>'+esc(L("l_"+k))+'</span><input id="nl_'+k+'" type="text" inputmode="url" placeholder="https://"></label>'}).join("")+
     ["instagram","youtube"].map(function(k){return '<label class="f soonf" for="nl_'+k+'"><span>'+esc(k==="instagram"?"Instagram Reels":"YouTube Shorts")+' · '+esc(L("soon_w"))+'</span><input id="nl_'+k+'" type="text" placeholder="https://" disabled></label>'}).join("")+
     '</div><h3 class="sub">'+esc(L("sec_more"))+'</h3><div class="card form">'+
+    '<label class="f" for="nCover"><span>'+esc(L("cv_l"))+'</span><input id="nCover" type="file" accept="image/*"><img id="nCoverPrev" class="covprev" alt="" hidden></label>'+
     '<label class="f" for="nMsg"><span>'+esc(L("p_msg"))+'</span><textarea id="nMsg" rows="3" maxlength="600" placeholder="'+esc(L("p_msg_ph"))+'"></textarea></label>'+
     '<p class="hint">'+esc(L("p_review_note"))+'</p>'+
     '<div class="note err" id="nErr" hidden></div>'+
@@ -3006,8 +3025,8 @@ Object.assign(LT.en,{a_waiting:"Waiting for your decision",a_wait_none:"No accou
 Object.assign(LT.ru,{a_waiting:"Ждут решения",a_wait_none:"Нет аккаунтов, ожидающих решения.",a_from:"От кого"});
 Object.assign(LT.en,{a_chk_ed:"Check the site as an editor",a_chk_pr:"Check the site as a producer",a_notif:"Turn on sound and notifications",a_new_items:"Something new is waiting for you"});
 Object.assign(LT.ru,{a_chk_ed:"Проверить сайт как редактор",a_chk_pr:"Проверить сайт как продюсер",a_notif:"Включить звук и уведомления",a_new_items:"Пришло что-то новое"});
-Object.assign(LT.en,{p_msg:"Message to the manager (optional)",p_msg_ph:"For example: my Telegram is @name, write me if you have questions"});
-Object.assign(LT.ru,{p_msg:"Сообщение менеджеру (необязательно)",p_msg_ph:"Например: мой Telegram @name, пишите, если будут вопросы"});
+Object.assign(LT.en,{p_msg:"Message to the manager (optional)",p_msg_ph:"For example: maximum aura, only quality content"});
+Object.assign(LT.ru,{p_msg:"Сообщение менеджеру (необязательно)",p_msg_ph:"Например: максимум ауры, только качественный контент"});
 
 var CONTACTS=null;
 function loadContacts(){fetch("/api/contacts",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){CONTACTS=j;contactBtn()}).catch(function(){})}
@@ -3128,7 +3147,7 @@ function drawLCamps(){
     if(t.hasMp3)links+='<a class="plink" style="--c:#6B5CFF" href="/api/track/mp3?id='+esc(t.id)+'">⬇ MP3</a>';
     if(!links&&t.link)links='<a class="plink" style="--c:#6B5CFF" href="'+esc(t.link)+'" target="_blank" rel="noopener noreferrer">▶ Link</a>';
     return '<article class="tcard" data-tid="'+esc(t.id)+'" style="animation-delay:'+Math.min(i,8)*0.07+'s"><div class="tcover" style="'+coverStyle(t)+'"><span class="tnote">♪</span><span class="tinit">'+esc((t.title||"?").charAt(0).toUpperCase())+'</span></div><div class="tbody"><div class="tname">'+esc(t.title)+'</div><div class="tby">'+esc(t.artist)+(t.producerName?' · '+esc(L("t_by"))+' '+esc(t.producerName):'')+'</div><div class="tcats">'+catPills(t.categories,t.otherCategory)+'</div><div class="tlinks">'+links+'</div>'+
-      (t.deadline?'<div class="trule">⏰ '+esc(L("t_deadline"))+': <b>'+esc(t.deadline)+'</b></div>':'')+(t.descRule?'<div class="trule">📝 '+esc(descTxt(t))+'</div>':'')+
+      (t.deadline?'<div class="trule">⏰ '+esc(L("t_deadline"))+': <b>'+esc(t.deadline)+'</b></div>':'')+(t.descRule?'<div class="trule">📝 '+esc(descTxt(t))+'</div>':'')+(t.message?'<div class="trule">💬 '+esc(t.message)+'</div>':'')+
       '<button class="btn primary tgo" data-l="req" data-id="'+esc(t.id)+'">'+esc(S.accounts.length?L("t_req"):L("t_signin"))+'</button></div></article>';
   }).join(""):'<div class="empty">'+esc(L("t_none"))+'</div>';
 }
@@ -4182,7 +4201,7 @@ function trackModalHtml(q){
   if(lk.other)rows.push('<a class="plink big" style="--c:#6B5CFF" href="'+esc(lk.other)+'" target="_blank" rel="noopener noreferrer">▶ '+esc(L("fd_open"))+'</a>');
   var cov=q.tcover?'<img class="fdcov" src="'+esc(q.tcover)+'" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'fdcov ph\',textContent:\'🎵\'}))">':'<span class="fdcov ph">🎵</span>';
   return '<div class="trmod"><div class="fdtop">'+cov+'<div class="fdinfo"><b class="fdname">'+esc(q.track)+'</b><span class="fdart">'+esc(q.artist||"")+'</span><div>'+((q.tcats||[]).length?trCats({categories:q.tcats,otherCategory:q.tother}):'')+'</div></div></div>'+
-    (q.tdl?'<div class="trule">⏰ '+esc(L("tm_deadline"))+': <b>'+esc(q.tdl)+'</b></div>':'')+
+    (q.tdl?'<div class="trule">⏰ '+esc(L("tm_deadline"))+': <b>'+esc(q.tdl)+'</b></div>':'')+(q.message?'<div class="trule">💬 '+esc(q.message)+'</div>':'')+
     '<h4>'+esc(L("tm_links"))+'</h4><div class="fdlinks">'+(rows.join("")||'<span class="hint">—</span>')+'</div>'+
     '<h4>'+esc(L("tm_todo"))+'</h4>'+soundRules(q)+
     '<div class="row"><button type="button" class="btn" data-l="mclose2">'+esc(L("tm_close"))+'</button></div></div>';
@@ -5835,9 +5854,9 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
 /* ===== v75: saved "paid by" names, payer field by method, write to producer from a new track ===== */
 (function(){
   Object.assign(LT.en,{py_saved:"Saved payers",py_add:"+ Save this name",py_none:"Type a name once and press “Save this name”. Next time just tap it.",py_del:"Remove",pp_from_paypal:"Name or email on the PayPal that sends the money",pp_from_card:"Name of the card owner who sends the money",pp_from_ph2:"Name or email",pp_from_ph3:"Name",nt_wr:"✉ Write to producer",
-    ig_l:"Your Instagram, for contact with you (required)",p_msg:"Comment under the track: what you want from editors (optional)",p_msg_ph:"For example: maximum aura, only quality content. Contact: Telegram @name",nt_msg:"Producer's comment"});
+    ig_l:"Your Instagram, for contact with you (required)",p_msg:"Comment under the track: what you want from editors (optional)",p_msg_ph:"For example: maximum aura, only quality content",nt_msg:"Producer's comment"});
   Object.assign(LT.ru,{py_saved:"Сохранённые плательщики",py_add:"+ Сохранить это имя",py_none:"Впишите имя один раз и нажмите «Сохранить это имя». В следующий раз просто нажмёте на него.",py_del:"Убрать",pp_from_paypal:"Имя или email на PayPal, с которого придут деньги",pp_from_card:"Имя владельца карты, с которой придут деньги",pp_from_ph2:"Имя или email",pp_from_ph3:"Имя",nt_wr:"✉ Написать продюсеру",
-    ig_l:"Ваш Instagram, для связи с вами (обязательно)",p_msg:"Комментарий под треком: что вы хотите от эдиторов (необязательно)",p_msg_ph:"Например: максимум ауры, только качественный контент. Связь: Telegram @name",nt_msg:"Комментарий продюсера"});
+    ig_l:"Ваш Instagram, для связи с вами (обязательно)",p_msg:"Комментарий под треком: что вы хотите от эдиторов (необязательно)",p_msg_ph:"Например: максимум ауры, только качественный контент",nt_msg:"Комментарий продюсера"});
 
   /* ---- saved payers in the payout window ---- */
   var PY={list:null};
@@ -5873,9 +5892,9 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
 /* ===== v77: archive of deleted accounts, link-change review, discount minimum, producer drafts ===== */
 (function(){
   Object.assign(LT.en,{lc_note:"The editor changed the TikTok profile link",arc_f_del:"Deleted by authors",arc_f_adm:"Deleted by me",arc_f_ban:"Banned",arc_back:"Bring back",arc_none:"Nothing here yet.",ad_del_q:"Remove this account from the base? It goes to the archive and you can bring it back.",ad_del_yes:"Yes, remove",tr_min:"The discount must be at least 1%, from 2 videos.",
-    df_h:"Drafts",df_none:"No drafts yet. Fill in the form and press “Save as draft”.",df_save:"💾 Save as draft",df_saved:"Draft saved",df_name:"Draft name",df_del_q:"Delete this draft?",df_yes:"Yes, delete",df_loaded:"Draft loaded into the form",df_def:"Draft",df_pin:"Pin",df_ren:"Rename",df_ok:"Save",df_upd:"💾 Update this draft"});
+    df_h:"Drafts",df_none:"No drafts yet. Fill in the form and press “Save as draft”.",df_save:"💾 Save as draft",df_saved:"Draft saved",df_name:"Draft name",df_del_q:"Delete this draft?",df_yes:"Yes, delete",df_loaded:"Draft loaded into the form",df_def:"Draft",df_pin:"Pin",df_ren:"Rename",df_ok:"Save",df_upd:"💾 Update this draft",df_new:"New draft"});
   Object.assign(LT.ru,{lc_note:"Эдитор сменил ссылку на профиль TikTok",arc_f_del:"Удалены авторами",arc_f_adm:"Удалены мной",arc_f_ban:"В бане",arc_back:"Вернуть",arc_none:"Здесь пока пусто.",ad_del_q:"Убрать этот аккаунт из базы? Он уйдёт в архив, его можно вернуть.",ad_del_yes:"Да, убрать",tr_min:"Скидка должна быть минимум 1%, от 2 видео.",
-    df_h:"Черновики",df_none:"Черновиков пока нет. Заполните форму и нажмите «Сохранить в черновики».",df_save:"💾 Сохранить в черновики",df_saved:"Черновик сохранён",df_name:"Название черновика",df_del_q:"Удалить этот черновик?",df_yes:"Да, удалить",df_loaded:"Черновик загружен в форму",df_def:"Черновик",df_pin:"Закрепить",df_ren:"Переименовать",df_ok:"Сохранить",df_upd:"💾 Обновить этот черновик"});
+    df_h:"Черновики",df_none:"Черновиков пока нет. Заполните форму и нажмите «Сохранить в черновики».",df_save:"💾 Сохранить в черновики",df_saved:"Черновик сохранён",df_name:"Название черновика",df_del_q:"Удалить этот черновик?",df_yes:"Да, удалить",df_loaded:"Черновик загружен в форму",df_def:"Черновик",df_pin:"Закрепить",df_ren:"Переименовать",df_ok:"Сохранить",df_upd:"💾 Обновить этот черновик",df_new:"Новый черновик"});
 
   /* archive + owner delete */
   window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
@@ -5901,20 +5920,55 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
     return l.length?l.map(function(d){return '<div class="card ord dfrow'+(DF.cur===d.id?' on':'')+'"><button type="button" class="dfmain" data-l="dfOpen" data-id="'+esc(d.id)+'"><b>'+(d.pinned?'📌 ':'')+esc(d.name)+'</b><small>'+esc(new Date(d.updated).toLocaleString())+'</small></button><button type="button" class="dfb" data-l="dfRen" data-id="'+esc(d.id)+'" title="'+esc(L("df_ren"))+'">✏️</button><button type="button" class="dfb" data-l="dfPin" data-id="'+esc(d.id)+'" title="'+esc(L("df_pin"))+'">'+(d.pinned?'📍':'📌')+'</button><button type="button" class="dfb" data-l="dfDel" data-id="'+esc(d.id)+'">🗑</button></div>'}).join(""):'<p class="hint">'+esc(L("df_none"))+'</p>'}
   function dfDraw(){var root=$("lprodBody");if(!root||!$("nTitle"))return;var box=$("dfBox");
     if(!box){var hs=root.querySelectorAll("h3.sub")[0];if(!hs)return;box=document.createElement("div");box.id="dfBox";box.className="dfbox";hs.parentNode.insertBefore(box,hs)}
-    box.innerHTML='<h3 class="sub">📝 '+esc(L("df_h"))+(DF.list?' · '+DF.list.length:'')+'</h3><div class="dflist">'+dfRows()+'</div>';
+    box.innerHTML='<div class="row dfbar"><button type="button" class="btn" data-l="dfAll">📝 '+esc(L("df_h"))+' · '+(DF.list?DF.list.length:0)+'</button><button type="button" class="btn primary" data-l="dfNew">＋ '+esc(L("df_new"))+'</button></div>';
+    if(LV.dfModal)dfModalDraw();
     var sb=root.querySelector('[data-l="pAdd"]');if(sb&&!$("dfSaveBtn")){sb.insertAdjacentHTML("afterend",' <button type="button" class="btn" id="dfSaveBtn" data-l="dfSave"></button>')}
     var b2=$("dfSaveBtn");if(b2)b2.textContent=L(DF.cur&&DF.list&&DF.list.some(function(d){return d.id===DF.cur})?"df_upd":"df_save")}
+  function dfModalDraw(){var h=$("dfModalList");if(h)h.innerHTML=dfRows()}
   var oDP=drawProd;drawProd=function(){var keepD=null;try{keepD=$("nTitle")?dfRead():null}catch(e){}oDP.apply(this,arguments);try{if(keepD&&LV.dfKeep){dfApply(keepD);LV.dfKeep=false}}catch(e){}dfLoad(dfDraw);dfDraw()};
   window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");if(a.indexOf("df")!==0)return;e.stopImmediatePropagation();var id=el.getAttribute("data-id"),d=(DF.list||[]).filter(function(x){return x.id===id})[0];
     if(a==="dfSave"){var cur=DF.cur&&(DF.list||[]).filter(function(x){return x.id===DF.cur})[0],data=dfRead();
       if(cur){cur.data=data;cur.updated=Date.now()}else{var t=(data.f.nTitle||"").trim(),nd={id:Math.random().toString(16).slice(2,14),name:L("df_def")+(t?" — "+t:""),pinned:false,updated:Date.now(),data:data};DF.list=(DF.list||[]).concat([nd]);DF.cur=nd.id}
       dfSave();dfDraw();toast(L("df_saved"));return}
-    if(a==="dfOpen"&&d){dfApply(d.data);DF.cur=d.id;dfDraw();toast(L("df_loaded"));var f=$("nTitle");if(f)f.scrollIntoView({behavior:"smooth",block:"center"});return}
+    if(a==="dfAll"){LV.dfModal=true;openModal('<h3>📝 '+esc(L("df_h"))+'</h3><div class="dflist" id="dfModalList">'+dfRows()+'</div><div class="row" style="margin-top:12px"><button class="btn primary" data-l="dfNew">＋ '+esc(L("df_new"))+'</button><button class="btn" data-l="mclose2">'+esc(L("tm_close"))+'</button></div>');return}
+    if(a==="dfNew"){var nm=L("df_def")+" "+((DF.list||[]).length+1),nd={id:Math.random().toString(16).slice(2,14),name:nm,pinned:false,updated:Date.now(),data:{f:{},k:{},c:{}}};DF.list=(DF.list||[]).concat([nd]);DF.cur=nd.id;dfSave();if(LV.dfModal){LV.dfModal=false;closeModal()}
+      document.querySelectorAll("#lprodBody input[id^=n],#lprodBody textarea[id^=n]").forEach(function(x){if(x.type==="checkbox")x.checked=false;else if(x.type!=="file"&&x.id!=="nInsta")x.value=""});dfApply({c:{nCats:[],nPlat:["tiktok"]},f:{},k:{}});dfDraw();toast(L("df_saved")+": "+nm);var f0=$("nTitle");if(f0)f0.scrollIntoView({behavior:"smooth",block:"center"});return}
+    if(a==="dfOpen"&&d){if(LV.dfModal){LV.dfModal=false;closeModal()}dfApply(d.data);DF.cur=d.id;dfDraw();toast(L("df_loaded"));var f=$("nTitle");if(f)f.scrollIntoView({behavior:"smooth",block:"center"});return}
     if(a==="dfPin"&&d){d.pinned=!d.pinned;d.updated=Date.now();dfSave();dfDraw();return}
     if(a==="dfRen"&&d){openModal('<h3>✏️ '+esc(L("df_name"))+'</h3><label class="f" for="dfName"><input id="dfName" type="text" maxlength="80" value="'+esc(d.name)+'"></label><div class="row"><button class="btn primary" data-l="dfRenGo" data-id="'+esc(id)+'">'+esc(L("df_ok"))+'</button><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div>');return}
     if(a==="dfRenGo"&&d){var v=(($("dfName")||{}).value||"").trim();if(v){d.name=v.slice(0,80);d.updated=Date.now();dfSave()}closeModal();dfDraw();return}
     if(a==="dfDel"&&d){openModal('<h3>🗑 '+esc(d.name)+'</h3><p>'+esc(L("df_del_q"))+'</p><div class="row"><button class="btn danger" data-l="dfDelGo" data-id="'+esc(id)+'">'+esc(L("df_yes"))+'</button><button class="btn" data-l="mclose2">'+esc(L("sl_cancel"))+'</button></div>');return}
     if(a==="dfDelGo"){DF.list=(DF.list||[]).filter(function(x){return x.id!==id});if(DF.cur===id)DF.cur=null;dfSave();closeModal();dfDraw();return}
+  },true);
+})();
+
+/* ===== v78: track photo, archived-by-budget note, livelier notifications ===== */
+(function(){
+  Object.assign(LT.en,{cv_l:"Track photo (optional)",cv_big:"Photo is too big or not an image.",p_st_archived:"Budget used up. Add budget to bring it back"});
+  Object.assign(LT.ru,{cv_l:"Фото трека (необязательно)",cv_big:"Фото слишком большое или это не картинка.",p_st_archived:"Бюджет закончился. Добавьте бюджет, и трек вернётся"});
+  function prev(){var i=$("nCoverPrev");if(!i)return;if(LV.nCoverData){i.src=LV.nCoverData;i.hidden=false}else i.hidden=true}
+  document.addEventListener("change",function(e){if(!e.target||e.target.id!=="nCover")return;var f=e.target.files&&e.target.files[0];if(!f){LV.nCoverData=null;prev();return}
+    if(!/^image\//.test(f.type)||f.size>15e6){toast(L("cv_big"));e.target.value="";LV.nCoverData=null;prev();return}
+    var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);LV.nCoverData=c.toDataURL("image/jpeg",.8);prev()};im.onerror=function(){toast(L("cv_big"))};im.src=fr.result};fr.readAsDataURL(f)});
+  var oD=drawProd;drawProd=function(){oD.apply(this,arguments);prev()};
+  var oC=api;api=function(path,body){var isT=path==="/api/producer/track";if(isT&&body&&LV.nCoverData)body.cover=LV.nCoverData;var pr=oC.apply(this,arguments);if(isT&&pr&&pr.then)pr.then(function(r){if(r&&r.ok)LV.nCoverData=null});return pr};
+})();
+
+/* ===== v80: owner test of notifications ===== */
+(function(){
+  Object.assign(LT.en,{nz_t:"Test notifications",nz_h:"Pick what to show and press the button. You will see the same pop-up editors and producers get.",nz_track:"New track",nz_order:"New order",nz_money:"Payment",nz_msg:"New message",nz_go:"Show notification",nz_txt:"Your text (optional)",nz_d_track:"MONTAGEM ASSOMBRADA — CHAXZER is waiting for editors",nz_d_order:"A new order is waiting for your decision",nz_d_money:"Payment received, the budget is updated",nz_d_msg:"You have a new message"});
+  Object.assign(LT.ru,{nz_t:"Тест уведомлений",nz_h:"Выберите, что показать, и нажмите кнопку. Вы увидите такое же всплывающее уведомление, как получают эдиторы и продюсеры.",nz_track:"Новый трек",nz_order:"Новый заказ",nz_money:"Оплата",nz_msg:"Новое сообщение",nz_go:"Показать уведомление",nz_txt:"Ваш текст (необязательно)",nz_d_track:"MONTAGEM ASSOMBRADA — CHAXZER ждёт эдиторов",nz_d_order:"Новый заказ ждёт вашего решения",nz_d_money:"Оплата пришла, бюджет обновлён",nz_d_msg:"У вас новое сообщение"});
+  var IC={track:"🎵",order:"🎬",money:"💸",msg:"💬"};
+  function add(){if(LV.adTab!=="overview")return;var mn=document.querySelector(".ownmain");if(!mn||$("nzBox"))return;LV.nzK=LV.nzK||"track";
+    mn.insertAdjacentHTML("beforeend",'<div class="card form nzbox" id="nzBox"><h3>🔔 '+esc(L("nz_t"))+'</h3><p class="hint">'+esc(L("nz_h"))+'</p><div class="row nzk">'+["track","order","money","msg"].map(function(k){return '<button type="button" class="chip" data-l="nzK" data-k="'+k+'" aria-pressed="'+(LV.nzK===k)+'">'+IC[k]+' '+esc(L("nz_"+k))+'</button>'}).join("")+'</div><label class="f" for="nzTxt"><span>'+esc(L("nz_txt"))+'</span><input id="nzTxt" type="text" maxlength="120" placeholder="'+esc(L("nz_d_"+LV.nzK))+'"></label><div class="row"><button type="button" class="btn primary" data-l="nzGo">▶ '+esc(L("nz_go"))+'</button></div></div>')}
+  var oR=renderOwner;renderOwner=function(){var r=oR.apply(this,arguments);try{add()}catch(e){}return r};
+  window.addEventListener("click",function(e){var tt=e.target.closest&&e.target.closest('.tktoast[data-test]');if(tt){e.stopImmediatePropagation();tt.classList.add("out");setTimeout(function(){tt.remove()},450);return}
+    var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+    if(a==="nzK"){e.stopImmediatePropagation();LV.nzK=el.getAttribute("data-k");document.querySelectorAll('[data-l="nzK"]').forEach(function(b){b.setAttribute("aria-pressed",String(b===el))});var i=$("nzTxt");if(i)i.placeholder=L("nz_d_"+LV.nzK);return}
+    if(a==="nzGo"){e.stopImmediatePropagation();var k=LV.nzK||"track",txt=(($("nzTxt")||{}).value||"").trim()||L("nz_d_"+k),b=$("tkToasts");if(!b){b=document.createElement("div");b.id="tkToasts";document.body.appendChild(b)}
+      var t=document.createElement("button");t.type="button";t.className="tktoast";t.setAttribute("data-test","1");t.innerHTML='<i>'+IC[k]+'</i><span><b>'+esc(L("nz_"+k))+'</b><small style="white-space:normal;max-width:240px">'+esc(txt)+'</small></span>';b.appendChild(t);while(b.children.length>3)b.firstChild.remove();
+      document.querySelectorAll(".agb .cnt,#bellBtn,.bellb").forEach(function(x){x.classList.add("nzpulse");setTimeout(function(){x.classList.remove("nzpulse")},3000)});
+      setTimeout(function(){t.classList.add("out");setTimeout(function(){t.remove()},450)},6000);return}
   },true);
 })();
 

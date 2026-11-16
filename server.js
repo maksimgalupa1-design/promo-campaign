@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 48;
+const SERVER_VER = 49;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -402,7 +402,12 @@ function discountFor(acc, videos) {
 }
 function maxTier(acc) { return Math.max(acc.discount || 0, ...(acc.tiers || []).map(t => t.pct)); }
 function dlMs(r) { return (Number(r.days) > 0 ? Number(r.days) : 16) * 86400000; }
-function refundReq(r) { const t = db.tracks[r.trackId]; if (t && r.approvedAt) t.spent = Math.max(0, Math.round(((t.spent || 0) - reqCost(r)) * 100) / 100); }
+function syncArchive(t) {   // a track whose budget is almost gone goes to the archive by itself, and comes back when money returns
+  if (!t || t.demo) return;
+  if (t.status === "active" && trackLeft(t) < 2) { t.status = "archived"; t.archivedAt = Date.now(); t.archivedAuto = true; }
+  else if (t.status === "archived" && t.archivedAuto && trackLeft(t) >= 2) { t.status = "active"; t.archivedAt = 0; delete t.archivedAuto; }
+}
+function refundReq(r) { const t = db.tracks[r.trackId]; if (t && r.approvedAt) { t.spent = Math.max(0, Math.round(((t.spent || 0) - reqCost(r)) * 100) / 100); syncArchive(t); } }
 function expireOverdue() {
   let n = 0;
   Object.values(db.requests).forEach(r => { if (["approved", "returned"].includes(r.status) && r.approvedAt && Date.now() - r.approvedAt > dlMs(r)) {
@@ -663,7 +668,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (P === "/api/tracks" && M === "GET") {            // catalog for editors: tracks that still have budget
       const u = sessionUser(req);
-      const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ cover: (ensureCover(t), t.cover || ""), id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, deadline: t.deadline || "", producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
+      const list = Object.values(db.tracks).filter(t => t.status === "active" && (!t.demo || adminOk(req)) && trackLeft(t) > 0 && (t.platforms || ["tiktok"]).includes("tiktok")).map(t => ({ cover: (ensureCover(t), t.cover || ""), id: t.id, title: t.title, artist: t.artist, link: t.link, links: t.links || {}, descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", hasMp3: !!t.mp3, deadline: t.deadline || "", producerName: (db.producers[t.producerId] || {}).name || "", platforms: t.platforms || ["tiktok"], categories: t.categories || [], otherCategory: t.otherCategory || "" }));
       return send(res, 200, { tracks: list, signedIn: !!u });
     }
     if (P === "/api/requests" && M === "GET") {          // editor's own requests
@@ -877,7 +882,7 @@ const server = http.createServer(async (req, res) => {
         p.drafts = out; saveDb(); return send(res, 200, { drafts: p.drafts });
       }
       if (P === "/api/producer/track" && M === "POST") {     // new track; the budget becomes a pending payment the owner confirms
-        const b = await readBody(req), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
+        const b = await readBody(req, 4e5), title = String(b.title || "").trim().slice(0, 120), budget = Number(b.budget);
         if (!need(res, title && budget >= minBud(p) && budget <= 1000000, 400, "minimum budget is $" + minBud(p))) return;
         const L = {}, src = b.links && typeof b.links === "object" ? b.links : {};
         for (const k of ["spotify", "soundcloud", "tiktok", "mp3"]) { const v = String(src[k] || "").trim().slice(0, 400); if (v) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(v), 400, "link must start with https://")) return; const kk = classifyLink(v); if (!L[kk]) L[kk] = v; } }
@@ -890,7 +895,7 @@ const server = http.createServer(async (req, res) => {
         p.instagram = ig; p.tiktok = String(b.tiktok || "").trim().slice(0, 100); p.discord = String(b.discord || "").trim().slice(0, 100);
         const cats = cleanCats(b.categories);
         const t = { id: uid8(), producerId: p.id, title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0] || "", links: L, budget: 0, spent: 0,
-          platforms: plats.length ? plats : ["tiktok"], descRule: !!b.descRule, descText: b.descRule ? String(b.descText || "").trim().slice(0, 120) : "", message: String(b.message || "").trim().slice(0, 600), deadline: String(b.deadline || "").trim().slice(0, 60),
+          platforms: plats.length ? plats : ["tiktok"], descRule: !!b.descRule, descText: b.descRule ? String(b.descText || "").trim().slice(0, 120) : "", message: String(b.message || "").trim().slice(0, 600), cover: (typeof b.cover === "string" && b.cover.length <= 140000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.cover)) ? b.cover : "", deadline: String(b.deadline || "").trim().slice(0, 60),
           categories: cats, otherCategory: cats.includes("other") ? String(b.otherCategory || "").slice(0, 60) : "", status: "review", created: Date.now() };
         db.tracks[t.id] = t;
         const tp = { id: uid8(), producerId: p.id, trackId: t.id, amount: Math.round(budget * 100) / 100, method: METHODS.includes(b.method) ? b.method : "paypal", coin: COINS.includes(b.coin) ? b.coin : "", from: String(b.from || "").trim().slice(0, 80), status: "pending", created: Date.now() };
@@ -1078,7 +1083,7 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, t && t.status === "active", 404, "only an active track can be archived")) return;
         const open = Object.values(db.requests).filter(r => r.trackId === t.id && ["pending", "approved", "submitted", "returned"].includes(r.status)).length;
         if (!need(res, open === 0, 409, "This track has " + open + " open order(s). Finish or cancel them first.")) return;
-        t.status = "archived"; t.archivedAt = Date.now(); saveDb(); return send(res, 200, { ok: true });
+        t.status = "archived"; t.archivedAt = Date.now(); delete t.archivedAuto; saveDb(); return send(res, 200, { ok: true });
       }
       if (P === "/api/admin/track/delete" && M === "POST") {    // the owner can delete any track; its data stays in the database
         const t = db.tracks[b.id]; if (!need(res, t && t.status !== "deleted", 404, "no such track")) return;
@@ -1164,7 +1169,7 @@ const server = http.createServer(async (req, res) => {
           const nv = Math.round(Number(b.videos)); if (nv >= 1 && nv <= 500 && nv !== r.videos) { const ac0 = findAccAny(r.openId); r.videos = nv; r.discount = ac0 ? discountFor(ac0, nv) : 0; }
           const t = db.tracks[r.trackId], cost = reqCost(r);
           if (!need(res, t && t.status === "active" && trackLeft(t) >= cost, 409, "not enough budget on the track")) return;
-          t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100; r.approvedAt = Date.now();
+          t.spent = Math.round(((t.spent || 0) + cost) * 100) / 100; r.approvedAt = Date.now(); syncArchive(t);
           const dd = Math.round(Number(b.days)); r.days = dd >= 1 && dd <= 180 ? dd : 16;
         }
         if (st === "cancelled") refundReq(r);
@@ -1197,7 +1202,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
         const tp = db.topups[b.id]; if (!need(res, tp && tp.status === "pending", 404, "no pending payment")) return;
         if (b.status === "confirmed" && !need(res, ["active", "archived"].includes((db.tracks[tp.trackId] || {}).status), 409, "approve the track first")) return;
-        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t && t.status === "archived") { t.status = "active"; t.archivedAt = 0; } if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; tp.confirmedAt = Date.now(); }
+        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t && t.status === "archived") { t.status = "active"; t.archivedAt = 0; delete t.archivedAuto; } if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; tp.confirmedAt = Date.now(); }
         else if (b.status === "rejected") tp.status = "rejected";
         else return send(res, 400, { error: "bad status" });
         saveDb(); return send(res, 200, { ok: true });
