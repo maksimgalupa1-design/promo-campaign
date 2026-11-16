@@ -1881,7 +1881,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v102 · 17.11 01:35</span>
+  <span>© Promo Campaign · v103 · 17.11 01:55</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6659,7 +6659,7 @@ function probeLive(){
       if((r.headers.get("content-type")||"").indexOf("application/json")<0||(r.status!==200&&r.status!==401))return;
       LIVE=true;admLoad().then(admNav);admNav();
       if(r.status===200)return r.json().then(applyLive).then(loadReqs);
-      if(S.accounts.some(function(a){return a.scenario!=="live"})){S.accounts=[];S.active=0;sync();S.orders=[];S.history=[];save()}
+      if(S.accounts.length||S.orders.length){S.accounts=[];S.active=0;sync();S.orders=[];S.history=[];save()}   /* signed out on this browser: drop any saved copy of an account, it may be old */
     }).catch(function(){clearTimeout(to);if(n+1<tries.length)return once(n+1)});
   }
   /* a slow server start must not leave an old saved copy on screen: keep trying and redraw when the answer arrives */
