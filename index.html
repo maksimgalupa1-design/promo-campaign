@@ -1541,6 +1541,19 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .btn[data-l=rcPdf]{background:rgba(79,140,255,.18)!important;border-color:rgba(79,140,255,.7)!important}.btn[data-l=rcPdf]:hover{box-shadow:0 0 22px rgba(79,140,255,.6)!important}
 .btn[data-l=showProof]{background:rgba(167,139,250,.2)!important;border-color:rgba(167,139,250,.75)!important}.btn[data-l=showProof]:hover{box-shadow:0 0 22px rgba(167,139,250,.65)!important}
 
+/* v87 */
+.temod{max-width:560px}.temod textarea{width:100%;border-radius:14px}
+.tecard .teitem{padding:14px;border-radius:20px;background:rgba(139,108,255,.1);border:1.5px solid rgba(139,108,255,.4);margin-top:10px}
+.tediff{display:flex;flex-direction:column;gap:6px;margin:10px 0}.terow{display:grid;grid-template-columns:140px 1fr 1fr;gap:8px;font-size:13px;align-items:start}
+.terow span{opacity:.7}.terow s{opacity:.6;overflow-wrap:anywhere}.terow i{font-style:normal;font-weight:700;color:#7ee2a8;overflow-wrap:anywhere}
+@media(max-width:520px){.terow{grid-template-columns:1fr}}
+
+/* v88 — topic checkboxes: round, glowing, grow on hover */
+.cats label,.mchip{border-radius:999px!important;border:1.5px solid rgba(139,108,255,.4)!important;background:rgba(139,108,255,.08)!important;transition:transform .22s cubic-bezier(.2,1.4,.4,1),box-shadow .22s,background .22s,border-color .22s}
+.cats label:not(.soon):hover{transform:scale(1.06);background:rgba(139,108,255,.2)!important;box-shadow:0 0 20px rgba(139,108,255,.5)}
+.cats label:has(input:checked){background:rgba(139,108,255,.28)!important;border-color:#8b6cff!important;box-shadow:0 0 0 3px rgba(139,108,255,.2),0 0 18px rgba(139,108,255,.55);font-weight:700}
+.cats label.soon{opacity:.5}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1718,7 +1731,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v86 · 17.11 03:00</span>
+  <span>© Promo Campaign · v88 · 17.11 04:00</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4344,7 +4357,7 @@ document.addEventListener("click",function(e){
   var after=function(){
     var t=x==="pay"?$("payH1"):(x==="add"?document.querySelector("#v-lprod h3, #v-lprod .form, #nTitle"):null);
     if(x==="add"&&$("nTitle")){$("nTitle").closest("label").scrollIntoView({behavior:"smooth",block:"center"});setTimeout(function(){var i=$("nTitle");if(i)i.focus({preventScroll:true})},450);return}
-    if(t)t.scrollIntoView({behavior:"smooth",block:"start"});else window.scrollTo({top:0,behavior:"smooth"})};
+    if(t)t.scrollIntoView({behavior:"smooth",block:"start"})};
   if(location.hash==="#"+g){route();dockRender();setTimeout(after,350)}else{go(g);setTimeout(after,700)}
 });
 (function(){var o=navRole;navRole=function(){o.apply(this,arguments);dockRender()}})();
@@ -6138,13 +6151,13 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   Object.assign(LT.ru,{cv_tt:"Взять аватарку из TikTok",cv_tt_h:"Пока недоступно: TikTok ещё проверяет приложение. А пока загрузите своё фото выше.",ep_t:"Опубликовать трек",ep_h:"Выберите, до какого времени идёт набор эдиторов. После этого начинаются заказы и выплаты.",ep_l:"Набор открыт до",ep_ok:"Опубликовать",ep_no:"Отмена",ep_need:"Сначала выберите срок набора"});
   var CID=null;
   function epClose(){var o=$("epop");if(o)o.remove();CID=null}
-  document.addEventListener("click",function(e){var t=e.target,ob=t.closest&&t.closest('[data-l="trAct"][data-s="approved"]');
-    if(ob){e.stopImmediatePropagation();e.preventDefault();CID=ob.getAttribute("data-id");var tr=((ADM.data&&ADM.data.tracks)||[]).filter(function(x){return x.id===CID})[0];
+  window.addEventListener("click",function(e){var t=e.target,ob=t.closest&&t.closest('[data-l="trAct"][data-s="approved"],[data-l="ntOk"]');
+    if(ob){e.stopImmediatePropagation();e.preventDefault();CID=ob.getAttribute("data-id");window.__epNt=ob.getAttribute("data-l")==="ntOk";var tr=((ADM.data&&ADM.data.tracks)||[]).filter(function(x){return x.id===CID})[0];
       var o=document.createElement("div");o.id="epop";o.className="dpop";o.style.zIndex=10000;o.innerHTML='<div class="dpbox epbox"><h3>🚀 '+esc(L("ep_t"))+(tr?': '+esc(tr.title):'')+'</h3><p class="hint">'+esc(L("ep_h"))+'</p><div class="eprow"><span>'+esc(L("ep_l"))+'</span>'+dtField("epin","")+'</div><div class="dpf"><button type="button" class="btn" data-ep="no">'+esc(L("ep_no"))+'</button><button type="button" class="btn primary" data-ep="ok">🚀 '+esc(L("ep_ok"))+'</button></div></div>';document.body.appendChild(o);return}
     var b=t.closest&&t.closest("[data-ep]");if(b){e.stopImmediatePropagation();
       if(b.getAttribute("data-ep")==="no"){epClose();return}
       var v=($("epop").querySelector(".epin")||{}).value,ms=v?new Date(v).getTime():0;if(!(ms>Date.now())){toast(L("ep_need"));return}
-      var id=CID;api("/api/admin/track",{id:id,status:"approved",enrollUntil:ms}).then(function(r){if(r.ok){epClose();toast("✓");ownerReload()}else toast((r.j&&r.j.error)||"error")});return}
+      var id=CID;var nt=window.__epNt;api("/api/admin/track",{id:id,status:"approved",enrollUntil:ms}).then(function(r){if(r.ok){epClose();toast("✓");if(nt){var tt=((ADM.data&&ADM.data.tracks)||[]).filter(function(x){return x.id===id})[0];api("/api/admin/broadcast",{text:L("bc_track_text").replace("{t}",tt?(tt.title+(tt.artist?" — "+tt.artist:"")):""),title:L("bc_track_title"),audience:"editors",type:"campaigns",trackId:id}).then(function(){ownerReload()})}else ownerReload()}else toast((r.j&&r.j.error)||"error")});return}
     if(t.id==="epop"){e.stopImmediatePropagation();epClose()}},true);
 })();
 
@@ -6154,7 +6167,7 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   var KEY="pc_olog",INI="pc_olog_i";
   function logGet(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return []}}
   function logSet(a){try{localStorage.setItem(KEY,JSON.stringify(a.slice(0,300)))}catch(e){}}
-  function tidOf(id){var m=/^(nt|en|k|r|s|p|a|t)(.+)$/.exec(id);if(!m)return"";var r=m[2];if(m[1]==="en")r=r.split("-")[0];if(m[1]==="a")r=r.replace(/p$/,"");return r}
+  function tidOf(id){var m=/^(nt|en|te|k|r|s|p|a|t)(.+)$/.exec(id);if(!m)return"";var r=m[2];if(m[1]==="en"||m[1]==="te")r=r.split("-")[0];if(m[1]==="a")r=r.replace(/p$/,"");return r}
   var base=ownItems,busy=false;
   ownItems=function(){var cur=base.apply(this,arguments);if(busy)return cur;busy=true;
     try{var log=logGet(),have={};log.forEach(function(x){have[x.id]=1});var first=!localStorage.getItem(INI),fresh=[],now=Date.now();
@@ -6181,6 +6194,55 @@ try{if(window.__pcReady)window.__pcReady()}catch(e){}
   document.addEventListener("click",function(e){if(!e.target.closest||!e.target.closest(".csm"))closeM()});
   document.addEventListener("keydown",function(e){if(e.key==="Escape")closeM()});window.addEventListener("scroll",closeM,true);window.addEventListener("resize",closeM);
   var tm=0;new MutationObserver(function(){if(tm)return;tm=setTimeout(function(){tm=0;try{enhance()}catch(e){}},30)}).observe(document.body,{childList:true,subtree:true});enhance();
+})();
+
+/* ===== v87: producer edits his own track, owner checks the changes ===== */
+(function(){
+  Object.assign(LT.en,{te_btn:"Edit",te_t:"Edit track",te_h:"Everything is filled in. Change what you need and send it for a check. A live track keeps working as before until the manager approves.",te_title:"Track title",te_artist:"Artist",te_sp:"Spotify link",te_sc:"SoundCloud link",te_tt:"TikTok sound link",te_msg:"Comment for editors and the manager",te_dl:"Deadline for editors (e.g. 2 weeks)",te_desc:"Editors must put this in the description",te_cover:"Track photo",te_up:"Choose a photo",te_rm:"Remove photo",te_send:"Send for review",te_cancel:"Cancel",te_ok:"Sent. The manager will check the changes.",te_pend:"Changes on review",te_rej:"Changes were declined",te_ttna:"Take my TikTok avatar (not available yet: TikTok is still reviewing the app)",te_own:"Changes to review",te_old:"Was",te_new:"Now",te_ap:"Approve changes",te_no:"Decline",te_ow:"{t}: changes to review",te_cats:"Topics",te_none:"—",te_photo:"photo changed"});
+  Object.assign(LT.ru,{te_btn:"Изменить",te_t:"Изменить трек",te_h:"Всё уже заполнено. Измените что нужно и отправьте на проверку. Опубликованный трек работает как раньше, пока менеджер не одобрит изменения.",te_title:"Название трека",te_artist:"Артист",te_sp:"Ссылка Spotify",te_sc:"Ссылка SoundCloud",te_tt:"Ссылка на звук в TikTok",te_msg:"Комментарий для эдиторов и менеджера",te_dl:"Срок для эдиторов (например, 2 недели)",te_desc:"Эдиторы должны вписать в описание",te_cover:"Фото трека",te_up:"Выбрать фото",te_rm:"Убрать фото",te_send:"Отправить на проверку",te_cancel:"Отмена",te_ok:"Отправлено. Менеджер проверит изменения.",te_pend:"Изменения на проверке",te_rej:"Изменения отклонены",te_ttna:"Взять аватарку из TikTok (пока недоступно: TikTok ещё проверяет приложение)",te_own:"Изменения трека",te_old:"Было",te_new:"Стало",te_ap:"Одобрить изменения",te_no:"Отклонить",te_ow:"{t}: изменения на проверке",te_cats:"Темы",te_none:"—",te_photo:"фото изменено"});
+  var ED=null;
+  function lk(l,k){return (l&&l[k])||""}
+  function linksOf(l){var o={};["spotify","soundcloud","tiktok"].forEach(function(k){o[k]=lk(l,k)});return o}
+  /* make every track card of the producer clickable + add an edit button */
+  function decorate(){var b=$("lprodBody");if(!b||!LV.prod)return;b.querySelectorAll(".card.ord").forEach(function(c){if(c.getAttribute("data-te"))return;var d=c.querySelector('[data-l="pDel"]');if(!d)return;var id=d.getAttribute("data-id");c.setAttribute("data-te","1");
+      var row=d.parentNode;if(row){var e=document.createElement("button");e.type="button";e.className="btn sm primary";e.setAttribute("data-l","pEdit");e.setAttribute("data-id",id);e.textContent="✏️ "+L("te_btn");row.insertBefore(e,row.firstChild)}
+      var tt=c.querySelector(".t > div:first-child");if(tt){tt.setAttribute("data-l","pEdit");tt.setAttribute("data-id",id);tt.style.cursor="pointer";tt.title=L("te_btn");
+        var t=LV.prod.tracks.filter(function(x){return x.id===id})[0];if(t&&t.editPending)tt.insertAdjacentHTML("beforeend",'<span class="pill warn">⏳ '+esc(L("te_pend"))+'</span>');else if(t&&t.editRej)tt.insertAdjacentHTML("beforeend",'<span class="pill bad">'+esc(L("te_rej"))+'</span>')}})}
+  var oD=drawProd;drawProd=function(){oD.apply(this,arguments);try{decorate()}catch(e){}};
+  function resize(f,cb){var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",.8))};im.onerror=function(){toast(L("cv_big"))};im.src=fr.result};fr.readAsDataURL(f)}
+  function prev(){var i=$("eCvPrev"),r=$("eCvRm");if(!i)return;if(ED.cover){i.src=ED.cover;i.hidden=false;if(r)r.hidden=false}else{i.hidden=true;if(r)r.hidden=true}}
+  function openEdit(id){api("/api/producer/track/get",{id:id}).then(function(r){if(!r.ok){toast((r.j&&r.j.error)||"error");return}var t=r.j;ED={id:id,cover:t.cover||"",newCover:"",rm:false};var l=linksOf(t.links);
+    openModal('<div class="temod"><h3>✏️ '+esc(L("te_t"))+'</h3><p class="hint">'+esc(L("te_h"))+'</p>'+
+      '<label class="f" for="eTitle"><span>'+esc(L("te_title"))+'</span><input id="eTitle" type="text" maxlength="120" value="'+esc(t.title)+'"></label>'+
+      '<label class="f" for="eArtist"><span>'+esc(L("te_artist"))+'</span><input id="eArtist" type="text" maxlength="120" value="'+esc(t.artist)+'"></label>'+
+      '<label class="f" for="eSp"><span>'+esc(L("te_sp"))+'</span><input id="eSp" type="url" value="'+esc(l.spotify)+'"></label>'+
+      '<label class="f" for="eSc"><span>'+esc(L("te_sc"))+'</span><input id="eSc" type="url" value="'+esc(l.soundcloud)+'"></label>'+
+      '<label class="f" for="eTt"><span>'+esc(L("te_tt"))+'</span><input id="eTt" type="url" value="'+esc(l.tiktok)+'"></label>'+
+      '<label class="f" for="eMsg"><span>'+esc(L("te_msg"))+'</span><textarea id="eMsg" maxlength="600" rows="3">'+esc(t.message)+'</textarea></label>'+
+      '<label class="f" for="eDl"><span>'+esc(L("te_dl"))+'</span><input id="eDl" type="text" maxlength="60" value="'+esc(t.deadline)+'"></label>'+
+      '<label class="chk" for="eDesc"><input type="checkbox" id="eDesc"'+(t.descRule?' checked':'')+'><span>'+esc(L("te_desc"))+'</span></label>'+
+      '<label class="f" for="eDescT"><span>'+esc(L("desc_txt_l"))+'</span><input id="eDescT" type="text" maxlength="120" value="'+esc(t.descText)+'"></label>'+
+      '<b>'+esc(L("te_cats"))+'</b>'+catChecks("eCats",t.categories||[])+
+      '<div class="f"><span>'+esc(L("te_cover"))+'</span><img id="eCvPrev" class="covprev" alt="" hidden><div class="row"><label class="btn sm" for="eCv">📷 '+esc(L("te_up"))+'</label><input id="eCv" type="file" accept="image/*" hidden><button type="button" class="btn sm danger" id="eCvRm" data-l="eCvRm" hidden>'+esc(L("te_rm"))+'</button></div><div class="cvtt"><button type="button" class="btn sm" disabled>🎵 '+esc(L("cv_tt"))+'</button><span class="hint">'+esc(L("cv_tt_h"))+'</span></div></div>'+
+      '<div class="note err" id="eErr" hidden></div><div class="row" style="margin-top:12px"><button type="button" class="btn primary" data-l="eSend">🚀 '+esc(L("te_send"))+'</button><button type="button" class="btn" data-l="mclose2">'+esc(L("te_cancel"))+'</button></div></div>');prev()})}
+  document.addEventListener("change",function(e){if(!e.target||e.target.id!=="eCv")return;var f=e.target.files&&e.target.files[0];if(!f||!/^image\//.test(f.type)||f.size>15e6){toast(L("cv_big"));return}resize(f,function(d){ED.cover=d;ED.newCover=d;ED.rm=false;prev()})});
+  document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l]");if(!el)return;var a=el.getAttribute("data-l");
+    if(a==="pEdit"){e.stopImmediatePropagation();e.preventDefault();openEdit(el.getAttribute("data-id"));return}
+    if(a==="eCvRm"){e.stopImmediatePropagation();ED.cover="";ED.newCover="";ED.rm=true;prev();return}
+    if(a==="eSend"){e.stopImmediatePropagation();var er=$("eErr");er.hidden=true;el.disabled=true;
+      api("/api/producer/track/edit",{id:ED.id,title:val("eTitle"),artist:val("eArtist"),links:{spotify:val("eSp"),soundcloud:val("eSc"),tiktok:val("eTt")},message:val("eMsg"),deadline:val("eDl"),descRule:$("eDesc").checked,descText:val("eDescT"),categories:checked("eCats"),cover:ED.newCover,coverRemove:ED.rm}).then(function(r){el.disabled=false;
+        if(r.ok){LV.prod=r.j;closeModal();drawProd();toast(L("te_ok"))}else{er.textContent=(r.j&&r.j.error)||"error";er.hidden=false}});return}
+  },true);
+  /* owner side */
+  function chg(o,n){var rows=[];function add(l,a,b){if((a||"")!==(b||""))rows.push([l,a||L("te_none"),b||L("te_none")])}
+    add(L("te_title"),o.title,n.title);add(L("te_artist"),o.artist,n.artist);add(L("te_sp"),lk(o.links,"spotify"),lk(n.links,"spotify"));add(L("te_sc"),lk(o.links,"soundcloud"),lk(n.links,"soundcloud"));add(L("te_tt"),lk(o.links,"tiktok"),lk(n.links,"tiktok"));add(L("te_msg"),o.message,n.message);add(L("te_dl"),o.deadline,n.deadline);add(L("te_desc"),o.descRule?o.descText:"",n.descRule?n.descText:"");
+    add(L("te_cats"),(o.categories||[]).join(", "),(n.categories||[]).join(", "));if(!!n.hasCover!==!!o.hasCover||n.hasCover)rows.push([L("te_cover"),o.hasCover?"✓":L("te_none"),n.hasCover?"✓ "+L("te_photo"):L("te_none")]);return rows}
+  function ownHtml(){var D=ADM.data;if(!D)return"";var T=(D.tracks||[]).filter(function(t){return t.edit});if(!T.length)return"";
+    return '<div class="card form tecard"><h3>✏️ '+esc(L("te_own"))+'</h3>'+T.map(function(t){var rows=chg(t,t.edit);return '<div class="teitem" data-id="'+esc(t.id)+'"><b>'+esc(t.title)+'</b>'+(t.producerName?' <small>· '+esc(t.producerName)+'</small>':'')+'<div class="tediff">'+rows.map(function(r){return '<div class="terow"><span>'+esc(r[0])+'</span><s>'+esc(r[1])+'</s><i>'+esc(r[2])+'</i></div>'}).join("")+'</div><div class="row"><button type="button" class="btn primary" data-l="teOk" data-id="'+esc(t.id)+'">✓ '+esc(L("te_ap"))+'</button><button type="button" class="btn danger" data-l="teNo" data-id="'+esc(t.id)+'">'+esc(L("te_no"))+'</button></div></div>'}).join("")+'</div>'}
+  var oR=renderOwner;renderOwner=function(){var r=oR.apply(this,arguments);try{if((LV.adTab==="newtracks"||LV.adTab==="tracks")&&!document.querySelector(".tecard")){var h=ownHtml(),m=document.querySelector(".ownmain");if(h&&m)m.insertAdjacentHTML("afterbegin",h)}}catch(e){}return r};
+  window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="teOk"],[data-l="teNo"]');if(!el)return;e.stopImmediatePropagation();var ok=el.getAttribute("data-l")==="teOk";el.disabled=true;
+    api("/api/admin/track-edit",{id:el.getAttribute("data-id"),ok:ok}).then(function(r){if(r.ok){toast("✓");ownerReload()}else{el.disabled=false;toast((r.j&&r.j.error)||"error")}})},true);
+  var oI=ownItems;ownItems=function(){var it=oI.apply(this,arguments),D=ADM.data;if(D)(D.tracks||[]).forEach(function(t){if(t.edit)it.push({id:"te"+t.id+"-"+(t.edit.at||0),t:"tracks",tab:"newtracks",txt:L("te_ow").replace("{t}",t.title)})});return it};
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
