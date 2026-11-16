@@ -1523,6 +1523,23 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .chips .chip[data-l=rFil][data-f=work]{--cc:#5b9bff}.chips .chip[data-l=rFil][data-f=done]{--cc:#a78bfa}.chips .chip[data-l=rFil][data-f=all]{--cc:#9aa4b8}
 .mbox .btn[data-l=mclose2],.mbox .btn[data-l=mclose]{border-radius:999px;background:rgba(240,70,90,.16);border:1.5px solid rgba(240,70,90,.7);color:#ff8794;font-weight:700;transition:transform .2s cubic-bezier(.2,1.4,.4,1),box-shadow .2s}
 .mbox .btn[data-l=mclose2]:hover{transform:scale(1.06);background:rgba(240,70,90,.3);box-shadow:0 0 22px rgba(240,70,90,.55)}
+/* v86 — every chip and button: round, coloured, glowing, hover grows */
+.chip{--cc:#8b6cff;border-radius:999px!important;font-weight:700;border:1.5px solid color-mix(in srgb,var(--cc) 65%,transparent)!important;background:color-mix(in srgb,var(--cc) 14%,transparent)!important;transition:transform .22s cubic-bezier(.2,1.4,.4,1),box-shadow .22s,background .22s}
+.chip:hover{transform:scale(1.07);box-shadow:0 0 20px color-mix(in srgb,var(--cc) 60%,transparent)}
+.chip[aria-pressed=true]{background:var(--cc)!important;color:#10101a!important;box-shadow:0 0 0 4px color-mix(in srgb,var(--cc) 25%,transparent),0 0 24px color-mix(in srgb,var(--cc) 65%,transparent);transform:scale(1.04)}
+.chip[data-l=pFil][data-f=pending],.chip[data-l=vlF][data-k=none],.chip[data-l=arcF][data-k=del]{--cc:#f5b82e}
+.chip[data-l=pFil][data-f=done],.chip[data-l=vlF][data-k=sent]{--cc:#34d17a}
+.chip[data-l=arcF][data-k=ban]{--cc:#ff5d73}.chip[data-l=arcF][data-k=adm]{--cc:#8b6cff}
+.chip[data-l=ordF],.chip[data-l=nFil],.chip[data-l=tcat]{--cc:#5b9bff}
+.chips .chip[data-l=rFil]{--cc:var(--cc)}
+.btn{border-radius:999px;transition:transform .22s cubic-bezier(.2,1.4,.4,1),box-shadow .22s,background .22s,filter .2s}
+.btn:not(:disabled):hover{transform:scale(1.05)}
+.btn:not(.primary):not(.danger):not([data-l=mclose2]):not([data-l=mclose]){background:rgba(139,108,255,.16);border:1.5px solid rgba(139,108,255,.55);color:inherit;font-weight:700}
+.btn:not(.primary):not(.danger):not([data-l=mclose2]):not([data-l=mclose]):not(:disabled):hover{background:rgba(139,108,255,.3);box-shadow:0 0 22px rgba(139,108,255,.55)}
+.btn.primary{background:linear-gradient(135deg,#7c5cff,#4f8cff);border:0;box-shadow:0 6px 22px rgba(124,92,255,.45)}
+.btn.primary:not(:disabled):hover{box-shadow:0 0 0 4px rgba(124,92,255,.25),0 8px 30px rgba(124,92,255,.7)}
+.btn[data-l=rcPdf]{background:rgba(79,140,255,.18)!important;border-color:rgba(79,140,255,.7)!important}.btn[data-l=rcPdf]:hover{box-shadow:0 0 22px rgba(79,140,255,.6)!important}
+.btn[data-l=showProof]{background:rgba(167,139,250,.2)!important;border-color:rgba(167,139,250,.75)!important}.btn[data-l=showProof]:hover{box-shadow:0 0 22px rgba(167,139,250,.65)!important}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1701,7 +1718,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v85 · 17.11 02:30</span>
+  <span>© Promo Campaign · v86 · 17.11 03:00</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
