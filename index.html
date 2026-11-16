@@ -1701,6 +1701,9 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 @media(max-width:700px){.cstk{bottom:max(84px,calc(env(safe-area-inset-bottom,0px) + 76px))}.vlh2{padding:12px}.vlbody{padding:0 12px 14px}}
 @media(max-width:700px){.vlh2{grid-template-columns:1fr!important}.vla{grid-row:1}.vla b{white-space:normal}.vltrk{grid-row:2!important;grid-column:1!important}.vlr{grid-row:3!important;grid-column:1!important;justify-content:flex-start}.vlch{margin-left:auto}}
 
+/* v99: chat covers the whole phone screen */
+@media(max-width:899px){.chatov{top:0!important;z-index:96;padding-top:env(safe-area-inset-top,0px)!important}body.hasdock #dock{z-index:97}}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1878,7 +1881,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v98 · 16.11 23:50</span>
+  <span>© Promo Campaign · v99 · 17.11 00:20</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2294,7 +2297,7 @@ function renderAnalysis(){loadRanges();
     var h=winTable(A)+videoTable(u);
     if(!A.accepted){
       h+='<div class="blk"><h3>'+esc(t("rp_bad"))+'</h3>'+reasonList([A.reject],"b")+'<p class="hint" style="margin-top:8px">'+esc(t("rej_hint"))+'</p></div>'+
-        '<div class="note" style="margin-top:12px"><b>'+esc(L("rj_chance"))+'</b> '+esc(L("rj_note"))+'</div>';
+        '<div class="note" style="margin-top:12px"><b>'+esc(L("rj_chance"))+'</b> '+esc(L("rj_note"))+'</div>'+(LIVE?'<div class="delzone" id="rjDelBox" style="margin-top:14px"><button type="button" class="btn danger" data-l="rjDel">🗑 '+esc(L("rj_del"))+'</button></div>':'');
     }
       h+='<div class="card" style="margin-top:18px"><h3>'+esc(L("tp_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(L("tp_h"))+'</p>'+catChecks("anCats",u.categories||[])+(LIVE?'<label class="f" for="anAbout" style="margin-top:14px"><span>'+esc(L("an_about"))+'</span><textarea id="anAbout" rows="3" maxlength="600" placeholder="'+esc(L("dl_about_ph"))+'">'+esc(u.about||"")+'</textarea><span class="hint">'+esc(L("an_about_h"))+'</span></label><div class="note err" id="aboutErr" hidden>'+esc(L("an_about_err"))+'</div>':'')+'<div class="note err" id="topicErr" hidden style="margin-top:12px">'+esc(L("tp_err"))+'</div></div>'+
         '<div class="card" style="margin-top:18px"><h3>'+esc(t("price_title"))+'</h3><p class="hint" style="margin:6px 0 12px">'+esc(t("price_hint"))+'</p><div class="note" id="rangeHint" hidden style="margin-bottom:12px"></div>'+
@@ -6611,6 +6614,18 @@ document.addEventListener("touchend",function(e){if(!sd)return;var dx=e.changedT
 document.addEventListener("click",function(e){if(window.__swiped&&Date.now()-window.__swiped<400&&e.target.closest&&e.target.closest(".cst,.cpop")){e.stopImmediatePropagation();e.preventDefault()}},true);
 })();
 
+/* ===== v99: delete a rejected account from the rejection screen ===== */
+(function(){
+Object.assign(LT.en,{rj_del:"Delete this account",rj_del_q:"Are you sure you want to delete this account?",rj_del_yes:"Yes, delete",rj_del_no:"No",rj_del_err:"Could not delete: "});
+Object.assign(LT.ru,{rj_del:"Удалить этот аккаунт",rj_del_q:"Вы уверены, что хотите удалить этот аккаунт?",rj_del_yes:"Да, удалить",rj_del_no:"Нет",rj_del_err:"Не удалось удалить: "});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};["rj_del","rj_del_q","rj_del_yes","rj_del_no","rj_del_err"].forEach(function(q){XLL[k][q]=XLL[k][q]||LT.en[q]})});
+window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest("[data-l^=rjDel]");if(!el)return;e.stopImmediatePropagation();e.preventDefault();var a=el.getAttribute("data-l"),box=$("rjDelBox");
+  if(a==="rjDel"){box.innerHTML='<div class="note err"><p>'+esc(L("rj_del_q"))+'</p><div class="row ynrow" style="margin-top:10px"><button type="button" class="yn yes btn" data-l="rjDelYes">'+esc(L("rj_del_yes"))+'</button><button type="button" class="yn no btn" data-l="rjDelNo">'+esc(L("rj_del_no"))+'</button></div></div>';return}
+  if(a==="rjDelNo"){box.innerHTML='<button type="button" class="btn danger" data-l="rjDel">🗑 '+esc(L("rj_del"))+'</button>';return}
+  if(a==="rjDelYes"){el.disabled=true;var acc=S.accounts[S.active];if(!acc)return;api("/api/account/delete",{id:acc.id}).then(function(r){if(!r.ok){el.disabled=false;box.insertAdjacentHTML("beforeend",'<p class="hint" style="color:#ff8a96">'+esc(L("rj_del_err")+((r.j&&r.j.error)||""))+'</p>');return}applyLive(r.j);S.active=0;save();go("dashboard")})}
+},true);
+})();
+
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
 window.addEventListener("hashchange",route);
 function applyLive(d){
@@ -6622,15 +6637,20 @@ function applyLive(d){
 /* When the page is served by server.js it talks to /api; anywhere else (this preview) it stays in demo mode */
 function probeLive(){
   if(!/^https?:$/.test(location.protocol))return Promise.resolve();
-  var ctl=("AbortController" in window)?new AbortController():null;
-  var to=setTimeout(function(){if(ctl)ctl.abort()},2500);
-  return fetch("/api/me",{credentials:"same-origin",signal:ctl?ctl.signal:undefined}).then(function(r){
-    clearTimeout(to);
-    if((r.headers.get("content-type")||"").indexOf("application/json")<0||(r.status!==200&&r.status!==401))return;
-    LIVE=true;admLoad().then(admNav);admNav();
-    if(r.status===200)return r.json().then(applyLive).then(loadReqs);
-    if(S.accounts.some(function(a){return a.scenario!=="live"})){S.accounts=[];S.active=0;sync();S.orders=[];S.history=[];save()}
-  }).catch(function(){clearTimeout(to)});
+  var tries=[6000,15000,25000],done=false;
+  function once(n){
+    var ctl=("AbortController" in window)?new AbortController():null;
+    var to=setTimeout(function(){if(ctl)ctl.abort()},tries[n]);
+    return fetch("/api/me",{credentials:"same-origin",signal:ctl?ctl.signal:undefined}).then(function(r){
+      clearTimeout(to);
+      if((r.headers.get("content-type")||"").indexOf("application/json")<0||(r.status!==200&&r.status!==401))return;
+      LIVE=true;admLoad().then(admNav);admNav();
+      if(r.status===200)return r.json().then(applyLive).then(loadReqs);
+      if(S.accounts.some(function(a){return a.scenario!=="live"})){S.accounts=[];S.active=0;sync();S.orders=[];S.history=[];save()}
+    }).catch(function(){clearTimeout(to);if(n+1<tries.length)return once(n+1)});
+  }
+  /* a slow server start must not leave an old saved copy on screen: keep trying and redraw when the answer arrives */
+  return once(0).then(function(){if(!LIVE)setTimeout(function(){probeLive().then(function(){if(LIVE){applyStatic();route()}})},4000)});
 }
 applyStatic();$("openTT").disabled=!termsOk();
 probeLive().then(function(){applyStatic();route()},function(){applyStatic();route()});
