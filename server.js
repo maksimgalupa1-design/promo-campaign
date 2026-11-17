@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 58;
+const SERVER_VER = 59;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -423,10 +423,20 @@ function topicStats() {
     const list = accs.filter(a => (a.categories || []).includes(c)), act = list.filter(a => PC.analyze(a.videos || [], Date.now()).accepted);
     const pr = act.filter(a => a.price > 0), ai = act.map(a => aiPrice(a, ctx)), aip = ai.filter(x => x.price > 0), ev = ai.filter(x => x.roi.avgRatio !== null);
     const avg = (arr, f) => arr.length ? Math.round(arr.reduce((x, y) => x + f(y), 0) / arr.length * 100) / 100 : null;
-    out.push({ id: c, accounts: list.length, active: act.length, avgPrice: avg(pr, a => a.price), avgAi: avg(aip, x => x.price), avgViews: avg(ai, x => x.parts.views), views30: ai.reduce((x, y) => x + y.views30, 0),
+    out.push({ id: c, accounts: list.length, active: act.length, avgPrice: avg(pr, a => a.price), avgAi: avg(aip, x => x.price), avgViews: avg(ai, x => x.parts.views), avgFollowers: avg(ai.filter(x => x.followers > 0), x => x.followers), views30: ai.reduce((x, y) => x + y.views30, 0),
       orders: ctx.demand[c].orders, demand: ctx.demand[c].idx, factor: ctx.demand[c].factor, avgRatio: avg(ev, x => x.roi.avgRatio) });
   });
   return out;
+}
+// Price ceiling for an account from the manager's topic limits: the topic's max price applies at the topic's baseline average views;
+// an account with more views than the baseline may go up in proportion (at most x3), an account with fewer keeps the topic max.
+function priceCeiling(acc) {
+  const R = db.settings.ranges || {}, cats = (acc.categories || []).filter(c => R[c] && R[c].max > 0);
+  if (!cats.length) return null;
+  let views = 0; try { views = aiPrice(acc).parts.views || 0; } catch (e) {}
+  let best = 0;
+  for (const c of cats) { const r = R[c], scale = r.views > 0 && views > r.views ? Math.min(3, views / r.views) : 1; best = Math.max(best, r.max * scale); }
+  return Math.round(best * 100) / 100;
 }
 const FEE = 0.2;   // site commission, taken from every confirmed payment
 const RATES = { t: 0, live: false, v: { UAH: 41.5, USDT: 1, SOL: 0.0058, TRX: 3.4, ETH: 0.00032, LTC: 0.0105, TON: 0.42, BTC: 0.0000105 } };
@@ -656,7 +666,8 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req), price = Number(b.price), acc = findAcc(u, b.id);
       if (!acc) return send(res, 404, { error: "no such account" });
       if (!(price >= 1 && price <= 60)) return send(res, 400, { error: "price 1..60" });
-      const np = Math.round(price * 100) / 100;
+      const np = Math.round(price * 100) / 100, cap = priceCeiling(acc);
+      if (cap !== null && np > cap + 1e-9) return send(res, 400, { error: "The maximum price for your topic is $" + cap + " per video", max: cap });
       acc.price = np; acc.priceReq = null;   // after the first approval the editor changes the price any time
       saveDb(); return send(res, 200, view(u));
     }
@@ -691,6 +702,7 @@ const server = http.createServer(async (req, res) => {
       const b = await readBody(req), acc = findAcc(u, b.id); if (!acc) return send(res, 404, { error: "no such account" });
       if (!need(res, acc.adminStatus !== "banned", 403, "This account is blocked")) return;
       if (!need(res, acc.price > 0, 400, "Set your price first")) return;
+      { const cap = priceCeiling(acc); if (cap !== null && acc.price > cap + 1e-9) return send(res, 400, { error: "The maximum price for your topic is $" + cap + " per video. Lower your price first.", max: cap }); }
       if (!need(res, (acc.about || "").trim().split(/\s+/).filter(Boolean).length >= 3, 400, "Describe your account in at least 3 words first")) return;
       acc.adminStatus = "new"; acc.sentAt = Date.now(); notify("An editor sent account @" + ((acc.profile || {}).username || "") + " for review."); saveDb(); return send(res, 200, view(u));
     }
@@ -1061,9 +1073,19 @@ const server = http.createServer(async (req, res) => {
         const spent = Math.round((budget - rem) * 100) / 100;
         return send(res, 200, { track: t.title, budget, spent, left: rem, videos: plan.reduce((x, p) => x + p.videos, 0), expViews: plan.reduce((x, p) => x + p.expViews, 0), plan, candidates: cands.length });
       }
+      if (P === "/api/admin/price-range" && M === "POST") {   // one topic: baseline average views + min and max price
+        const c = String(b.cat || ""); if (!need(res, CATEGORIES.includes(c), 400, "unknown topic")) return;
+        const R = Object.assign({}, db.settings.ranges || {});
+        if (b.clear) { delete R[c]; db.settings.ranges = R; saveDb(); return send(res, 200, { ranges: R }); }
+        const mn = Number(b.min), mx = Number(b.max), vw = Math.round(Number(b.views) || 0);
+        if (!need(res, mn > 0 && mx >= mn && mx <= 200, 400, "Minimum must be above 0 and not higher than the maximum (maximum up to $200)")) return;
+        if (!need(res, vw === 0 || (vw >= 500 && vw <= 50000000), 400, "Average views: from 500 to 50,000,000 (or leave empty)")) return;
+        R[c] = { min: Math.round(mn * 100) / 100, max: Math.round(mx * 100) / 100 }; if (vw > 0) R[c].views = vw;
+        db.settings.ranges = R; saveDb(); return send(res, 200, { ranges: R });
+      }
       if (P === "/api/admin/price-ranges" && M === "POST") {
         const out = {}, src = b.ranges && typeof b.ranges === "object" ? b.ranges : {};
-        for (const c of CATEGORIES) { const x = src[c] || {}, mn = Number(x.min), mx = Number(x.max); if (mn > 0 && mx >= mn && mx <= 200) out[c] = { min: Math.round(mn * 100) / 100, max: Math.round(mx * 100) / 100 }; }
+        for (const c of CATEGORIES) { const x = src[c] || {}, mn = Number(x.min), mx = Number(x.max); if (mn > 0 && mx >= mn && mx <= 200) { out[c] = { min: Math.round(mn * 100) / 100, max: Math.round(mx * 100) / 100 }; const v0 = ((db.settings.ranges || {})[c] || {}).views; if (v0 > 0) out[c].views = v0; } }
         db.settings.ranges = out; saveDb(); return send(res, 200, { ranges: out });
       }
       if (P === "/api/admin/contacts" && M === "POST") { let tg = String(b.telegram || "").trim().slice(0, 200); if (tg && !/^https?:\/\//i.test(tg)) tg = "https://t.me/" + tg.replace(/^@/, "").replace(/^t\.me\//i, ""); if (tg && !/^https:\/\/(t|telegram)\.me\/\S+$/i.test(tg)) tg = ""; const dc = String(b.discord || "").trim().slice(0, 200); const link = (v, base, re) => { v = String(v || "").trim().slice(0, 200); if (!v) return ""; if (!/^https?:\/\//i.test(v)) v = base + v.replace(/^@/, ""); return re.test(v) ? v : ""; };

@@ -1722,6 +1722,20 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .entend{font-size:14px}
 .entm .row{justify-content:center}
 
+/* v110: price topics */
+.ptxg{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:12px}
+@media(max-width:600px){.ptxg{grid-template-columns:1fr 1fr;gap:10px}}
+.ptxc{display:flex;flex-direction:column;gap:10px;text-align:left;padding:14px;border-radius:18px;background:#18181b;border:1px solid #2a2a31;color:inherit;font:inherit;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.ptxc:hover{transform:translateY(-2px);border-color:#7b6cff;box-shadow:0 8px 24px rgba(0,0,0,.45),0 0 18px rgba(123,108,255,.3)}.ptxc:active{transform:scale(.98)}
+.ptxc b{font-size:15px}
+.ptxs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.ptxs div{display:flex;flex-direction:column;min-width:0}.ptxs span{font-size:10px;opacity:.65;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ptxs strong{font-size:16px}
+.ptxp{padding:8px 10px;border-radius:12px;background:#121212;font-size:13px;opacity:.7}.ptxp.on{opacity:1;color:#7ee0b0;border:1px solid rgba(126,224,176,.35);font-weight:700}.ptxp small{font-weight:400;opacity:.75}
+.ptxc.set{border-color:rgba(126,224,176,.35)}
+.ptm{display:grid;gap:12px;background:#18181b}
+.ptmst{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ptmst div{padding:10px;border-radius:14px;background:#121212;border:1px solid #2a2a31;text-align:center}.ptmst b{display:block;font-size:20px}.ptmst span{font-size:11px;opacity:.65}
+.ptmrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ptm input{background:#121212}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1899,7 +1913,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v109 · 17.11 04:10</span>
+  <span>© Promo Campaign · v110 · 17.11 13:05</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6696,6 +6710,37 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   var end=new Date(t.enrollUntil);
   openModal('<div class="entm"><h3>⏳ '+esc(L("en_tm_t"))+'</h3><p class="hint"><b>'+esc(t.title)+'</b></p><div class="entimer" id="enTimer"></div><div class="entend">📅 '+esc(L("en_tm_end"))+': <b>'+esc(end.toLocaleString(lang==="ru"?"ru-RU":undefined,{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}))+'</b></div><p class="hint">'+esc(L("en_tm_hint"))+'</p><div class="row">'+(t.enrollUntil>Date.now()?'<button type="button" class="btn primary" data-l="req" data-id="'+esc(t.id)+'">'+esc(L("en_tm_go"))+'</button>':'')+'<button type="button" class="btn" data-l="mclose2">'+"✕"+'</button></div></div>');
   if(TM)clearInterval(TM.iv);TM={until:t.enrollUntil};tick();TM.iv=setInterval(tick,1000)},true);
+})();
+
+/* ===== v110: "Price topics" tab - topic cards + mini window (baseline views, min and max price) ===== */
+(function(){
+var K=["pt_h","pt_sub","pt_acc","pt_fol","pt_views","pt_bounds","pt_unset","pt_base","pt_m_t","pt_m_base","pt_m_base_h","pt_m_min","pt_m_max","pt_m_now","pt_m_rule","pt_m_save","pt_m_clear","pt_m_cancel","pt_m_err","pt_saved"];
+var EN={pt_h:"Prices by topic",pt_sub:"Tap a topic to set its limits. Editors cannot set a price above the topic maximum.",pt_acc:"Accounts",pt_fol:"Avg. subs",pt_views:"Avg. views",pt_bounds:"Price",pt_unset:"not set",pt_base:"base",pt_m_t:"Topic limits",pt_m_base:"Baseline average views",pt_m_base_h:"The max price applies to accounts with about this many views. More views allow a proportionally higher price (up to ×3).",pt_m_min:"Minimum price, $",pt_m_max:"Maximum price, $",pt_m_now:"Use current average",pt_m_rule:"Example: baseline 10,000 views and max $7 means an editor with 10,000 average views cannot ask more than $7 per video.",pt_m_save:"Save",pt_m_clear:"Remove limits",pt_m_cancel:"Cancel",pt_m_err:"Could not save: ",pt_saved:"Saved"};
+var RU={pt_h:"Цены по тематикам",pt_sub:"Нажмите на тематику, чтобы задать лимиты. Эдитор не сможет поставить цену выше максимума тематики.",pt_acc:"Аккаунтов",pt_fol:"Ср. подп.",pt_views:"Ср. просмотры",pt_bounds:"Цена",pt_unset:"не задано",pt_base:"база",pt_m_t:"Лимиты тематики",pt_m_base:"Базовые средние просмотры",pt_m_base_h:"Максимальная цена действует для аккаунтов примерно с таким числом просмотров. Больше просмотров — пропорционально выше цена (до ×3).",pt_m_min:"Минимальная цена, $",pt_m_max:"Максимальная цена, $",pt_m_now:"Взять текущее среднее",pt_m_rule:"Пример: база 10 000 просмотров и максимум $7 значит, что эдитор со средними 10 000 просмотров не сможет поставить больше $7 за видео.",pt_m_save:"Сохранить",pt_m_clear:"Убрать лимиты",pt_m_cancel:"Отмена",pt_m_err:"Не удалось сохранить: ",pt_saved:"Сохранено"};
+Object.assign(LT.en,EN);Object.assign(LT.ru,RU);
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};K.forEach(function(q){XLL[k][q]=XLL[k][q]||EN[q]})});
+function fk(n){n=Number(n)||0;return n>=1e6?(n/1e6).toFixed(1).replace(/\.0$/,"")+"M":n>=1e3?(n/1e3).toFixed(n>=1e4?0:1).replace(/\.0$/,"")+"K":String(Math.round(n))}
+function pm(n){return "$"+(Math.round(n*100)/100)}
+function ptHtml(){var d=ADM.data||{},tp=d.topics||[],by={};tp.forEach(function(x){by[x.id]=x});var R=LV.ranges||{};
+  return '<div class="ptx"><div class="card form"><h3>'+esc(L("pt_h"))+'</h3><p class="hint">'+esc(L("pt_sub"))+'</p></div><div class="ptxg">'+CATS.map(function(c){var s=by[c]||{},r=R[c];
+    return '<button type="button" class="ptxc'+(r?' set':'')+'" data-l="ptOpen" data-c="'+c+'"><b>'+esc(L("c_"+c))+'</b><div class="ptxs"><div><span>'+esc(L("pt_acc"))+'</span><strong>'+(s.accounts||0)+'</strong></div><div><span>'+esc(L("pt_fol"))+'</span><strong>'+(s.avgFollowers?fk(s.avgFollowers):"—")+'</strong></div><div><span>'+esc(L("pt_views"))+'</span><strong>'+(s.avgViews?fk(s.avgViews):"—")+'</strong></div></div><div class="ptxp '+(r?'on':'')+'">'+(r?pm(r.min)+' – '+pm(r.max)+(r.views?' <small>· '+esc(L("pt_base"))+' '+fk(r.views)+'</small>':''):esc(L("pt_bounds"))+': '+esc(L("pt_unset")))+'</div></button>'}).join("")+'</div></div>'}
+var oR=renderOwner;renderOwner=function(){var r=oR.apply(this,arguments);try{if(LV.adTab==="prices"&&ADM.data){var mn=document.querySelector(".ownmain")||$("adApp");if(mn&&!mn.querySelector(".ptx")){var y=window.scrollY;mn.innerHTML=ptHtml();window.scrollTo(0,y)}}}catch(e){}return r};
+function openPt(c){var d=ADM.data||{},s=((d.topics||[]).filter(function(x){return x.id===c})[0])||{},r=(LV.ranges||{})[c]||{};
+  openModal('<div class="ptm"><h3>'+esc(L("c_"+c))+'</h3><p class="hint">'+esc(L("pt_m_t"))+'</p>'+
+   '<div class="ptmst"><div><b>'+(s.accounts||0)+'</b><span>'+esc(L("pt_acc"))+'</span></div><div><b>'+(s.avgFollowers?fk(s.avgFollowers):"—")+'</b><span>'+esc(L("pt_fol"))+'</span></div><div><b>'+(s.avgViews?fk(s.avgViews):"—")+'</b><span>'+esc(L("pt_views"))+'</span></div></div>'+
+   '<label class="f" for="ptV"><span>'+esc(L("pt_m_base"))+'</span><input id="ptV" type="number" min="500" step="500" inputmode="numeric" value="'+(r.views||"")+'" placeholder="'+(s.avgViews?Math.round(s.avgViews):"10000")+'"></label>'+
+   (s.avgViews?'<button type="button" class="btn sm" data-l="ptNow" data-v="'+Math.round(s.avgViews)+'">'+esc(L("pt_m_now"))+' · '+fk(s.avgViews)+'</button>':'')+
+   '<p class="hint">'+esc(L("pt_m_base_h"))+'</p>'+
+   '<div class="ptmrow"><label class="f" for="ptMin"><span>'+esc(L("pt_m_min"))+'</span><input id="ptMin" type="number" min="0.5" step="0.5" inputmode="decimal" value="'+(r.min||"")+'" placeholder="3"></label><label class="f" for="ptMax"><span>'+esc(L("pt_m_max"))+'</span><input id="ptMax" type="number" min="0.5" step="0.5" inputmode="decimal" value="'+(r.max||"")+'" placeholder="7"></label></div>'+
+   '<p class="hint">'+esc(L("pt_m_rule"))+'</p><div class="note err" id="ptErr" hidden></div>'+
+   '<div class="row"><button type="button" class="btn primary" data-l="ptSave" data-c="'+c+'">'+esc(L("pt_m_save"))+'</button>'+(r.max?'<button type="button" class="btn danger" data-l="ptClear" data-c="'+c+'">'+esc(L("pt_m_clear"))+'</button>':'')+'<button type="button" class="btn" data-l="mclose2">'+esc(L("pt_m_cancel"))+'</button></div></div>')}
+function done(r){if(r.ok&&r.j&&r.j.ranges){LV.ranges=r.j.ranges;closeModal();toast(L("pt_saved"));renderOwner();return}var e=$("ptErr");if(e){e.hidden=false;e.textContent=L("pt_m_err")+((r.j&&r.j.error)||"")}}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="ptOpen"],[data-l="ptNow"],[data-l="ptSave"],[data-l="ptClear"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();var a=el.getAttribute("data-l"),c=el.getAttribute("data-c");
+  if(a==="ptOpen"){openPt(c);return}
+  if(a==="ptNow"){$("ptV").value=el.getAttribute("data-v");return}
+  if(a==="ptClear"){api("/api/admin/price-range",{cat:c,clear:true}).then(done);return}
+  if(a==="ptSave"){el.disabled=true;api("/api/admin/price-range",{cat:c,min:val("ptMin"),max:val("ptMax"),views:val("ptV")}).then(function(r){el.disabled=false;done(r)})}
+},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
