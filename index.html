@@ -1788,6 +1788,22 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 @keyframes vmk{0%{left:0}30%,88%{left:var(--w)}100%{left:0}}
 @media (prefers-reduced-motion:reduce){.vmf{animation:none;width:var(--w)}.vmk{animation:none;left:var(--w)}}
 .lkm{display:grid;gap:12px}.lkm .lkset{display:grid;gap:8px}.lkm .lkin{width:100%;box-sizing:border-box}.lkm .vmx{margin:0}.lkm .lkack{display:flex;gap:10px;align-items:flex-start;font-size:13px}.lkm .lkack input{margin-top:3px}
+/* v118: payment block for producers */
+#nPayBox .note.payok,#payBoxM .note.payok,#payBoxP .note.payok{background:rgba(255,201,77,.09);border:2px solid #ffc94d;box-shadow:0 0 24px rgba(255,201,77,.28);border-radius:18px;padding:14px}
+.paysend{display:block;margin-bottom:8px;font-size:18px;font-weight:800;color:#ffc94d;letter-spacing:.01em}
+.payok .payrow{padding:12px 14px}
+.payok .payl{font-size:14px;font-weight:800;color:#ffd978}
+.payok .payv{font-size:18px;font-weight:800}
+.payok .payrow.rcp{background:rgba(139,108,255,.2)}.payok .payrow.rcp .payl{color:#c9b9ff}
+.payok .hotnote,.payok .hotnote b{font-weight:700;font-size:15px}
+.cvt h4{font-size:16px;font-weight:800;line-height:1.35;margin:0 0 8px}
+.cvt .cvr b{font-weight:800}.cvt .cvr span{font-weight:800;font-size:17px}
+#nBudgetInfo,.card.form .f>span{font-weight:700}
+#nBudgetInfo{font-size:14px;opacity:1}
+.payok .payv{color:#fff}:root[data-theme=light] .payok .payv{color:#1c1830}
+@media(max-width:560px){.payok .payl{flex:1 1 100%;min-width:0}.payok .payv{flex:1 1 auto}}
+.pzbox h3{font-size:18px}.pzf.big span{font-size:14px;font-weight:800}.pzf.big input{font-size:17px;font-weight:700;padding:14px 16px}.pzh{margin:-6px 0 12px}
+.pzbox .btn.primary{padding:13px 26px;font-weight:800}#payOk{color:#2fb574;font-weight:700}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1966,7 +1982,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v117 · 17.11 20:30</span>
+  <span>© Promo Campaign · v119 · 17.11 21:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -7016,6 +7032,33 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   el.disabled=true;api("/api/request/links",{id:id,links:links,ack:true}).then(function(r){el.disabled=false;
     if(!r.ok){err.textContent=(r.j&&r.j.error)||L("dl_bad_link");err.hidden=false;return}
     closeModal();toast("✓ "+L("lk_wait"));loadReqs().then(function(){try{renderDashLive()}catch(x){}try{ordRefresh()}catch(x){}})})},true);
+})();
+
+/* ===== v118: producer payment block: bold, eye-catching, with the recipient ===== */
+(function(){
+var o=payBoxHtml;payBoxHtml=function(method,amount,coin,compact){
+  var h=o.apply(this,arguments),x=(LV.prod&&LV.prod.pay)||{};
+  h=h.replace('<b>'+esc(L("p_send_to"))+'</b>','<b class="paysend">💸 '+esc(L("p_send_to"))+'</b>');
+  if(method!=="card"&&x.cardHolder&&h.indexOf('class="payrow"')>=0){
+    h=h.replace('<div class="payrow">','<div class="payrow rcp"><span class="payl">👤 '+esc(L("p_recipient"))+'</span><b class="payv">'+esc(x.cardHolder)+'</b><button type="button" class="copybtn" data-l="cpy" data-v="'+esc(x.cardHolder)+'">⧉ '+esc(L("cp_copy"))+'</button></div><div class="payrow">')}
+  return h};
+})();
+
+/* ===== v119: clear admin screen for payment details (recipient, PayPal, card, crypto) ===== */
+(function(){
+Object.assign(LT.en,{pz_t:"Where producers send money",pz_h:"Fill this in yourself and change it any time. Producers see exactly this when they add a track.",pz_rcp:"Recipient name",pz_rcp_h:"Shown to producers with every method (PayPal, card, crypto).",pz_pp:"PayPal (email or link)",pz_card:"Card number (UA)",pz_cr:"Crypto wallets",pz_save:"Save details",pz_ok:"Saved. Producers see the new details now."});
+Object.assign(LT.ru,{pz_t:"Куда продюсеры отправляют деньги",pz_h:"Заполняйте сами и меняйте когда угодно. Продюсеры видят именно это при добавлении трека.",pz_rcp:"Имя получателя",pz_rcp_h:"Показывается продюсерам при любом способе (PayPal, карта, крипта).",pz_pp:"PayPal (email или ссылка)",pz_card:"Номер карты (UA)",pz_cr:"Крипто-кошельки",pz_save:"Сохранить реквизиты",pz_ok:"Сохранено. Продюсеры видят новые реквизиты сразу."});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("pz_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
+function fld(id,lbl,val,ph,big){return '<label class="f pzf'+(big?' big':'')+'" for="'+id+'"><span>'+esc(lbl)+'</span><input id="'+id+'" type="text" maxlength="140" autocomplete="off" placeholder="'+esc(ph||"")+'" value="'+esc(val||"")+'"></label>'}
+function html(){var X=LV.payInfo||{},C=X.crypto||{};
+  return '<div class="card form pzbox"><h3>💸 '+esc(L("pz_t"))+'</h3><p class="hint">'+esc(L("pz_h"))+'</p>'+
+   fld("pay_cardHolder","👤 "+L("pz_rcp"),X.cardHolder,"Name Surname",true)+'<p class="hint pzh">'+esc(L("pz_rcp_h"))+'</p>'+
+   fld("pay_paypal","🅿️ "+L("pz_pp"),X.paypal,"name@example.com",true)+
+   fld("pay_card","💳 "+L("pz_card"),X.card,"0000 0000 0000 0000",true)+
+   '<div class="paysec">🪙 '+esc(L("pz_cr"))+'</div>'+COINS.map(function(c){return fld("pay_c_"+c,coinL(c),C[c],"",false)}).join("")+
+   '<div class="row"><button type="button" class="btn primary" data-l="paySave">'+esc(L("pz_save"))+'</button><span class="hint" id="payOk"></span></div></div>'}
+var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="pay"){var mn=document.querySelector(".ownmain")||$("adApp");if(mn&&!mn.querySelector(".pzbox")){var ae=document.activeElement,keep=ae&&ae.id?{i:ae.id,v:ae.value}:null,y=window.scrollY;mn.innerHTML=html();if(keep&&$(keep.i)){$(keep.i).value=keep.v;$(keep.i).focus()}window.scrollTo(0,y)}}}catch(e){}return r};
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest('[data-l="paySave"]');if(!b)return;setTimeout(function(){var t=$("payOk");if(t&&t.textContent)t.textContent="✓ "+L("pz_ok")},600)},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
