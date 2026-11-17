@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 60;
+const SERVER_VER = 61;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -165,7 +165,7 @@ const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
 const HISTORY_DAYS = 200;           // how far back we load videos
 const MAX_PAGES = 15;               // 20 videos per page
 const REFRESH_EVERY = 30 * 60000;   // background refresh of views
-const CATEGORIES = ["movies", "sports", "anime", "gym", "cars", "lyrics", "visual", "gaming", "cartoons", "celeb", "memes", "dancing", "kpop", "motivation", "irl", "beauty", "nature", "other"];
+const CATEGORIES = ["movies", "sports", "anime", "gym", "cars", "lyrics", "visual", "gaming", "cartoons", "celeb", "memes", "dancing", "kpop", "motivation", "irl", "beauty", "nature", "looksmax", "other"];
 
 if (!KEY || !SECRET || !ADMIN_TOKEN) { console.error("Set TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET and ADMIN_TOKEN"); process.exit(1); }
 
