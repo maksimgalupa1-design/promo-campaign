@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 61;
+const SERVER_VER = 62;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -443,7 +443,7 @@ const RATES = { t: 0, live: false, v: { UAH: 41.5, USDT: 1, SOL: 0.0058, TRX: 3.
 const METHODS = ["paypal", "usdt", "card", "crypto"];
 const COINS = ["solana", "tron", "ethereum", "litecoin", "ton"];
 const PLATFORMS = ["tiktok", "instagram", "youtube"];
-function payInfo() { const x = db.settings.pay || {}, c = x.crypto || {}; const o = { paypal: x.paypal || "", card: x.card || "", cardHolder: x.cardHolder || "", crypto: {} }; for (const k of COINS) o.crypto[k] = c[k] || ""; return o; }
+function payInfo() { const x = db.settings.pay || {}, c = x.crypto || {}; const o = { paypal: x.paypal || "", paypalHolder: x.paypalHolder || "", card: x.card || "", cardHolder: x.cardHolder || "", cryptoHolder: x.cryptoHolder || "", crypto: {} }; for (const k of COINS) o.crypto[k] = c[k] || ""; return o; }
 const PKEY = () => crypto.scryptSync(ADMIN_TOKEN, "pc-payout-v1", 32);
 function encObj(o) { const iv = crypto.randomBytes(12), c = crypto.createCipheriv("aes-256-gcm", PKEY(), iv), ct = Buffer.concat([c.update(JSON.stringify(o), "utf8"), c.final()]); return [iv, c.getAuthTag(), ct].map(x => x.toString("base64")).join("."); }
 function decObj(str) { try { const [iv, tag, ct] = String(str).split(".").map(x => Buffer.from(x, "base64")), d = crypto.createDecipheriv("aes-256-gcm", PKEY(), iv); d.setAuthTag(tag); return JSON.parse(Buffer.concat([d.update(ct), d.final()]).toString("utf8")); } catch (e) { return null; } }
@@ -1163,7 +1163,7 @@ const server = http.createServer(async (req, res) => {
         saveDb(); return send(res, 200, { key });
       }
       if (P === "/api/admin/pay" && M === "GET") return send(res, 200, payInfo());
-      if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) cr[k] = c(b.crypto, k); db.settings.pay = { paypal: c(b, "paypal"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), crypto: cr }; saveDb(); return send(res, 200, payInfo()); }
+      if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) cr[k] = c(b.crypto, k); db.settings.pay = { paypal: c(b, "paypal"), paypalHolder: c(b, "paypalHolder"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), cryptoHolder: c(b, "cryptoHolder"), crypto: cr }; saveDb(); return send(res, 200, payInfo()); }
       if (P === "/api/admin/track" && M === "POST") {   // owner approves a track before the producer pays
         const t = db.tracks[b.id]; if (!need(res, t && t.status === "review", 404, "no track waiting for review")) return;
         if (b.status === "approved") { const eu = Number(b.enrollUntil); if (!need(res, eu > Date.now() && eu < Date.now() + 3.2e10, 400, "set the enrolment deadline")) return; t.enrollUntil = Math.round(eu); t.status = "active"; } else if (b.status === "rejected") t.status = "rejected"; else return send(res, 400, { error: "bad status" });

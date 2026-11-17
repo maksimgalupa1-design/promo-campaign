@@ -1804,6 +1804,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 @media(max-width:560px){.payok .payl{flex:1 1 100%;min-width:0}.payok .payv{flex:1 1 auto}}
 .pzbox h3{font-size:18px}.pzf.big span{font-size:14px;font-weight:800}.pzf.big input{font-size:17px;font-weight:700;padding:14px 16px}.pzh{margin:-6px 0 12px}
 .pzbox .btn.primary{padding:13px 26px;font-weight:800}#payOk{color:#2fb574;font-weight:700}
+.pzsec{margin:14px 0;border:1.5px solid rgba(139,108,255,.4)}.pzt{font-size:20px;font-weight:800;margin-bottom:12px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1982,7 +1983,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v119 · 17.11 21:10</span>
+  <span>© Promo Campaign · v120 · 17.11 21:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -3091,7 +3092,7 @@ document.addEventListener("click",function(e){
   if(a==="prSave"){var rg={};CATS.forEach(function(c){var mn=val("prmin_"+c),mx=val("prmax_"+c);if(mn&&mx)rg[c]={min:Number(mn),max:Number(mx)}});api("/api/admin/price-ranges",{ranges:rg}).then(function(r){if(r.ok)LV.ranges=r.j.ranges;var o=$("prOk");if(o)o.textContent=r.ok?L("a_pay_saved"):L("p_err")});return}
   if(a==="ctSave"){api("/api/admin/contacts",{telegram:val("ct_tg"),discord:val("ct_dc"),instagram:val("ct_ig"),tiktok:val("ct_tk")}).then(function(r){if(r.ok){CONTACTS=r.j;var o=$("ctOk");if(o)o.textContent=L("a_pay_saved");contactBtn()}});return}
   if(a==="ctToggle"){var bx=$("ctBox");if(bx)bx.hidden=!bx.hidden;return}
-  if(a==="paySave"){api("/api/admin/pay",{paypal:val("pay_paypal"),card:val("pay_card"),cardHolder:val("pay_cardHolder"),crypto:COINS.reduce(function(o,c){o[c]=val("pay_c_"+c);return o},{})}).then(function(r){LV.payInfo=r.j||{};var o=$("payOk");if(o)o.textContent=L("a_pay_saved")});return}
+  if(a==="paySave"){api("/api/admin/pay",{paypal:val("pay_paypal"),paypalHolder:val("pay_paypalHolder"),cryptoHolder:val("pay_cryptoHolder"),card:val("pay_card"),cardHolder:val("pay_cardHolder"),crypto:COINS.reduce(function(o,c){o[c]=val("pay_c_"+c);return o},{})}).then(function(r){LV.payInfo=r.j||{};var o=$("payOk");if(o)o.textContent=L("a_pay_saved")});return}
   if(a==="daySave"){api("/api/admin/request-days",{id:id,days:Number(val("dy_"+id))}).then(function(r){toast(r.ok?"✓":((r.j&&r.j.error)||"error"));ownerReload()});return}
   if(a==="rAct"){var bd={id:id,status:el.getAttribute("data-s")};if(bd.status==="approved"&&$("dy_"+id))bd.days=Number(val("dy_"+id));api("/api/admin/request",bd).then(function(r){if(!r.ok)alert((r.j&&r.j.error)||"error");ownerReload()});return}
   if(a==="trAct"){api("/api/admin/track",{id:id,status:el.getAttribute("data-s")}).then(function(){ownerReload()});return}
@@ -7039,23 +7040,24 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
 var o=payBoxHtml;payBoxHtml=function(method,amount,coin,compact){
   var h=o.apply(this,arguments),x=(LV.prod&&LV.prod.pay)||{};
   h=h.replace('<b>'+esc(L("p_send_to"))+'</b>','<b class="paysend">💸 '+esc(L("p_send_to"))+'</b>');
-  if(method!=="card"&&x.cardHolder&&h.indexOf('class="payrow"')>=0){
-    h=h.replace('<div class="payrow">','<div class="payrow rcp"><span class="payl">👤 '+esc(L("p_recipient"))+'</span><b class="payv">'+esc(x.cardHolder)+'</b><button type="button" class="copybtn" data-l="cpy" data-v="'+esc(x.cardHolder)+'">⧉ '+esc(L("cp_copy"))+'</button></div><div class="payrow">')}
+  var hold=method==="paypal"?x.paypalHolder:(method==="crypto"?x.cryptoHolder:"");
+  if(method!=="card"&&hold&&h.indexOf('class="payrow"')>=0){
+    h=h.replace('<div class="payrow">','<div class="payrow rcp"><span class="payl">👤 '+esc(L("p_recipient"))+'</span><b class="payv">'+esc(hold)+'</b><button type="button" class="copybtn" data-l="cpy" data-v="'+esc(hold)+'">⧉ '+esc(L("cp_copy"))+'</button></div><div class="payrow">')}
   return h};
 })();
 
 /* ===== v119: clear admin screen for payment details (recipient, PayPal, card, crypto) ===== */
 (function(){
-Object.assign(LT.en,{pz_t:"Where producers send money",pz_h:"Fill this in yourself and change it any time. Producers see exactly this when they add a track.",pz_rcp:"Recipient name",pz_rcp_h:"Shown to producers with every method (PayPal, card, crypto).",pz_pp:"PayPal (email or link)",pz_card:"Card number (UA)",pz_cr:"Crypto wallets",pz_save:"Save details",pz_ok:"Saved. Producers see the new details now."});
-Object.assign(LT.ru,{pz_t:"Куда продюсеры отправляют деньги",pz_h:"Заполняйте сами и меняйте когда угодно. Продюсеры видят именно это при добавлении трека.",pz_rcp:"Имя получателя",pz_rcp_h:"Показывается продюсерам при любом способе (PayPal, карта, крипта).",pz_pp:"PayPal (email или ссылка)",pz_card:"Номер карты (UA)",pz_cr:"Крипто-кошельки",pz_save:"Сохранить реквизиты",pz_ok:"Сохранено. Продюсеры видят новые реквизиты сразу."});
+Object.assign(LT.en,{pz_t:"Where producers send money",pz_h:"Fill this in yourself and change it any time. Producers see exactly this when they add a track.",pz_rcp:"Recipient (name shown to producers)",pz_pp_s:"email or link",pz_cardno:"Card number",pz_card:"Card (UA)",pz_cr:"Crypto",pz_save:"Save details",pz_ok:"Saved. Producers see the new details now."});
+Object.assign(LT.ru,{pz_t:"Куда продюсеры отправляют деньги",pz_h:"Заполняйте сами и меняйте когда угодно. Продюсеры видят именно это при добавлении трека.",pz_rcp:"Получатель (имя, которое видят продюсеры)",pz_pp_s:"email или ссылка",pz_cardno:"Номер карты",pz_card:"Карта (UA)",pz_cr:"Крипта",pz_save:"Сохранить реквизиты",pz_ok:"Сохранено. Продюсеры видят новые реквизиты сразу."});
 ["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("pz_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
 function fld(id,lbl,val,ph,big){return '<label class="f pzf'+(big?' big':'')+'" for="'+id+'"><span>'+esc(lbl)+'</span><input id="'+id+'" type="text" maxlength="140" autocomplete="off" placeholder="'+esc(ph||"")+'" value="'+esc(val||"")+'"></label>'}
+function sec(ic,ti,body){return '<div class="card form pzsec"><div class="pzt">'+ic+' '+esc(ti)+'</div>'+body+'</div>'}
 function html(){var X=LV.payInfo||{},C=X.crypto||{};
-  return '<div class="card form pzbox"><h3>💸 '+esc(L("pz_t"))+'</h3><p class="hint">'+esc(L("pz_h"))+'</p>'+
-   fld("pay_cardHolder","👤 "+L("pz_rcp"),X.cardHolder,"Name Surname",true)+'<p class="hint pzh">'+esc(L("pz_rcp_h"))+'</p>'+
-   fld("pay_paypal","🅿️ "+L("pz_pp"),X.paypal,"name@example.com",true)+
-   fld("pay_card","💳 "+L("pz_card"),X.card,"0000 0000 0000 0000",true)+
-   '<div class="paysec">🪙 '+esc(L("pz_cr"))+'</div>'+COINS.map(function(c){return fld("pay_c_"+c,coinL(c),C[c],"",false)}).join("")+
+  return '<div class="pzbox"><h3>💸 '+esc(L("pz_t"))+'</h3><p class="hint">'+esc(L("pz_h"))+'</p>'+
+   sec("🅿️","PayPal",fld("pay_paypalHolder",L("pz_rcp"),X.paypalHolder,"Name Surname",true)+fld("pay_paypal","PayPal ("+L("pz_pp_s")+")",X.paypal,"name@example.com",true))+
+   sec("💳",L("pz_card"),fld("pay_cardHolder",L("pz_rcp"),X.cardHolder,"Name Surname",true)+fld("pay_card",L("pz_cardno"),X.card,"0000 0000 0000 0000",true))+
+   sec("🪙",L("pz_cr"),fld("pay_cryptoHolder",L("pz_rcp"),X.cryptoHolder,"Name Surname",true)+COINS.map(function(c){return fld("pay_c_"+c,coinL(c),C[c],"",false)}).join(""))+
    '<div class="row"><button type="button" class="btn primary" data-l="paySave">'+esc(L("pz_save"))+'</button><span class="hint" id="payOk"></span></div></div>'}
 var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="pay"){var mn=document.querySelector(".ownmain")||$("adApp");if(mn&&!mn.querySelector(".pzbox")){var ae=document.activeElement,keep=ae&&ae.id?{i:ae.id,v:ae.value}:null,y=window.scrollY;mn.innerHTML=html();if(keep&&$(keep.i)){$(keep.i).value=keep.v;$(keep.i).focus()}window.scrollTo(0,y)}}}catch(e){}return r};
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest('[data-l="paySave"]');if(!b)return;setTimeout(function(){var t=$("payOk");if(t&&t.textContent)t.textContent="✓ "+L("pz_ok")},600)},true);
