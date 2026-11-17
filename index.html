@@ -1787,6 +1787,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 @keyframes vmg{0%{width:0}30%,88%{width:var(--w)}100%{width:0}}
 @keyframes vmk{0%{left:0}30%,88%{left:var(--w)}100%{left:0}}
 @media (prefers-reduced-motion:reduce){.vmf{animation:none;width:var(--w)}.vmk{animation:none;left:var(--w)}}
+.lkm{display:grid;gap:12px}.lkm .lkset{display:grid;gap:8px}.lkm .lkin{width:100%;box-sizing:border-box}.lkm .vmx{margin:0}.lkm .lkack{display:flex;gap:10px;align-items:flex-start;font-size:13px}.lkm .lkack input{margin-top:3px}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1965,7 +1966,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v116 · 17.11 20:10</span>
+  <span>© Promo Campaign · v117 · 17.11 20:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6982,6 +6983,39 @@ new MutationObserver(function(){if(!busy){busy=true;requestAnimationFrame(put)}}
 /* an order that is paid is finished: never "expected", always in history / Completed */
 pmWay=function(q){return !q.paid&&(q.status==="approved"||q.status==="submitted"||q.status==="returned"||q.status==="completed")};
 var g=mkGroup;mkGroup=function(q){return q.paid?"completed":g(q)};
+})();
+
+/* ===== v116b: "Add links" mini window in the Links tab ===== */
+(function(){
+Object.assign(LT.en,{lm_t:"Add video links",lm_h:"Paste the TikTok links of your finished videos.",lm_send:"Send for check",lm_cancel:"Cancel"});
+Object.assign(LT.ru,{lm_t:"Добавить ссылки на видео",lm_h:"Вставьте ссылки TikTok на готовые видео.",lm_send:"Отправить на проверку",lm_cancel:"Отмена"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};["lm_t","lm_h","lm_send","lm_cancel"].forEach(function(x){if(!XLL[k][x])XLL[k][x]=LT.en[x]})});
+function vrow(lbl,v){return '<div class="vmr"><span>'+esc(lbl)+'</span><div class="vmt"><i class="vmf" style="--w:'+v+'%"></i><u class="vmk" style="--w:'+v+'%"></u></div><b>'+v+'%</b></div>'}
+/* the button now says "Add links" and opens the window instead of sending to Approved */
+function fixBtns(){document.querySelectorAll(".lkcard.lk-back .lkbody").forEach(function(bd){if(bd.querySelector("[data-l=lkM]"))return;var h=bd.parentNode.querySelector('[data-l="lkTog"]');if(h)bd.insertAdjacentHTML("beforeend",'<button type="button" class="btn sm" data-l="lkM" data-id="'+esc(h.getAttribute("data-id"))+'">➕ '+esc(L("lk_open").replace(/^➕\s*/,""))+'</button>')});document.querySelectorAll('.lkbody [data-l="mkF"][data-f="approved"]').forEach(function(b){var c=b.closest(".lkcard"),h=c&&c.querySelector('[data-l="lkTog"]');if(!h)return;b.setAttribute("data-l","lkM");b.setAttribute("data-id",h.getAttribute("data-id"));b.removeAttribute("data-f");b.textContent="➕ "+L("lk_open").replace(/^➕\s*/,"")})}
+var bz=false;new MutationObserver(function(){if(!bz){bz=true;requestAnimationFrame(function(){bz=false;fixBtns()})}}).observe(document.body,{childList:true,subtree:true});
+/* returned orders with links too: always offer the button when the order can still take links */
+function openM(id){
+  var q=(LV.reqs||[]).filter(function(x){return x.id===id})[0];if(!q)return;
+  if(q.status!=="approved"&&q.status!=="returned"){toast(L("lk_wait"));return}
+  var have=(q.links||[]).map(function(l){return l.url}),inp="";
+  for(var i=0;i<(q.videos||1);i++)inp+='<input class="lkin" type="url" inputmode="url" autocomplete="off" placeholder="'+esc(L("lk_n").replace("{n}",i+1))+'" value="'+esc(have[i]||"")+'">';
+  openModal('<div class="lkm"><h3>🔗 '+esc(L("lm_t"))+'</h3><p class="hint"><b>'+esc(q.track)+'</b>'+(q.handle?' · '+esc(q.handle):'')+'<br>'+esc(L("lm_h"))+' ('+(q.videos||1)+')</p>'+
+    '<div class="lkset" id="lkMset">'+inp+'</div>'+
+    '<div class="vmx"><div class="vmh">🔊 '+esc(L("vm_t"))+'</div>'+vrow(L("vm_o"),100)+vrow(L("vm_p"),10)+'</div>'+
+    '<label class="lkack"><input type="checkbox" id="lkMack"><span>'+esc(L("sr_ack"))+'</span></label>'+
+    '<div class="note err" id="lkMErr" hidden></div>'+
+    '<div class="row"><button type="button" class="btn primary" data-l="lkMSend" data-id="'+esc(id)+'" data-n="'+(q.videos||1)+'">'+esc(L("lm_send"))+'</button><button type="button" class="btn" data-l="mclose2">'+esc(L("lm_cancel"))+'</button></div></div>');
+  var f=document.querySelector("#lkMset .lkin");if(f)try{f.focus()}catch(e){}}
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="lkM"],[data-l="lkMSend"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();
+  var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="lkM"){openM(id);return}
+  var err=$("lkMErr"),n=Number(el.getAttribute("data-n"))||1,links=[];document.querySelectorAll("#lkMset .lkin").forEach(function(i){var v=i.value.trim();if(v)links.push(v)});
+  if(!links.length||links.length>n){err.textContent=L("dl_bad_link");err.hidden=false;return}
+  if(!$("lkMack").checked){err.textContent=L("sr_need");err.hidden=false;return}
+  el.disabled=true;api("/api/request/links",{id:id,links:links,ack:true}).then(function(r){el.disabled=false;
+    if(!r.ok){err.textContent=(r.j&&r.j.error)||L("dl_bad_link");err.hidden=false;return}
+    closeModal();toast("✓ "+L("lk_wait"));loadReqs().then(function(){try{renderDashLive()}catch(x){}try{ordRefresh()}catch(x){}})})},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
