@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 59;
+const SERVER_VER = 60;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -1008,7 +1008,7 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, !b.descRule || String(b.descText || "").trim(), 400, "write what editors must put in the description")) return;
         const cats = cleanCats(b.categories), curCover = (t.pendingEdit ? t.pendingEdit.cover : t.cover) || "";
         const cover = typeof b.cover === "string" && b.cover ? ((b.cover.length <= 140000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.cover)) ? b.cover : curCover) : (b.coverRemove ? "" : curCover);
-        const f = { title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0] || "", links: L, message: String(b.message || "").trim().slice(0, 600), cover, deadline: String(b.deadline || "").trim().slice(0, 60), categories: cats, otherCategory: cats.includes("other") ? String(b.otherCategory || "").slice(0, 60) : "", descRule: !!b.descRule, descText: b.descRule ? String(b.descText || "").trim().slice(0, 120) : "" };
+        const f = { title, artist: String(b.artist || "").slice(0, 120), link: Object.values(L)[0] || "", links: L, message: ((t.pendingEdit && t.pendingEdit.message !== undefined ? t.pendingEdit.message : t.message) || "") ? ((t.pendingEdit && t.pendingEdit.message !== undefined ? t.pendingEdit.message : t.message) || "") : String(b.message || "").trim().slice(0, 600), cover, deadline: String(b.deadline || "").trim().slice(0, 60), categories: cats, otherCategory: cats.includes("other") ? String(b.otherCategory || "").slice(0, 60) : "", descRule: !!b.descRule, descText: b.descRule ? String(b.descText || "").trim().slice(0, 120) : "" };
         if (t.status === "review") Object.assign(t, f);      // not published yet, the owner has not looked at it
         else if (t.status === "rejected") { Object.assign(t, f); t.status = "review"; }
         else { t.pendingEdit = Object.assign(f, { at: Date.now() }); delete t.editRej; }
@@ -1263,6 +1263,10 @@ const server = http.createServer(async (req, res) => {
         if (b.ok === false) { t.editRej = String(b.reason || "").trim().slice(0, 200) || "declined"; delete t.pendingEdit; }
         else { const e = t.pendingEdit; for (const k of ["title", "artist", "link", "links", "message", "cover", "deadline", "categories", "otherCategory", "descRule", "descText"]) t[k] = e[k]; delete t.pendingEdit; delete t.editRej; }
         saveDb(); return send(res, 200, { ok: true });
+      }
+      if (P === "/api/admin/track-message" && M === "POST") {   // only the manager can change the producer's comment once it is saved
+        const t = db.tracks[b.id]; if (!need(res, t, 404, "no such track")) return;
+        t.message = String(b.message || "").trim().slice(0, 600); if (t.pendingEdit) t.pendingEdit.message = t.message; saveDb(); return send(res, 200, { ok: true, message: t.message });
       }
       if (P === "/api/admin/track-enroll" && M === "POST") {
         const t = db.tracks[b.id]; if (!need(res, t, 404, "no such track")) return;

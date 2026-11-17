@@ -1758,6 +1758,9 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .tstbox .nzin h3{font-size:15px}
 .ownmain .card.ord .enrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0}
 @media(max-width:560px){.tpbar{gap:8px}.fbtn{flex:0 0 auto}.tpbar select{flex:1 1 100%}.fp{padding:10px 14px}.tstbox .tstrow .btn{flex:1 1 100%}}
+.cmhint{margin:-6px 0 12px;font-size:12px;opacity:.8}.cmq{margin:10px 0;padding:12px 14px;border-left:3px solid #8b6cff;background:#121212;border-radius:10px;white-space:pre-wrap;word-break:break-word}
+.cmck{display:grid;gap:12px}.cmck textarea{width:100%;background:#121212;color:inherit;border:1px solid #2a2a31;border-radius:12px;padding:10px;font:inherit}.cmlock{opacity:.65}
+.dpf{position:sticky;bottom:0;padding:10px 0 12px;background:#171523}:root[data-theme=light] .dpf{background:#fff}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1936,7 +1939,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v111 · 17.11 13:40</span>
+  <span>© Promo Campaign · v113 · 17.11 19:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6340,7 +6343,7 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
     var a=b.getAttribute("data-dp"),v=+b.getAttribute("data-v"),s=ST;if(!s)return;
     if(a==="prev"){s.m--;if(s.m<0){s.m=11;s.y--}}
     else if(a==="next"){s.m++;if(s.m>11){s.m=0;s.y++}}
-    else if(a==="day"){s.d=v;s.sy=s.y;s.sm=s.m}
+    else if(a==="day"){s.d=v;s.sy=s.y;s.sm=s.m;commit()}
     else if(a==="h")s.h=v;else if(a==="mi")s.mi=v;
     else if(a==="today"){var n=new Date();s.y=s.sy=n.getFullYear();s.m=s.sm=n.getMonth();s.d=n.getDate()}
     else if(a==="clear"){s.d=0;commit();close();return}
@@ -6876,6 +6879,29 @@ function ev(ms){if(!(ms>0))return "";var d=new Date(ms-new Date().getTimezoneOff
       var w=document.createElement("div");w.className="enrow";w.innerHTML='<label>'+esc(L("en_lbl"))+'</label>'+dtField("enin",ev(t.enrollUntil))+'<button type="button" class="btn sm" data-l="enSave" data-id="'+esc(t.id)+'">'+esc(L("en_save"))+'</button>';
       b.parentNode.parentNode.insertBefore(w,b.parentNode)})}
   }catch(e){}return r}})();
+})();
+
+/* ===== v111b: producer comment: confirm before saving, locked afterwards, manager can edit ===== */
+(function(){
+var E={en:{cm_ck_t:"Check your comment",cm_ck_w:"Editors will see this comment under your track. After you save it you cannot change it yourself. If you need a change, write to the manager.",cm_yes:"Yes, save",cm_no:"No, edit",cm_hint:"Editors will see this under the track. You cannot change it after saving; only the manager can.",cm_lock:"This comment is locked. To change it, write to the manager.",cm_mgr_b:"💬 Comment",cm_mgr_t:"Producer's comment",cm_mgr_h:"Editors see this under the track.",cm_save:"Save"},
+ru:{cm_ck_t:"Проверьте комментарий",cm_ck_w:"Эдиторы увидят этот комментарий под вашим треком. После сохранения вы не сможете изменить его сами. Если нужно что-то поправить, напишите менеджеру.",cm_yes:"Да, сохранить",cm_no:"Нет, исправить",cm_hint:"Эдиторы увидят это под треком. После сохранения вы не сможете изменить текст, это сможет сделать только менеджер.",cm_lock:"Комментарий заблокирован. Чтобы изменить его, напишите менеджеру.",cm_mgr_b:"💬 Комментарий",cm_mgr_t:"Комментарий продюсера",cm_mgr_h:"Эдиторы видят это под треком.",cm_save:"Сохранить"}};
+Object.assign(LT.en,E.en);Object.assign(LT.ru,E.ru);
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in E.en)if(!XLL[k][x])XLL[k][x]=E.en[x]});
+/* hint under the field + lock in the edit window */
+new MutationObserver(function(){try{
+  var m=$("nMsg");if(m&&!m.getAttribute("data-h")){m.setAttribute("data-h","1");var l=m.closest("label");if(l)l.insertAdjacentHTML("afterend",'<p class="hint cmhint">⚠️ '+esc(L("cm_hint"))+'</p>')}
+  var cf=document.querySelector('[data-l="cfYes"]');if(cf&&!cf.getAttribute("data-h")){cf.setAttribute("data-h","1");var mt=$("nMsg"),tx=mt?mt.value.trim():"";if(tx){var rw=cf.parentNode;rw.insertAdjacentHTML("beforebegin",'<div class="cmck"><b>💬 '+esc(L("cm_ck_t"))+'</b><blockquote class="cmq">'+esc(tx)+'</blockquote><p class="hint">⚠️ '+esc(L("cm_ck_w"))+'</p></div>')}}
+  var e=$("eMsg");if(e&&!e.getAttribute("data-h")){e.setAttribute("data-h","1");if(e.value.trim()){e.readOnly=true;e.classList.add("cmlock");var l2=e.closest("label");if(l2)l2.insertAdjacentHTML("afterend",'<p class="hint cmhint">🔒 '+esc(L("cm_lock"))+'</p>')}}
+}catch(x){}}).observe(document.body,{childList:true,subtree:true});
+/* manager edits the comment */
+function D(){return ADM&&ADM.data}
+(function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{
+  if(LV.adTab==="tracks"&&D()&&!LV.trArch){document.querySelectorAll('.ownmain [data-l="trDel"]').forEach(function(b){var c=b.closest(".card.ord");if(!c||c.querySelector('[data-l="cmEd"]'))return;
+    var row=b.parentNode;b.insertAdjacentHTML("beforebegin",'<button type="button" class="btn sm" data-l="cmEd" data-id="'+esc(b.getAttribute("data-id"))+'">'+esc(L("cm_mgr_b"))+'</button> ')})}
+  }catch(e){}return r}})();
+document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="cmEd"],[data-l="cmSave"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();var a=el.getAttribute("data-l"),id=el.getAttribute("data-id");
+  if(a==="cmEd"){var t=((D()||{}).tracks||[]).filter(function(x){return x.id===id})[0]||{};openModal('<div class="cmck"><h3>💬 '+esc(L("cm_mgr_t"))+'</h3><p class="hint">'+esc(L("cm_mgr_h"))+'</p><textarea id="cmTxt" rows="5" maxlength="600">'+esc(t.message||"")+'</textarea><div class="row"><button type="button" class="btn primary" data-l="cmSave" data-id="'+esc(id)+'">'+esc(L("cm_save"))+'</button><button type="button" class="btn" data-l="mclose2">'+esc(L("tpx_close"))+'</button></div></div>');return}
+  el.disabled=true;api("/api/admin/track-message",{id:id,message:val("cmTxt")}).then(function(r){el.disabled=false;if(r.ok){closeModal();toast("✓");ownerReload()}else toast((r.j&&r.j.error)||"error")})},true);
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
