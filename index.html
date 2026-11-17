@@ -1776,6 +1776,17 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 :root[data-theme=light] .rdp{background:#fff;color:#1c1830;box-shadow:0 14px 40px rgba(60,40,140,.25),0 0 24px rgba(139,108,255,.25)}
 :root[data-theme=light] .rdi.on{color:#1c1830}
 @media(max-width:560px){.rdi{min-height:46px}}
+/* v116: volume mixer on track cards */
+.vmx{margin:12px 0;padding:12px 14px;border-radius:18px;background:#121212;border:1px solid rgba(139,108,255,.35)}
+.vmh{font-weight:700;font-size:13px;margin-bottom:10px}
+.vmr{display:grid;grid-template-columns:minmax(96px,34%) 1fr 44px;align-items:center;gap:10px;font-size:12px;margin:8px 0}
+.vmr span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85}.vmr b{text-align:right}
+.vmt{position:relative;height:8px;border-radius:99px;background:rgba(255,255,255,.12)}
+.vmf{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:99px;background:linear-gradient(90deg,#6c5cff,#a78bfa);box-shadow:0 0 12px rgba(139,108,255,.6);animation:vmg 4.2s cubic-bezier(.4,0,.2,1) infinite}
+.vmk{position:absolute;top:50%;left:0;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(139,108,255,.5),0 0 14px rgba(139,108,255,.8);animation:vmk 4.2s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes vmg{0%{width:0}30%,88%{width:var(--w)}100%{width:0}}
+@keyframes vmk{0%{left:0}30%,88%{left:var(--w)}100%{left:0}}
+@media (prefers-reduced-motion:reduce){.vmf{animation:none;width:var(--w)}.vmk{animation:none;left:var(--w)}}
 
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
@@ -1954,7 +1965,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v115 · 17.11 19:55</span>
+  <span>© Promo Campaign · v116 · 17.11 20:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -6957,6 +6968,20 @@ document.addEventListener("keydown",function(e){
   var s=e.target;if(s&&s.tagName==="SELECT"&&ok(s)&&(e.key==="Enter"||e.key===" "||(e.altKey&&e.key==="ArrowDown"))){e.preventDefault();e.stopImmediatePropagation();open(s)}},true);
 window.addEventListener("resize",close);
 window.addEventListener("scroll",function(e){if(pop&&Date.now()-t0>400&&!(e.target&&e.target.nodeType===1&&e.target.closest&&e.target.closest(".rdp")))close()},true);
+})();
+
+/* ===== v116: sound mix on every track card; paid orders always count as done ===== */
+(function(){
+Object.assign(LT.en,{vm_t:"Sound mix in TikTok",vm_o:"Original sound",vm_p:"Promo track"});Object.assign(LT.ru,{vm_t:"Громкость звука в TikTok",vm_o:"Оригинальный звук",vm_p:"Промо-трек"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};XLL[k].vm_t=XLL[k].vm_t||"TikTok";XLL[k].vm_o=XLL[k].vm_o||(XLL[k].sr_orig||"Original");XLL[k].vm_p=XLL[k].vm_p||(XLL[k].sr_track||"Promo")});
+function row(lbl,v){return '<div class="vmr"><span>'+esc(lbl)+'</span><div class="vmt"><i class="vmf" style="--w:'+v+'%"></i><u class="vmk" style="--w:'+v+'%"></u></div><b>'+v+'%</b></div>'}
+function box(){return '<div class="vmx"><div class="vmh">🔊 '+esc(L("vm_t"))+'</div>'+row(L("vm_o"),100)+row(L("vm_p"),10)+'</div>'}
+var busy=false;
+function put(){busy=false;document.querySelectorAll('button[data-l="req"][data-id]').forEach(function(b){var card=b.closest("article,.card");if(!card||card.querySelector(".vmx"))return;var anchor=(b.parentNode&&b.parentNode.classList&&b.parentNode.classList.contains("row"))?b.parentNode:b;anchor.insertAdjacentHTML("beforebegin",box())})}
+new MutationObserver(function(){if(!busy){busy=true;requestAnimationFrame(put)}}).observe(document.body,{childList:true,subtree:true});
+/* an order that is paid is finished: never "expected", always in history / Completed */
+pmWay=function(q){return !q.paid&&(q.status==="approved"||q.status==="submitted"||q.status==="returned"||q.status==="completed")};
+var g=mkGroup;mkGroup=function(q){return q.paid?"completed":g(q)};
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
