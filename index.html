@@ -2093,7 +2093,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v135 · 19.11 01:15</span>
+  <span>© Promo Campaign · v136 · 19.11 01:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4934,9 +4934,9 @@ function oqApply(){
   Array.prototype.forEach.call(document.querySelectorAll("#adApp .list > *"),function(c){c.hidden=!!q&&(c.textContent||"").toLowerCase().indexOf(q)<0});
 }
 function oqInject(){
-  var tab=oqTab();if(["payments","producers","accounts","promos","waiting","editorpay","tracks","requests","vlinks","accarch","newtracks"].indexOf(tab)<0)return;
+  var tab=oqTab();if(["payments","producers","accounts","promos","waiting","editorpay","tracks","requests","accarch"].indexOf(tab)<0)return;
   var app=$("adApp");if(!app||$("oSrch"))return;var first=app.querySelector(".list");if(!first)return;
-  var ph=tab==="producers"||tab==="payments"?"srch_pr":(tab==="promos"?"srch_pm":(tab==="tracks"||tab==="newtracks"?"srch_tr":(tab==="vlinks"?"srch_vl":"srch_acc")));
+  var ph=tab==="producers"||tab==="payments"?"srch_pr":(tab==="promos"?"srch_pm":(tab==="tracks"?"srch_tr":"srch_acc"));
   first.insertAdjacentHTML("beforebegin",'<input id="oSrch" class="osrch" type="search" autocomplete="off" placeholder="🔍 '+esc(L(ph))+'" value="'+esc(OQ[tab]||"")+'">');
   oqApply();
 }
@@ -7491,8 +7491,8 @@ window.addEventListener("click",function(e){var b=e.target.closest&&e.target.clo
 
 /* ---- v132: "Track history" tab: finished and archived tracks, topic filter (several at once), search ---- */
 (function(){
-Object.assign(LT.en,{th_q:"Search by track, artist or producer",th_none:"No tracks here yet.",th_fin:"Budget used up",th_arc:"In archive",th_n:"Tracks: {n}"});
-Object.assign(LT.ru,{th_q:"Поиск по треку, артисту или продюсеру",th_none:"Здесь пока нет треков.",th_fin:"Бюджет закончился",th_arc:"В архиве",th_n:"Треков: {n}"});
+Object.assign(LT.en,{th_q:"Search by track name, artist or producer",th_none:"No tracks here yet.",th_fin:"Budget used up",th_arc:"In archive",th_n:"Tracks: {n}"});
+Object.assign(LT.ru,{th_q:"Найти по названию трека, артисту или продюсеру",th_none:"Здесь пока нет треков.",th_fin:"Бюджет закончился",th_arc:"В архиве",th_n:"Треков: {n}"});
 ["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("th_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
 LV.thF=LV.thF||[];LV.thQ=LV.thQ||"";
 function base(D){return (D.tracks||[]).filter(function(t){return !t.demo&&(t.status==="archived"||(t.status==="active"&&(t.left||0)<=0))})}
