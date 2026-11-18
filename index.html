@@ -2093,7 +2093,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v134 · 19.11 01:00</span>
+  <span>© Promo Campaign · v135 · 19.11 01:15</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4934,9 +4934,9 @@ function oqApply(){
   Array.prototype.forEach.call(document.querySelectorAll("#adApp .list > *"),function(c){c.hidden=!!q&&(c.textContent||"").toLowerCase().indexOf(q)<0});
 }
 function oqInject(){
-  var tab=oqTab();if(["payments","producers","accounts","promos","waiting","editorpay","tracks","requests"].indexOf(tab)<0)return;
+  var tab=oqTab();if(["payments","producers","accounts","promos","waiting","editorpay","tracks","requests","vlinks","accarch","newtracks"].indexOf(tab)<0)return;
   var app=$("adApp");if(!app||$("oSrch"))return;var first=app.querySelector(".list");if(!first)return;
-  var ph=tab==="producers"||tab==="payments"?"srch_pr":(tab==="promos"?"srch_pm":(tab==="tracks"?"srch_tr":"srch_acc"));
+  var ph=tab==="producers"||tab==="payments"?"srch_pr":(tab==="promos"?"srch_pm":(tab==="tracks"||tab==="newtracks"?"srch_tr":(tab==="vlinks"?"srch_vl":"srch_acc")));
   first.insertAdjacentHTML("beforebegin",'<input id="oSrch" class="osrch" type="search" autocomplete="off" placeholder="🔍 '+esc(L(ph))+'" value="'+esc(OQ[tab]||"")+'">');
   oqApply();
 }
@@ -5125,6 +5125,8 @@ Object.assign(LT.ru,{ch_rules_t:"Правила чата",ch_agree:"Прочит
 Object.assign(LT.en,{srch_tr:"Search a track by name"});Object.assign(LT.ru,{srch_tr:"Найти трек по названию"});
 
 Object.assign(LT.en,{a_trhist:"Track archive"});Object.assign(LT.ru,{a_trhist:"Архив треков"});
+
+Object.assign(LT.en,{srch_vl:"Search by track or nickname"});Object.assign(LT.ru,{srch_vl:"Найти по треку или нику"});
 
 /* ---------- support assistant in the other languages ---------- */
 var FAQX={
