@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 72;
+const SERVER_VER = 73;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");

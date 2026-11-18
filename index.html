@@ -2091,7 +2091,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v132 · 19.11 00:30</span>
+  <span>© Promo Campaign · v133 · 19.11 00:45</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4528,7 +4528,7 @@ Object.assign(LT.ru,{ar_btn:"🗄 Архив",ar_move:"В архив",ar_all:"У
 function arcFinished(D){return (D.tracks||[]).filter(function(t){return t.status==="active"&&(t.left||0)<=0&&!t.demo})}
 function arcBtn(D){
   var n=(D.tracks||[]).filter(function(t){return t.status==="archived"}).length,f=arcFinished(D).length;
-  return '<div class="row arcbar"><button type="button" class="btn sm ghost" data-l="arcOpen">'+esc(L("ar_btn"))+(n?' ('+n+')':'')+'</button>'+(f?'<button type="button" class="btn sm ghost" data-l="arcAll">'+esc(L("ar_all"))+' ('+f+')</button>':'')+'</div>';
+  return '<div class="row arcbar">'+(f?'<button type="button" class="btn sm ghost" data-l="arcAll">'+esc(L("ar_all"))+' ('+f+')</button>':'')+'</div>';
 }
 function arcRows(D){
   var q=(LV.arcQ||"").toLowerCase().trim(),list=(D.tracks||[]).filter(function(t){return t.status==="archived"&&(!q||((t.title||"")+" "+(t.artist||"")+" "+(t.producerName||"")+" "+(t.producer||"")).toLowerCase().indexOf(q)>=0)}).sort(function(a,b){return (b.pending||0)-(a.pending||0)});
@@ -5122,7 +5122,7 @@ Object.assign(LT.ru,{ch_rules_t:"Правила чата",ch_agree:"Прочит
 
 Object.assign(LT.en,{srch_tr:"Search a track by name"});Object.assign(LT.ru,{srch_tr:"Найти трек по названию"});
 
-Object.assign(LT.en,{a_trhist:"Track history"});Object.assign(LT.ru,{a_trhist:"История треков"});
+Object.assign(LT.en,{a_trhist:"Track archive"});Object.assign(LT.ru,{a_trhist:"Архив треков"});
 
 /* ---------- support assistant in the other languages ---------- */
 var FAQX={
