@@ -1914,6 +1914,8 @@ select{-webkit-touch-callout:none}
 
 .trfbar>button.chip{align-self:flex-start;width:auto}
 
+.ownside .atb[data-k=trhist]::before{content:"🗃"}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -2091,7 +2093,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v133 · 19.11 00:45</span>
+  <span>© Promo Campaign · v134 · 19.11 01:00</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -3067,7 +3069,7 @@ function renderOwner(){
   if(!ADM.ok||!D)return false;checkNew(D);
   var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="vlinks"&&D.requests.filter(function(q){return q.status==="submitted"}).length?' <i class="cnt">'+D.requests.filter(function(q){return q.status==="submitted"}).length+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')+(k==="newtracks"&&window.__NTn&&window.__NTn()?' <i class="cnt">'+window.__NTn()+'</i>':'')+(k==="tickets"&&window.__TK&&window.__TK.unread?' <i class="cnt">'+(window.__TK.unread>99?"99+":window.__TK.unread)+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","vlinks","accounts","editorpay","accarch","chatmod","prices","topics"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks","trhist","accarch"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","vlinks","accounts","editorpay","accarch","chatmod","prices","topics"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks","trhist"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -4970,7 +4972,7 @@ Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Ос
   var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
 
 /* ===== v29: phone owner cabinet with bottom menu ===== */
-var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices","topics"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks","trhist","accarch"]],["st","⚙️","g_st",["pay","contacts"]]];
+var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices","topics"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks","trhist"]],["st","⚙️","g_st",["pay","contacts"]]];
 function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
 function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
   if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
