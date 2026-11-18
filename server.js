@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 66;
+const SERVER_VER = 68;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -632,7 +632,7 @@ function overview() {
       pendingRequests: reqsAll.filter(r => r.status === "pending" || r.status === "submitted").length, pendingTopups: Object.values(db.topups).filter(t => t.status === "pending").length,
       refreshedAt: Math.max(0, ...accs.map(a => a.analysisAt || 0)) },
     requests: reqsAll.sort((x, y) => (y.priority || 0) - (x.priority || 0) || x.created - y.created).map(r => reqView(r, true)),
-    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", enrollUntil: t.enrollUntil || 0, message: t.message || "", id: t.id, title: t.title, edit: t.pendingEdit ? Object.assign({}, t.pendingEdit, { cover: "", hasCover: !!t.pendingEdit.cover }) : null, hasCover: !!t.cover, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, producerId: t.producerId, producerName: (db.producers[t.producerId] || {}).name || "", pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
+    tracks: Object.values(db.tracks).map(t => ({ deadline: t.deadline || "", enrollUntil: t.enrollUntil || 0, message: t.message || "", id: t.id, title: t.title, edit: t.pendingEdit ? Object.assign({}, t.pendingEdit, { cover: "", hasCover: !!t.pendingEdit.cover }) : null, hasCover: !!t.cover, artist: t.artist, link: t.link, producer: (db.producers[t.producerId] || {}).email, budget: t.budget, spent: t.spent, left: trackLeft(t), demo: !!t.demo, categories: t.categories, otherCategory: t.otherCategory || "", links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", hasMp3: !!t.mp3, producerId: t.producerId, producerName: t.producerId === "owner" ? "§" + (t.role || "artist") : ((db.producers[t.producerId] || {}).name || ""), pending: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").length, status: t.status })),
     topups: Object.values(db.topups).filter(x => !x.demo).sort((x, y) => y.created - x.created).map(p => ({ from: p.from || "", id: p.id, producer: (db.producers[p.producerId] || {}).email, producerName: (db.producers[p.producerId] || {}).name, message: (db.tracks[p.trackId] || {}).message || "", deadline: (db.tracks[p.trackId] || {}).deadline || "", track: (db.tracks[p.trackId] || {}).title, amount: p.amount, cur: p.cur || "", orig: p.orig || 0, fee: p.fee || 0, hasProof: !!p.proof, method: p.method, coin: p.coin || "", status: p.status, created: p.created })),
     producers: Object.values(db.producers).sort((x, y) => y.created - x.created).map(p => { const ts = Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
       return { id: p.id, name: p.name || "", email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", created: p.created, tracks: ts.map(t => ({ title: t.title, status: t.status, budget: t.budget, left: trackLeft(t) })),
@@ -1330,7 +1330,11 @@ const server = http.createServer(async (req, res) => {
         const title = String(b.title || "").trim().slice(0, 120); if (!need(res, title, 400, "write the track title")) return;
         const link = String(b.link || "").trim().slice(0, 400); if (!need(res, !link || /^https?:\/\/\S+\.\S+/i.test(link), 400, "the link must start with https://")) return;
         const budget = Math.max(0, Math.min(100000, Math.round(Number(b.budget) * 100) / 100 || 0));
-        const t = { id: uid8(), producerId: "owner", title, artist: String(b.artist || "").trim().slice(0, 120), link, links: link ? { [classifyLink(link)]: link } : {}, budget, spent: 0, platforms: ["tiktok"], categories: cleanCats(b.categories), otherCategory: "", status: "active", created: Date.now() };
+        const role = ["artist", "label", "producer"].includes(b.role) ? b.role : "artist";
+        const tk = String(b.tiktok || "").trim().slice(0, 400); if (!need(res, !tk || /^https?:\/\/\S+\.\S+/i.test(tk), 400, "the TikTok link must start with https://")) return;
+        if (!need(res, !tk || !/tiktok\.com\/@[^/\s]+\/(video|photo)\//i.test(tk), 400, "this is a link to a video, not to the sound. Open the sound in TikTok and copy the link tiktok.com/music/…")) return;
+        const links = {}; if (link) links[classifyLink(link)] = link; if (tk) links.tiktok = tk;
+        const t = { id: uid8(), producerId: "owner", role, message: String(b.message || "").trim().slice(0, 600), title, artist: String(b.artist || "").trim().slice(0, 120), link: link || tk, links, budget, spent: 0, platforms: ["tiktok"], categories: cleanCats(b.categories), otherCategory: "", status: "active", created: Date.now() };
         db.tracks[t.id] = t; saveDb(); return send(res, 200, { ok: true, id: t.id });
       }
       if (P === "/api/admin/track/archive" && M === "POST") {    // finished tracks go to the archive; the owner can bring them back

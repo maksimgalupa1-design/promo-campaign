@@ -1907,6 +1907,11 @@ select{-webkit-touch-callout:none}
 .trfc{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .trfbar .chip[aria-pressed=true]{background:linear-gradient(135deg,#6D5CFF,#A56BFF)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 0 18px rgba(139,108,255,.55)}
 
+/* v128 */
+.card.ord .t .tkmsg{display:block;width:fit-content;max-width:86%;margin:8px 0 0 auto;text-align:left}
+.card.ord .t>div>span{margin-right:10px}
+.pocard .potk{display:block;font-weight:600;color:var(--text,inherit);opacity:.9}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -2084,7 +2089,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v126 · 18.11 22:50</span>
+  <span>© Promo Campaign · v128 · 18.11 23:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -3094,9 +3099,10 @@ function renderOwner(){
     body='<div class="list">'+((D.producers||[]).length?D.producers.map(function(p){return '<div class="card ord"><div class="t"><div><b>'+esc(p.name||"—")+'</b><span>'+esc(p.email)+'</span><span>'+esc(L("a_pr_joined"))+' '+fmtDate(p.created)+'</span>'+(p.instagram?'<span>📷 Instagram: '+esc(p.instagram)+'</span>':'')+(p.tiktok?'<span>🎵 TikTok: '+esc(p.tiktok)+'</span>':'')+'</div><div class="kv" style="grid-template-columns:1fr 1fr"><div><b>'+p.tracks.length+'</b><span>'+esc(L("a_pr_tracks"))+'</span></div><div><b>'+money(p.paid)+'</b><span>'+esc(L("a_pr_paid"))+'</span></div></div></div>'+p.tracks.map(function(t){return '<div class="hint">'+esc(t.title)+' · '+esc(t.status)+' · '+money(t.left)+' '+esc(L("a_left"))+'</div>'}).join("")+'<div class="row"><button class="btn sm danger" data-l="prDel" data-id="'+esc(p.id)+'" data-n="'+esc(p.name||p.email)+'">🗑 '+esc(L("pr_del"))+'</button></div></div>'}).join(""):'<div class="empty">'+esc(L("a_pr_none"))+'</div>')+'</div>';
   }else if(LV.adTab==="editorpay"){
     var dl0=D.requests.filter(function(q){return ["approved","returned","submitted","completed"].indexOf(q.status)>=0}).sort(function(x,y){return (x.paid?1:0)-(y.paid?1:0)||(y.completedAt||0)-(x.completedAt||0)});
+    var tfp=LV.trFp||[],dlAll=dl0;if(tfp.length)dl0=dl0.filter(function(q){return tfp.indexOf(q.trackId)>=0});
     var dl=dl0.filter(function(q){return !LV.eF||LV.eF==="all"||(LV.eF==="done"?q.paid:!q.paid)});
-    body=payBar("eF",[["all",dl0.length],["pending",dl0.filter(function(q){return !q.paid}).length],["done",dl0.filter(function(q){return q.paid}).length]])+'<div class="list pogrid">'+(dl.length?dl.map(function(q){
-      return '<button type="button" class="card pocard'+(q.paid?' done':'')+'" data-l="poOpen" data-id="'+esc(q.id)+'"><b>'+esc(q.handle)+'</b><small>'+esc(q.internalName||q.track||"")+'</small>'+(q.status!=="completed"&&!q.paid?'<small class="powork">⏳ '+esc(L("po_work"))+'</small>':"")+'<span class="poamt">'+money(q.cost)+'</span><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></button>';
+    body=payBar("eF",[["all",dl0.length],["pending",dl0.filter(function(q){return !q.paid}).length],["done",dl0.filter(function(q){return q.paid}).length]])+(window.__trBar?window.__trBar(D,dlAll,"trFp","p"):"")+'<div class="list pogrid">'+(dl.length?dl.map(function(q){
+      return '<button type="button" class="card pocard'+(q.paid?' done':'')+'" data-l="poOpen" data-id="'+esc(q.id)+'"><b>'+esc(q.handle)+'</b>'+(q.internalName?'<small>'+esc(q.internalName)+'</small>':'')+'<small class="potk">🎵 '+esc(q.track||"")+'</small>'+(q.status!=="completed"&&!q.paid?'<small class="powork">⏳ '+esc(L("po_work"))+'</small>':"")+'<span class="poamt">'+money(q.cost)+'</span><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></button>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="prices"){
     var RG=LV.ranges||{};
@@ -7395,14 +7401,37 @@ function wrap(getList,key,w,call){return function(D){var sel=LV[key],all=getList
   var h=call(D2),bar=barHtml(D,all,key,w),m=w==="v"?'<div class="row vlbar">':'<div class="chips" role="group">',a=h.indexOf(m),i=a>=0?h.indexOf('</div>',a):-1;
   if(i>=0){i+=6;return h.slice(0,i)+bar+h.slice(i)}
   i=h.indexOf('<div class="list">');if(i<0)return h+bar;return h.slice(0,i)+bar+h.slice(i)}}
+window.__trBar=barHtml;LV.trFp=LV.trFp||[];
 var ro=reqTabHtml;reqTabHtml=wrap(function(D){return (D.requests||[]).filter(function(q){return q.status!=="approved"&&q.status!=="returned"})},"trFr","r",ro);
 var vo=window.vlinksHtml;window.vlinksHtml=wrap(function(D){return (D.requests||[]).filter(function(r){return ["approved","submitted","returned","completed"].indexOf(r.status)>=0})},"trFv","v",vo);
 window.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest('[data-l="trF"]');if(!b)return;e.stopImmediatePropagation();e.preventDefault();
-  var key=b.getAttribute("data-w")==="v"?"trFv":"trFr",id=b.getAttribute("data-t");
+  var ww=b.getAttribute("data-w"),key=ww==="v"?"trFv":ww==="p"?"trFp":"trFr",id=b.getAttribute("data-t");
   if(!id)LV[key]=[];else{var i=LV[key].indexOf(id);if(i>=0)LV[key].splice(i,1);else LV[key].push(id)}
   var y=window.scrollY;renderOwner();window.scrollTo(0,y)},true);
 })();
 
+
+/* ---- v127: owner adds own track: role (artist / label / producer), TikTok sound, comment ---- */
+(function(){
+Object.assign(LT.en,{rl_h:"Who releases the track",rl_artist:"Artist",rl_label:"Label",rl_producer:"Producer",rl_own:"mine",tr_tk:"TikTok sound link (tiktok.com/music/…)",tr_msg:"Comment for editors (only you can change it later)"});
+Object.assign(LT.ru,{rl_h:"Кто выпускает трек",rl_artist:"Артист",rl_label:"Лейбл",rl_producer:"Продюсер",rl_own:"мой",tr_tk:"Ссылка на звук в TikTok (tiktok.com/music/…)",tr_msg:"Комментарий для монтажёров (потом менять можете только вы)"});
+var oldAdd=addTrackHtml;
+addTrackHtml=function(){
+  var h=oldAdd();if(!LV.addTr)return h;
+  var rs=["artist","label","producer"].map(function(k){return '<option value="'+k+'">'+esc(L("rl_"+k))+'</option>'}).join("");
+  var ins='<label class="f" for="atRole"><span>'+esc(L("rl_h"))+'</span><select id="atRole">'+rs+'</select></label>';
+  var ins2='<label class="f" for="atTk"><span>'+esc(L("tr_tk"))+'</span><input id="atTk" type="text" inputmode="url" placeholder="https://"></label><label class="f" for="atMsg"><span>'+esc(L("tr_msg"))+'</span><textarea id="atMsg" rows="2" maxlength="600"></textarea></label>';
+  var a=h.indexOf('<label class="f" for="atTitle">'),b=h.indexOf('<label class="f" for="atBudget">');
+  if(a<0||b<0)return h;
+  return h.slice(0,a)+ins+h.slice(a,b)+ins2+h.slice(b)};
+window.addEventListener("click",function(e){
+  var el=e.target.closest&&e.target.closest('[data-l="trAddGo"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();
+  var er=$("atErr"),title=val("atTitle");if(!title){er.textContent=L("p_bad");er.hidden=false;return}
+  el.disabled=true;
+  api("/api/admin/track/create",{title:title,artist:val("atArtist"),role:val("atRole"),link:val("atLink"),tiktok:val("atTk"),message:val("atMsg"),budget:Number(val("atBudget"))||0,categories:checked("atCats")}).then(function(r){el.disabled=false;if(!r.ok){er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false;return}LV.addTr=false;LV.trMsg=L("tr_added");ownerReload()})},true);
+function mark(){var q=document.querySelectorAll(".card.ord .t > div > span");for(var i=0;i<q.length;i++){var x=q[i].textContent;if(x.charAt(0)==="§"){var k=x.replace(/[^a-z]/g,"");q[i].textContent="👑 "+L("rl_"+k)+" ("+L("rl_own")+")"}}}
+new MutationObserver(mark).observe(document.body,{childList:true,subtree:true});mark();
+})();
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();
