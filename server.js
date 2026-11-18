@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 65;
+const SERVER_VER = 66;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -308,12 +308,12 @@ async function fetchVideos(token) {
   let cursor, more = true;
   for (let page = 0; page < MAX_PAGES && more; page++) {
     const body = { max_count: 20 }; if (cursor) body.cursor = cursor;
-    const r = await fetch("https://open.tiktokapis.com/v2/video/list/?fields=id,create_time,view_count,like_count,comment_count,share_count,share_url", {
+    const r = await fetch("https://open.tiktokapis.com/v2/video/list/?fields=id,create_time,view_count,like_count,comment_count,share_count,share_url,video_description,cover_image_url", {
       method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify(body)
     });
     const j = await r.json();
     if (!j.data) throw new Error("video/list: " + JSON.stringify(j));
-    (j.data.videos || []).forEach(v => out.push({ id: v.id, created: v.create_time * 1000, views: v.view_count || 0, likes: v.like_count || 0, url: v.share_url }));
+    (j.data.videos || []).forEach(v => out.push({ id: v.id, created: v.create_time * 1000, views: v.view_count || 0, likes: v.like_count || 0, url: v.share_url, desc: String(v.video_description || "").slice(0, 600), cover: v.cover_image_url || "" }));
     more = j.data.has_more; cursor = j.data.cursor;
     if (out.length && out[out.length - 1].created < since) break;     // videos come newest first
   }
@@ -594,6 +594,15 @@ function reqView(r, withAdmin) {
   if (withAdmin && acc) { const A0 = PC.analyze(acc.videos || [], Date.now()); o.about = acc.about || ""; o.tiers = acc.tiers || []; o.bulk = maxTier(acc); o.avgViews = A0.refAvg || 0; o.accPrice = acc.price || 0; o.avatar = (acc.profile && acc.profile.avatar_url) || ""; const st = autoStars(acc); o.stars = acc.rating_manual != null ? acc.rating_manual : st.stars; o.categories = acc.categories || []; }
   return o;
 }
+async function refreshOpen() {   // editors with an open order: look for a newly posted video every few minutes
+  const open = new Set(Object.values(db.requests).filter(r => ["approved", "returned"].includes(r.status) && !r.demo).map(r => r.openId));
+  let n = 0;
+  for (const a of allAccounts()) {
+    if (n >= 20) break;
+    if (!open.has(a.open_id) || !a.refresh_token || (a.analysisAt && Date.now() - a.analysisAt < 8 * 60000)) continue;
+    n++; try { await refreshAnalysis(a); } catch (e) { console.error("refresh", a.open_id, String(e.message).slice(0, 200)); a.analysisAt = Date.now(); }
+  }
+}
 async function refreshStale(max) {
   let n = 0;
   for (const a of allAccounts()) {
@@ -777,6 +786,52 @@ const server = http.createServer(async (req, res) => {
       u.accounts = u.accounts.filter(x => x !== acc); delete db.byOpen[acc.open_id];
       Object.values(db.requests).forEach(r => { if (r.openId === acc.open_id && r.status === "pending") r.status = "cancelled"; });
       saveDb(); return send(res, 200, view(u));
+    }
+    const nzs = x => String(x || "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+    if (P === "/api/me/new-videos" && M === "GET") {   // videos the editor posted after an order was approved, not yet put into any order
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const out = [], all = Object.values(db.requests);
+      for (const acc of (u.accounts || [])) {
+        const used = new Set(); all.filter(r => r.openId === acc.open_id).forEach(r => (r.links || []).concat(r.draft || []).forEach(l => { const q = videoIdOf(l); if (q) used.add(q.id); }));
+        const orders = all.filter(r => r.openId === acc.open_id && ["approved", "returned"].includes(r.status) && !r.demo).sort((x, y) => (x.approvedAt || 0) - (y.approvedAt || 0));
+        if (!orders.length) continue;
+        const dis = acc.dismissed || {};
+        for (const v of (acc.videos || [])) {
+          if (used.has(v.id) || dis[v.id] || !v.url || Date.now() - v.created > 30 * 86400000) continue;
+          const cands = orders.filter(r => v.created >= (r.approvedAt || 0));
+          if (!cands.length) continue;
+          const ok = r => { const t = db.tracks[r.trackId] || {}, d = nzs(v.desc); const need_ = t.descRule && t.descText ? nzs(t.descText) : nzs(t.title); return !!need_ && d.includes(need_); };
+          const r = cands.find(ok) || cands[0], t = db.tracks[r.trackId] || {};
+          out.push({ vid: v.id, orderId: r.id, accId: acc.open_id, handle: "@" + (acc.profile && acc.profile.username || ""), name: acc.internal_name || (acc.profile && acc.profile.display_name) || "", avatar: (acc.profile && acc.profile.avatar_url) || "", track: t.title || "", artist: t.artist || "",
+            views: v.views || 0, desc: v.desc || "", cover: v.cover || "", url: v.url, created: v.created, captionOk: ok(r), n: (r.draft || []).length, m: r.videos });
+        }
+      }
+      out.sort((x, y) => y.created - x.created);
+      return send(res, 200, { videos: out.slice(0, 10) });
+    }
+    if (P === "/api/video/dismiss" && M === "POST") {
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req), acc = (u.accounts || []).find(a => a.open_id === String(b.accId || ""));
+      if (!need(res, acc, 404, "no such account")) return;
+      acc.dismissed = acc.dismissed || {}; acc.dismissed[String(b.videoId || "").slice(0, 30)] = Date.now();
+      const ks = Object.keys(acc.dismissed); if (ks.length > 300) ks.sort((x, y) => acc.dismissed[x] - acc.dismissed[y]).slice(0, ks.length - 300).forEach(k => delete acc.dismissed[k]);
+      saveDb(); return send(res, 200, { ok: true });
+    }
+    if (P === "/api/video/add" && M === "POST") {   // put a found video (or a pasted link) into the order
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const b = await readBody(req), r = db.requests[b.orderId];
+      if (!need(res, r && findAcc(u, r.openId), 404, "no such request")) return;
+      if (!need(res, r.status === "approved" || r.status === "returned", 409, "request is not waiting for a link")) return;
+      const acc = findAcc(u, r.openId), me = (acc.profile && acc.profile.username || "").toLowerCase();
+      let link = "";
+      if (b.videoId) { const v = (acc.videos || []).find(x => x.id === String(b.videoId)); link = v && v.url || ""; } else link = String(b.url || "").trim();
+      const p = videoIdOf(link);
+      if (!need(res, p && p.user === me, 400, "link must be a tiktok.com/@" + me + "/video/... link")) return;
+      r.draft = (r.draft || []).filter(l => { const q = videoIdOf(l); return q && q.id !== p.id; }); r.draft.push(link);
+      acc.dismissed = acc.dismissed || {}; acc.dismissed[p.id] = Date.now();
+      let done = false;
+      if (r.draft.length >= r.videos) { r.links = r.draft.slice(0, r.videos); r.draft = []; r.ack = true; r.ackAt = Date.now(); r.retReason = ""; r.status = "submitted"; r.updated = Date.now(); done = true; notify("an editor sent video links to check"); }
+      saveDb(); return send(res, 200, { ok: true, done, n: done ? r.videos : r.draft.length, m: r.videos });
     }
     if (P === "/api/account/delete-all" && M === "POST") {   // the editor leaves: every account goes to the archive for 30 days, then it is gone for good
       const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
@@ -1457,6 +1512,7 @@ loadDb().then(() => {
   } catch (e) { console.error("topic migration", e); }
   server.listen(PORT, () => console.log("Promo Campaign on " + PUBLIC_URL));
   setInterval(() => refreshStale(30).catch(e => console.error(e)), REFRESH_EVERY);
+  setInterval(() => refreshOpen().catch(e => console.error(e)), 5 * 60000);
   setInterval(() => { try { remindEditors(); } catch (e) { console.error(e); } }, 3600e3);
   setInterval(() => { try { expireOverdue(); } catch (e) { console.error(e); } }, 3600e3);
   setInterval(() => { try { purgeArchive(); } catch (e) { console.error(e); } }, 6 * 3600e3);

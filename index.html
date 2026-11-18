@@ -1877,6 +1877,29 @@ select{-webkit-touch-callout:none}
 :root[data-theme=light] body.isadmin .ownmain .mchip,:root[data-theme=light] body.isadmin .ownmain select,:root[data-theme=light] body.isadmin .ownmain #oSrch.osrch{background:#fff;color:#1c1830}
 :root[data-theme=light] body.isadmin .ownside .pcsrch{background:#f3f1ff;color:#1c1830}
 
+/* v125: new-video popup */
+.znv{align-items:flex-end}
+.znv-p{width:min(460px,100%);max-height:94vh;overflow:auto;border-radius:28px 28px 0 0;gap:12px;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px));background:#1f1f24}
+@media(min-width:700px){.znv{align-items:center}.znv-p{border-radius:28px}}
+.znv-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.znv-top b{font-size:15px;opacity:.8}
+.znv-back{background:none;border:0;color:#4a9bff;font:inherit;font-size:17px;font-weight:700;cursor:pointer;padding:6px 4px}
+.znv-prev{position:relative;display:block;align-self:center;width:min(240px,62%);aspect-ratio:9/14;border-radius:26px;overflow:hidden;background:linear-gradient(#34506e,#141a22);text-decoration:none}
+.znv-prev img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.znv-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(20,26,34,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px}
+.znv-views{position:absolute;left:10px;bottom:10px;padding:6px 12px;border-radius:999px;background:rgba(10,12,18,.7);color:#fff;font-weight:700}
+.znv-acc{display:flex;align-items:center;gap:12px}.znv-av{width:48px;height:48px;border-radius:12px;object-fit:cover;background:#000;flex:none}.znv-av.ph{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#6D5CFF,#A56BFF);color:#fff;font-weight:800}
+.znv-n{display:flex;flex-direction:column;min-width:0;flex:1}.znv-n b{font-size:18px}.znv-n small{opacity:.65}
+.znv-cnt{padding:6px 12px;border-radius:999px;background:rgba(74,155,255,.16);color:#6db2ff;font-weight:800}
+.znv-d{margin:0;line-height:1.4;word-break:break-word}
+.znv-b{display:flex;flex-wrap:wrap;gap:8px}.znv-chip{padding:7px 12px;border-radius:999px;font-size:13.5px;font-weight:700}
+.znv-chip.ok{background:rgba(52,199,120,.16);color:#5fe39a}.znv-chip.bad{background:rgba(229,72,77,.18);color:#ff8a8a}.znv-chip.warn{background:rgba(255,190,60,.16);color:#ffcc66}.znv-chip.gray{background:rgba(255,255,255,.08);opacity:.85}
+.znv-ttk{text-align:center;text-decoration:none;justify-content:center}
+.znv-add{background:linear-gradient(135deg,#2f7bd8,#3b8cf0)!important}
+.znv-note{margin:0;font-size:12.5px;opacity:.65;line-height:1.4}
+.znv-msg{min-height:18px;font-size:14px}.znv-msg.good{color:#5fe39a}.znv-msg.bad{color:#ff8a8a}
+.znv-row{display:flex;gap:10px}.znv-row .btn{flex:1}
+:root[data-theme=light] .znv-p{background:#fff;color:#1c1830}:root[data-theme=light] .znv-chip.gray{background:rgba(0,0,0,.06)}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -2054,7 +2077,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v124 · 18.11 14:50</span>
+  <span>© Promo Campaign · v125 · 18.11 22:30</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -7309,6 +7332,43 @@ window.addEventListener("click",function(e){var b=e.target.closest&&e.target.clo
   o.querySelector("#daNo").onclick=ovClose;
   o.querySelector("#daYes").onclick=function(){var y=this;y.disabled=true;y.textContent=L("da_busy");api("/api/account/delete-all",{}).then(function(r){if(r.ok){ovClose();try{location.hash=""}catch(x){}location.reload()}else{y.disabled=false;y.textContent=L("da_yes");$("daM").textContent=(r.j&&r.j.error)||L("da_err")}})}},true);
 
+})();
+
+/* ===== v125: a newly posted video is found automatically (popup with the video, caption check, add to order) ===== */
+(function(){
+Object.assign(LT.en,{nv_open:"Open in TikTok",nv_add:"Add to order",nv_add_any:"Add anyway",nv_chg:"Change link",nv_not:"Not this video",nv_back:"Back",nv_cap_ok:"✍️ Track name is in the caption",nv_cap_bad:"⚠️ Track name is not in the caption",nv_snd:"🎵 Check the campaign sound (10% promo / 100% original)",nv_note:"By adding the video you confirm: the campaign sound is used and the caption follows the rules.",nv_min:"{n} min ago",nv_h:"{n} h ago",nv_d:"{n} d ago",nv_now:"just now",nv_link_t:"Paste the video link",nv_link_ph:"https://www.tiktok.com/@name/video/…",nv_send:"Add",nv_err:"The link must be a video of this account.",nv_done:"Done ✓ The order was sent for checking.",nv_part:"Added. Videos in the order: {n}/{m}",nv_new:"New video found"});
+Object.assign(LT.ru,{nv_open:"Открыть в TikTok",nv_add:"Добавить в заказ",nv_add_any:"Всё равно добавить",nv_chg:"Изменить ссылку",nv_not:"Не это видео",nv_back:"Назад",nv_cap_ok:"✍️ Название трека в подписи",nv_cap_bad:"⚠️ Названия трека нет в подписи",nv_snd:"🎵 Проверьте звук кампании (промо 10% / оригинал 100%)",nv_note:"Добавляя видео, вы подтверждаете: звук кампании стоит, а подпись соответствует правилам.",nv_min:"{n} мин назад",nv_h:"{n} ч назад",nv_d:"{n} дн. назад",nv_now:"только что",nv_link_t:"Вставьте ссылку на видео",nv_link_ph:"https://www.tiktok.com/@name/video/…",nv_send:"Добавить",nv_err:"Ссылка должна быть на видео этого аккаунта.",nv_done:"Готово ✓ Заказ отправлен на проверку.",nv_part:"Добавлено. Видео в заказе: {n}/{m}",nv_new:"Найдено новое видео"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("nv_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
+function F(k,o){var s=L(k);for(var x in o)s=s.replace("{"+x+"}",o[x]);return s}
+function ago(ms){var m=Math.max(0,Math.round((Date.now()-ms)/60000));if(m<1)return L("nv_now");if(m<60)return F("nv_min",{n:m});var h=Math.round(m/60);if(h<24)return F("nv_h",{n:h});return F("nv_d",{n:Math.round(h/24)})}
+function fk(n){n=Number(n)||0;return n>=1e6?(Math.round(n/1e5)/10)+"M":n>=1e4?(Math.round(n/100)/10)+"K":String(n)}
+var Q=[],busy=false,ov=null,off=false,seen={};
+function close(cb){if(!ov)return;var o=ov;ov=null;o.classList.add("out");o.classList.remove("in");setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o);if(cb)cb()},200)}
+function dismiss(v,then){api("/api/video/dismiss",{accId:v.accId,videoId:v.vid});seen[v.vid]=1;close(function(){busy=false;if(then)then();else next()})}
+function show(v){busy=true;var av=v.avatar?'<img class="znv-av" src="'+esc(v.avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="znv-av ph">'+esc((v.handle||"?").replace("@","").charAt(0).toUpperCase())+'</span>';
+  var cover=v.cover?'<img src="'+esc(v.cover)+'" alt="" referrerpolicy="no-referrer">':'';
+  var o=document.createElement("div");o.className="zcpk znv";o.innerHTML='<div class="zcpk-p znv-p" role="dialog" aria-modal="true"><div class="znv-top"><button type="button" class="znv-back" data-z="back">‹ '+esc(L("nv_back"))+'</button><b>'+esc(L("nv_new"))+'</b><button type="button" class="zcpk-x" data-z="x" aria-label="close">✕</button></div>'+
+   '<a class="znv-prev" href="'+esc(v.url)+'" target="_blank" rel="noopener">'+cover+'<span class="znv-play">▶</span><span class="znv-views">👁 '+fk(v.views)+'</span></a>'+
+   '<div class="znv-acc">'+av+'<div class="znv-n"><b>'+esc(v.track||v.name||v.handle)+'</b><small>'+esc(v.handle)+'</small></div><span class="znv-cnt">🔗 '+v.n+'/'+v.m+'</span></div>'+
+   '<p class="znv-d">'+esc(v.desc||"—")+'</p>'+
+   '<div class="znv-b"><span class="znv-chip '+(v.captionOk?"ok":"bad")+'">'+esc(L(v.captionOk?"nv_cap_ok":"nv_cap_bad"))+'</span><span class="znv-chip warn">'+esc(L("nv_snd"))+'</span><span class="znv-chip gray">📅 '+esc(ago(v.created))+'</span></div>'+
+   '<a class="btn ghost znv-ttk" href="'+esc(v.url)+'" target="_blank" rel="noopener">'+esc(L("nv_open"))+'</a>'+
+   '<button type="button" class="btn primary znv-add" data-z="add">'+esc(L(v.captionOk?"nv_add":"nv_add_any"))+'</button>'+
+   '<p class="znv-note">'+esc(L("nv_note"))+'</p><div class="znv-msg" id="znvM"></div>'+
+   '<div class="znv-row"><button type="button" class="btn ghost" data-z="chg">'+esc(L("nv_chg"))+'</button><button type="button" class="btn ghost" data-z="not">'+esc(L("nv_not"))+'</button></div></div>';
+  o.addEventListener("mousedown",function(e){if(e.target===o)dismiss(v)});
+  o.addEventListener("click",function(e){var b=e.target.closest("[data-z]");if(!b)return;var z=b.getAttribute("data-z");
+    if(z==="x"||z==="back"||z==="not"){dismiss(v);return}
+    if(z==="add"){b.disabled=true;api("/api/video/add",{orderId:v.orderId,videoId:v.vid}).then(function(r){b.disabled=false;var m=o.querySelector("#znvM");if(r.ok){m.className="znv-msg good";m.textContent=r.j.done?L("nv_done"):F("nv_part",{n:r.j.n,m:r.j.m});seen[v.vid]=1;setTimeout(function(){close(function(){busy=false;next();if(typeof loadReqs==="function")try{loadReqs()}catch(x){}})},1100)}else{m.className="znv-msg bad";m.textContent=(r.j&&r.j.error)||L("nv_err")}});return}
+    if(z==="chg"){var p=o.querySelector(".znv-p");p.innerHTML='<div class="znv-top"><button type="button" class="znv-back" data-z="x2">‹ '+esc(L("nv_back"))+'</button><b>'+esc(L("nv_chg"))+'</b><span></span></div><p class="hint">'+esc(L("nv_link_t"))+'</p><input type="text" class="zcpq" id="znvU" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+esc(L("nv_link_ph"))+'"><div class="znv-msg" id="znvM"></div><button type="button" class="btn primary" data-z="send">'+esc(L("nv_send"))+'</button>';return}
+    if(z==="x2"){close(function(){busy=false;show(v)});return}
+    if(z==="send"){var u=o.querySelector("#znvU").value.trim(),m=o.querySelector("#znvM");if(!u)return;b.disabled=true;api("/api/video/add",{orderId:v.orderId,url:u}).then(function(r){b.disabled=false;if(r.ok){m.className="znv-msg good";m.textContent=r.j.done?L("nv_done"):F("nv_part",{n:r.j.n,m:r.j.m});seen[v.vid]=1;api("/api/video/dismiss",{accId:v.accId,videoId:v.vid});setTimeout(function(){close(function(){busy=false;next();if(typeof loadReqs==="function")try{loadReqs()}catch(x){}})},1100)}else{m.className="znv-msg bad";m.textContent=L("nv_err")}})}
+  });
+  document.body.appendChild(o);ov=o;requestAnimationFrame(function(){o.classList.add("in")})}
+function next(){if(busy||off)return;var v=Q.shift();while(v&&seen[v.vid])v=Q.shift();if(v)show(v)}
+function poll(){if(busy||off||document.hidden)return;if(document.querySelector(".cpk:not(.out),.zcpk:not(.out)"))return;
+  fetch("/api/me/new-videos",{credentials:"same-origin"}).then(function(r){if(r.status===401){off=true;setTimeout(function(){off=false},120000);return null}return r.ok?r.json():null}).then(function(j){if(!j||!j.videos)return;Q=j.videos.filter(function(v){return !seen[v.vid]});next()}).catch(function(){})}
+setTimeout(poll,3500);setInterval(poll,60000);document.addEventListener("visibilitychange",function(){if(!document.hidden)setTimeout(poll,800)});
 })();
 
 })();
