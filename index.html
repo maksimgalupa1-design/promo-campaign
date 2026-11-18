@@ -1806,6 +1806,55 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .pzbox .btn.primary{padding:13px 26px;font-weight:800}#payOk{color:#2fb574;font-weight:700}
 .pzsec{margin:14px 0;border:1.5px solid rgba(139,108,255,.4)}.pzt{font-size:20px;font-weight:800;margin-bottom:12px}
 
+.feepre{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.feepre .fbtn{min-width:56px}
+
+select{-webkit-touch-callout:none}
+
+/* v123: payment methods, crypto picker */
+.zcpk{position:fixed;inset:0;z-index:100001;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(7,5,20,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;transition:opacity .18s}
+.zcpk.in{opacity:1}.zcpk.out{opacity:0;pointer-events:none}
+.zcpk-p{box-sizing:border-box;width:min(440px,100%);max-height:min(82vh,640px);display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:24px;background:#18181b;color:#f2f0ff;border:1.5px solid rgba(139,108,255,.55);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 34px rgba(139,108,255,.3);transform:translateY(10px) scale(.97);transition:transform .2s cubic-bezier(.2,.9,.3,1.2)}
+.zcpk.in .zcpk-p{transform:none}.zcpk-p.sm{width:min(380px,100%)}
+.zcpk-p h3{margin:0;font-size:20px}.zcpk-t{margin:0;line-height:1.45;color:#d9d3ff}
+.zcpk-h{display:flex;align-items:center;gap:10px}.zcpk-h b{flex:1;font-size:18px}
+.zcpk-x,.zcpk-back{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(139,108,255,.4);background:transparent;color:#f2f0ff;font-size:18px;cursor:pointer}
+.zcpk-b{display:flex;gap:10px;justify-content:flex-end}
+.zpcdanger{background:linear-gradient(135deg,#e5484d,#ff7a7a)!important;box-shadow:0 0 18px rgba(229,72,77,.45)!important}
+.zcpq{box-sizing:border-box;width:100%;padding:13px 16px;border-radius:999px;border:1.5px solid rgba(139,108,255,.45);background:#232329;color:#fff;font:inherit;font-size:16px;outline:none}
+.zcpq:focus{border-color:#a56bff;box-shadow:0 0 0 3px rgba(139,108,255,.3)}
+.zcpw{position:relative;overflow:auto;min-height:120px;flex:1;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:16px}
+.zcpl{position:relative;display:grid;gap:2px}
+.zcph{position:absolute;left:0;right:0;top:0;height:0;border-radius:14px;background:rgba(139,108,255,.26);box-shadow:0 0 0 1.5px #8b6cff,0 0 22px rgba(139,108,255,.6);opacity:0;transition:transform .2s cubic-bezier(.4,0,.2,1),height .2s,opacity .18s;pointer-events:none;z-index:0}
+.zcpi{position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:9px 12px;border-radius:14px;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.zcpb{flex:none;min-width:44px;height:44px;padding:0 6px;box-sizing:border-box;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#6d5cff,#a56bff);color:#fff;font-size:11px;font-weight:800;letter-spacing:.2px}
+.zcpt{display:flex;flex-direction:column;min-width:0}.zcpt b{font-size:15px}.zcpt small{opacity:.7;font-size:12.5px}
+.zcpe{padding:24px;text-align:center;opacity:.7}
+.zcpsel{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:16px;background:rgba(139,108,255,.14)}
+.zpcmsg{min-height:20px;white-space:pre-line;font-size:14px;line-height:1.4}.zpcmsg.good{color:#5fe39a}.zpcmsg.bad{color:#ff8a8a}
+.zpcmsg.good{color:#5fe39a}
+.zpcm .zpch{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.zpcact{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.zpcbadge{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
+.zpcbadge.good{background:rgba(52,199,120,.16);color:#47d98a}.zpcbadge.bad{background:rgba(229,72,77,.18);color:#ff6b70}
+.zpceye{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:1.5px solid;background:transparent;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:box-shadow .2s,transform .15s}
+.zpceye.good{color:#47d98a;border-color:rgba(52,199,120,.6)}.zpceye.good:hover{box-shadow:0 0 16px rgba(52,199,120,.45)}
+.zpceye.bad{color:#fff;background:#e5484d;border-color:#e5484d;box-shadow:0 0 16px rgba(229,72,77,.4)}
+.zpceye:active{transform:scale(.96)}
+.zpctr{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(139,108,255,.4);background:transparent;color:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.zpctr:hover{border-color:#e5484d;color:#ff6b70}
+.pzsec.zpcoff,.zpcrow.zpcoff{border-color:#e5484d!important;box-shadow:0 0 0 1px rgba(229,72,77,.35),0 0 22px rgba(229,72,77,.18)}
+.pzsec.zpcm:not(.zpcoff){border-color:rgba(52,199,120,.45)}
+.zpcrow{margin:10px 0;padding:10px;border-radius:16px;border:1.5px solid rgba(52,199,120,.35)}
+.zpcrh{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:8px}.zpcrh .zpcact{margin-left:auto}
+.zpcrow input{box-sizing:border-box;width:100%}.zpcerr{border-color:#e5484d!important}
+.zpcaddb{margin:8px 0}
+.zpcbtn{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;margin-top:6px;padding:8px 14px;border-radius:999px;border:1.5px solid rgba(139,108,255,.5);background:var(--surface,#232329);color:inherit;font:inherit;text-align:left;cursor:pointer}
+.zpcbtn .zcpb{min-width:38px;height:38px}.zpcbtn i{margin-left:auto;font-style:normal;font-size:18px}
+.zpcbtn:hover{box-shadow:0 0 0 2px rgba(139,108,255,.4),0 8px 22px rgba(139,108,255,.3)}
+@media(max-width:480px){.zpcrh .zpcact{margin-left:0;width:100%}.zcpk{padding:12px}}
+
+.zdaBtn{margin-top:10px;background:transparent!important;color:#ff6b70!important;border:1.5px solid #e5484d!important;box-shadow:none!important}.zdaBtn:hover{box-shadow:0 0 16px rgba(229,72,77,.45)!important}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -1983,7 +2032,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v120 · 17.11 21:30</span>
+  <span>© Promo Campaign · v123 · 18.11 14:40</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -2757,6 +2806,7 @@ function api(path,body){
   return fetch(path,{method:body===undefined?"GET":"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:body===undefined?undefined:JSON.stringify(body)})
     .then(function(r){return r.json().catch(function(){return {}}).then(function(j){return {ok:r.ok,status:r.status,j:j}})});
 }
+var FEEP=20;
 function money(x){return "$"+(Math.round(x*100)/100)}
 function starsTxt(x){return x==null?"—":"★ "+x}
 function catPills(list,other){return (list||[]).map(function(c){return '<span class="pill">'+esc(c==="other"&&other?other:L("c_"+c))+'</span>'}).join(" ")}
@@ -2772,9 +2822,9 @@ function payBoxHtml(method,amount){
   if(method==="paypal"&&x.paypal)rows.push([L("p_to_paypal"),x.paypal]);
   if(method==="usdt"&&x.usdt){rows.push([L("p_to_usdt"),x.usdt]);if(x.usdtNet)rows.push([L("p_to_net"),x.usdtNet])}
   if(method==="card"&&x.card){rows.push([L("p_to_card"),x.card]);if(x.cardHolder)rows.push([L("p_to_holder"),x.cardHolder])}
-  var a=Number(amount)||0,fee=Math.round(a*0.2*100)/100;
+  var a=Number(amount)||0,fee=Math.round(a*FEEP)/100;
   return '<div class="note"><b>'+esc(L("p_send_to"))+'</b>'+(rows.length?rows.map(function(r){return '<div style="overflow-wrap:anywhere">'+esc(r[0])+': <b>'+esc(r[1])+'</b></div>'}).join(""):'<div>'+esc(L("p_no_pay"))+'</div>')+
-    (a>0?'<div style="margin-top:8px">'+esc(L("p_you_get"))+': <b>'+money(a-fee)+'</b> ('+money(a)+' − 20% = '+money(fee)+')</div>':'')+'<div class="hint" style="margin-top:6px">'+esc(L("p_fee"))+'</div></div>';
+    (a>0?'<div style="margin-top:8px">'+esc(L("p_you_get"))+': <b>'+money(a-fee)+'</b> ('+money(a)+' − '+FEEP+'% = '+money(fee)+')</div>':'')+'<div class="hint" style="margin-top:6px">'+esc(L("p_fee"))+'</div></div>';
 }
 function refreshPayBox(){var b=$("payBoxP");if(b)b.innerHTML=payBoxHtml(val("nMethod"),val("nBudget"));var c=$("payBoxM");if(c)c.innerHTML=payBoxHtml(val("tMeth"),val("tAmt"))}
 document.addEventListener("input",refreshPayBox);document.addEventListener("change",refreshPayBox);
@@ -2985,7 +3035,7 @@ function renderOwner(){
   }else if(LV.adTab==="payments"){
     var tps=D.topups.filter(function(p){return !LV.pF||LV.pF==="all"||(LV.pF==="done"?p.status!=="pending":p.status==="pending")});
     body=payBar("pF",[["all",D.topups.length],["pending",D.topups.filter(function(p){return p.status==="pending"}).length],["done",D.topups.filter(function(p){return p.status!=="pending"}).length]])+'<div class="list">'+(tps.length?tps.map(function(p){
-      return '<div class="card ord"><div class="t"><div><span>'+esc(L("a_from"))+': '+esc(p.producerName?p.producerName+" · ":"")+esc(p.producer||"")+'</span><b>'+(p.orig?esc(p.orig+' '+(p.cur==='UAH'?'₴':p.cur))+' ≈ ':'')+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' 20%: '+money(Math.round(p.amount*20)/100)+'</span>'+(p.from?'<span class="hotnote">👤 '+esc(L("pp_payer"))+': <b>'+esc(p.from)+'</b></span>':'')+'<span>'+esc(p.track||"")+'</span>'+(p.message?'<span class="hotnote">'+esc(p.message)+'</span>':'')+(p.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(p.deadline)+'</span>':'')+'</div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
+      return '<div class="card ord"><div class="t"><div><span>'+esc(L("a_from"))+': '+esc(p.producerName?p.producerName+" · ":"")+esc(p.producer||"")+'</span><b>'+(p.orig?esc(p.orig+' '+(p.cur==='UAH'?'₴':p.cur))+' ≈ ':'')+money(p.amount)+' · '+esc(L("m_"+p.method))+'</b><span>'+esc(L("a_fee"))+' '+FEEP+'%: '+money(Math.round(p.amount*FEEP)/100)+'</span>'+(p.from?'<span class="hotnote">👤 '+esc(L("pp_payer"))+': <b>'+esc(p.from)+'</b></span>':'')+'<span>'+esc(p.track||"")+'</span>'+(p.message?'<span class="hotnote">'+esc(p.message)+'</span>':'')+(p.deadline?'<span>⏰ '+esc(L("t_deadline"))+': '+esc(p.deadline)+'</span>':'')+'</div>'+stL(p.status==="confirmed"?"completed":(p.status==="rejected"?"rejected":"pending"))+'</div>'+
         (p.hasProof?'<div class="row"><button class="btn sm" data-l="admProofT" data-id="'+esc(p.id)+'">'+esc(L("a_view_proof"))+'</button></div>':'')+(p.status==="pending"?'<div class="row"><button class="btn sm primary" data-l="tAct" data-id="'+esc(p.id)+'" data-s="confirmed">'+esc(L("a_confirm"))+'</button><button class="btn sm danger" data-l="tAct" data-id="'+esc(p.id)+'" data-s="rejected">'+esc(L("a_reject"))+'</button></div>':'')+'</div>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
   }else if(LV.adTab==="producers"){
@@ -3147,9 +3197,9 @@ function payBoxHtml(method,amount,coin,compact){
   if(method==="paypal"&&x.paypal)rows.push(["PayPal",x.paypal]);
   if(method==="crypto"){var ad=(x.crypto||{})[coin||"solana"];if(ad){rows.push([coinL(coin||"solana"),ad])}}
   if(method==="card"&&x.card){if(x.cardHolder)rows.push([L("p_recipient"),x.cardHolder]);rows.push([L("p_cardno"),x.card])}
-  var a=Number(amount)||0,fee=Math.round(a*0.2*100)/100;
+  var a=Number(amount)||0,fee=Math.round(a*FEEP)/100;
   return '<div class="note payok"><b>'+esc(L("p_send_to"))+'</b>'+(rows.length?rows.map(function(r){return '<div class="payrow"><span class="payl">'+esc(r[0])+'</span><b class="payv">'+esc(r[1])+'</b><button type="button" class="copybtn" data-l="cpy" data-v="'+esc(r[1])+'">⧉ '+esc(L("cp_copy"))+'</button></div>'}).join(""):'<div>'+esc(L("p_no_pay"))+'</div>')+
-    (compact?'':(a>0?'<div class="hotnote" style="margin-top:8px">'+esc(L("p_you_get"))+': <b>'+money(a-fee)+'</b> ('+money(a)+' − 20% = '+money(fee)+')<br><small>'+esc(L("p_fee_short"))+'</small></div>':'')+'<div class="hint" style="margin-top:6px">'+esc(L("p_fee"))+'</div>')+'</div>';
+    (compact?'':(a>0?'<div class="hotnote" style="margin-top:8px">'+esc(L("p_you_get"))+': <b>'+money(a-fee)+'</b> ('+money(a)+' − '+FEEP+'% = '+money(fee)+')<br><small>'+esc(L("p_fee_short"))+'</small></div>':'')+'<div class="hint" style="margin-top:6px">'+esc(L("p_fee"))+'</div>')+'</div>';
 }
 function refreshPayBox(){
   var c=$("nCoinRow");if(c)c.hidden=val("nMethod")!=="crypto";
@@ -3158,7 +3208,7 @@ function refreshPayBox(){
   var o=$("nOtherRow");if(o){var on=checked("nCats").indexOf("other")>=0;o.hidden=!on}
   var b=$("payBoxM");if(b)b.innerHTML=payBoxHtml(val("tMeth"),val("tAmt"),val("tCoin"));
   var np=$("nPayBox");if(np)np.innerHTML=payBoxHtml(val("nMethod"),Number(val("nBudget"))||0,val("nCoin"),true);
-  var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;if(a>0&&a<minBud()){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=a>0?L("p_fee_line").replace("{f}",money(a*0.2)).replace("{n}",money(a*0.8)):L("p_fee");q.className=a>0?"hotnote":"hint"}}
+  var q=$("nBudgetInfo");if(q){var a=Number(val("nBudget"))||0;if(a>0&&a<minBud()){q.textContent=L("p_too_small");q.className="note err"}else{q.textContent=a>0?L("p_fee_line").replace("{f}",money(a*FEEP/100)).replace("{n}",money(a*(100-FEEP)/100)):L("p_fee");q.className=a>0?"hotnote":"hint"}}
   var so=$("sOtherRow");if(so&&$("sCats"))so.hidden=checked("sCats").indexOf("other")<0;
   var pc=$("pyCoinRow");if(pc)pc.hidden=val("pyMethod")!=="crypto";var ph=$("pyHolderRow");if(ph)ph.hidden=val("pyMethod")!=="card";
   var pv=$("pyValueL");if(pv)pv.textContent=L("py_value_"+val("pyMethod"));
@@ -6658,7 +6708,7 @@ if(/relinked=1/.test(location.hash||"")){setTimeout(function(){try{toast(L("tt_r
 if(/relinkfail=1/.test(location.hash||"")){setTimeout(function(){try{toast(L("tt_fail"))}catch(e){}},1200)}
 /* payout method as round pills */
 var IC={paypal:"🅿️",crypto:"🪙",card:"💳"};
-function enh(){document.querySelectorAll("#pyMethod,#tMeth,#nMethod").forEach(function(sel){if(sel.getAttribute("data-mp"))return;sel.setAttribute("data-mp","1");sel.classList.add("cs-hid");
+function enh(){document.querySelectorAll("#pyMethod,#tMeth,#nMethod").forEach(function(sel){if(sel.getAttribute("data-mp"))return;try{if(window.PCFIX)window.PCFIX(sel)}catch(e){}sel.setAttribute("data-mp","1");sel.classList.add("cs-hid");
   var lb=sel.closest("label"),w=document.createElement("div");w.className="mpills";w.setAttribute("role","radiogroup");
   w.innerHTML=Array.prototype.map.call(sel.options,function(o){return '<button type="button" class="mpill'+(o.selected?' on':'')+'" role="radio" aria-checked="'+o.selected+'" data-v="'+esc(o.value)+'"><i>'+(IC[o.value]||"💠")+'</i><span>'+esc(o.textContent)+'</span></button>'}).join("");
   w.addEventListener("click",function(ev){var b=ev.target.closest(".mpill");if(!b)return;ev.preventDefault();ev.stopPropagation();sel.value=b.getAttribute("data-v");w.querySelectorAll(".mpill").forEach(function(x){var on=x===b;x.classList.toggle("on",on);x.setAttribute("aria-checked",on)});sel.dispatchEvent(new Event("change",{bubbles:true}))});
@@ -6976,6 +7026,12 @@ function open(s){if(!ok(s))return;if(cur===s){close();return}close();cur=s;
   t0=Date.now();requestAnimationFrame(function(){if(!pop)return;pop.classList.add("in");hl(sel>=0?sel:0,false);if(sel>=0&&items[sel]){var it=items[sel];pop.scrollTop=Math.max(0,it.offsetTop-pop.clientHeight/2+it.offsetHeight/2)}})}
 function down(e){var s=e.target;if(!(s&&s.tagName==="SELECT"))return;if(!ok(s))return;if(e.button&&e.button!==0)return;e.preventDefault();e.stopImmediatePropagation();try{s.focus({preventScroll:true})}catch(x){}open(s)}
 document.addEventListener("mousedown",down,true);
+var tx=null;
+document.addEventListener("touchstart",function(e){var s=e.target;if(!(s&&s.tagName==="SELECT"&&ok(s))){tx=null;return}var t=e.touches[0];tx={s:s,x:t.clientX,y:t.clientY,m:false}},{capture:true,passive:true});
+document.addEventListener("touchmove",function(e){if(!tx)return;var t=e.touches[0];if(Math.abs(t.clientX-tx.x)>10||Math.abs(t.clientY-tx.y)>10)tx.m=true},{capture:true,passive:true});
+document.addEventListener("touchend",function(e){var z=tx;tx=null;if(!z)return;if(e.cancelable)e.preventDefault();e.stopImmediatePropagation();if(z.m)return;try{z.s.blur()}catch(x){}open(z.s)},{capture:true,passive:false});
+document.addEventListener("touchcancel",function(){tx=null},true);
+document.addEventListener("focusin",function(e){var s=e.target;if(s&&s.tagName==="SELECT"&&ok(s)&&"ontouchstart" in window){setTimeout(function(){if(document.activeElement===s)try{s.blur()}catch(x){}},0)}},true);
 document.addEventListener("click",function(e){var s=e.target;if(s&&s.tagName==="SELECT"&&ok(s)){e.preventDefault();e.stopImmediatePropagation()}},true);
 document.addEventListener("pointerdown",function(e){if(pop&&!(e.target.closest&&(e.target.closest(".rdp")||e.target===cur)))close()},true);
 document.addEventListener("keydown",function(e){
@@ -7061,6 +7117,179 @@ function html(){var X=LV.payInfo||{},C=X.crypto||{};
    '<div class="row"><button type="button" class="btn primary" data-l="paySave">'+esc(L("pz_save"))+'</button><span class="hint" id="payOk"></span></div></div>'}
 var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="pay"){var mn=document.querySelector(".ownmain")||$("adApp");if(mn&&!mn.querySelector(".pzbox")){var ae=document.activeElement,keep=ae&&ae.id?{i:ae.id,v:ae.value}:null,y=window.scrollY;mn.innerHTML=html();if(keep&&$(keep.i)){$(keep.i).value=keep.v;$(keep.i).focus()}window.scrollTo(0,y)}}}catch(e){}return r};
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest('[data-l="paySave"]');if(!b)return;setTimeout(function(){var t=$("payOk");if(t&&t.textContent)t.textContent="✓ "+L("pz_ok")},600)},true);
+
+/* v121: owner-editable site commission */
+Object.assign(LT.en,{fee_t:"Site commission",fee_h:"The share of every producer payment that you keep. Producers see the new percent right away; payments already confirmed keep the percent they had.",fee_l:"Commission, % (0 to 100)",fee_ex:"Example: producer pays $6000 → you keep {a}, editors' budget {b}",fee_save:"Save commission",fee_ok:"Saved ✓",fee_bad:"Enter a number from 0 to 100"});
+Object.assign(LT.ru,{fee_t:"Комиссия сайта",fee_h:"Какую долю от каждого платежа продюсера вы оставляете себе. Продюсеры сразу видят новый процент; уже подтверждённые платежи остаются со старым процентом.",fee_l:"Комиссия, % (от 0 до 100)",fee_ex:"Пример: продюсер платит $6000 → вам {a}, бюджет эдиторам {b}",fee_save:"Сохранить комиссию",fee_ok:"Сохранено ✓",fee_bad:"Введите число от 0 до 100"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("fee_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
+var _Lfee=L;L=function(k){var s=_Lfee(k);if(FEEP===20||typeof s!=="string"||s.indexOf("20")<0||k.indexOf("fee")<0&&k.indexOf("p_")!==0)return s;return s.replace(/\b20(\s?)%/g,function(m,sp){return FEEP+sp+"%"})};
+function feeSet(v){v=Number(v);if(isFinite(v)&&v>=0&&v<=100)FEEP=v}
+function feeLoad(){fetch("/api/fee").then(function(r){return r.json()}).then(function(j){if(j&&j.pct!=null&&Number(j.pct)!==FEEP){feeSet(j.pct);if(typeof ownerReload==="function"&&LV.adTab!=="pay"&&0)ownerReload()}}).catch(function(){})}
+feeLoad();setInterval(feeLoad,60000);
+function feeEx(v){v=Number(String(v).replace(",","."));if(!isFinite(v)||v<0||v>100)return "";var f=Math.round(6000*v)/100;return L("fee_ex").replace("{a}",money(f)).replace("{b}",money(6000-f))}
+function feeBox(){return '<div class="card form pzsec" id="feeBox"><div class="pzt">% '+esc(L("fee_t"))+'</div><p class="hint">'+esc(L("fee_h"))+'</p><label class="f pzf big" for="feeIn"><span>'+esc(L("fee_l"))+'</span><input id="feeIn" type="text" inputmode="decimal" maxlength="6" autocomplete="off" value="'+FEEP+'"></label><div class="feepre">'+[0,10,15,20,25,30,50].map(function(n){return '<button type="button" class="fbtn" data-l="feePre" data-v="'+n+'">'+n+'%</button>'}).join("")+'</div><div class="hint" id="feeEx">'+esc(feeEx(FEEP))+'</div><div class="row"><button type="button" class="btn primary" data-l="feeSave">'+esc(L("fee_save"))+'</button><span class="hint" id="feeOk"></span></div></div>'}
+var _of=renderOwner;renderOwner=function(){var r=_of.apply(this,arguments);try{if(LV.adTab==="pay"){var bx=document.querySelector(".pzbox");if(bx&&!$("feeBox")){var h=bx.querySelector("p.hint");var d=document.createElement("div");d.innerHTML=feeBox();if(h&&h.nextSibling)bx.insertBefore(d.firstChild,h.nextSibling);else bx.appendChild(d.firstChild);api("/api/admin/fee").then(function(x){if(x.ok&&x.j&&x.j.pct!=null){feeSet(x.j.pct);if($("feeIn")&&document.activeElement!==$("feeIn")){$("feeIn").value=FEEP;$("feeEx").textContent=feeEx(FEEP)}}})}}}catch(e){}return r};
+document.addEventListener("input",function(e){if(e.target&&e.target.id==="feeIn"){var t=$("feeEx");if(t)t.textContent=feeEx(e.target.value)}},true);
+window.addEventListener("click",function(e){var p=e.target.closest&&e.target.closest('[data-l="feePre"]');if(p){e.stopImmediatePropagation();e.preventDefault();$("feeIn").value=p.getAttribute("data-v");$("feeEx").textContent=feeEx(p.getAttribute("data-v"));return}
+ var b=e.target.closest&&e.target.closest('[data-l="feeSave"]');if(!b)return;e.stopImmediatePropagation();e.preventDefault();var raw=$("feeIn").value.trim().replace(",","."),v=Number(raw),ok=$("feeOk");
+ if(raw===""||!isFinite(v)||v<0||v>100){ok.textContent=L("fee_bad");ok.style.color="#ff8a8a";return}
+ b.disabled=true;api("/api/admin/fee",{pct:v}).then(function(r){b.disabled=false;if(r.ok){feeSet(r.j.pct);$("feeIn").value=FEEP;$("feeEx").textContent=feeEx(FEEP);ok.style.color="";ok.textContent=L("fee_ok");setTimeout(function(){if(ok)ok.textContent=""},3000)}else{ok.textContent=L("fee_bad");ok.style.color="#ff8a8a"}})},true);
+
+/* ===== v123: payment methods — show/hide (eye), add/delete, crypto catalog with search + address check ===== */
+(function(){
+/*PC_SHARED_BEGIN*/
+var PC_CAT=[
+["bitcoin","Bitcoin","BTC","btc",""],["ethereum","Ethereum","ETH","evm","ERC20"],
+["usdt-trc20","Tether","USDT","tron","TRC20"],["usdt-erc20","Tether","USDT","evm","ERC20"],["usdt-bep20","Tether","USDT","evm","BEP20"],["usdt-ton","Tether","USDT","ton","TON"],["usdt-sol","Tether","USDT","sol","Solana"],["usdt-polygon","Tether","USDT","evm","Polygon"],["usdt-arbitrum","Tether","USDT","evm","Arbitrum"],
+["usdc-erc20","USD Coin","USDC","evm","ERC20"],["usdc-bep20","USD Coin","USDC","evm","BEP20"],["usdc-trc20","USD Coin","USDC","tron","TRC20"],["usdc-sol","USD Coin","USDC","sol","Solana"],["usdc-polygon","USD Coin","USDC","evm","Polygon"],["usdc-base","USD Coin","USDC","evm","Base"],["usdc-arbitrum","USD Coin","USDC","evm","Arbitrum"],
+["bnb","BNB","BNB","evm","BEP20"],["solana","Solana","SOL","sol",""],["tron","Tron","TRX","tron","TRC20"],["litecoin","Litecoin","LTC","ltc",""],["ton","TON (Toncoin)","TON","ton","TON"],
+["xrp","XRP","XRP","xrp","XRP Ledger"],["dogecoin","Dogecoin","DOGE","doge",""],["cardano","Cardano","ADA","ada",""],["polkadot","Polkadot","DOT","dot",""],
+["avalanche","Avalanche","AVAX","evm","C-Chain"],["polygon","Polygon","POL","evm","Polygon"],["chainlink","Chainlink","LINK","evm","ERC20"],["shiba","Shiba Inu","SHIB","evm","ERC20"],["uniswap","Uniswap","UNI","evm","ERC20"],
+["bitcoin-cash","Bitcoin Cash","BCH","bch",""],["stellar","Stellar","XLM","xlm",""],["cosmos","Cosmos","ATOM","atom",""],["near","NEAR Protocol","NEAR","near",""],["algorand","Algorand","ALGO","algo",""],["monero","Monero","XMR","xmr",""],
+["sui","Sui","SUI","move",""],["aptos","Aptos","APT","move",""],["dai","Dai","DAI","evm","ERC20"],["arbitrum","Arbitrum","ARB","evm","Arbitrum"],["optimism","Optimism","OP","evm","Optimism"],["ethereum-classic","Ethereum Classic","ETC","evm","ETC"],
+["zcash","Zcash","ZEC","zec",""],["dash","Dash","DASH","dash",""],["hedera","Hedera","HBAR","hbar",""],["kaspa","Kaspa","KAS","kas",""],["injective","Injective","INJ","inj",""],
+["pepe","Pepe","PEPE","evm","ERC20"],["notcoin","Notcoin","NOT","ton","TON"],["pyusd","PayPal USD","PYUSD","evm","ERC20"],["usde","Ethena USDe","USDe","evm","ERC20"],["wbtc","Wrapped Bitcoin","WBTC","evm","ERC20"],["aave","Aave","AAVE","evm","ERC20"]
+];
+var PC_K=[
+["tron","Tron (TRC20)",/^T[1-9A-HJ-NP-Za-km-z]{33}$/],
+["evm","Ethereum / BNB Chain / Polygon / Arbitrum / Base (0x…)",/^0x[a-fA-F0-9]{40}$/],
+["move","Sui / Aptos (0x…, 64)",/^0x[a-fA-F0-9]{64}$/],
+["btc","Bitcoin",/^(bc1[a-z0-9]{25,59}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$/],
+["ltc","Litecoin",/^(ltc1[a-z0-9]{25,60}|[LM][a-km-zA-HJ-NP-Z1-9]{26,33})$/],
+["doge","Dogecoin",/^D[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{32}$/],
+["xrp","XRP",/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/],
+["ton","TON",/^((?:[EU]Q|kQ|0Q)[A-Za-z0-9_-]{46}|0:[a-fA-F0-9]{64})$/],
+["bch","Bitcoin Cash",/^(bitcoincash:)?[qp][a-z0-9]{41}$/],
+["ada","Cardano",/^addr1[a-z0-9]{50,110}$/],
+["dot","Polkadot",/^1[1-9A-HJ-NP-Za-km-z]{46,47}$/],
+["xlm","Stellar",/^G[A-Z2-7]{55}$/],
+["atom","Cosmos",/^cosmos1[a-z0-9]{38}$/],
+["inj","Injective",/^inj1[a-z0-9]{38}$/],
+["near","NEAR",/^([a-z0-9_-]{2,64}\.near|[a-f0-9]{64})$/],
+["algo","Algorand",/^[A-Z2-7]{58}$/],
+["xmr","Monero",/^[48][1-9A-HJ-NP-Za-km-z]{94}$/],
+["zec","Zcash",/^t[13][a-km-zA-HJ-NP-Z1-9]{33}$/],
+["dash","Dash",/^X[1-9A-HJ-NP-Za-km-z]{33}$/],
+["hbar","Hedera",/^0\.0\.\d{1,10}$/],
+["kas","Kaspa",/^kaspa:[a-z0-9]{61,63}$/],
+["sol","Solana",/^[1-9A-HJ-NP-Za-km-z]{32,44}$/]
+];
+function pcCoin(id){for(var i=0;i<PC_CAT.length;i++)if(PC_CAT[i][0]===id)return {id:id,n:PC_CAT[i][1],s:PC_CAT[i][2],k:PC_CAT[i][3],t:PC_CAT[i][4]};return null}
+function pcKindName(k){for(var i=0;i<PC_K.length;i++)if(PC_K[i][0]===k)return PC_K[i][1];return k}
+function pcDetect(a){a=String(a||"").trim();for(var i=0;i<PC_K.length;i++){if(PC_K[i][2].test(a)){if(PC_K[i][0]==="sol"||true)return PC_K[i][0]}}return ""}
+/* returns {ok:true,note?} or {ok:false,why:"kind"|"bad",found?:kindname} */
+function pcCheck(id,addr){var c=pcCoin(id);addr=String(addr||"").trim();if(!c)return {ok:false,why:"bad"};if(!addr)return {ok:false,why:"empty"};
+  var re=null;for(var i=0;i<PC_K.length;i++)if(PC_K[i][0]===c.k)re=PC_K[i][2];
+  var hit=re&&re.test(addr);
+  if(hit&&c.k==="sol"&&addr.length<43){var d=pcDetect(addr);if(d&&d!=="sol")hit=false}
+  if(hit)return {ok:true,multi:c.k==="evm"};
+  var f=pcDetect(addr);if(f&&f!==c.k)return {ok:false,why:"kind",found:pcKindName(f)};
+  return {ok:false,why:"bad"}}
+/*PC_SHARED_END*/
+
+var T={en:{pc_vis:"Visible to producers",pc_hid:"Hidden",pc_hide:"Hide",pc_show:"Enable",pc_del:"Delete",pc_ask_h:"Are you sure?",pc_ask_hide:"Hide “{x}” from producers? They will not see this payment method until you enable it again.",pc_yes:"Yes",pc_no:"Cancel",pc_ask_del:"Delete “{x}”? The saved details will be erased.",pc_add:"＋ Add crypto",pc_add_t:"Add cryptocurrency",pc_pick_t:"Choose cryptocurrency",pc_search:"Search: BTC, USDT, TRC20, Solana…",pc_none:"Nothing found",pc_addr:"Wallet address",pc_addr_for:"Paste the address for the network: {x}",pc_ok:"✓ The address fits",pc_multi:"The 0x… format is the same for several networks (ERC20, BEP20, Polygon…). Make sure the network matches.",pc_kind:"This is a {f} address, not {c}. Enter another one.",pc_bad:"This does not look like a {c} address. Check it and enter again.",pc_addb:"Add",pc_nocrypto:"No cryptocurrencies added yet.",pc_savebad:"Wrong address for {c}",pc_save:"Save details",pc_saved:"Saved ✓",pc_cry:"Crypto",pc_card:"Card",pc_rcp:"Recipient (name shown to producers)",pc_ppl:"PayPal (email or link)",pc_cardno:"Card number",pc_h:"Where producers send money",pc_h2:"Eye hides a method from producers (with a red mark), Enable shows it again. You can add or delete methods any time.",pc_cur:"Crypto",pc_sel:"Cryptocurrency",pc_net:"Network"},
+ru:{pc_vis:"Виден продюсерам",pc_hid:"Скрыто",pc_hide:"Скрыть",pc_show:"Включить",pc_del:"Удалить",pc_ask_h:"Вы уверены?",pc_ask_hide:"Скрыть «{x}» от продюсеров? Они не будут видеть этот способ оплаты, пока вы снова его не включите.",pc_yes:"Да",pc_no:"Отмена",pc_ask_del:"Удалить «{x}»? Сохранённые данные будут стёрты.",pc_add:"＋ Добавить крипту",pc_add_t:"Добавить криптовалюту",pc_pick_t:"Выберите криптовалюту",pc_search:"Поиск: BTC, USDT, TRC20, Solana…",pc_none:"Ничего не найдено",pc_addr:"Адрес кошелька",pc_addr_for:"Вставьте адрес для сети: {x}",pc_ok:"✓ Адрес подходит",pc_multi:"Формат 0x… один для нескольких сетей (ERC20, BEP20, Polygon…). Убедитесь, что сеть совпадает.",pc_kind:"Это адрес сети «{f}», а не «{c}». Введите другой адрес.",pc_bad:"Это не похоже на адрес «{c}». Проверьте и введите ещё раз.",pc_addb:"Добавить",pc_nocrypto:"Криптовалюты пока не добавлены.",pc_savebad:"Неверный адрес для {c}",pc_save:"Сохранить реквизиты",pc_saved:"Сохранено ✓",pc_cry:"Крипта",pc_card:"Карта",pc_rcp:"Получатель (имя, которое видят продюсеры)",pc_ppl:"PayPal (email или ссылка)",pc_cardno:"Номер карты",pc_h:"Куда продюсеры отправляют деньги",pc_h2:"Глазик скрывает способ от продюсеров (красная метка), «Включить» показывает снова. Способы можно добавлять и удалять в любой момент.",pc_cur:"Крипта",pc_sel:"Криптовалюта",pc_net:"Сеть"}};
+Object.assign(LT.en,T.en);Object.assign(LT.ru,T.ru);
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in T.en)if(!XLL[k][x])XLL[k][x]=T.en[x]});
+function F(k,o){var s=L(k);for(var x in o)s=s.replace("{"+x+"}",o[x]);return s}
+var _cl=coinL;coinL=function(c){var e=pcCoin(c);if(e)return e.n+(e.s&&e.s!==e.n?" · "+e.s:"")+(e.t?" · "+e.t:"");return _cl(c)};
+function cLabel(id){return coinL(id)}
+/* ---------- overlay ---------- */
+function ovClose(){var o=document.querySelector(".zcpk:not(.out)");if(o){o.classList.add("out");o.classList.remove("in");setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},180)}}
+function ovOpen(inner,cls){ovClose();var o=document.createElement("div");o.className="zcpk";o.innerHTML='<div class="zcpk-p'+(cls?" "+cls:"")+'" role="dialog" aria-modal="true">'+inner+'</div>';
+  o.addEventListener("mousedown",function(e){if(e.target===o)ovClose()});o.addEventListener("touchend",function(e){if(e.target===o){e.preventDefault();ovClose()}},{passive:false});
+  document.body.appendChild(o);requestAnimationFrame(function(){o.classList.add("in")});return o}
+document.addEventListener("keydown",function(e){if(e.key==="Escape")ovClose()});
+function ask(title,text,yes,fn){var o=ovOpen('<h3>'+esc(title)+'</h3><p class="zcpk-t">'+esc(text)+'</p><div class="zcpk-b"><button type="button" class="btn ghost" data-pc="no">'+esc(L("pc_no"))+'</button><button type="button" class="btn primary zpcdanger" data-pc="yes">'+esc(yes)+'</button></div>',"sm");
+  o.querySelector('[data-pc="no"]').onclick=ovClose;o.querySelector('[data-pc="yes"]').onclick=function(){ovClose();fn()}}
+/* ---------- coin picker (search + one shared highlight) ---------- */
+function listHtml(ids){return '<div class="zcpl"><i class="zcph"></i>'+(ids.length?ids.map(function(id){var e=pcCoin(id);return '<button type="button" class="zcpi" data-id="'+esc(id)+'"><span class="zcpb">'+esc(e.s)+'</span><span class="zcpt"><b>'+esc(e.n)+'</b><small>'+esc((e.t?e.t+" · ":"")+e.s)+'</small></span></button>'}).join(""):'<div class="zcpe">'+esc(L("pc_none"))+'</div>')+'</div>'}
+function hlTo(box,it){var h=box.querySelector(".zcph");if(!h)return;if(!it){h.style.opacity="0";return}h.style.height=it.offsetHeight+"px";h.style.transform="translateY("+it.offsetTop+"px)";h.style.opacity="1"}
+function picker(title,ids,onPick){
+  var o=ovOpen('<div class="zcpk-h"><b>'+esc(title)+'</b><button type="button" class="zcpk-x" aria-label="close">✕</button></div><input type="text" class="zcpq" id="cpQ" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+esc(L("pc_search"))+'"><div class="zcpw" id="cpW">'+listHtml(ids)+'</div>');
+  var q=o.querySelector("#cpQ"),w=o.querySelector("#cpW");o.querySelector(".zcpk-x").onclick=ovClose;
+  function draw(){var s=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);var f=ids.filter(function(id){var e=pcCoin(id),h=(id+" "+e.n+" "+e.s+" "+e.t).toLowerCase();return s.every(function(x){return h.indexOf(x)>=0})});w.innerHTML=listHtml(f);w.scrollTop=0}
+  q.addEventListener("input",draw);
+  w.addEventListener("mouseover",function(e){var it=e.target.closest(".zcpi");if(it)hlTo(w,it)});
+  w.addEventListener("mouseleave",function(){hlTo(w,null)});
+  w.addEventListener("click",function(e){var it=e.target.closest(".zcpi");if(!it)return;e.preventDefault();hlTo(w,it);var id=it.getAttribute("data-id");setTimeout(function(){onPick(id)},90)});
+  setTimeout(function(){try{q.focus({preventScroll:true})}catch(e){}},220);return o}
+/* ---------- add crypto: step 2 (address) ---------- */
+function addrStep(id,done){var e=pcCoin(id);
+  var o=ovOpen('<div class="zcpk-h"><button type="button" class="zcpk-back" aria-label="back">‹</button><b>'+esc(L("pc_add_t"))+'</b><button type="button" class="zcpk-x" aria-label="close">✕</button></div>'+
+    '<div class="zcpsel"><span class="zcpb">'+esc(e.s)+'</span><span class="zcpt"><b>'+esc(e.n)+'</b><small>'+esc((e.t?e.t+" · ":"")+e.s)+'</small></span></div>'+
+    '<p class="hint">'+esc(F("pc_addr_for",{x:(e.t||e.n)+" ("+pcKindName(e.k)+")"}))+'</p>'+
+    '<input type="text" class="zcpq" id="cpA" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+esc(L("pc_addr"))+'"><div class="zpcmsg" id="cpM"></div>'+
+    '<button type="button" class="btn primary" id="cpGo" disabled>'+esc(L("pc_addb"))+'</button>');
+  var a=o.querySelector("#cpA"),m=o.querySelector("#cpM"),g=o.querySelector("#cpGo"),res=null;
+  o.querySelector(".zcpk-x").onclick=ovClose;o.querySelector(".zcpk-back").onclick=function(){openAdd()};
+  function chk(){var v=a.value.trim();res=null;g.disabled=true;m.className="zpcmsg";if(!v){m.textContent="";return}
+    var r=pcCheck(id,v);res=r;
+    if(r.ok){m.className="zpcmsg good";m.textContent=L("pc_ok")+(r.multi?"\n"+L("pc_multi"):"");g.disabled=false}
+    else{m.className="zpcmsg bad";m.textContent=r.why==="kind"?F("pc_kind",{f:r.found,c:e.t?e.n+" "+e.t:e.n}):F("pc_bad",{c:e.n+(e.t?" · "+e.t:"")})}}
+  a.addEventListener("input",chk);a.addEventListener("paste",function(){setTimeout(chk,0)});
+  g.onclick=function(){chk();if(!res||!res.ok)return;g.disabled=true;api("/api/admin/pay-op",{op:"coin",id:id,addr:a.value.trim()}).then(function(r){if(r.ok){snap();adopt(r.j);ovClose();pcDraw()}else{g.disabled=false;m.className="zpcmsg bad";m.textContent=F("pc_bad",{c:e.n})}})};
+  setTimeout(function(){try{a.focus({preventScroll:true})}catch(x){}},220)}
+function openAdd(){var have=Object.keys(PCS.crypto||{});var ids=PC_CAT.map(function(c){return c[0]}).filter(function(i){return have.indexOf(i)<0});picker(L("pc_add_t"),ids,addrStep)}
+/* ---------- admin screen ---------- */
+var PCS={paypal:"",paypalHolder:"",card:"",cardHolder:"",cryptoHolder:"",crypto:{},off:{}},LOC={};
+function adopt(j){if(!j)return;PCS.off=j.off||{};var c={};Object.keys(j.crypto||{}).forEach(function(k){c[k]=LOC["c:"+k]!=null?LOC["c:"+k]:j.crypto[k]});PCS.crypto=c;["paypal","paypalHolder","card","cardHolder","cryptoHolder"].forEach(function(k){PCS[k]=LOC[k]!=null?LOC[k]:(j[k]||"")})}
+function snap(){["paypal","paypalHolder","card","cardHolder","cryptoHolder"].forEach(function(k){var i=$("pcf_"+k);if(i)LOC[k]=i.value});Object.keys(PCS.crypto||{}).forEach(function(k){var i=$("pcc_"+k);if(i)LOC["c:"+k]=i.value})}
+var EYE='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>',EYEOFF='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 19c-7 0-11-7-11-7a19.8 19.8 0 0 1 5.06-5.94M9.9 4.24A10.9 10.9 0 0 1 12 4c7 0 11 7 11 7a19.7 19.7 0 0 1-3.17 4.19M1 1l22 22"/></svg>',TRASH='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
+function inp(id,lbl,v,ph){return '<label class="f pzf big" for="'+id+'"><span>'+esc(lbl)+'</span><input id="'+id+'" type="text" maxlength="140" autocomplete="off" placeholder="'+esc(ph||"")+'" value="'+esc(v||"")+'"></label>'}
+function ctr(key,name,small){var off=!!PCS.off[key];return '<span class="zpcact"><span class="zpcbadge '+(off?"bad":"good")+'">'+esc(off?L("pc_hid"):L("pc_vis"))+'</span><button type="button" class="zpceye '+(off?"bad":"good")+'" data-l="pcEye" data-k="'+esc(key)+'" data-n="'+esc(name)+'">'+(off?EYEOFF:EYE)+'<span>'+esc(off?L("pc_show"):L("pc_hide"))+'</span></button>'+(small?'':'<button type="button" class="zpctr" data-l="pcDel" data-k="'+esc(key)+'" data-n="'+esc(name)+'" aria-label="'+esc(L("pc_del"))+'">'+TRASH+'</button>')+'</span>'}
+function pcSec(key,ic,name,body,small){return '<div class="card form pzsec zpcm'+(PCS.off[key]?" zpcoff":"")+'" data-pk="'+esc(key)+'"><div class="pzt zpch"><span>'+ic+' '+esc(name)+'</span>'+ctr(key,name,small)+'</div>'+body+'</div>'}
+function pcHtml(){
+  var ids=Object.keys(PCS.crypto||{});
+  var rows=ids.length?ids.map(function(id){var e=pcCoin(id)||{n:id,s:"",t:""},k="c:"+id,off=!!PCS.off[k];
+    return '<div class="zpcrow'+(off?" zpcoff":"")+'"><div class="zpcrh"><span class="zcpb">'+esc(e.s||"?")+'</span><span class="zcpt"><b>'+esc(e.n)+'</b><small>'+esc((e.t?e.t+" · ":"")+e.s)+'</small></span>'+ctr(k,coinL(id))+'</div><input id="pcc_'+esc(id)+'" type="text" maxlength="140" autocomplete="off" value="'+esc(PCS.crypto[id])+'"></div>'}).join(""):'<p class="hint">'+esc(L("pc_nocrypto"))+'</p>';
+  return pcSec("paypal","🅿️","PayPal",inp("pcf_paypalHolder",L("pc_rcp"),PCS.paypalHolder,"Name Surname")+inp("pcf_paypal",L("pc_ppl"),PCS.paypal,"name@example.com"))+
+   pcSec("card","💳",L("pc_card"),inp("pcf_cardHolder",L("pc_rcp"),PCS.cardHolder,"Name Surname")+inp("pcf_card",L("pc_cardno"),PCS.card,"0000 0000 0000 0000"))+
+   pcSec("crypto","🪙",L("pc_cry"),inp("pcf_cryptoHolder",L("pc_rcp"),PCS.cryptoHolder,"Name Surname")+'<div class="zpcrows">'+rows+'</div><button type="button" class="btn ghost zpcaddb" data-l="pcAdd">'+esc(L("pc_add"))+'</button>')+
+   '<div class="row"><button type="button" class="btn primary" data-l="pcSave">'+esc(L("pc_save"))+'</button><span class="hint" id="pcOk"></span></div>'}
+function pcDraw(){var h=$("pcHost");if(!h)return;var y=window.scrollY;h.innerHTML=pcHtml();window.scrollTo(0,y)}
+function pcMount(){var bx=document.querySelector(".pzbox");if(!bx||bx.getAttribute("data-pc"))return;bx.setAttribute("data-pc","1");
+  Array.prototype.slice.call(bx.children).forEach(function(c){if(c.id==="feeBox"||c.tagName==="H3"||c.tagName==="P")return;c.parentNode.removeChild(c)});
+  var h3=bx.querySelector("h3"),p=bx.querySelector("p.hint");if(h3)h3.textContent="💸 "+L("pc_h");if(p)p.textContent=L("pc_h2");
+  var d=document.createElement("div");d.id="pcHost";bx.appendChild(d);
+  api("/api/admin/pay").then(function(r){if(r.ok){LOC={};adopt(r.j);pcDraw()}})}
+var _o3=renderOwner;renderOwner=function(){var r=_o3.apply(this,arguments);try{if(LV.adTab==="pay"){var fb=$("feeBox"),bx=document.querySelector(".pzbox");if(bx&&(fb||bx.getAttribute("data-pc")))pcMount();else if(bx)setTimeout(pcMount,50)}}catch(e){}return r};
+window.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="pcEye"],[data-l="pcDel"],[data-l="pcAdd"],[data-l="pcSave"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();
+  var a=el.getAttribute("data-l"),k=el.getAttribute("data-k"),n=el.getAttribute("data-n");
+  function op(body){snap();return api("/api/admin/pay-op",body).then(function(r){if(r.ok){adopt(r.j);if(body.op==="del"){delete LOC[k];if(k.indexOf("c:")===0)delete PCS.crypto[k.slice(2)]}pcDraw()}})}
+  if(a==="pcAdd"){snap();openAdd();return}
+  if(a==="pcEye"){if(PCS.off[k]){op({op:"off",key:k,val:false})}else ask(L("pc_ask_h"),F("pc_ask_hide",{x:n}),L("pc_yes"),function(){op({op:"off",key:k,val:true})});return}
+  if(a==="pcDel"){ask(L("pc_ask_h"),F("pc_ask_del",{x:n}),L("pc_yes"),function(){if(k==="paypal"){delete LOC.paypal;delete LOC.paypalHolder}if(k==="card"){delete LOC.card;delete LOC.cardHolder}if(k==="crypto"){Object.keys(LOC).forEach(function(z){if(z.indexOf("c:")===0)delete LOC[z]});delete LOC.cryptoHolder}op({op:"del",key:k})});return}
+  if(a==="pcSave"){snap();var ok=$("pcOk"),cr={},bad="";Object.keys(PCS.crypto).forEach(function(id){var v=(LOC["c:"+id]!=null?LOC["c:"+id]:PCS.crypto[id]).trim();var r=pcCheck(id,v);if(!r.ok&&!bad)bad=id;cr[id]=v});
+    if(bad){ok.style.color="#ff8a8a";ok.textContent=F("pc_savebad",{c:coinL(bad)});var i=$("pcc_"+bad);if(i){i.classList.add("zpcerr");i.focus()}return}
+    el.disabled=true;api("/api/admin/pay",{paypal:LOC.paypal!=null?LOC.paypal:PCS.paypal,paypalHolder:LOC.paypalHolder!=null?LOC.paypalHolder:PCS.paypalHolder,card:LOC.card!=null?LOC.card:PCS.card,cardHolder:LOC.cardHolder!=null?LOC.cardHolder:PCS.cardHolder,cryptoHolder:LOC.cryptoHolder!=null?LOC.cryptoHolder:PCS.cryptoHolder,crypto:cr}).then(function(r){el.disabled=false;if(r.ok){LOC={};adopt(r.j);ok.style.color="";ok.textContent=L("pc_saved");setTimeout(function(){if(ok)ok.textContent=""},3000)}})}
+},true);
+/* ---------- producer side ---------- */
+function PX(){return (LV.prod&&LV.prod.pay)||null}
+function avail(){var x=PX();if(!x)return null;var off=x.off||{},m=[];if(x.paypal&&!off.paypal)m.push("paypal");var ids=Object.keys(x.crypto||{}).filter(function(k){return x.crypto[k]&&pcCoin(k)});if(ids.length&&!off.crypto)m.push("crypto");if(x.card&&!off.card)m.push("card");return {m:m,coins:ids}}
+window.PCFIX=function(sel){var av=avail();if(!av||!av.m.length)return;if(sel.id!=="nMethod"&&sel.id!=="tMeth")return;
+  Array.prototype.slice.call(sel.options).forEach(function(o){if(av.m.indexOf(o.value)<0)sel.removeChild(o)});if(av.m.indexOf(sel.value)<0&&sel.options.length){sel.value=sel.options[0].value}};
+function fixCoin(sel){if(sel.getAttribute("data-pc"))return;var av=avail();if(!av||!av.coins.length)return;sel.setAttribute("data-pc","1");
+  var cur=sel.value;sel.innerHTML=av.coins.map(function(id){return '<option value="'+esc(id)+'">'+esc(coinL(id))+'</option>'}).join("");sel.value=av.coins.indexOf(cur)>=0?cur:av.coins[0];
+  sel.classList.add("cs-hid");var lb=sel.closest("label"),b=document.createElement("button");b.type="button";b.className="zpcbtn";
+  function lab(){var e=pcCoin(sel.value);b.innerHTML='<span class="zcpb">'+esc(e?e.s:"?")+'</span><span class="zcpt"><b>'+esc(e?e.n:sel.value)+'</b><small>'+esc(e?(e.t?e.t+" · ":"")+e.s:"")+'</small></span><i>⌄</i>'}
+  lab();b.addEventListener("click",function(ev){ev.preventDefault();ev.stopPropagation();var ids=avail().coins;picker(L("pc_pick_t"),ids,function(id){sel.value=id;lab();ovClose();sel.dispatchEvent(new Event("change",{bubbles:true}))})});
+  sel.addEventListener("change",lab);(lb||sel).appendChild(b);
+  if(sel.value!==cur)sel.dispatchEvent(new Event("change",{bubbles:true}))}
+var rf=0;new MutationObserver(function(){if(rf)return;rf=requestAnimationFrame(function(){rf=0;try{document.querySelectorAll("#nCoin,#tCoin").forEach(fixCoin)}catch(e){}})}).observe(document.body,{childList:true,subtree:true});
+/* leave all accounts (30 days to come back) */
+Object.assign(LT.en,{da_btn:"Sign out of all accounts",da_t:"Sign out of all accounts?",da_p:"You will delete all your accounts and this main account. You can restore it within 30 days: just sign in again through TikTok with the same account and everything comes back. After 30 days the data is erased for good.",da_yes:"Yes, delete everything",da_busy:"Deleting…",da_err:"Could not do it"});
+Object.assign(LT.ru,{da_btn:"Выйти из всех аккаунтов",da_t:"Выйти из всех аккаунтов?",da_p:"Вы удалите все свои аккаунты и этот основной аккаунт. Его можно будет восстановить в течение 30 дней: просто войдите снова через TikTok тем же аккаунтом, и всё вернётся. Через 30 дней данные удаляются окончательно.",da_yes:"Да, удалить всё",da_busy:"Удаляю…",da_err:"Не получилось"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("da_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
+function daMount(){var a=$("addAcc");if(!a||$("delAllBtn"))return;var b=document.createElement("button");b.type="button";b.id="delAllBtn";b.className="btn wide zdaBtn";b.textContent=L("da_btn");a.insertAdjacentElement("afterend",b)}
+var rd=0;new MutationObserver(function(){if(rd)return;rd=requestAnimationFrame(function(){rd=0;try{daMount()}catch(e){}})}).observe(document.body,{childList:true,subtree:true});
+window.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("#delAllBtn");if(!b)return;e.stopImmediatePropagation();e.preventDefault();
+  var o=ovOpen('<h3>'+esc(L("da_t"))+'</h3><p class="zcpk-t">'+esc(L("da_p"))+'</p><div class="zpcmsg bad" id="daM"></div><div class="zcpk-b"><button type="button" class="btn ghost" id="daNo">'+esc(L("pc_no"))+'</button><button type="button" class="btn primary zpcdanger" id="daYes">'+esc(L("da_yes"))+'</button></div>',"sm");
+  o.querySelector("#daNo").onclick=ovClose;
+  o.querySelector("#daYes").onclick=function(){var y=this;y.disabled=true;y.textContent=L("da_busy");api("/api/account/delete-all",{}).then(function(r){if(r.ok){ovClose();try{location.hash=""}catch(x){}location.reload()}else{y.disabled=false;y.textContent=L("da_yes");$("daM").textContent=(r.j&&r.j.error)||L("da_err")}})}},true);
+
+})();
+
 })();
 
 (function(){try{var sl=localStorage.getItem("pc_lang");if(sl&&LANGS.some(function(x){return x[0]===sl}))lang=sl}catch(e){}try{themeOpts()}catch(e){}var ls=$("langSel");ls.innerHTML=LANGS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join("");ls.value=lang;ls.addEventListener("change",function(){setLang(ls.value)})})();

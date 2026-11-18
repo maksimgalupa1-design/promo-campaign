@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 62;
+const SERVER_VER = 64;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -357,6 +357,8 @@ function accView(acc) {
     videos: (acc.videos || []).slice(0, 150).map(v => ({ id: v.id, created: v.created, views: v.views, likes: v.likes || 0, url: v.url })) };
 }
 function accPayoutRaw(user, acc) { return (acc && acc.payout) || (user && user.payout) || null; }   // every TikTok account can have its own payout details; the user-level ones are the fallback
+const ARCHIVE_DAYS = 30;
+function purgeArchive() { const a = db.archive || {}; let n = 0; for (const k of Object.keys(a)) if (a[k].by === "user" && Date.now() - a[k].at > ARCHIVE_DAYS * 86400000) { delete a[k]; n++; } if (n) saveDb(); }
 function archiveAcc(u, acc, by) { db.archive = db.archive || {}; db.archive[acc.open_id] = { id: acc.open_id, userId: u.id, by, at: Date.now(), handle: "@" + ((acc.profile || {}).username || ""), internalName: acc.internal_name || "", acc: JSON.parse(JSON.stringify(acc)) }; }
 function view(user) { return { accounts: (user.accounts || []).map(a => { const x = accView(a), p = accPayoutRaw(user, a); x.payout = p ? { set: true, method: p.method, coin: p.coin || "", label: p.label, own: !!a.payout, value: p.method === "paypal" && p.enc ? String((decObj(p.enc) || {}).value || "") : "" } : { set: false }; return x; }), categories: CATEGORIES, payout: payoutLabel(user), coins: COINS }; }
 function accAdminView(acc) {
@@ -438,12 +440,68 @@ function priceCeiling(acc) {
   for (const c of cats) { const r = R[c], scale = r.views > 0 && views > r.views ? Math.min(3, views / r.views) : 1; best = Math.max(best, r.max * scale); }
   return Math.round(best * 100) / 100;
 }
-const FEE = 0.2;   // site commission, taken from every confirmed payment
+const FEE_DEFAULT = 20;   // site commission %, owner can change it in the admin
+function feePct() { const v = db && db.settings && db.settings.feePct; return (typeof v === "number" && v >= 0 && v <= 100) ? v : FEE_DEFAULT; }
+function feeRate() { return feePct() / 100; }
 const RATES = { t: 0, live: false, v: { UAH: 41.5, USDT: 1, SOL: 0.0058, TRX: 3.4, ETH: 0.00032, LTC: 0.0105, TON: 0.42, BTC: 0.0000105 } };
 const METHODS = ["paypal", "usdt", "card", "crypto"];
-const COINS = ["solana", "tron", "ethereum", "litecoin", "ton"];
+/*PC_SHARED_BEGIN*/
+var PC_CAT=[
+["bitcoin","Bitcoin","BTC","btc",""],["ethereum","Ethereum","ETH","evm","ERC20"],
+["usdt-trc20","Tether","USDT","tron","TRC20"],["usdt-erc20","Tether","USDT","evm","ERC20"],["usdt-bep20","Tether","USDT","evm","BEP20"],["usdt-ton","Tether","USDT","ton","TON"],["usdt-sol","Tether","USDT","sol","Solana"],["usdt-polygon","Tether","USDT","evm","Polygon"],["usdt-arbitrum","Tether","USDT","evm","Arbitrum"],
+["usdc-erc20","USD Coin","USDC","evm","ERC20"],["usdc-bep20","USD Coin","USDC","evm","BEP20"],["usdc-trc20","USD Coin","USDC","tron","TRC20"],["usdc-sol","USD Coin","USDC","sol","Solana"],["usdc-polygon","USD Coin","USDC","evm","Polygon"],["usdc-base","USD Coin","USDC","evm","Base"],["usdc-arbitrum","USD Coin","USDC","evm","Arbitrum"],
+["bnb","BNB","BNB","evm","BEP20"],["solana","Solana","SOL","sol",""],["tron","Tron","TRX","tron","TRC20"],["litecoin","Litecoin","LTC","ltc",""],["ton","TON (Toncoin)","TON","ton","TON"],
+["xrp","XRP","XRP","xrp","XRP Ledger"],["dogecoin","Dogecoin","DOGE","doge",""],["cardano","Cardano","ADA","ada",""],["polkadot","Polkadot","DOT","dot",""],
+["avalanche","Avalanche","AVAX","evm","C-Chain"],["polygon","Polygon","POL","evm","Polygon"],["chainlink","Chainlink","LINK","evm","ERC20"],["shiba","Shiba Inu","SHIB","evm","ERC20"],["uniswap","Uniswap","UNI","evm","ERC20"],
+["bitcoin-cash","Bitcoin Cash","BCH","bch",""],["stellar","Stellar","XLM","xlm",""],["cosmos","Cosmos","ATOM","atom",""],["near","NEAR Protocol","NEAR","near",""],["algorand","Algorand","ALGO","algo",""],["monero","Monero","XMR","xmr",""],
+["sui","Sui","SUI","move",""],["aptos","Aptos","APT","move",""],["dai","Dai","DAI","evm","ERC20"],["arbitrum","Arbitrum","ARB","evm","Arbitrum"],["optimism","Optimism","OP","evm","Optimism"],["ethereum-classic","Ethereum Classic","ETC","evm","ETC"],
+["zcash","Zcash","ZEC","zec",""],["dash","Dash","DASH","dash",""],["hedera","Hedera","HBAR","hbar",""],["kaspa","Kaspa","KAS","kas",""],["injective","Injective","INJ","inj",""],
+["pepe","Pepe","PEPE","evm","ERC20"],["notcoin","Notcoin","NOT","ton","TON"],["pyusd","PayPal USD","PYUSD","evm","ERC20"],["usde","Ethena USDe","USDe","evm","ERC20"],["wbtc","Wrapped Bitcoin","WBTC","evm","ERC20"],["aave","Aave","AAVE","evm","ERC20"]
+];
+var PC_K=[
+["tron","Tron (TRC20)",/^T[1-9A-HJ-NP-Za-km-z]{33}$/],
+["evm","Ethereum / BNB Chain / Polygon / Arbitrum / Base (0x…)",/^0x[a-fA-F0-9]{40}$/],
+["move","Sui / Aptos (0x…, 64)",/^0x[a-fA-F0-9]{64}$/],
+["btc","Bitcoin",/^(bc1[a-z0-9]{25,59}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$/],
+["ltc","Litecoin",/^(ltc1[a-z0-9]{25,60}|[LM][a-km-zA-HJ-NP-Z1-9]{26,33})$/],
+["doge","Dogecoin",/^D[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{32}$/],
+["xrp","XRP",/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/],
+["ton","TON",/^((?:[EU]Q|kQ|0Q)[A-Za-z0-9_-]{46}|0:[a-fA-F0-9]{64})$/],
+["bch","Bitcoin Cash",/^(bitcoincash:)?[qp][a-z0-9]{41}$/],
+["ada","Cardano",/^addr1[a-z0-9]{50,110}$/],
+["dot","Polkadot",/^1[1-9A-HJ-NP-Za-km-z]{46,47}$/],
+["xlm","Stellar",/^G[A-Z2-7]{55}$/],
+["atom","Cosmos",/^cosmos1[a-z0-9]{38}$/],
+["inj","Injective",/^inj1[a-z0-9]{38}$/],
+["near","NEAR",/^([a-z0-9_-]{2,64}\.near|[a-f0-9]{64})$/],
+["algo","Algorand",/^[A-Z2-7]{58}$/],
+["xmr","Monero",/^[48][1-9A-HJ-NP-Za-km-z]{94}$/],
+["zec","Zcash",/^t[13][a-km-zA-HJ-NP-Z1-9]{33}$/],
+["dash","Dash",/^X[1-9A-HJ-NP-Za-km-z]{33}$/],
+["hbar","Hedera",/^0\.0\.\d{1,10}$/],
+["kas","Kaspa",/^kaspa:[a-z0-9]{61,63}$/],
+["sol","Solana",/^[1-9A-HJ-NP-Za-km-z]{32,44}$/]
+];
+function pcCoin(id){for(var i=0;i<PC_CAT.length;i++)if(PC_CAT[i][0]===id)return {id:id,n:PC_CAT[i][1],s:PC_CAT[i][2],k:PC_CAT[i][3],t:PC_CAT[i][4]};return null}
+function pcKindName(k){for(var i=0;i<PC_K.length;i++)if(PC_K[i][0]===k)return PC_K[i][1];return k}
+function pcDetect(a){a=String(a||"").trim();for(var i=0;i<PC_K.length;i++){if(PC_K[i][2].test(a)){if(PC_K[i][0]==="sol"||true)return PC_K[i][0]}}return ""}
+/* returns {ok:true,note?} or {ok:false,why:"kind"|"bad",found?:kindname} */
+function pcCheck(id,addr){var c=pcCoin(id);addr=String(addr||"").trim();if(!c)return {ok:false,why:"bad"};if(!addr)return {ok:false,why:"empty"};
+  var re=null;for(var i=0;i<PC_K.length;i++)if(PC_K[i][0]===c.k)re=PC_K[i][2];
+  var hit=re&&re.test(addr);
+  if(hit&&c.k==="sol"&&addr.length<43){var d=pcDetect(addr);if(d&&d!=="sol")hit=false}
+  if(hit)return {ok:true,multi:c.k==="evm"};
+  var f=pcDetect(addr);if(f&&f!==c.k)return {ok:false,why:"kind",found:pcKindName(f)};
+  return {ok:false,why:"bad"}}
+/*PC_SHARED_END*/
+
+const COINS = PC_CAT.map(c => c[0]);
 const PLATFORMS = ["tiktok", "instagram", "youtube"];
-function payInfo() { const x = db.settings.pay || {}, c = x.crypto || {}; const o = { paypal: x.paypal || "", paypalHolder: x.paypalHolder || "", card: x.card || "", cardHolder: x.cardHolder || "", cryptoHolder: x.cryptoHolder || "", crypto: {} }; for (const k of COINS) o.crypto[k] = c[k] || ""; return o; }
+function payInfo(pub) { const x = db.settings.pay || {}, c = x.crypto || {}, off = {}; const ox = x.off || {}; for (const k of Object.keys(ox)) if (ox[k]) off[k] = true;
+  const o = { paypal: x.paypal || "", paypalHolder: x.paypalHolder || "", card: x.card || "", cardHolder: x.cardHolder || "", cryptoHolder: x.cryptoHolder || "", crypto: {}, off };
+  for (const k of COINS) if (c[k] && !(pub && off["c:" + k])) o.crypto[k] = c[k];
+  if (pub) { if (off.paypal) { o.paypal = ""; o.paypalHolder = ""; } if (off.card) { o.card = ""; o.cardHolder = ""; } if (off.crypto) { o.crypto = {}; o.cryptoHolder = ""; } }
+  return o; }
 const PKEY = () => crypto.scryptSync(ADMIN_TOKEN, "pc-payout-v1", 32);
 function encObj(o) { const iv = crypto.randomBytes(12), c = crypto.createCipheriv("aes-256-gcm", PKEY(), iv), ct = Buffer.concat([c.update(JSON.stringify(o), "utf8"), c.final()]); return [iv, c.getAuthTag(), ct].map(x => x.toString("base64")).join("."); }
 function decObj(str) { try { const [iv, tag, ct] = String(str).split(".").map(x => Buffer.from(x, "base64")), d = crypto.createDecipheriv("aes-256-gcm", PKEY(), iv); d.setAuthTag(tag); return JSON.parse(Buffer.concat([d.update(ct), d.final()]).toString("utf8")); } catch (e) { return null; } }
@@ -600,7 +658,7 @@ const server = http.createServer(async (req, res) => {
       const user = db.users[uid] || (db.users[uid] = { id: uid, createdAt: Date.now(), accounts: [] });
       let acc = findAcc(user, tok.open_id);
       const isNew = !acc;
-      if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now(), categories: [], discount: 0 }; const ar = db.archive && db.archive[tok.open_id]; if (ar && ar.acc) { for (const k of ["categories", "other_category", "about", "tiers", "discount", "internal_name", "price", "adminStatus", "tiktok_url"]) if (ar.acc[k] !== undefined) acc[k] = ar.acc[k]; delete db.archive[tok.open_id]; } user.accounts.push(acc); notify("new editor account connected, check Waiting for your decision"); }
+      if (!acc) { acc = { open_id: tok.open_id, createdAt: Date.now(), categories: [], discount: 0 }; const ar = db.archive && db.archive[tok.open_id]; if (ar && ar.by === "user" && Date.now() - ar.at > ARCHIVE_DAYS * 86400000) { delete db.archive[tok.open_id]; } else if (ar && ar.acc) { for (const k of ["categories", "other_category", "about", "tiers", "discount", "internal_name", "price", "adminStatus", "tiktok_url"]) if (ar.acc[k] !== undefined) acc[k] = ar.acc[k]; delete db.archive[tok.open_id]; } user.accounts.push(acc); notify("new editor account connected, check Waiting for your decision"); }
       Object.assign(acc, { access_token: tok.access_token, refresh_token: tok.refresh_token, expires_at: Date.now() + tok.expires_in * 1000 });
       await refreshAnalysis(acc);
       if (relink && want && ((acc.profile && acc.profile.username) || "").toLowerCase() !== want) {   // the pasted link does not belong to the TikTok account that was verified
@@ -720,6 +778,17 @@ const server = http.createServer(async (req, res) => {
       Object.values(db.requests).forEach(r => { if (r.openId === acc.open_id && r.status === "pending") r.status = "cancelled"; });
       saveDb(); return send(res, 200, view(u));
     }
+    if (P === "/api/account/delete-all" && M === "POST") {   // the editor leaves: every account goes to the archive for 30 days, then it is gone for good
+      const u = sessionUser(req); if (!u) return send(res, 401, { error: "not signed in" });
+      const ids = (u.accounts || []).map(x => x.open_id);
+      if (!need(res, !Object.values(db.requests).some(r => ids.includes(r.openId) && ["approved", "submitted", "returned"].includes(r.status)), 409, "You have open orders. Finish them first.")) return;
+      if (!need(res, !Object.values(db.requests).some(r => ids.includes(r.openId) && r.status === "completed" && !r.paid), 409, "You still have earnings that are not paid out yet. Wait for the payout first.")) return;
+      for (const acc of (u.accounts || []).slice()) { archiveAcc(u, acc, "user"); delete db.byOpen[acc.open_id]; }
+      Object.values(db.requests).forEach(r => { if (ids.includes(r.openId) && r.status === "pending") r.status = "cancelled"; });
+      u.accounts = []; u.deletedAt = Date.now(); delete u.notif;
+      for (const k of Object.keys(db.sessions)) if (db.sessions[k] === u.id) delete db.sessions[k];
+      saveDb(); return send(res, 200, { ok: true, days: ARCHIVE_DAYS }, { "Set-Cookie": setCookie("sid", "", 0) });
+    }
     if (/^\/google[0-9a-f]{8,32}\.html$/.test(P) && M === "GET") { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); return res.end("google-site-verification: " + P.slice(1)); }   // any Google Search Console verification file name
     if (/^\/yandex_[0-9a-f]{8,32}\.html$/.test(P) && M === "GET") { res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }); return res.end('<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>Verification: ' + P.slice(8, -5) + '</body></html>'); }   // Yandex Webmaster verification file
     if (/^\/tiktok[A-Za-z0-9]{8,64}\.txt$/.test(P) && M === "GET") { res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("tiktok-developers-site-verification=" + P.slice(7, -4)); }   // TikTok URL-prefix verification file
@@ -745,6 +814,7 @@ const server = http.createServer(async (req, res) => {
       const em = String(b.email || "").trim().slice(0, 120); if (!need(res, !em || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em), 400, "email looks wrong")) return;
       me.notif = { types, email: em }; saveDb(); return send(res, 200, { ok: true, prefs: me.notif });
     }
+    if (P === "/api/fee" && M === "GET") return send(res, 200, { pct: feePct() });
     if (P === "/api/price-ranges" && M === "GET") return send(res, 200, { ranges: db.settings.ranges || { visual: { min: 3, max: 5 } } });
     if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "", instagram: c.instagram || "", tiktok: c.tiktok || "" }); }
     if (P === "/api/platform-stats" && M === "GET") {      // public numbers for the editor home widgets
@@ -944,7 +1014,7 @@ const server = http.createServer(async (req, res) => {
     if (P.startsWith("/api/producer/")) {
       const p = producerOf(req); if (!p) return send(res, 401, { error: "not signed in" });
       const mine = () => Object.values(db.tracks).filter(t => t.producerId === p.id && t.status !== "deleted");
-      const pview = () => ({ email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", discord: p.discord || "", name: p.name || "", fee: FEE, pay: payInfo(), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, hasMp3: !!t.mp3, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", deadline: t.deadline || "", editPending: !!t.pendingEdit, editRej: t.editRej || "",
+      const pview = () => ({ email: p.email, instagram: p.instagram || "", tiktok: p.tiktok || "", discord: p.discord || "", name: p.name || "", fee: feeRate(), pay: payInfo(true), categories: CATEGORIES, tracks: mine().map(t => ({ id: t.id, title: t.title, artist: t.artist, link: t.link, budget: t.budget, spent: t.spent, left: trackLeft(t), categories: t.categories, otherCategory: t.otherCategory || "", created: t.created, status: t.status, hasMp3: !!t.mp3, links: t.links || {}, platforms: t.platforms || ["tiktok"], descRule: !!t.descRule, descText: t.descText || "", message: t.message || "", deadline: t.deadline || "", editPending: !!t.pendingEdit, editRej: t.editRej || "",
         topups: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").map(x => ({ id: x.id, amount: x.amount, method: x.method, coin: x.coin || "", proof: !!x.proof })),
         pendingTopup: Object.values(db.topups).filter(x => x.trackId === t.id && x.status === "pending").reduce((s, x) => s + x.amount, 0) })) });
       if (P === "/api/producer/me" && M === "GET") { const c = cookie(req, "psid"); if (db.psessions[c]) db.psessions[c].exp = Date.now() + 30 * 86400000; return send(res, 200, pview(), { "Set-Cookie": setCookie("psid", c, 2592000) }); }
@@ -1162,8 +1232,17 @@ const server = http.createServer(async (req, res) => {
         D.threads[key] = D.threads[key] || { key, kind: "producer", name: pr.name || pr.email, sub: [pr.email, pr.instagram && "IG " + pr.instagram, pr.tiktok && "TikTok " + pr.tiktok, pr.discord && "Discord " + pr.discord].filter(Boolean).join(" · "), tt: pr.tiktok ? [String(pr.tiktok).slice(0, 120)] : [], avatar: "", msgs: [], updated: 0, userSeen: 0, adminSeen: 0 };
         saveDb(); return send(res, 200, { key });
       }
+      if (P === "/api/admin/fee" && M === "GET") return send(res, 200, { pct: feePct() });
+      if (P === "/api/admin/fee" && M === "POST") { let v = Number(String(b.pct).replace(",", ".")); if (!isFinite(v) || v < 0 || v > 100) return send(res, 400, { error: "0-100" }); v = Math.round(v * 100) / 100; db.settings.feePct = v; saveDb(); return send(res, 200, { pct: v }); }
+      if (P === "/api/admin/pay-op" && M === "POST") { const x = db.settings.pay = db.settings.pay || {}; x.off = x.off || {}; x.crypto = x.crypto || {}; const key = String(b.key || "");
+        const okKey = key === "paypal" || key === "card" || key === "crypto" || (key.startsWith("c:") && COINS.includes(key.slice(2)));
+        if (b.op === "off" && okKey) { if (b.val) x.off[key] = true; else delete x.off[key]; }
+        else if (b.op === "del" && okKey) { if (key === "paypal") { x.paypal = ""; x.paypalHolder = ""; delete x.off.paypal; } else if (key === "card") { x.card = ""; x.cardHolder = ""; delete x.off.card; } else if (key === "crypto") { x.crypto = {}; x.cryptoHolder = ""; delete x.off.crypto; for (const k of Object.keys(x.off)) if (k.startsWith("c:")) delete x.off[k]; } else { delete x.crypto[key.slice(2)]; delete x.off[key]; } }
+        else if (b.op === "coin" && COINS.includes(String(b.id))) { const addr = String(b.addr || "").trim().slice(0, 140); const r = pcCheck(String(b.id), addr); if (!r.ok) return send(res, 400, { error: "address", why: r.why, found: r.found || "" }); x.crypto[String(b.id)] = addr; delete x.off["c:" + b.id]; }
+        else return send(res, 400, { error: "bad op" });
+        saveDb(); return send(res, 200, payInfo()); }
       if (P === "/api/admin/pay" && M === "GET") return send(res, 200, payInfo());
-      if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) cr[k] = c(b.crypto, k); db.settings.pay = { paypal: c(b, "paypal"), paypalHolder: c(b, "paypalHolder"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), cryptoHolder: c(b, "cryptoHolder"), crypto: cr }; saveDb(); return send(res, 200, payInfo()); }
+      if (P === "/api/admin/pay" && M === "POST") { const c = (o, k) => String((o || {})[k] || "").trim().slice(0, 140); const cr = {}; for (const k of COINS) { const v = c(b.crypto, k); if (v) cr[k] = v; } db.settings.pay = { paypal: c(b, "paypal"), paypalHolder: c(b, "paypalHolder"), card: c(b, "card"), cardHolder: c(b, "cardHolder"), cryptoHolder: c(b, "cryptoHolder"), crypto: cr, off: (db.settings.pay || {}).off || {} }; saveDb(); return send(res, 200, payInfo()); }
       if (P === "/api/admin/track" && M === "POST") {   // owner approves a track before the producer pays
         const t = db.tracks[b.id]; if (!need(res, t && t.status === "review", 404, "no track waiting for review")) return;
         if (b.status === "approved") { const eu = Number(b.enrollUntil); if (!need(res, eu > Date.now() && eu < Date.now() + 3.2e10, 400, "set the enrolment deadline")) return; t.enrollUntil = Math.round(eu); t.status = "active"; } else if (b.status === "rejected") t.status = "rejected"; else return send(res, 400, { error: "bad status" });
@@ -1342,7 +1421,7 @@ const server = http.createServer(async (req, res) => {
       if (P === "/api/admin/topup" && M === "POST") {        // confirm payment -> budget added to the track
         const tp = db.topups[b.id]; if (!need(res, tp && tp.status === "pending", 404, "no pending payment")) return;
         if (b.status === "confirmed" && !need(res, ["active", "archived"].includes((db.tracks[tp.trackId] || {}).status), 409, "approve the track first")) return;
-        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t && t.status === "archived") { t.status = "active"; t.archivedAt = 0; delete t.archivedAuto; } if (t) { tp.fee = Math.round(tp.amount * FEE * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; tp.confirmedAt = Date.now(); }
+        if (b.status === "confirmed") { const t = db.tracks[tp.trackId]; if (t && t.status === "archived") { t.status = "active"; t.archivedAt = 0; delete t.archivedAuto; } if (t) { tp.fee = Math.round(tp.amount * feeRate() * 100) / 100; t.budget = Math.round(((t.budget || 0) + tp.amount - tp.fee) * 100) / 100; } tp.status = "confirmed"; tp.confirmedAt = Date.now(); }
         else if (b.status === "rejected") tp.status = "rejected";
         else return send(res, 400, { error: "bad status" });
         saveDb(); return send(res, 200, { ok: true });
@@ -1380,4 +1459,6 @@ loadDb().then(() => {
   setInterval(() => refreshStale(30).catch(e => console.error(e)), REFRESH_EVERY);
   setInterval(() => { try { remindEditors(); } catch (e) { console.error(e); } }, 3600e3);
   setInterval(() => { try { expireOverdue(); } catch (e) { console.error(e); } }, 3600e3);
+  setInterval(() => { try { purgeArchive(); } catch (e) { console.error(e); } }, 6 * 3600e3);
+  try { purgeArchive(); } catch (e) { console.error(e); }
 }).catch(e => { console.error("Could not load the database:", e); process.exit(1); });
