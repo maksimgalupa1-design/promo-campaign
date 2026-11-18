@@ -1855,6 +1855,28 @@ select{-webkit-touch-callout:none}
 
 .zdaBtn{margin-top:10px;background:transparent!important;color:#ff6b70!important;border:1.5px solid #e5484d!important;box-shadow:none!important}.zdaBtn:hover{box-shadow:0 0 16px rgba(229,72,77,.45)!important}
 
+/* v124: the admin and my newer blocks follow the light theme too */
+:root[data-theme=light] body.isadmin{--bg:#F2F4FA;--surface:#FFFFFF;--soft:#E9EDF6;--line:#DADFEB}
+:root[data-theme=light] .tpxsrch,:root[data-theme=light] #tpxSort,:root[data-theme=light] .aiinp,:root[data-theme=light] .ptxc,:root[data-theme=light] .ptm,:root[data-theme=light] .fbtn,:root[data-theme=light] .fpan,:root[data-theme=light] .tksrch,:root[data-theme=light] .rdp,:root[data-theme=light] .zcpk-p,:root[data-theme=light] .zpcbtn{background:#fff;color:#1c1830;border-color:rgba(109,92,255,.38)}
+:root[data-theme=light] .ptxp,:root[data-theme=light] .ptmst div,:root[data-theme=light] .ptm input,:root[data-theme=light] .cmq,:root[data-theme=light] .cmck textarea,:root[data-theme=light] .vmx,:root[data-theme=light] .zcpq{background:#f3f1ff;color:#1c1830;border-color:rgba(109,92,255,.3)}
+:root[data-theme=light] .ptxc{border-color:#ddd8f5}:root[data-theme=light] .fpan{border-color:#ddd8f5}
+:root[data-theme=light] .tpxsrch input,:root[data-theme=light] .tksrch input,:root[data-theme=light] .aiinp input{color:#1c1830}
+:root[data-theme=light] .rdi,:root[data-theme=light] .rdi.on{color:#1c1830}:root[data-theme=light] .rdi b{color:#6d5cff}
+:root[data-theme=light] .zcpk{background:rgba(236,233,255,.6)}
+:root[data-theme=light] .zcpk-p h3,:root[data-theme=light] .zcpk-x,:root[data-theme=light] .zcpk-back,:root[data-theme=light] .zpctr{color:#1c1830}
+:root[data-theme=light] .zcpk-t{color:#3b3560}:root[data-theme=light] .zcpi{color:#1c1830}
+:root[data-theme=light] .zcpsel{background:rgba(109,92,255,.12)}
+:root[data-theme=light] .dpf{background:#fff}
+
+.fp[aria-pressed=true]{background:linear-gradient(135deg,#6D5CFF,#A56BFF);border-color:transparent;color:#fff;box-shadow:0 0 18px rgba(139,108,255,.55)}
+:root[data-theme=light] body.isadmin .ownside{background:#fff;border-color:#DADFEB}
+:root[data-theme=light] body.isadmin .ownside .agrp,:root[data-theme=light] body.isadmin .ownside .agrp.g-tk,:root[data-theme=light] body.isadmin .ownside .agrp.g-ov,:root[data-theme=light] body.isadmin .ownside .agrp.g-ed,:root[data-theme=light] body.isadmin .ownside .agrp.g-pr,:root[data-theme=light] body.isadmin .ownside .agrp.g-st{background:#f6f4ff!important;border:1px solid #e1dcf7!important}
+:root[data-theme=light] body.isadmin .ownside .atb{color:#1c1830}
+:root[data-theme=light] body.isadmin .ownside .atb:hover{background:rgba(109,92,255,.12)!important}
+:root[data-theme=light] body.isadmin .ownside .agh,:root[data-theme=light] body.isadmin .ownside .agh *{color:#5b4fd6}
+:root[data-theme=light] body.isadmin .ownmain .mchip,:root[data-theme=light] body.isadmin .ownmain select,:root[data-theme=light] body.isadmin .ownmain #oSrch.osrch{background:#fff;color:#1c1830}
+:root[data-theme=light] body.isadmin .ownside .pcsrch{background:#f3f1ff;color:#1c1830}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -2032,7 +2054,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v123 · 18.11 14:40</span>
+  <span>© Promo Campaign · v124 · 18.11 14:50</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -4699,7 +4721,7 @@ function cvLoad(){
 function cvFmt(coin,v){
   if(!isFinite(v))return "—";
   if(coin==="UAH")return (Math.round(v*100)/100).toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2});
-  var d=(coin==="USDT"||coin==="USD")?2:(coin==="BTC"||coin==="ETH")?6:(coin==="TRX")?2:4;
+  var d=(coin==="USDT"||coin==="USD")?2:(coin==="BTC"||coin==="ETH"||coin==="WBTC")?6:(coin==="TRX")?2:4;
   return Number(v.toFixed(d)).toString();
 }
 function cvCtx(){
@@ -4727,9 +4749,9 @@ function cvUpdate(force){
      '<div class="cvr sel"><b>₴ UAH</b><span>'+(usd>0?cvFmt("UAH",uah)+' ₴':'—')+'</span>'+(usd>0?'<button type="button" data-cv="'+(Math.round(uah*100)/100)+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'+
      '<div class="cvb">'+esc(L("cv_rate"))+': 1 $ = '+cvFmt("UAH",R.UAH)+' ₴ · '+esc(L("cv_min"))+': $100</div>'+approx;
   }else{
-    var sel=c.coin?(CV.coinMap[c.coin.value]||""):"",order=["USDT","SOL","TRX","ETH","LTC","TON"];
+    var sel=c.coin?((window.PCSYM&&window.PCSYM(c.coin.value))||CV.coinMap[c.coin.value]||""):"",ST={USDT:1,USDC:1,DAI:1,PYUSD:1,USDE:1},order=[sel||"USDT"];
     html='<h4>◎ '+esc(L("cv_crypto_h"))+'</h4>'+
-     order.map(function(k){var v=k==="USDT"?usd:usd*(R[k]||0),show=usd>0?cvFmt(k,v):"—",pick=k!=="USDT";
+     order.map(function(k){var v=ST[k]?usd:usd*(R[k]||0),show=usd>0&&(ST[k]||R[k])?cvFmt(k,v):"—",pick=false;
        return '<div class="cvr'+(k===sel?' sel':'')+(pick?' pick':'')+'"'+(pick?' data-net="'+k+'"':'')+'><b>'+k+'</b><span>'+show+'</span>'+(usd>0?'<button type="button" data-cv="'+show+'">'+esc(L("cv_copy"))+'</button>':'<i></i>')+'</div>'}).join("")+
      '<div class="cvb">'+esc(L("cv_min"))+': 100 USDT</div>'+approx;
   }
@@ -6888,7 +6910,7 @@ document.addEventListener("change",function(e){if(e.target&&e.target.id==="pyMet
 setInterval(function(){["pyValue","pyHolder"].forEach(function(i){var x=$(i);if(x&&x.value&&!x.dataset.t&&document.activeElement!==x)x.value=""})},350);
 
 /* ---- 2. topics explorer: multi-select, filter button with one shared highlight ---- */
-var V={cats:[],q:"",f:"views",open:false};
+var V={cats:[],q:"",fs:["views"],open:false};
 var FK=["views","disc","price","rating","roi","ai"];
 function accList(){var d=D();return d?(d.accounts||[]).filter(function(a){return !a.demo&&a.adminStatus!=="banned"&&a.analysis&&a.analysis.accepted}):[]}
 function discOf(a){var m=a.discount||0;(a.tiers||[]).forEach(function(t){if(t.pct>m)m=t.pct});return m}
@@ -6899,9 +6921,10 @@ function qNorm(){var q=V.q.trim().toLowerCase();var m=q.match(/tiktok\.com\/@([a
 function pool(){
   var q=qNorm(),l=accList().filter(function(a){if(!V.cats.length)return true;return (a.categories||[]).some(function(c){return V.cats.indexOf(c)>=0})});
   if(q)l=l.filter(function(a){return ((a.handle||"")+" "+(a.name||"")+" "+(a.internalName||"")+" "+(a.tiktokUrl||"")).toLowerCase().indexOf(q)>=0});
-  if(V.f==="disc")l=l.filter(function(a){return discOf(a)>0});
-  var key={views:function(a){return -(a.ai?a.ai.views30:0)},disc:function(a){return -discOf(a)},price:function(a){return -(a.price||0)},rating:function(a){return -(a.stars?a.stars.final:0)},roi:function(a){return -((a.ai&&a.ai.roi&&a.ai.roi.avgRatio)||0)},ai:function(a){return -((a.price||0)-((a.ai&&a.ai.price)||0))}}[V.f]||function(){return 0};
-  return l.sort(function(x,y){return key(x)-key(y)})}
+  if(V.fs.indexOf("disc")>=0)l=l.filter(function(a){return discOf(a)>0});
+  var key={views:function(a){return -(a.ai?a.ai.views30:0)},disc:function(a){return -discOf(a)},price:function(a){return -(a.price||0)},rating:function(a){return -(a.stars?a.stars.final:0)},roi:function(a){return -((a.ai&&a.ai.roi&&a.ai.roi.avgRatio)||0)},ai:function(a){return -((a.price||0)-((a.ai&&a.ai.price)||0))}};
+  var ks=V.fs.map(function(k){return key[k]}).filter(Boolean);
+  return l.sort(function(x,y){for(var i=0;i<ks.length;i++){var d=ks[i](x)-ks[i](y);if(d)return d}return 0})}
 function cardsH(l){
   if(!l.length)return'<div class="empty">'+esc(L("tpx_none"))+'</div>';
   return l.slice(0,200).map(function(a){var ai=a.ai||{},dc=discOf(a);
@@ -6914,22 +6937,19 @@ function statsH(l){
   if(V.cats.length===1&&by[V.cats[0]]){var cur=by[V.cats[0]],dm=cur.demand>=1.25?L("tpx_hot"):(cur.demand<0.75?L("tpx_cool"):"×"+cur.demand);
     return [[cur.active,"tpx_active"],[pr(cur.avgPrice),"tpx_avgp"],[pr(cur.avgAi),"tpx_avgai"],[fk(cur.avgViews),"tpx_avgv"],[fk(cur.views30),"tpx_v30"],[cur.orders,"tpx_ord"],[dm+(cur.demand>=1.25||cur.demand<0.75?" · ×"+cur.demand:""),"tpx_dem"],[cur.avgRatio===null?"—":Math.round(cur.avgRatio*100)+"%","tpx_res"]]}
   return [[l.length,"tp2_found"],[pr(avg(l,function(a){return a.price})),"tpx_avgp"],[pr(avg(l,function(a){return a.ai&&a.ai.price})),"tpx_avgai"],[fk(l.reduce(function(s,a){return s+((a.ai&&a.ai.views30)||0)},0)),"tpx_v30"]]}
-function pillsH(){return FK.map(function(k){return '<button type="button" class="fp" data-l="tp2P" data-k="'+k+'" aria-pressed="'+(V.f===k)+'">'+esc(L("f_"+k))+'</button>'}).join("")}
+function pillsH(){return FK.map(function(k){return '<button type="button" class="fp" data-l="tp2P" data-k="'+k+'" aria-pressed="'+(V.fs.indexOf(k)>=0)+'">'+esc(L("f_"+k))+'</button>'}).join("")}
 function pageHtml(){
   var d=D(),tp=d.topics||[],l=pool();
   var grid='<div class="tpxcats"><button type="button" class="tpxcat all" data-l="tp2All" aria-pressed="'+(!V.cats.length)+'"><b>🌐 '+esc(L("tp2_all"))+'</b><span>'+esc(L("tpx_acc"))+': '+tp.reduce(function(s,x){return s+x.active},0)+'</span></button>'+tp.map(function(x){return '<button type="button" class="tpxcat" data-l="tp2Cat" data-c="'+x.id+'" aria-pressed="'+(V.cats.indexOf(x.id)>=0)+'"><b>'+esc(L("c_"+x.id))+'</b><span>'+esc(L("tpx_acc"))+': '+x.active+'</span>'+(x.demand>=1.25&&x.orders?'<i class="hot">🔥</i>':'')+'</button>'}).join("")+'</div>';
   var st='<div class="tpxstats" id="tp2St">'+statsH(l).map(function(x){return '<div class="card tpxs"><b>'+x[0]+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("")+'</div>';
   var ttl=V.cats.length?V.cats.map(function(c){return L("c_"+c)}).join(" · "):L("tp2_all");
-  var bar='<div class="tpbar"><button type="button" class="fbtn" data-l="tp2F" aria-expanded="'+V.open+'"><span aria-hidden="true">⚙️</span> '+esc(L("f_btn"))+'</button><label class="tpxsrch"><span aria-hidden="true">🔎</span><input id="tp2Q" type="search" autocomplete="off" placeholder="'+esc(L("tpx_search"))+'" value="'+esc(V.q)+'"></label><select id="tp2Sort" aria-label="'+esc(L("tpx_sort"))+'">'+FK.map(function(k){return '<option value="'+k+'"'+(V.f===k?' selected':'')+'>'+esc(L("f_"+k))+'</option>'}).join("")+'</select></div>'+
-    '<div class="fpan" id="tp2Pan"'+(V.open?'':' hidden')+'><div class="fpills" id="tp2Pills"><i class="fhl" id="tp2Hl"></i>'+pillsH()+'</div></div>';
+  var bar='<div class="tpbar"><button type="button" class="fbtn" data-l="tp2F" aria-expanded="'+V.open+'"><span aria-hidden="true">⚙️</span> '+esc(L("f_btn"))+'</button><label class="tpxsrch"><span aria-hidden="true">🔎</span><input id="tp2Q" type="search" autocomplete="off" placeholder="'+esc(L("tpx_search"))+'" value="'+esc(V.q)+'"></label></div>'+
+    '<div class="fpan" id="tp2Pan"'+(V.open?'':' hidden')+'><div class="fpills" id="tp2Pills">'+pillsH()+'</div></div>';
   return '<div class="tpx"><div class="card form"><h3>'+esc(L("tpx_h"))+'</h3><p class="hint">'+esc(L("tp2_hint"))+'</p>'+grid+'</div>'+st+'<h4 class="tpxt" id="tp2T">'+esc(ttl)+'</h4>'+bar+'<div class="tpxlist" id="tpxList">'+cardsH(l)+'</div></div>'}
-function hl(first){var p=$("tp2Pills"),h=$("tp2Hl");if(!p||!h||$("tp2Pan").hidden)return;var on=p.querySelector('.fp[aria-pressed="true"]');if(!on)return;
-  if(first){h.classList.add("nt")}
-  h.style.width=on.offsetWidth+"px";h.style.height=on.offsetHeight+"px";h.style.transform="translate("+on.offsetLeft+"px,"+on.offsetTop+"px)";
-  if(first)requestAnimationFrame(function(){requestAnimationFrame(function(){h.classList.remove("nt")})})}
+function hl(){}
 function upd(){var l=pool(),x=$("tpxList");if(x)x.innerHTML=cardsH(l);var s=$("tp2St");if(s)s.innerHTML=statsH(l).map(function(x){return '<div class="card tpxs"><b>'+x[0]+'</b><span>'+esc(L(x[1]))+'</span></div>'}).join("");
   var t=$("tp2T");if(t)t.textContent=V.cats.length?V.cats.map(function(c){return L("c_"+c)}).join(" · "):L("tp2_all")}
-function setF(k){V.f=k;document.querySelectorAll("#tp2Pills .fp").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-k")===k))});var s=$("tp2Sort");if(s)s.value=k;hl(false);upd()}
+function setF(k){var i=V.fs.indexOf(k);if(i>=0){if(V.fs.length>1)V.fs.splice(i,1)}else V.fs.push(k);document.querySelectorAll("#tp2Pills .fp").forEach(function(b){b.setAttribute("aria-pressed",String(V.fs.indexOf(b.getAttribute("data-k"))>=0))});upd()}
 function full(){var mn=document.querySelector(".ownmain")||$("adApp");if(!mn)return;var f=document.activeElement&&document.activeElement.id==="tp2Q",p=f?document.activeElement.selectionStart:0,y=window.scrollY;mn.innerHTML=pageHtml();if(f){var i=$("tp2Q");i.focus();try{i.setSelectionRange(p,p)}catch(e){}}window.scrollTo(0,y);hl(true)}
 (function(){var o=renderOwner;renderOwner=function(){var r=o.apply(this,arguments);try{if(LV.adTab==="topics"&&D())full()}catch(e){}return r}})();
 document.addEventListener("click",function(e){var el=e.target.closest&&e.target.closest('[data-l="tp2Cat"],[data-l="tp2All"],[data-l="tp2F"],[data-l="tp2P"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();var a=el.getAttribute("data-l");
@@ -6940,7 +6960,6 @@ document.addEventListener("click",function(e){var el=e.target.closest&&e.target.
   if(a==="tp2P"){setF(el.getAttribute("data-k"));return}
 },true);
 document.addEventListener("input",function(e){if(e.target&&e.target.id==="tp2Q"){V.q=e.target.value;upd()}});
-document.addEventListener("change",function(e){if(e.target&&e.target.id==="tp2Sort")setF(e.target.value)});
 window.addEventListener("resize",function(){hl(false)});
 
 /* ---- 3. tickets: search by nickname or TikTok link ---- */
@@ -7133,7 +7152,7 @@ document.addEventListener("input",function(e){if(e.target&&e.target.id==="feeIn"
 window.addEventListener("click",function(e){var p=e.target.closest&&e.target.closest('[data-l="feePre"]');if(p){e.stopImmediatePropagation();e.preventDefault();$("feeIn").value=p.getAttribute("data-v");$("feeEx").textContent=feeEx(p.getAttribute("data-v"));return}
  var b=e.target.closest&&e.target.closest('[data-l="feeSave"]');if(!b)return;e.stopImmediatePropagation();e.preventDefault();var raw=$("feeIn").value.trim().replace(",","."),v=Number(raw),ok=$("feeOk");
  if(raw===""||!isFinite(v)||v<0||v>100){ok.textContent=L("fee_bad");ok.style.color="#ff8a8a";return}
- b.disabled=true;api("/api/admin/fee",{pct:v}).then(function(r){b.disabled=false;if(r.ok){feeSet(r.j.pct);$("feeIn").value=FEEP;$("feeEx").textContent=feeEx(FEEP);ok.style.color="";ok.textContent=L("fee_ok");setTimeout(function(){if(ok)ok.textContent=""},3000)}else{ok.textContent=L("fee_bad");ok.style.color="#ff8a8a"}})},true);
+ b.disabled=true;api("/api/admin/fee",{pct:v}).then(function(r){b.disabled=false;if(r.ok){feeSet(r.j.pct);$("feeIn").value=FEEP;$("feeEx").textContent=feeEx(FEEP);ok.style.color="";ok.textContent="";var old=b.getAttribute("data-old")||b.textContent;b.setAttribute("data-old",old);b.classList.add("savedg");b.textContent=L("saved_ok");setTimeout(function(){b.classList.remove("savedg");b.textContent=old;b.removeAttribute("data-old")},3000)}else{ok.textContent=L("fee_bad");ok.style.color="#ff8a8a"}})},true);
 
 /* ===== v123: payment methods — show/hide (eye), add/delete, crypto catalog with search + address check ===== */
 (function(){
@@ -7194,6 +7213,8 @@ Object.assign(LT.en,T.en);Object.assign(LT.ru,T.ru);
 function F(k,o){var s=L(k);for(var x in o)s=s.replace("{"+x+"}",o[x]);return s}
 var _cl=coinL;coinL=function(c){var e=pcCoin(c);if(e)return e.n+(e.s&&e.s!==e.n?" · "+e.s:"")+(e.t?" · "+e.t:"");return _cl(c)};
 function cLabel(id){return coinL(id)}
+window.PCSYM=function(id){var e=pcCoin(id);return e?String(e.s).toUpperCase():""};
+Object.assign(LT.en,{cv_crypto_h:"Type the amount in USDT. Below is how much to send in the coin you chose. Tap Copy to copy the number."});Object.assign(LT.ru,{cv_crypto_h:"Впишите сумму в USDT. Ниже — сколько отправить в выбранной монете. Нажмите «Копировать», чтобы скопировать число."});
 /* ---------- overlay ---------- */
 function ovClose(){var o=document.querySelector(".zcpk:not(.out)");if(o){o.classList.add("out");o.classList.remove("in");setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},180)}}
 function ovOpen(inner,cls){ovClose();var o=document.createElement("div");o.className="zcpk";o.innerHTML='<div class="zcpk-p'+(cls?" "+cls:"")+'" role="dialog" aria-modal="true">'+inner+'</div>';
@@ -7262,7 +7283,7 @@ window.addEventListener("click",function(e){var el=e.target.closest&&e.target.cl
   if(a==="pcDel"){ask(L("pc_ask_h"),F("pc_ask_del",{x:n}),L("pc_yes"),function(){if(k==="paypal"){delete LOC.paypal;delete LOC.paypalHolder}if(k==="card"){delete LOC.card;delete LOC.cardHolder}if(k==="crypto"){Object.keys(LOC).forEach(function(z){if(z.indexOf("c:")===0)delete LOC[z]});delete LOC.cryptoHolder}op({op:"del",key:k})});return}
   if(a==="pcSave"){snap();var ok=$("pcOk"),cr={},bad="";Object.keys(PCS.crypto).forEach(function(id){var v=(LOC["c:"+id]!=null?LOC["c:"+id]:PCS.crypto[id]).trim();var r=pcCheck(id,v);if(!r.ok&&!bad)bad=id;cr[id]=v});
     if(bad){ok.style.color="#ff8a8a";ok.textContent=F("pc_savebad",{c:coinL(bad)});var i=$("pcc_"+bad);if(i){i.classList.add("zpcerr");i.focus()}return}
-    el.disabled=true;api("/api/admin/pay",{paypal:LOC.paypal!=null?LOC.paypal:PCS.paypal,paypalHolder:LOC.paypalHolder!=null?LOC.paypalHolder:PCS.paypalHolder,card:LOC.card!=null?LOC.card:PCS.card,cardHolder:LOC.cardHolder!=null?LOC.cardHolder:PCS.cardHolder,cryptoHolder:LOC.cryptoHolder!=null?LOC.cryptoHolder:PCS.cryptoHolder,crypto:cr}).then(function(r){el.disabled=false;if(r.ok){LOC={};adopt(r.j);ok.style.color="";ok.textContent=L("pc_saved");setTimeout(function(){if(ok)ok.textContent=""},3000)}})}
+    el.disabled=true;api("/api/admin/pay",{paypal:LOC.paypal!=null?LOC.paypal:PCS.paypal,paypalHolder:LOC.paypalHolder!=null?LOC.paypalHolder:PCS.paypalHolder,card:LOC.card!=null?LOC.card:PCS.card,cardHolder:LOC.cardHolder!=null?LOC.cardHolder:PCS.cardHolder,cryptoHolder:LOC.cryptoHolder!=null?LOC.cryptoHolder:PCS.cryptoHolder,crypto:cr}).then(function(r){el.disabled=false;if(r.ok){LOC={};adopt(r.j);ok.style.color="";ok.textContent="";var old=el.getAttribute("data-old")||el.textContent;el.setAttribute("data-old",old);el.classList.add("savedg");el.textContent=L("saved_ok");setTimeout(function(){el.classList.remove("savedg");el.textContent=old;el.removeAttribute("data-old")},3000)}})}
 },true);
 /* ---------- producer side ---------- */
 function PX(){return (LV.prod&&LV.prod.pay)||null}

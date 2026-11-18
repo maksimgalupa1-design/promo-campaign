@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 64;
+const SERVER_VER = 65;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -443,7 +443,7 @@ function priceCeiling(acc) {
 const FEE_DEFAULT = 20;   // site commission %, owner can change it in the admin
 function feePct() { const v = db && db.settings && db.settings.feePct; return (typeof v === "number" && v >= 0 && v <= 100) ? v : FEE_DEFAULT; }
 function feeRate() { return feePct() / 100; }
-const RATES = { t: 0, live: false, v: { UAH: 41.5, USDT: 1, SOL: 0.0058, TRX: 3.4, ETH: 0.00032, LTC: 0.0105, TON: 0.42, BTC: 0.0000105 } };
+const RATES = { t: 0, live: false, v: { UAH: 41.5, USDT: 1, USDC: 1, DAI: 1, PYUSD: 1, USDE: 1, SOL: 0.0058, TRX: 3.4, ETH: 0.00032, LTC: 0.0105, TON: 0.42, BTC: 0.0000105 } };
 const METHODS = ["paypal", "usdt", "card", "crypto"];
 /*PC_SHARED_BEGIN*/
 var PC_CAT=[
@@ -957,7 +957,7 @@ const server = http.createServer(async (req, res) => {
         RATES.t = now;
         try {
           const r = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=USD"), j = await r.json(), x = (j && j.data && j.data.rates) || {}, o = {};
-          for (const k of ["UAH", "USDT", "SOL", "TRX", "ETH", "LTC", "TON", "BTC"]) { const v = Number(x[k]); if (v > 0) o[k] = v; }
+          for (const k of ["UAH"].concat(Array.from(new Set(PC_CAT.map(c => c[2].toUpperCase()))))) { const v = Number(x[k]); if (v > 0) o[k] = v; }
           if (o.UAH && o.SOL && o.ETH) { RATES.v = Object.assign({ USDT: 1 }, o); RATES.live = true; RATES.ok = now; }
         } catch (e) { /* keep the previous rates */ }
       }
