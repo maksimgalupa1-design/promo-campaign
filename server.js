@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 68;
+const SERVER_VER = 71;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -1172,7 +1172,15 @@ const server = http.createServer(async (req, res) => {
       if (!adminOk(req)) return send(res, 401, { error: "unauthorized" });
       if (P === "/api/admin/overview" && M === "GET") { refreshStale(20).catch(() => {}); return send(res, 200, overview()); }
       if (P === "/api/admin/applicants" && M === "GET") return send(res, 200, allAccounts().map(accAdminView));
-      const b = M === "POST" ? await readBody(req, P === "/api/admin/payout" ? 8e5 : 1e5) : {};
+      if (P === "/api/admin/mp3" && M === "POST") {        // the owner uploads the mp3 of his own track (max 8 MB)
+        const t = db.tracks[url.searchParams.get("id") || ""];
+        if (!need(res, t && t.producerId === "owner" && t.status !== "deleted", 404, "no such track")) return;
+        const buf = await readRaw(req, 8 * 1024 * 1024);
+        const okMp3 = buf.length > 1000 && buf.length <= 8 * 1024 * 1024 && ((buf[0] === 0x49 && buf[1] === 0x44 && buf[2] === 0x33) || (buf[0] === 0xFF && (buf[1] & 0xE0) === 0xE0));
+        if (!need(res, okMp3, 400, "this is not an mp3 file (max 8 MB)")) return;
+        await putBlob("m" + t.id, buf.toString("base64")); t.mp3 = { size: buf.length, at: Date.now() }; saveDb(); return send(res, 200, { ok: true });
+      }
+      const b = M === "POST" ? await readBody(req, P === "/api/admin/payout" ? 8e5 : (P === "/api/admin/track/create" ? 3e5 : 1e5)) : {};
       if (P === "/api/admin/plan" && M === "POST") {   // suggests how many videos to buy from which accounts for one track
         const t = db.tracks[b.trackId]; if (!need(res, t && ["active", "archived"].includes(t.status), 404, "track not active")) return;
         let rem = Math.round((Number(b.budget) > 0 ? Number(b.budget) : trackLeft(t)) * 100) / 100; const budget = rem;
@@ -1328,13 +1336,18 @@ const server = http.createServer(async (req, res) => {
       }
       if (P === "/api/admin/track/create" && M === "POST") {    // the owner adds a track himself (already approved, budget as he sets it)
         const title = String(b.title || "").trim().slice(0, 120); if (!need(res, title, 400, "write the track title")) return;
-        const link = String(b.link || "").trim().slice(0, 400); if (!need(res, !link || /^https?:\/\/\S+\.\S+/i.test(link), 400, "the link must start with https://")) return;
+        const L = {}, src = { spotify: b.spotify || b.link, soundcloud: b.soundcloud, tiktok: b.tiktok };
+        for (const k of ["spotify", "soundcloud", "tiktok"]) { const x = String(src[k] || "").trim().slice(0, 400); if (x) { if (!need(res, /^https?:\/\/\S+\.\S+/i.test(x), 400, "the link must start with https://")) return; const kk = k === "tiktok" ? "tiktok" : classifyLink(x); if (!L[kk]) L[kk] = x; } }
+        const plats = (Array.isArray(b.platforms) ? b.platforms : []).filter(x => PLATFORMS.includes(x)), pl = plats.length ? plats : ["tiktok"];
+        if (!need(res, !pl.includes("tiktok") || L.tiktok, 400, "add the TikTok sound link")) return;
+        if (!need(res, !L.tiktok || !/tiktok\.com\/@[^/\s]+\/(video|photo)\//i.test(L.tiktok), 400, "this is a link to a video, not to the sound. Open the sound in TikTok and copy the link tiktok.com/music/…")) return;
+        if (!need(res, deadlineOk(b.deadline), 400, "The deadline must be at least 1 week (for example: 2 weeks, 1 month)")) return;
+        if (!need(res, !b.descRule || String(b.descText || "").trim(), 400, "write what editors must put in the description")) return;
+        const cats0 = cleanCats(b.categories);
         const budget = Math.max(0, Math.min(100000, Math.round(Number(b.budget) * 100) / 100 || 0));
         const role = ["artist", "label", "producer"].includes(b.role) ? b.role : "artist";
-        const tk = String(b.tiktok || "").trim().slice(0, 400); if (!need(res, !tk || /^https?:\/\/\S+\.\S+/i.test(tk), 400, "the TikTok link must start with https://")) return;
-        if (!need(res, !tk || !/tiktok\.com\/@[^/\s]+\/(video|photo)\//i.test(tk), 400, "this is a link to a video, not to the sound. Open the sound in TikTok and copy the link tiktok.com/music/…")) return;
-        const links = {}; if (link) links[classifyLink(link)] = link; if (tk) links.tiktok = tk;
-        const t = { id: uid8(), producerId: "owner", role, message: String(b.message || "").trim().slice(0, 600), title, artist: String(b.artist || "").trim().slice(0, 120), link: link || tk, links, budget, spent: 0, platforms: ["tiktok"], categories: cleanCats(b.categories), otherCategory: "", status: "active", created: Date.now() };
+        const cover = (typeof b.cover === "string" && b.cover.length <= 140000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(b.cover)) ? b.cover : "";
+        const t = { id: uid8(), producerId: "owner", role, message: String(b.message || "").trim().slice(0, 600), title, artist: String(b.artist || "").trim().slice(0, 120), link: Object.values(L)[0] || "", links: L, cover, budget, spent: 0, platforms: pl, categories: cats0, otherCategory: cats0.includes("other") ? String(b.otherCategory || "").slice(0, 60) : "", descRule: !!b.descRule, descText: b.descRule ? String(b.descText || "").trim().slice(0, 120) : "", deadline: String(b.deadline || "").trim().slice(0, 60), status: "active", created: Date.now() };
         db.tracks[t.id] = t; saveDb(); return send(res, 200, { ok: true, id: t.id });
       }
       if (P === "/api/admin/track/archive" && M === "POST") {    // finished tracks go to the archive; the owner can bring them back

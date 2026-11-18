@@ -2089,7 +2089,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v128 · 18.11 23:10</span>
+  <span>© Promo Campaign · v131 · 19.11 00:10</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -3110,10 +3110,12 @@ function renderOwner(){
   }else if(LV.adTab==="promos"){
     body=moneySum(D)+promosHtml(D);
   }else if(LV.adTab==="waiting"){
-    var wl=D.accounts.filter(function(a){return isWait(a)}).sort(function(x,y){return ((y.stars&&y.stars.final)||0)-((x.stars&&x.stars.final)||0)}).map(function(a){return accCardHtml(a)}).join("");
-    var wn=D.accounts.filter(function(a){return isWait(a)}).length;
+    var wAll=D.accounts.filter(function(a){return isWait(a)}),wsel=LV.wcF||[];
+    var wArr=wAll.filter(function(a){return !wsel.length||(a.categories||[]).some(function(c){return wsel.indexOf(c)>=0})}).sort(function(x,y){return ((y.stars&&y.stars.final)||0)-((x.stars&&x.stars.final)||0)});
+    var wl=wArr.map(function(a){return accCardHtml(a)}).join("");
+    var wn=wArr.length;
     var wr="";
-    body=(wl?'<div class="waitbig">'+esc(L("a_wait_cnt").replace("{n}",wn))+'</div><div class="list">'+wl+'</div>':'')+(wr?'<h3 class="wrh">'+esc(L("wr_title"))+'</h3>'+wr:'')+((wl||wr)?'':'<div class="empty">'+esc(L("a_wait_none"))+'</div>');
+    body=(window.__catBar?window.__catBar(wAll):"")+(wl?'<div class="waitbig">'+esc(L("a_wait_cnt").replace("{n}",wn))+'</div><div class="list">'+wl+'</div>':'')+(wr?'<h3 class="wrh">'+esc(L("wr_title"))+'</h3>'+wr:'')+((wl||wr)?'':'<div class="empty">'+esc(L("a_wait_none"))+'</div>');
   }else if(LV.adTab==="accounts"){
     var fcs=LV.fCats||[];
     var list=D.accounts.filter(function(a){if(a.adminStatus==='new'||!a.adminStatus||a.adminStatus==='banned')return false;var s=a.stars.final;var okS=LV.rgMin==null||(s!=null&&s>=LV.rgMin-0.001&&s<=LV.rgMax+0.001);return okS&&(LV.fDisc!=="yes"||(a.discount||0)>0)&&(!fcs.length||(a.categories||[]).some(function(c){return fcs.indexOf(c)>=0}))}).sort(function(x,y){return (y.stars.final||0)-(x.stars.final||0)||(y.discount||0)-(x.discount||0)||(x.cpm||9)-(y.cpm||9)});
@@ -4928,7 +4930,7 @@ function oqApply(){
 function oqInject(){
   var tab=oqTab();if(["payments","producers","accounts","promos","waiting","editorpay","tracks","requests"].indexOf(tab)<0)return;
   var app=$("adApp");if(!app||$("oSrch"))return;var first=app.querySelector(".list");if(!first)return;
-  var ph=tab==="producers"||tab==="payments"?"srch_pr":(tab==="promos"?"srch_pm":"srch_acc");
+  var ph=tab==="producers"||tab==="payments"?"srch_pr":(tab==="promos"?"srch_pm":(tab==="tracks"?"srch_tr":"srch_acc"));
   first.insertAdjacentHTML("beforebegin",'<input id="oSrch" class="osrch" type="search" autocomplete="off" placeholder="🔍 '+esc(L(ph))+'" value="'+esc(OQ[tab]||"")+'">');
   oqApply();
 }
@@ -4964,7 +4966,7 @@ Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Ос
   var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
 
 /* ===== v29: phone owner cabinet with bottom menu ===== */
-var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices","topics"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks"]],["st","⚙️","g_st",["pay","contacts"]]];
+var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices","topics"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks","accarch"]],["st","⚙️","g_st",["pay","contacts"]]];
 function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
 function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
   if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
@@ -5113,6 +5115,8 @@ Object.assign(LT.ru,{ch_down:"Чат не загрузился. Обновите
 
 Object.assign(LT.en,{ch_rules_t:"Chat rules",ch_agree:"I read it and I agree",ch_rule:"Be kind and respect the other editors. No insults, no spam, no links and no payment details. The manager can read the chat and remove messages.",ch_nick_t:"Choose a nickname",ch_nick_h:"Any name works, for example Vasya. It does not have to be your TikTok name.",ch_nick_ph:"Nickname (up to 10 characters)"});
 Object.assign(LT.ru,{ch_rules_t:"Правила чата",ch_agree:"Прочитал и согласен",ch_rule:"Будьте добры и уважайте других редакторов. Без оскорблений, спама, ссылок и платёжных данных. Менеджер может читать чат и удалять сообщения.",ch_nick_t:"Придумайте ник",ch_nick_h:"Подойдёт любое имя, например Вася. Это не обязательно ник из TikTok.",ch_nick_ph:"Ник (до 10 символов)"});
+
+Object.assign(LT.en,{srch_tr:"Search a track by name"});Object.assign(LT.ru,{srch_tr:"Найти трек по названию"});
 
 /* ---------- support assistant in the other languages ---------- */
 var FAQX={
@@ -7415,22 +7419,64 @@ window.addEventListener("click",function(e){var b=e.target.closest&&e.target.clo
 (function(){
 Object.assign(LT.en,{rl_h:"Who releases the track",rl_artist:"Artist",rl_label:"Label",rl_producer:"Producer",rl_own:"mine",tr_tk:"TikTok sound link (tiktok.com/music/…)",tr_msg:"Comment for editors (only you can change it later)"});
 Object.assign(LT.ru,{rl_h:"Кто выпускает трек",rl_artist:"Артист",rl_label:"Лейбл",rl_producer:"Продюсер",rl_own:"мой",tr_tk:"Ссылка на звук в TikTok (tiktok.com/music/…)",tr_msg:"Комментарий для монтажёров (потом менять можете только вы)"});
-var oldAdd=addTrackHtml;
+Object.assign(LT.en,{rl_name_artist:"Artist name",rl_name_label:"Label name",rl_name_producer:"Producer name",tr_sp:"Spotify link",tr_sc:"SoundCloud link",tr_tk_req:"TikTok sound link (required)",tr_ph:"Track photo (optional)",tr_plat:"Where should the videos be posted?",pl_tiktok:"TikTok",pl_instagram:"Instagram Reels (soon)",pl_youtube:"YouTube Shorts (soon)",tr_sure:"Are you sure you want to add this track?",tr_sure_y:"Yes, add",tr_need_tk:"Add the TikTok sound link.",tr_dl_h:"at least 1 week, e.g. 2 weeks"});
+Object.assign(LT.ru,{rl_name_artist:"Имя артиста",rl_name_label:"Название лейбла",rl_name_producer:"Имя продюсера",tr_sp:"Ссылка на Spotify",tr_sc:"Ссылка на SoundCloud",tr_tk_req:"Ссылка на звук в TikTok (обязательно)",tr_ph:"Фото трека (необязательно)",tr_plat:"Где должны быть выложены видео?",pl_tiktok:"TikTok",pl_instagram:"Instagram Reels (скоро)",pl_youtube:"YouTube Shorts (скоро)",tr_sure:"Вы уверены, что хотите добавить этот трек?",tr_sure_y:"Да, добавить",tr_need_tk:"Добавьте ссылку на звук в TikTok.",tr_dl_h:"не меньше 1 недели, например 2 недели"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if((x.indexOf("rl_")===0||x.indexOf("tr_")===0||x.indexOf("pl_")===0)&&!XLL[k][x])XLL[k][x]=LT.en[x]});
 addTrackHtml=function(){
-  var h=oldAdd();if(!LV.addTr)return h;
+  if(!LV.addTr)return '<div class="row" style="margin-bottom:12px"><button class="btn primary" data-l="trAddOpen">'+esc(L("tr_add"))+'</button></div>'+(LV.trMsg?'<div class="note okn">'+esc(LV.trMsg)+'</div>':'');
   var rs=["artist","label","producer"].map(function(k){return '<option value="'+k+'">'+esc(L("rl_"+k))+'</option>'}).join("");
-  var ins='<label class="f" for="atRole"><span>'+esc(L("rl_h"))+'</span><select id="atRole">'+rs+'</select></label>';
-  var ins2='<label class="f" for="atTk"><span>'+esc(L("tr_tk"))+'</span><input id="atTk" type="text" inputmode="url" placeholder="https://"></label><label class="f" for="atMsg"><span>'+esc(L("tr_msg"))+'</span><textarea id="atMsg" rows="2" maxlength="600"></textarea></label>';
-  var a=h.indexOf('<label class="f" for="atTitle">'),b=h.indexOf('<label class="f" for="atBudget">');
-  if(a<0||b<0)return h;
-  return h.slice(0,a)+ins+h.slice(a,b)+ins2+h.slice(b)};
+  var fl=function(id,l,x){return '<label class="f" for="'+id+'"><span id="'+id+'L">'+esc(l)+'</span>'+x+'</label>'};
+  return '<div class="card form" style="margin-bottom:14px"><p class="hint">'+esc(L("tr_add_h"))+'</p>'+
+    fl("atRole",L("rl_h"),'<select id="atRole">'+rs+'</select>')+
+    fl("atArtist",L("rl_name_artist"),'<input id="atArtist" type="text" maxlength="120">')+
+    fl("atTitle",L("tr_title"),'<input id="atTitle" type="text" maxlength="120">')+
+    fl("atSp",L("tr_sp"),'<input id="atSp" type="text" inputmode="url" placeholder="https://">')+
+    fl("atSc",L("tr_sc"),'<input id="atSc" type="text" inputmode="url" placeholder="https://">')+
+    fl("atTk",L("tr_tk_req"),'<input id="atTk" type="text" inputmode="url" placeholder="https://">')+
+    fl("atMsg",L("tr_msg"),'<textarea id="atMsg" rows="2" maxlength="600"></textarea>')+
+    fl("atBudget",L("tr_budget"),'<input id="atBudget" type="number" min="0" step="1" inputmode="decimal" value="0">')+
+    fl("atDl",L("t_deadline")+" ("+L("tr_dl_h")+")",'<input id="atDl" type="text" maxlength="60">')+
+    '<label class="chk" for="atDesc"><input type="checkbox" id="atDesc"><span>'+esc(L("p_desc_rule"))+'</span></label>'+
+    '<label class="f" id="atDescRow" for="atDescText" hidden><span>'+esc(L("desc_txt_l"))+'</span><input id="atDescText" type="text" maxlength="120" placeholder="'+esc(L("desc_txt_ph"))+'"></label>'+
+    fl("atMp3",L("p_mp3_file"),'<input id="atMp3" type="file" accept=".mp3,audio/mpeg">')+
+    fl("atCover",L("tr_ph"),'<input id="atCover" type="file" accept="image/*"><img id="atCoverPrev" class="covprev" alt="" hidden>')+
+    '<b>'+esc(L("tr_plat"))+'</b><div class="cats" id="atPlat">'+["tiktok","instagram","youtube"].map(function(k){return '<label'+(k==="tiktok"?'':' class="soon"')+'><input type="checkbox" value="'+k+'"'+(k==="tiktok"?' checked':' disabled')+'><span>'+esc(L("pl_"+k))+'</span></label>'}).join("")+'</div>'+
+    '<b>'+esc(L("p_cats"))+'</b>'+catChecks("atCats",[])+'<label class="f" id="atOtherRow" for="atOther" hidden><span>'+esc(L("p_other_h"))+'</span><input id="atOther" type="text" maxlength="60"></label><div class="note err" id="atErr" hidden></div><div class="row"><button class="btn primary" data-l="trAddGo">'+esc(L("tr_create"))+'</button><button class="btn" data-l="trAddOpen">'+esc(L("p_cancel"))+'</button></div></div>'};
+document.addEventListener("change",function(e){var t=e.target;if(!t)return;
+  if(t.id==="atDesc"){var r1=$("atDescRow");if(r1)r1.hidden=!t.checked;return}
+  if(t.closest&&t.closest("#atCats")){var r2=$("atOtherRow"),o=document.querySelector('#atCats input[value="other"]');if(r2&&o)r2.hidden=!o.checked}
+  if(t.id==="atRole"){var l=$("atArtistL");if(l)l.textContent=L("rl_name_"+t.value);return}
+  if(t.id==="atCover"){var f=t.files&&t.files[0],pv=$("atCoverPrev");if(!f){LV.atCover=null;if(pv)pv.hidden=true;return}
+    if(!/^image\//.test(f.type)||f.size>15e6){toast(L("cv_big"));t.value="";LV.atCover=null;if(pv)pv.hidden=true;return}
+    var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);LV.atCover=c.toDataURL("image/jpeg",.8);if(pv){pv.src=LV.atCover;pv.hidden=false}};im.src=fr.result};fr.readAsDataURL(f)}});
 window.addEventListener("click",function(e){
-  var el=e.target.closest&&e.target.closest('[data-l="trAddGo"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();
-  var er=$("atErr"),title=val("atTitle");if(!title){er.textContent=L("p_bad");er.hidden=false;return}
+  var el=e.target.closest&&e.target.closest('[data-l="trAddGo"],[data-l="trAddYes"]');if(!el)return;e.stopImmediatePropagation();e.preventDefault();
+  var er=$("atErr");
+  if(el.getAttribute("data-l")==="trAddGo"){var title=val("atTitle");if(!title){er.textContent=L("p_bad");er.hidden=false;return}
+    if(!val("atTk")){er.textContent=L("tr_need_tk");er.hidden=false;return}er.hidden=true;
+    LV.atPay={title:title,artist:val("atArtist"),role:val("atRole"),spotify:val("atSp"),soundcloud:val("atSc"),tiktok:val("atTk"),message:val("atMsg"),budget:Number(val("atBudget"))||0,categories:checked("atCats"),otherCategory:val("atOther"),platforms:checked("atPlat"),cover:LV.atCover||"",deadline:val("atDl"),descRule:!!($("atDesc")&&$("atDesc").checked),descText:val("atDescText")};
+    var mf=$("atMp3")&&$("atMp3").files&&$("atMp3").files[0];if(mf&&mf.size>8*1024*1024){er.textContent=L("p_mp3_big");er.hidden=false;return}LV.atMp3=mf||null;
+    openModal('<h3>'+esc(L("tr_sure"))+'</h3><p><b>'+esc(title)+'</b></p><div class="row"><button class="btn primary" data-l="trAddYes">'+esc(L("tr_sure_y"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
   el.disabled=true;
-  api("/api/admin/track/create",{title:title,artist:val("atArtist"),role:val("atRole"),link:val("atLink"),tiktok:val("atTk"),message:val("atMsg"),budget:Number(val("atBudget"))||0,categories:checked("atCats")}).then(function(r){el.disabled=false;if(!r.ok){er.textContent=(r.j&&r.j.error)||L("p_err");er.hidden=false;return}LV.addTr=false;LV.trMsg=L("tr_added");ownerReload()})},true);
+  api("/api/admin/track/create",LV.atPay).then(function(r){el.disabled=false;closeModal();if(!r.ok){var e2=$("atErr");if(e2){e2.textContent=(r.j&&r.j.error)||L("p_err");e2.hidden=false}return}var done=function(){LV.addTr=false;LV.atCover=null;LV.atMp3=null;LV.trMsg=L("tr_added");ownerReload()};
+    if(LV.atMp3&&r.j&&r.j.id)fetch("/api/admin/mp3?id="+encodeURIComponent(r.j.id),{method:"POST",credentials:"same-origin",headers:{"Content-Type":"audio/mpeg"},body:LV.atMp3}).then(done,done);else done()})},true);
 function mark(){var q=document.querySelectorAll(".card.ord .t > div > span");for(var i=0;i<q.length;i++){var x=q[i].textContent;if(x.charAt(0)==="§"){var k=x.replace(/[^a-z]/g,"");q[i].textContent="👑 "+L("rl_"+k)+" ("+L("rl_own")+")"}}}
 new MutationObserver(mark).observe(document.body,{childList:true,subtree:true});mark();
+})();
+
+/* ---- v129: topic filter (several at once) in "Account requests" ---- */
+(function(){
+Object.assign(LT.en,{cf_btn:"Topic",cf_all:"All topics",cf_none:"No topic"});Object.assign(LT.ru,{cf_btn:"Тематика",cf_all:"Все тематики",cf_none:"Без тематики"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("cf_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
+LV.wcF=LV.wcF||[];
+window.__catBar=function(all){var sel=LV.wcF,cnt={};all.forEach(function(a){(a.categories||[]).forEach(function(c){cnt[c]=(cnt[c]||0)+1})});
+  var h='<div class="trfbar"><button type="button" class="chip" data-l="cfT" aria-pressed="'+(!!LV.wcOpen||sel.length>0)+'">🏷 '+esc(L("cf_btn"))+(sel.length?' · '+sel.length:'')+' ▾</button>';
+  if(LV.wcOpen)h+='<div class="trfrow"><button type="button" class="chip" data-l="cfC" data-c="" aria-pressed="'+(!sel.length)+'">'+esc(L("cf_all"))+' · '+all.length+'</button>'+CATS.map(function(c){return '<button type="button" class="chip trfc" data-l="cfC" data-c="'+c+'" aria-pressed="'+(sel.indexOf(c)>=0)+'">'+esc(L("c_"+c))+' · '+(cnt[c]||0)+'</button>'}).join("")+'</div>';
+  return h+'</div>'};
+window.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest('[data-l="cfT"],[data-l="cfC"]');if(!b)return;e.stopImmediatePropagation();e.preventDefault();
+  if(b.getAttribute("data-l")==="cfT")LV.wcOpen=!LV.wcOpen;
+  else{var c=b.getAttribute("data-c");if(!c)LV.wcF=[];else{var i=LV.wcF.indexOf(c);if(i>=0)LV.wcF.splice(i,1);else LV.wcF.push(c)}}
+  var y=window.scrollY;renderOwner();window.scrollTo(0,y)},true);
 })();
 })();
 
