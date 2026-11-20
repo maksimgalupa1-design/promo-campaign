@@ -1375,7 +1375,7 @@ body.hasdock p,body.hasdock li,body.hasdock .hint{font-size:14px;line-height:1.4
 .vlact{margin-top:10px;gap:8px}
 @media(max-width:899px){
  .view,.view.on,.st,.tcard,.odc,.acard,.pmc,.pmh,details.rqd,.cmwho,.cmmem,.acitem,.card,.tile,.tbc,.dmm,.rqov,#adApp>*,#v-admin .card,.mbg,.mbox{animation:none!important}
- .st,.tcard,.odc,.view,.view.on{opacity:1!important}
+ .st,.tcard,.odc,.view,.view.on,.acitem,.astat{opacity:1!important}
  body.hasdock #dock{padding:5px 4px calc(5px + env(safe-area-inset-bottom,0px))}
  body.hasdock #dock button{padding:4px 0 3px}
  body.hasdock #dock button i{font-size:18px}
@@ -1916,6 +1916,17 @@ select{-webkit-touch-callout:none}
 
 .ownside .atb[data-k=trhist]::before{content:"🗃"}
 
+/* v137 topic demand */
+.dmbox{margin:10px 0 4px}.dmline{padding:6px 10px;border-radius:10px;margin:4px 0;background:rgba(124,92,255,.10)}
+.dmline.dm-hot{background:rgba(255,140,0,.14)}.dmline.dm-low{background:rgba(120,160,255,.12)}
+.trfc[disabled]{opacity:1;cursor:default}
+
+/* v139 change password */
+.ownside .atb[data-k=ownerpw]::before{content:"🔑"}
+.pwbig{font-size:clamp(30px,6vw,44px);line-height:1.1;margin:4px 0 14px;font-weight:800}
+.pwwarn{border-left:4px solid #e5484d;background:rgba(229,72,77,.12);padding:10px 12px;border-radius:12px;margin:12px 0}
+.pwok{border-left:4px solid #2fbf71;background:rgba(47,191,113,.14);padding:10px 12px;border-radius:12px;margin:12px 0}
+
 .lang select{font:inherit;font-weight:600;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .view.on{animation:viewIn .45s cubic-bezier(.2,.7,.2,1) both}
 @keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -2093,7 +2104,7 @@ select{-webkit-touch-callout:none}
 </main>
 
 <footer><div class="wrap">
-  <span>© Promo Campaign · v136 · 19.11 01:30</span>
+  <span>© Promo Campaign · v139 · 20.11 17:40</span>
   <span class="row"><button data-go="privacy" data-i18n="t_priv_c"></button><button data-go="terms" data-i18n="t_terms_c"></button></span>
 </div></footer>
 
@@ -3069,7 +3080,7 @@ function renderOwner(){
   if(!ADM.ok||!D)return false;checkNew(D);
   var WAITN=D.accounts.filter(function(a){return isWait(a)}).length;var S2=D.stats,badge=function(k){return (k==="waiting"&&WAITN?' <i class="cnt">'+WAITN+'</i>':'')+(k==="vlinks"&&D.requests.filter(function(q){return q.status==="submitted"}).length?' <i class="cnt">'+D.requests.filter(function(q){return q.status==="submitted"}).length+'</i>':'')+(k==="requests"&&S2.pendingRequests?' <i class="cnt">'+S2.pendingRequests+'</i>':'')+(k==="payments"&&S2.pendingTopups?' <i class="cnt">'+S2.pendingTopups+'</i>':'')+(k==="editorpay"&&S2.pendingPayouts?' <i class="cnt">'+S2.pendingPayouts+'</i>':'')+(k==="newtracks"&&window.__NTn&&window.__NTn()?' <i class="cnt">'+window.__NTn()+'</i>':'')+(k==="tickets"&&window.__TK&&window.__TK.unread?' <i class="cnt">'+(window.__TK.unread>99?"99+":window.__TK.unread)+'</i>':'')},
   tb=function(k){return '<button type="button" class="atb" data-l="atab" data-k="'+k+'" aria-pressed="'+(LV.adTab===k)+'">'+esc(L("a_"+k))+badge(k)+'</button>'},
-  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","vlinks","accounts","editorpay","accarch","chatmod","prices","topics"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks","trhist"]],["g-st","⚙️","g_st",["pay","contacts"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
+  tabs='<div class="agroups"><div class="agrp g-ov"><div class="agh">🏠 '+esc(L("g_ov"))+'</div><div class="agb">'+tb("overview")+'</div></div>'+[["g-tk","🎫","g_tk",["tickets"]],["g-ed","👥","g_ed",["promos","waiting","requests","vlinks","accounts","editorpay","accarch","chatmod","prices","topics"]],["g-pr","🎵","g_pr",["producers","newtracks","payments","tracks","trhist"]],["g-st","⚙️","g_st",["pay","contacts","ownerpw"]]].map(function(g){return '<div class="agrp '+g[0]+'"><div class="agh">'+g[1]+' '+esc(L(g[2]))+'</div><div class="agb">'+g[3].map(tb).join("")+'</div></div>'}).join("")+'</div><label class="autosc"><input type="checkbox" id="autoSc"'+(autoScOn()?' checked':'')+'> '+esc(L("as_lbl"))+'</label>';
   var body="";
   if(LV.adTab==="overview"){
     var bt=LV.ovTrack&&S2.byTrack?(S2.byTrack[LV.ovTrack]||{views:0,videos:0}):null;
@@ -3108,11 +3119,13 @@ function renderOwner(){
     body=payBar("eF",[["all",dl0.length],["pending",dl0.filter(function(q){return !q.paid}).length],["done",dl0.filter(function(q){return q.paid}).length]])+(window.__trBar?window.__trBar(D,dlAll,"trFp","p"):"")+'<div class="list pogrid">'+(dl.length?dl.map(function(q){
       return '<button type="button" class="card pocard'+(q.paid?' done':'')+'" data-l="poOpen" data-id="'+esc(q.id)+'"><b>'+esc(q.handle)+'</b>'+(q.internalName?'<small>'+esc(q.internalName)+'</small>':'')+'<small class="potk">🎵 '+esc(q.track||"")+'</small>'+(q.status!=="completed"&&!q.paid?'<small class="powork">⏳ '+esc(L("po_work"))+'</small>':"")+'<span class="poamt">'+money(q.cost)+'</span><span class="pill '+(q.paid?'ok':'warn')+'">'+esc(L(q.paid?"a_paid":"a_due"))+'</span></button>';
     }).join(""):'<div class="empty">'+esc(L("a_no_pay"))+'</div>')+'</div>';
+  }else if(LV.adTab==="ownerpw"){
+    body=window.__pwHtml?window.__pwHtml():"";
   }else if(LV.adTab==="trhist"){
     body=window.__thHtml?window.__thHtml(D):"";
   }else if(LV.adTab==="prices"){
     var RG=LV.ranges||{};
-    body='<div class="card form"><p class="hint">'+esc(L("a_prices_h"))+'</p>'+CATS.map(function(c){var r=RG[c]||{};return '<div class="row" style="align-items:center"><span style="flex:1 1 200px">'+esc(L("c_"+c))+'</span><label>$ <input id="prmin_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.min||"")+'" placeholder="min"></label><label>– <input id="prmax_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.max||"")+'" placeholder="max"></label></div>'}).join("")+'<div class="row"><button class="btn primary" data-l="prSave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="prOk"></span></div></div>';
+    body=(window.__dmHtml?window.__dmHtml():"")+'<div class="card form"><p class="hint">'+esc(L("a_prices_h"))+'</p>'+CATS.map(function(c){var r=RG[c]||{};return '<div class="row" style="align-items:center"><span style="flex:1 1 200px">'+esc(L("c_"+c))+'</span><label>$ <input id="prmin_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.min||"")+'" placeholder="min"></label><label>– <input id="prmax_'+c+'" type="number" min="0" step="0.5" style="width:90px" value="'+(r.max||"")+'" placeholder="max"></label></div>'}).join("")+'<div class="row"><button class="btn primary" data-l="prSave">'+esc(L("a_pay_save"))+'</button><span class="hint" id="prOk"></span></div></div>';
   }else if(LV.adTab==="promos"){
     body=moneySum(D)+promosHtml(D);
   }else if(LV.adTab==="waiting"){
@@ -4972,7 +4985,7 @@ Object.assign(LT.ru,{rb_owner:"Админ",a_overview:"Сводка",pm_dl:"Ос
   var cp=$("changePrice2");if(cp)cp.hidden=true}catch(e){}}})();
 
 /* ===== v29: phone owner cabinet with bottom menu ===== */
-var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices","topics"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks","trhist"]],["st","⚙️","g_st",["pay","contacts"]]];
+var AGRP=[["ov","🏠","a_overview",["overview"]],["tk","🎫","g_tk",["tickets"]],["ed","👥","g_ed",["promos","waiting","requests","accounts","editorpay","accarch","chatmod","prices","topics"]],["pr","🎵","g_pr",["producers","newtracks","payments","tracks","trhist"]],["st","⚙️","g_st",["pay","contacts","ownerpw"]]];
 function adGroupOf(tab){for(var i=0;i<AGRP.length;i++)if(AGRP[i][3].indexOf(tab)>=0)return AGRP[i][0];return "ov"}
 function adCount(g){var D=ADM&&ADM.data;if(!D)return 0;var S2=D.stats||{};
   if(g==="ed"){var w=(D.accounts||[]).filter(function(a){return isWait(a)}).length;return w+(S2.pendingRequests||0)+(S2.pendingPayouts||0)}
@@ -5127,6 +5140,8 @@ Object.assign(LT.en,{srch_tr:"Search a track by name"});Object.assign(LT.ru,{src
 Object.assign(LT.en,{a_trhist:"Track archive"});Object.assign(LT.ru,{a_trhist:"Архив треков"});
 
 Object.assign(LT.en,{srch_vl:"Search by track or nickname"});Object.assign(LT.ru,{srch_vl:"Найти по треку или нику"});
+
+Object.assign(LT.en,{a_ownerpw:"Change password"});Object.assign(LT.ru,{a_ownerpw:"Изменить пароль"});
 
 /* ---------- support assistant in the other languages ---------- */
 var FAQX={
@@ -6916,7 +6931,7 @@ function pm(n){return "$"+(Math.round(n*100)/100)}
 function ptHtml(){var d=ADM.data||{},tp=d.topics||[],by={};tp.forEach(function(x){by[x.id]=x});var R=LV.ranges||{};
   return '<div class="ptx"><div class="card form"><h3>'+esc(L("pt_h"))+'</h3><p class="hint">'+esc(L("pt_sub"))+'</p></div><div class="ptxg">'+CATS.map(function(c){var s=by[c]||{},r=R[c];
     return '<button type="button" class="ptxc'+(r?' set':'')+'" data-l="ptOpen" data-c="'+c+'"><b>'+esc(L("c_"+c))+'</b><div class="ptxs"><div><span>'+esc(L("pt_acc"))+'</span><strong>'+(s.accounts||0)+'</strong></div><div><span>'+esc(L("pt_fol"))+'</span><strong>'+(s.avgFollowers?fk(s.avgFollowers):"—")+'</strong></div><div><span>'+esc(L("pt_views"))+'</span><strong>'+(s.avgViews?fk(s.avgViews):"—")+'</strong></div></div><div class="ptxp '+(r?'on':'')+'">'+(r?pm(r.min)+' – '+pm(r.max)+(r.views?' <small>· '+esc(L("pt_base"))+' '+fk(r.views)+'</small>':''):esc(L("pt_bounds"))+': '+esc(L("pt_unset")))+'</div></button>'}).join("")+'</div></div>'}
-var oR=renderOwner;renderOwner=function(){var r=oR.apply(this,arguments);try{if(LV.adTab==="prices"&&ADM.data){var mn=document.querySelector(".ownmain")||$("adApp");if(mn&&!mn.querySelector(".ptx")){var y=window.scrollY;mn.innerHTML=ptHtml();window.scrollTo(0,y)}}}catch(e){}return r};
+var oR=renderOwner;renderOwner=function(){var r=oR.apply(this,arguments);try{if(LV.adTab==="prices"&&ADM.data){var mn=document.querySelector(".ownmain")||$("adApp");if(mn&&!mn.querySelector(".ptx")){var y=window.scrollY;mn.innerHTML=(window.__dmHtml?window.__dmHtml():"")+ptHtml();window.scrollTo(0,y)}}}catch(e){}return r};
 function openPt(c){var d=ADM.data||{},s=((d.topics||[]).filter(function(x){return x.id===c})[0])||{},r=(LV.ranges||{})[c]||{};
   openModal('<div class="ptm"><h3>'+esc(L("c_"+c))+'</h3><p class="hint">'+esc(L("pt_m_t"))+'</p>'+
    '<div class="ptmst"><div><b>'+(s.accounts||0)+'</b><span>'+esc(L("pt_acc"))+'</span></div><div><b>'+(s.avgFollowers?fk(s.avgFollowers):"—")+'</b><span>'+esc(L("pt_fol"))+'</span></div><div><b>'+(s.avgViews?fk(s.avgViews):"—")+'</b><span>'+esc(L("pt_views"))+'</span></div></div>'+
@@ -7511,6 +7526,78 @@ window.addEventListener("click",function(e){var b=e.target.closest&&e.target.clo
   if(b.getAttribute("data-l")==="thT")LV.thOpen=!LV.thOpen;
   else{var c=b.getAttribute("data-c");if(!c)LV.thF=[];else{var i=LV.thF.indexOf(c);if(i>=0)LV.thF.splice(i,1);else LV.thF.push(c)}}
   var y=window.scrollY;renderOwner();window.scrollTo(0,y)},true);
+})();
+
+/* ---- v137: topic demand (auto from orders, or chosen by the owner); shown to editors in their analysis ---- */
+(function(){
+Object.assign(LT.en,{dm_h:"Which topics are in demand",dm_sub:"The AI analysis tells editors whether their topic is in demand.",dm_auto:"Automatic (by orders)",dm_man:"I choose myself",dm_hot:"In demand",dm_mid:"Normal",dm_low:"Not in demand",dm_ord:"{n} videos ordered in 90 days",dm_pick:"Tap the topics that are in demand right now (several at once). The rest will be shown as not in demand.",dm_ed:"Topic demand",dm_ed_hot:"in demand right now",dm_ed_mid:"normal demand",dm_ed_low:"not in demand right now"});
+Object.assign(LT.ru,{dm_h:"Какие тематики востребованы",dm_sub:"ИИ-анализ скажет редакторам, востребована ли их тематика.",dm_auto:"Автоматически (по заказам)",dm_man:"Выберу сам",dm_hot:"Востребована",dm_mid:"Обычная",dm_low:"Не востребована",dm_ord:"Заказано видео за 90 дней: {n}",dm_pick:"Нажми на тематики, которые сейчас востребованы (можно несколько). Остальные будут показаны как «не востребована».",dm_ed:"Спрос на тематику",dm_ed_hot:"сейчас востребована",dm_ed_mid:"обычный спрос",dm_ed_low:"сейчас не востребована"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("dm_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
+var DM=null,DMsel=null,DMmode="auto",DMok=false,ICON={hot:"🔥",mid:"➖",low:"❄️"};
+function load(){return fetch("/api/admin/topic-demand",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){DM=j;DMmode=j.mode;DMsel=j.hot.slice();if(LV.adTab==="prices")renderOwner()}).catch(function(){})}
+window.__dmHtml=function(){
+  if(!DM){load();return ""}
+  var h='<div class="card form"><p class="hint"><b>'+esc(L("dm_h"))+'</b><br>'+esc(L("dm_sub"))+'</p><div class="chips" role="group"><button type="button" class="chip" data-l="dmM" data-m="auto" aria-pressed="'+(DMmode==="auto")+'">'+esc(L("dm_auto"))+'</button><button type="button" class="chip" data-l="dmM" data-m="manual" aria-pressed="'+(DMmode==="manual")+'">'+esc(L("dm_man"))+'</button></div>';
+  if(DMmode==="manual")h+='<p class="hint">'+esc(L("dm_pick"))+'</p>';
+  h+='<div class="trfrow">'+CATS.map(function(c){var a=DM.auto[c]||{},lv=DMmode==="manual"?(DMsel.indexOf(c)>=0?"hot":"low"):a.level;
+    return '<button type="button" class="chip trfc" '+(DMmode==="manual"?'data-l="dmC" data-c="'+c+'" aria-pressed="'+(DMsel.indexOf(c)>=0)+'"':'disabled aria-pressed="'+(lv==="hot")+'"')+'>'+ICON[lv]+' '+esc(L("c_"+c))+' · '+esc(L("dm_"+lv))+(DMmode==="auto"?' ('+esc(L("dm_ord").replace("{n}",a.orders||0))+')':'')+'</button>'}).join("")+'</div>';
+  h+='<div class="row"><button class="btn primary'+(DMok?' savedg':'')+'" data-l="dmSave">'+esc(L(DMok?"saved_ok":"a_pay_save"))+'</button></div></div>';return h};
+window.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest('[data-l="dmM"],[data-l="dmC"],[data-l="dmSave"]');if(!b||!DM)return;e.stopImmediatePropagation();e.preventDefault();
+  var k=b.getAttribute("data-l"),y=window.scrollY;
+  if(k==="dmM"){DMmode=b.getAttribute("data-m");DMok=false}
+  else if(k==="dmC"){var c=b.getAttribute("data-c"),i=DMsel.indexOf(c);if(i>=0)DMsel.splice(i,1);else DMsel.push(c);DMok=false}
+  else{api("/api/admin/topic-demand",{mode:DMmode,hot:DMsel}).then(function(r){if(r.ok){DM=r.j;DMok=true;renderOwner();window.scrollTo(0,y);setTimeout(function(){DMok=false;if(LV.adTab==="prices")renderOwner()},3200)}});return}
+  renderOwner();window.scrollTo(0,y)},true);
+/* editors: a line under the topic picker and in the report */
+var LVL=null;
+function lv(){return LVL?Promise.resolve(LVL):fetch("/api/topic-demand").then(function(r){return r.json()}).then(function(j){LVL=j.levels||{};return LVL}).catch(function(){return {}})}
+function line(){var sel=typeof checked==="function"&&$("anCats")?checked("anCats"):[];if(!sel.length||!LVL)return "";
+  return sel.map(function(c){var v=LVL[c]||"mid";return '<div class="dmline dm-'+v+'">'+ICON[v]+' <b>'+esc(L("c_"+c))+'</b> — '+esc(L("dm_ed_"+v))+'</div>'}).join("")}
+function paint(){lv().then(function(){var box=$("dmHint"),cats=$("anCats");
+  if(cats&&!box){box=document.createElement("div");box.id="dmHint";box.className="dmbox";cats.parentNode.insertBefore(box,cats.nextSibling)}
+  if(box){var h=line();box.innerHTML=h?'<div class="hint"><b>'+esc(L("dm_ed"))+'</b></div>'+h:""}})}
+document.addEventListener("change",function(e){if(e.target&&e.target.closest&&e.target.closest("#anCats"))paint()});
+new MutationObserver(function(){if($("anCats")&&!$("dmHint"))paint()}).observe(document.body,{childList:true,subtree:true});
+})();
+
+/* ---- v139: "Change password" tab: e-mail code, new password, the previous owner's payment details and contacts are erased ---- */
+(function(){
+Object.assign(LT.en,{pw_big:"Change password",pw_sub:"For handing the site over to a new owner. A confirmation code is sent to the current owner's e-mail.",pw_mail_h:"Owner e-mail (the code is sent here)",pw_mail_save:"Save e-mail",pw_code_to:"The code will be sent to {e}",pw_send:"Send me the code",pw_sent:"The code was sent. It works for 15 minutes.",pw_code:"Confirmation code (6 digits)",pw_new:"New password (8 characters or more)",pw_new2:"Repeat the new password",pw_mail2:"New owner e-mail for future codes (optional)",pw_go:"Change password",pw_warn:"After the change these are erased: PayPal, card and crypto details of the previous owner, support contacts (Telegram, Discord, Instagram, TikTok) and the owner's phone notifications. Accounts, editors, producers, tracks, orders and money stay. The new owner adds their own details.",pw_sure:"Are you sure you want to change the password?",pw_sure_y:"Yes, change",pw_done:"The password is changed. Sign in with the new password.",pw_nomail:"E-mail is not connected yet: add RESEND_API_KEY and MAIL_FROM in Render (or connect the Telegram bot), then ask for the code again.",pw_mismatch:"The passwords do not match.",pw_short:"The password must be at least 8 characters.",pw_newcode:"Ask for a new code"});
+Object.assign(LT.ru,{pw_big:"Изменить пароль",pw_sub:"Нужно, чтобы передать сайт новому владельцу. Код подтверждения приходит на почту текущего владельца.",pw_mail_h:"Почта владельца (сюда придёт код)",pw_mail_save:"Сохранить почту",pw_code_to:"Код придёт на {e}",pw_send:"Прислать код",pw_sent:"Код отправлен. Он действует 15 минут.",pw_code:"Код подтверждения (6 цифр)",pw_new:"Новый пароль (8 символов и больше)",pw_new2:"Повторите новый пароль",pw_mail2:"Почта нового владельца для будущих кодов (необязательно)",pw_go:"Изменить пароль",pw_warn:"После смены стираются: PayPal, карта и крипта прежнего владельца, контакты поддержки (Telegram, Discord, Instagram, TikTok) и телефонные уведомления владельца. Аккаунты, редакторы, продюсеры, треки, заказы и деньги остаются. Новый владелец добавляет свои данные.",pw_sure:"Вы уверены, что хотите изменить пароль?",pw_sure_y:"Да, изменить",pw_done:"Пароль изменён. Войдите с новым паролем.",pw_nomail:"Почта пока не подключена: добавьте RESEND_API_KEY и MAIL_FROM в Render (или подключите Telegram-бота) и запросите код снова.",pw_mismatch:"Пароли не совпадают.",pw_short:"Пароль должен быть не короче 8 символов.",pw_newcode:"Запросить новый код"});
+["uk","de","es","pt","fr","tr"].forEach(function(k){XLL[k]=XLL[k]||{};for(var x in LT.en)if(x.indexOf("pw_")===0&&!XLL[k][x])XLL[k][x]=LT.en[x]});
+var PW=null,step=1,msg="",bad=false,PV={};
+function keep(){["pwEm","pwCode","pwN1","pwN2","pwEm2"].forEach(function(i){var e=$(i);if(e)PV[i]=e.value})}
+function pv(i){return ' value="'+esc(PV[i]||"")+'"'}
+function load(){return fetch("/api/admin/owner",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){PW=j;if(LV.adTab==="ownerpw")renderOwner()}).catch(function(){})}
+function note(){return msg?'<div class="'+(bad?'pwwarn':'pwok')+'" id="pwMsg">'+esc(msg)+'</div>':""}
+window.__pwHtml=function(){
+  var h='<h1 class="pwbig">'+esc(L("pw_big"))+'</h1><p class="hint">'+esc(L("pw_sub"))+'</p>';
+  if(!PW){load();return h}
+  if(!PW.mailReady&&!PW.tgReady)h+='<div class="pwwarn">'+esc(L("pw_nomail"))+'</div>';
+  h+='<div class="card form">';
+  if(!PW.hasEmail){
+    h+='<label class="f" for="pwEm"><span>'+esc(L("pw_mail_h"))+'</span><input id="pwEm" type="email" autocomplete="email" inputmode="email"'+pv("pwEm")+'></label>'+note()+'<div class="row"><button class="btn primary" data-l="pwEmSave">'+esc(L("pw_mail_save"))+'</button></div>'}
+  else if(step===1){
+    h+='<p class="hint">'+esc(L("pw_code_to").replace("{e}",PW.email))+'</p>'+note()+'<div class="row"><button class="btn primary" data-l="pwSend">'+esc(L("pw_send"))+'</button></div>'}
+  else{
+    h+='<div class="pwwarn">'+esc(L("pw_warn"))+'</div>'+
+    '<label class="f" for="pwCode"><span>'+esc(L("pw_code"))+'</span><input id="pwCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code"'+pv("pwCode")+'></label>'+
+    '<label class="f" for="pwN1"><span>'+esc(L("pw_new"))+'</span><input id="pwN1" type="password" autocomplete="new-password"'+pv("pwN1")+'></label>'+
+    '<label class="f" for="pwN2"><span>'+esc(L("pw_new2"))+'</span><input id="pwN2" type="password" autocomplete="new-password"'+pv("pwN2")+'></label>'+
+    '<label class="f" for="pwEm2"><span>'+esc(L("pw_mail2"))+'</span><input id="pwEm2" type="email" autocomplete="off" inputmode="email"'+pv("pwEm2")+'></label>'+note()+
+    '<div class="row"><button class="btn primary" data-l="pwGo">'+esc(L("pw_go"))+'</button><button class="btn" data-l="pwSend">'+esc(L("pw_newcode"))+'</button></div>'}
+  return h+'</div>'};
+function show(m,b){keep();msg=m;bad=!!b;var y=window.scrollY;renderOwner();window.scrollTo(0,y)}
+window.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest('[data-l="pwEmSave"],[data-l="pwSend"],[data-l="pwGo"],[data-l="pwYes"]');if(!b)return;e.stopImmediatePropagation();e.preventDefault();
+  var k=b.getAttribute("data-l");
+  if(k==="pwEmSave"){api("/api/admin/owner/email",{email:val("pwEm")}).then(function(r){if(!r.ok)return show((r.j&&r.j.error)||L("p_err"),1);msg="";load()});return}
+  if(k==="pwSend"){b.disabled=true;api("/api/admin/owner/code",{}).then(function(r){b.disabled=false;if(!r.ok)return show(r.j&&r.j.error&&/not set up/.test(r.j.error)?L("pw_nomail"):((r.j&&r.j.error)||L("p_err")),1);step=2;show(L("pw_sent"),0)});return}
+  if(k==="pwGo"){var p1=val("pwN1"),p2=val("pwN2");
+    if(p1.length<8)return show(L("pw_short"),1);if(p1!==p2)return show(L("pw_mismatch"),1);
+    LV.pwPay={code:val("pwCode"),password:p1,email:val("pwEm2")};
+    openModal('<h3>'+esc(L("pw_sure"))+'</h3><p class="hint">'+esc(L("pw_warn"))+'</p><div class="row"><button class="btn primary" data-l="pwYes">'+esc(L("pw_sure_y"))+'</button><button class="btn" data-l="mclose2">'+esc(L("p_cancel"))+'</button></div>');return}
+  b.disabled=true;api("/api/admin/owner/apply",LV.pwPay).then(function(r){closeModal();if(!r.ok)return show((r.j&&r.j.error)||L("p_err"),1);LV.pwPay=null;
+    var ov=document.createElement("div");ov.style.cssText="position:fixed;inset:0;z-index:99999;background:#0b0b12;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font:600 22px system-ui;color:#fff";ov.textContent=L("pw_done");document.body.appendChild(ov);setTimeout(function(){location.href="/#admin";location.reload()},2600)})},true);
 })();
 })();
 

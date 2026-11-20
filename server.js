@@ -157,7 +157,7 @@ function badText(text) {
   }
   return false;
 }
-const SERVER_VER = 76;
+const SERVER_VER = 79;
 function chBanned(C, uid) { const v = C.bans && C.bans[uid]; if (v === true) return true; if (typeof v === "number") { if (v > Date.now()) return true; delete C.bans[uid]; } return false; }
 const DB_FILE = path.join(__dirname, "data.json");
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
@@ -246,8 +246,16 @@ function tooMany(ip, max) { const now = Date.now(), a = (loginTries.get(ip) || [
 function failTry(ip) { if (!loginTries.has(ip)) loginTries.set(ip, []); loginTries.get(ip).push(Date.now()); }
 function newSid() { return crypto.randomBytes(24).toString("hex"); }
 function setCookie(name, val, maxAge, strict) { return name + "=" + val + "; HttpOnly; Secure; SameSite=" + (strict ? "Strict" : "Lax") + "; Path=/; Max-Age=" + maxAge; }
+/* owner password: the Render ADMIN_TOKEN until the owner changes it on the site (then a salted hash in settings.owner is used and the old password stops working) */
+function ownerPwOk(pw) {
+  const o = db.settings.owner;
+  if (o && o.passHash) { try { return crypto.timingSafeEqual(Buffer.from(hashPw(pw || "", o.salt), "hex"), Buffer.from(o.passHash, "hex")); } catch (e) { return false; } }
+  return crypto.timingSafeEqual(sha(pw || ""), sha(ADMIN_TOKEN));
+}
+const ownerCodes = new Map();   // one pending e-mail code at a time: { h, exp, tries, sentAt }
+function maskEmail(e) { e = String(e || ""); const i = e.indexOf("@"); return i < 1 ? "" : e[0] + "***" + e.slice(i - 1 > 0 ? i - 1 : i); }
 function adminOk(req) {
-  if (req.headers.authorization === "Bearer " + ADMIN_TOKEN) return true;
+  const bm = /^Bearer (.+)$/.exec(req.headers.authorization || ""); if (bm && ownerPwOk(bm[1])) return true;
   const c = cookie(req, "adm"), exp = c && db.admin[c];
   if (exp && exp > Date.now()) return true;
   if (c && db.admin[c]) { delete db.admin[c]; saveDb(); }
@@ -418,6 +426,13 @@ function aiPrice(acc, ctx) {
   return { price, rpm: Math.round(rpm * eng * topic * hist * 1000) / 1000, parts: { views: v, tier: Math.round(tier * 100) / 100, eng, topic, hist }, conf: A.month.videos >= 6 ? "high" : (A.month.videos >= 3 ? "mid" : "low"),
     followers: fol, ratio: fol && v ? Math.round(v / fol * 100) / 100 : null, views30: mv, videos30: A.month.videos, er: er === null ? null : Math.round(er * 1000) / 1000,
     roi: { orders: perf.length, evaluated: ev.length, ok: paid, under: ev.length - paid, avgRatio: avgRatio === null ? null : Math.round(avgRatio * 100) / 100, spent: Math.round(cost * 100) / 100, views: act }, perf: perf.slice(0, 5) };
+}
+/* topic demand shown to editors: "auto" from the last 90 days of orders, or "manual" = the topics the owner marked as in demand */
+function demandInfo() {
+  const cfg = db.settings.demand || {}, mode = cfg.mode === "manual" ? "manual" : "auto", hot = (Array.isArray(cfg.hot) ? cfg.hot : []).filter(c => CATEGORIES.includes(c)), ctx = aiCtx(), auto = {}, levels = {};
+  CATEGORIES.forEach(c => { const d = ctx.demand[c]; auto[c] = { orders: d.orders, idx: d.idx, level: ctx.total < 5 ? "mid" : (d.idx >= 1.25 ? "hot" : (d.idx <= 0.6 ? "low" : "mid")) };
+    levels[c] = mode === "manual" ? (hot.includes(c) ? "hot" : "low") : auto[c].level; });
+  return { mode, hot, auto, levels };
 }
 function topicStats() {
   const ctx = aiCtx(), accs = allAccounts().filter(a => !a.demo && a.adminStatus !== "banned"), out = [];
@@ -870,6 +885,7 @@ const server = http.createServer(async (req, res) => {
       me.notif = { types, email: em }; saveDb(); return send(res, 200, { ok: true, prefs: me.notif });
     }
     if (P === "/api/fee" && M === "GET") return send(res, 200, { pct: feePct() });
+    if (P === "/api/topic-demand" && M === "GET") { const d = demandInfo(); return send(res, 200, { levels: d.levels }); }
     if (P === "/api/price-ranges" && M === "GET") return send(res, 200, { ranges: db.settings.ranges || { visual: { min: 3, max: 5 } } });
     if (P === "/api/contacts" && M === "GET") { const c = db.settings.contacts || {}; return send(res, 200, { telegram: c.telegram || "", discord: c.discord || "", instagram: c.instagram || "", tiktok: c.tiktok || "" }); }
     if (P === "/api/platform-stats" && M === "GET") {      // public numbers for the editor home widgets
@@ -1160,7 +1176,7 @@ const server = http.createServer(async (req, res) => {
       const ip = "adm:" + clientIp(req);
       if (tooMany(ip, 30)) return send(res, 429, { error: "too many attempts, wait 10 minutes" });
       const b = await readBody(req);
-      if (!crypto.timingSafeEqual(sha(b.password || ""), sha(ADMIN_TOKEN))) { failTry(ip); return send(res, 401, { error: "wrong password" }); }
+      if (!ownerPwOk(String(b.password || ""))) { failTry(ip); return send(res, 401, { error: "wrong password" }); }
       const sid = newSid(); db.admin[sid] = Date.now() + 12 * 3600000; saveDb();
       return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("adm", sid, 43200, true) });
     }
@@ -1215,6 +1231,43 @@ const server = http.createServer(async (req, res) => {
         if (!need(res, vw === 0 || (vw >= 500 && vw <= 50000000), 400, "Average views: from 500 to 50,000,000 (or leave empty)")) return;
         R[c] = { min: Math.round(mn * 100) / 100, max: Math.round(mx * 100) / 100 }; if (vw > 0) R[c].views = vw;
         db.settings.ranges = R; saveDb(); return send(res, 200, { ranges: R });
+      }
+      if (P === "/api/admin/owner" && M === "GET") { const o = db.settings.owner || {}; return send(res, 200, { hasEmail: !!o.email, email: maskEmail(o.email), mailReady: !!(process.env.RESEND_API_KEY && process.env.MAIL_FROM), tgReady: !!(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID), changedAt: o.changedAt || 0 }); }
+      if (P === "/api/admin/owner/email" && M === "POST") {      // first time only: the address that will receive the confirmation code
+        const o = db.settings.owner = db.settings.owner || {}; const em = String(b.email || "").trim().toLowerCase().slice(0, 120);
+        if (!need(res, !o.email, 409, "the e-mail is already set")) return;
+        if (!need(res, /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em), 400, "write a valid e-mail")) return;
+        o.email = em; saveDb(); return send(res, 200, { ok: true, email: maskEmail(em) });
+      }
+      if (P === "/api/admin/owner/code" && M === "POST") {
+        const o = db.settings.owner || {}; if (!need(res, o.email, 400, "first save your e-mail")) return;
+        const old = ownerCodes.get("c"); if (!need(res, !old || Date.now() - old.sentAt > 60000, 429, "wait a minute before asking for a new code")) return;
+        const code = String(crypto.randomInt(0, 1000000)).padStart(6, "0");
+        const mailed = await sendMail(o.email, "Promo Campaign: confirmation code", "Your code to change the site password: " + code + "\nIt works for 15 minutes. If this was not you, do nothing: the password stays the same.");
+        const tg = !!(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID); if (tg) notify("Code to change the site password: " + code);
+        if (!need(res, mailed || tg, 503, "the e-mail service is not set up yet (RESEND_API_KEY and MAIL_FROM in Render)")) return;
+        ownerCodes.set("c", { h: sha(code).toString("hex"), exp: Date.now() + 15 * 60000, tries: 0, sentAt: Date.now() });
+        return send(res, 200, { ok: true, email: maskEmail(o.email), viaMail: mailed, viaTelegram: tg });
+      }
+      if (P === "/api/admin/owner/apply" && M === "POST") {
+        const c = ownerCodes.get("c"), pw = String(b.password || ""), em = String(b.email || "").trim().toLowerCase().slice(0, 120);
+        if (!need(res, c && c.exp > Date.now(), 400, "ask for a new code")) return;
+        if (!need(res, c.tries < 5, 429, "too many wrong codes, ask for a new code")) { ownerCodes.delete("c"); return; }
+        c.tries++; const okc = crypto.timingSafeEqual(sha(String(b.code || "").trim()), Buffer.from(c.h, "hex"));
+        if (!need(res, okc, 400, "wrong code")) return;
+        if (!need(res, pw.length >= 8 && pw.length <= 100, 400, "the password must be 8 to 100 characters")) return;
+        if (!need(res, !em || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em), 400, "write a valid e-mail or leave it empty")) return;
+        ownerCodes.delete("c");
+        const salt = crypto.randomBytes(16).toString("hex");
+        db.settings.owner = { salt, passHash: hashPw(pw, salt), email: em, changedAt: Date.now() };
+        db.settings.pay = {}; db.settings.contacts = {}; { const ps = db.settings.push || {}; for (const k of Object.keys(ps)) if (ps[k] && ps[k].role === "owner") delete ps[k]; }   // the previous owner's payment details, contacts and phone alerts are gone; accounts, tracks, orders and money stay
+        db.admin = {}; saveDb();
+        return send(res, 200, { ok: true }, { "Set-Cookie": setCookie("adm", "", 0, true) });
+      }
+      if (P === "/api/admin/topic-demand" && M === "GET") return send(res, 200, demandInfo());
+      if (P === "/api/admin/topic-demand" && M === "POST") {
+        db.settings.demand = { mode: b.mode === "manual" ? "manual" : "auto", hot: (Array.isArray(b.hot) ? b.hot : []).filter(c => CATEGORIES.includes(c)) };
+        saveDb(); return send(res, 200, demandInfo());
       }
       if (P === "/api/admin/price-ranges" && M === "POST") {
         const out = {}, src = b.ranges && typeof b.ranges === "object" ? b.ranges : {};
@@ -1523,6 +1576,7 @@ const server = http.createServer(async (req, res) => {
   } catch (e) { console.error(e); send(res, 500, { error: "server error" }); }
 });
 loadDb().then(() => {
+  if (process.env.RESET_OWNER_PASSWORD === "1" && db.settings.owner && db.settings.owner.passHash) { delete db.settings.owner.passHash; delete db.settings.owner.salt; saveDb(); console.log("owner password reset: the ADMIN_TOKEN password works again"); }   // emergency: set RESET_OWNER_PASSWORD=1 in Render, then remove it
   try {   // the old "K-drama" topic is merged into "K-Pop & K-Drama"
     const fix = (o, d) => { if (!o || typeof o !== "object" || d > 8) return; for (const k of Object.keys(o)) { const x = o[k]; if (k === "categories" && Array.isArray(x) && x.includes("kdrama")) o[k] = [...new Set(x.map(c => c === "kdrama" ? "kpop" : c))]; else if (x && typeof x === "object") fix(x, d + 1); } };
     fix(db, 0); if (db.settings && db.settings.ranges && db.settings.ranges.kdrama) { const r = db.settings.ranges; if (!r.kpop) r.kpop = r.kdrama; delete r.kdrama; } saveDb();
